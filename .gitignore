@@ -1,0 +1,96 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Node modules
+node_modules/
+
+# Output directories
+dist/
+build/
+.vite/
+.vite-cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment settings
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite cache
+.vite/
+.vite/deps/
+.vite_cache/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Package lock files (optional, if you use a specific lockfile, you might want to keep it)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Typescript build files
+*.tsbuildinfo
+
+# Coverage directory used by tools like jest or cypress
+coverage/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# MacOS file attributes
+*.DS_Store
+
+# Windows file attributes
+Desktop.ini
+
+# npm global modules
+.npm/
+
+# npm cache
+.npm/_cacache/
+
+# Temp files
+tmp/
+temp/
+
+__pycache__/
