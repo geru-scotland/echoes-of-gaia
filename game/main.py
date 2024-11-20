@@ -159,7 +159,12 @@ class IntroScene(Scene):
     def render(self, screen):
         screen.fill(DARK_BLACK)
         self.title_surface.set_alpha(self.alpha)
-        self.press_key_surface.set_alpha(self.blink_alpha)
+
+        if self.fade_out:
+            self.press_key_surface.set_alpha(self.alpha)
+        else:
+            self.press_key_surface.set_alpha(self.blink_alpha)
+
         screen.blit(self.title_surface, self.text_rect)
         screen.blit(self.press_key_surface, self.press_key_rect)
 
