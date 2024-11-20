@@ -115,6 +115,7 @@ class IntValueEnum(Enum):
     def __int__(self):
         return self.value
 
+
 class IntroSceneState(Enum):
     STATE_LOADING = 0
     STATE_FADE_IN = 1
