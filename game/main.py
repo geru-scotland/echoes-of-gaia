@@ -4,13 +4,11 @@ import pygame
 import random
 import sys
 
-
 SCREEN_WIDTH = None
 SCREEN_HEIGHT = None
 TITLE = "Echoes of Gaia"
 FADE_SPEED = 0.8
 AUDIO_FILE = "assets/audio/intro.mp3"
-
 
 DARK_BLACK = (0, 0, 0)
 MATT_BLACK = (30, 30, 30)
@@ -23,7 +21,7 @@ def generate_matte_color():
         (102, 153, 102),  # Matte green
         (153, 102, 102),  # Matte red
         (153, 153, 102),  # Matte yellow
-        (102, 102, 102)   # Dark matte gray
+        (102, 102, 102)  # Dark matte gray
     ])
 
 
@@ -57,9 +55,9 @@ class Game:
 
     def run(self):
         while self.running:
-            self.clock.tick(60)
+            diff = self.clock.tick(60)
             self.handle_events()
-            self.update()
+            self.update(diff)
             self.render()
         pygame.quit()
         sys.exit()
@@ -73,8 +71,8 @@ class Game:
                     self.running = False
             self.scene_manager.handle_events(event)
 
-    def update(self):
-        self.scene_manager.update()
+    def update(self, diff):
+        self.scene_manager.update(diff)
 
     def render(self):
         self.scene_manager.render(self.screen)
@@ -91,8 +89,9 @@ class SceneManager:
     def handle_events(self, event):
         self.current_scene.handle_events(event)
 
-    def update(self):
-        self.current_scene.update()
+    def update(self, diff):
+        print(diff)
+        self.current_scene.update(diff)
 
     def render(self, screen):
         self.current_scene.render(screen)
@@ -105,17 +104,27 @@ class Scene:
     def handle_events(self, event):
         pass
 
-    def update(self):
+    def update(self, diff):
         pass
 
     def render(self, screen):
         pass
 
 
+class IntValueEnum(Enum):
+    def __int__(self):
+        return self.value
+
 class IntroSceneState(Enum):
-    FADE_IN = 1
-    IDLE = 2
-    FADE_OUT = 3
+    STATE_LOADING = 0
+    STATE_FADE_IN = 1
+    STATE_IDLE = 2
+    STATE_FADE_OUT = 3
+
+
+class IntroSceneTimers(IntValueEnum):
+    START_FADE_IN = 2000
+
 
 # Para transiciones, igual crear una clase especial y que introscene herede de ella
 class IntroScene(Scene):
@@ -134,32 +143,35 @@ class IntroScene(Scene):
         self.sound = pygame.mixer.Sound("assets/audio/effects/ff_menu.ogg")
         self.sound_played = False
 
-        self.start_time = pygame.time.get_ticks()
-        self.delay = 2000
-
-        self.state = IntroSceneState.FADE_IN
+        self.state = IntroSceneState.STATE_LOADING
+        self.start_timer = int(IntroSceneTimers.START_FADE_IN)
 
     def handle_events(self, event):
-        if event.type == pygame.KEYDOWN and self.state == IntroSceneState.IDLE:
-            self.state = IntroSceneState.FADE_OUT
+        if event.type == pygame.KEYDOWN and self.state == IntroSceneState.STATE_IDLE:
+            self.state = IntroSceneState.STATE_FADE_OUT
 
             if not self.sound_played:
                 self.sound.play()
                 self.sound_played = True
 
-    def update(self):
-        current_time = pygame.time.get_ticks()
+    def update(self, diff):
 
-        if self.state == IntroSceneState.FADE_IN:
-            # timer con delay del inicio del fade in
-            if current_time - self.start_time >= self.delay:
-                self.alpha += FADE_SPEED
-                if self.alpha >= 255:
-                    self.alpha = 255
-                    self.state = IntroSceneState.IDLE
-                    self.blink_increasing = True
+        # timer con delay del inicio del fade in
+        if (self.start_timer <= diff
+                and self.state == IntroSceneState.STATE_LOADING):
+            self.start_timer = int(IntroSceneTimers.START_FADE_IN)
+            self.state = IntroSceneState.STATE_FADE_IN
+        else:
+            self.start_timer -= diff
 
-        elif self.state == IntroSceneState.IDLE:
+        if self.state == IntroSceneState.STATE_FADE_IN:
+            self.alpha += FADE_SPEED
+            if self.alpha >= 255:
+                self.alpha = 255
+                self.state = IntroSceneState.STATE_IDLE
+                self.blink_increasing = True
+
+        elif self.state == IntroSceneState.STATE_IDLE:
             if self.blink_increasing:
                 self.blink_alpha += 1
                 if self.blink_alpha >= 255:
@@ -171,7 +183,7 @@ class IntroScene(Scene):
                     self.blink_alpha = 50
                     self.blink_increasing = True
 
-        elif self.state == IntroSceneState.FADE_OUT:
+        elif self.state == IntroSceneState.STATE_FADE_OUT:
             self.alpha -= FADE_SPEED
             if self.alpha <= 0:
                 self.alpha = 0
@@ -185,10 +197,10 @@ class IntroScene(Scene):
         screen.blit(self.title_surface, self.text_rect)
 
         # press key
-        if self.state == IntroSceneState.IDLE:
+        if self.state == IntroSceneState.STATE_IDLE:
             self.press_key_surface.set_alpha(self.blink_alpha)
             screen.blit(self.press_key_surface, self.press_key_rect)
-        elif self.state == IntroSceneState.FADE_OUT:
+        elif self.state == IntroSceneState.STATE_FADE_OUT:
             self.press_key_surface.set_alpha(self.alpha)
             screen.blit(self.press_key_surface, self.press_key_rect)
 
@@ -214,7 +226,7 @@ class EntityScene(Scene):
     def handle_events(self, event):
         pass
 
-    def update(self):
+    def update(self, diff):
         for entity in self.entities:
             entity["pos"][0] += entity["speed"][0]
             entity["pos"][1] += entity["speed"][1]
@@ -224,12 +236,12 @@ class EntityScene(Scene):
             if entity["pos"][1] <= 0 or entity["pos"][1] >= SCREEN_HEIGHT - entity["size"]:
                 entity["speed"][1] *= -1
 
-
     def render(self, screen):
         screen.fill(MATT_BLACK)
         for entity in self.entities:
             if entity["shape"] == "circle":
-                pygame.draw.circle(screen, entity["color"], (int(entity["pos"][0]), int(entity["pos"][1])), entity["size"] // 2)
+                pygame.draw.circle(screen, entity["color"], (int(entity["pos"][0]), int(entity["pos"][1])),
+                                   entity["size"] // 2)
             elif entity["shape"] == "square":
                 pygame.draw.rect(screen, entity["color"], (*entity["pos"], entity["size"], entity["size"]))
 
@@ -242,7 +254,7 @@ class TransitionScene(Scene):
         self.alpha = 0
         self.transitioning_in = False
 
-    def update(self):
+    def update(self, diff):
         if not self.transitioning_in:
             self.alpha += FADE_SPEED
             if self.alpha >= 255:
