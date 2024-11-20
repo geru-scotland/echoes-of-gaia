@@ -8,7 +8,7 @@ SCREEN_WIDTH = None
 SCREEN_HEIGHT = None
 TITLE = "Echoes of Gaia"
 FADE_SPEED = 0.8
-AUDIO_FILE = "assets/audio/intro.mp3"
+AUDIO_FILE = "assets/audio/enchanted_grove.mp3"
 
 DARK_BLACK = (0, 0, 0)
 MATT_BLACK = (30, 30, 30)
