@@ -3,10 +3,10 @@ import random
 import sys
 
 
-SCREEN_WIDTH = 1600
-SCREEN_HEIGHT = 900
+SCREEN_WIDTH = None
+SCREEN_HEIGHT = None
 TITLE = "Echoes of Gaia"
-FADE_SPEED = 1.5
+FADE_SPEED = 1
 AUDIO_FILE = "assets/audio/intro.mp3"
 
 
@@ -42,7 +42,9 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        global SCREEN_WIDTH, SCREEN_HEIGHT
+        SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_desktop_sizes()[0]
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         self.running = True
@@ -64,6 +66,9 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
             self.scene_manager.handle_events(event)
 
     def update(self):
@@ -120,11 +125,17 @@ class IntroScene(Scene):
         self.blink_increasing = True
         self.text_rect = self.title_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         self.press_key_rect = self.press_key_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 300))
+        self.sound = pygame.mixer.Sound("assets/audio/effects/ff_menu.ogg")
+        self.sound_played = False
 
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN and not self.fade_out:
             self.fade_in = False
             self.fade_out = True
+
+            if not self.sound_played:
+                self.sound.play()
+                self.sound_played = True
 
     def update(self):
         if self.fade_in and self.alpha < 255:
