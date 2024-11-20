@@ -25,6 +25,19 @@ def generate_matte_color():
     ])
 
 
+class ClickableEntity:
+    def __init__(self, x, y, width, height, color):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.surface = pygame.Surface((width, height))
+        self.surface.fill(color)
+
+    def draw(self, screen):
+        screen.blit(self.surface, self.rect.topleft)
+
+    def is_clicked(self, mouse_pos):
+        return self.rect.collidepoint(mouse_pos)
+
+
 class Game:
     def __init__(self):
         pygame.init()
