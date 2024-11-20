@@ -8,7 +8,7 @@ SCREEN_WIDTH = None
 SCREEN_HEIGHT = None
 TITLE = "Echoes of Gaia"
 FADE_SPEED = 0.8
-AUDIO_FILE = "assets/audio/enchanted_grove.mp3"
+AUDIO_FILE = "assets/audio/intro.mp3"
 
 DARK_BLACK = (0, 0, 0)
 MATT_BLACK = (30, 30, 30)
@@ -48,7 +48,7 @@ class Game:
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         self.running = True
-        self.scene_manager = SceneManager()
+        self.scene_manager = SceneManager(scene=IntroScene)
 
         pygame.mixer.music.load(AUDIO_FILE)
         pygame.mixer.music.play(-1)
@@ -79,24 +79,6 @@ class Game:
         pygame.display.flip()
 
 
-class SceneManager:
-    def __init__(self):
-        self.current_scene = IntroScene(self)
-
-    def change_scene(self, new_scene):
-        self.current_scene = TransitionScene(self, self.current_scene, new_scene)
-
-    def handle_events(self, event):
-        self.current_scene.handle_events(event)
-
-    def update(self, diff):
-        print(diff)
-        self.current_scene.update(diff)
-
-    def render(self, screen):
-        self.current_scene.render(screen)
-
-
 class Scene:
     def __init__(self, manager):
         self.manager = manager
@@ -109,6 +91,54 @@ class Scene:
 
     def render(self, screen):
         pass
+
+
+# Scene manager haré instancia en game
+class TransitionScene(Scene):
+    def __init__(self, manager, current_scene, next_scene):
+        super().__init__(manager)
+        self.current_scene = current_scene
+        self.next_scene = next_scene
+        self.alpha = 0
+        self.transitioning_in = False
+
+    def update(self, diff):
+        if not self.transitioning_in:
+            self.alpha += FADE_SPEED
+            if self.alpha >= 255:
+                self.transitioning_in = True
+                self.current_scene = self.next_scene
+        else:
+            self.alpha -= FADE_SPEED
+            if self.alpha <= 0:
+                self.manager.current_scene = self.current_scene
+
+    def render(self, screen):
+        if not self.transitioning_in:
+            self.current_scene.render(screen)
+        else:
+            self.next_scene.render(screen)
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        overlay.set_alpha(self.alpha)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+
+
+class SceneManager:
+    def __init__(self, scene=None):
+        self.current_scene = scene(self)
+
+    def change_scene(self, new_scene, transition_scene=TransitionScene):
+        self.current_scene = transition_scene(self, self.current_scene, new_scene)
+
+    def handle_events(self, event):
+        self.current_scene.handle_events(event)
+
+    def update(self, diff):
+        self.current_scene.update(diff)
+
+    def render(self, screen):
+        self.current_scene.render(screen)
 
 
 class IntValueEnum(Enum):
@@ -188,7 +218,8 @@ class IntroScene(Scene):
             self.alpha -= FADE_SPEED
             if self.alpha <= 0:
                 self.alpha = 0
-                self.manager.change_scene(EntityScene(self.manager))
+                self.manager.change_scene(EntityScene(self.manager),
+                                          transition_scene=TransitionScene)
 
     def render(self, screen):
         screen.fill(DARK_BLACK)
@@ -245,36 +276,6 @@ class EntityScene(Scene):
                                    entity["size"] // 2)
             elif entity["shape"] == "square":
                 pygame.draw.rect(screen, entity["color"], (*entity["pos"], entity["size"], entity["size"]))
-
-
-class TransitionScene(Scene):
-    def __init__(self, manager, current_scene, next_scene):
-        super().__init__(manager)
-        self.current_scene = current_scene
-        self.next_scene = next_scene
-        self.alpha = 0
-        self.transitioning_in = False
-
-    def update(self, diff):
-        if not self.transitioning_in:
-            self.alpha += FADE_SPEED
-            if self.alpha >= 255:
-                self.transitioning_in = True
-                self.current_scene = self.next_scene
-        else:
-            self.alpha -= FADE_SPEED
-            if self.alpha <= 0:
-                self.manager.current_scene = self.current_scene
-
-    def render(self, screen):
-        if not self.transitioning_in:
-            self.current_scene.render(screen)
-        else:
-            self.next_scene.render(screen)
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-        overlay.set_alpha(self.alpha)
-        overlay.fill((0, 0, 0))
-        screen.blit(overlay, (0, 0))
 
 
 if __name__ == "__main__":
