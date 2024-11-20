@@ -1,3 +1,5 @@
+from enum import Enum
+
 import pygame
 import random
 import sys
@@ -6,7 +8,7 @@ import sys
 SCREEN_WIDTH = None
 SCREEN_HEIGHT = None
 TITLE = "Echoes of Gaia"
-FADE_SPEED = 1
+FADE_SPEED = 0.8
 AUDIO_FILE = "assets/audio/intro.mp3"
 
 
@@ -110,6 +112,12 @@ class Scene:
         pass
 
 
+class IntroSceneState(Enum):
+    FADE_IN = 1
+    IDLE = 2
+    FADE_OUT = 3
+
+# Para transiciones, igual crear una clase especial y que introscene herede de ella
 class IntroScene(Scene):
     def __init__(self, manager):
         super().__init__(manager)
@@ -119,54 +127,70 @@ class IntroScene(Scene):
         self.title_surface = font.render(TITLE, True, BRIGHT_WHITE)
         self.press_key_surface = self.small_font.render("Press any key to continue", True, BRIGHT_WHITE)
         self.alpha = 0
-        self.fade_in = True
-        self.fade_out = False
         self.blink_alpha = 0
-        self.blink_increasing = True
+        self.blink_increasing = False
         self.text_rect = self.title_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         self.press_key_rect = self.press_key_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 300))
         self.sound = pygame.mixer.Sound("assets/audio/effects/ff_menu.ogg")
         self.sound_played = False
 
+        self.start_time = pygame.time.get_ticks()
+        self.delay = 2000
+
+        self.state = IntroSceneState.FADE_IN
+
     def handle_events(self, event):
-        if event.type == pygame.KEYDOWN and not self.fade_out:
-            self.fade_in = False
-            self.fade_out = True
+        if event.type == pygame.KEYDOWN and self.state == IntroSceneState.IDLE:
+            self.state = IntroSceneState.FADE_OUT
 
             if not self.sound_played:
                 self.sound.play()
                 self.sound_played = True
 
     def update(self):
-        if self.fade_in and self.alpha < 255:
-            self.alpha += FADE_SPEED
-        elif self.fade_out and self.alpha > 0:
+        current_time = pygame.time.get_ticks()
+
+        if self.state == IntroSceneState.FADE_IN:
+            # timer con delay del inicio del fade in
+            if current_time - self.start_time >= self.delay:
+                self.alpha += FADE_SPEED
+                if self.alpha >= 255:
+                    self.alpha = 255
+                    self.state = IntroSceneState.IDLE
+                    self.blink_increasing = True
+
+        elif self.state == IntroSceneState.IDLE:
+            if self.blink_increasing:
+                self.blink_alpha += 1
+                if self.blink_alpha >= 255:
+                    self.blink_alpha = 255
+                    self.blink_increasing = False
+            else:
+                self.blink_alpha -= 2
+                if self.blink_alpha <= 2:
+                    self.blink_alpha = 50
+                    self.blink_increasing = True
+
+        elif self.state == IntroSceneState.FADE_OUT:
             self.alpha -= FADE_SPEED
             if self.alpha <= 0:
+                self.alpha = 0
                 self.manager.change_scene(EntityScene(self.manager))
-
-        if self.blink_increasing:
-            self.blink_alpha += 2
-            if self.blink_alpha >= 255:
-                self.blink_alpha = 255
-                self.blink_increasing = False
-        else:
-            self.blink_alpha -= 2
-            if self.blink_alpha <= 50:
-                self.blink_alpha = 50
-                self.blink_increasing = True
 
     def render(self, screen):
         screen.fill(DARK_BLACK)
+
+        # renderizo titulo
         self.title_surface.set_alpha(self.alpha)
-
-        if self.fade_out:
-            self.press_key_surface.set_alpha(self.alpha)
-        else:
-            self.press_key_surface.set_alpha(self.blink_alpha)
-
         screen.blit(self.title_surface, self.text_rect)
-        screen.blit(self.press_key_surface, self.press_key_rect)
+
+        # press key
+        if self.state == IntroSceneState.IDLE:
+            self.press_key_surface.set_alpha(self.blink_alpha)
+            screen.blit(self.press_key_surface, self.press_key_rect)
+        elif self.state == IntroSceneState.FADE_OUT:
+            self.press_key_surface.set_alpha(self.alpha)
+            screen.blit(self.press_key_surface, self.press_key_rect)
 
 
 class EntityScene(Scene):
@@ -178,7 +202,7 @@ class EntityScene(Scene):
 
     def create_entities(self):
         entities = []
-        for _ in range(60):
+        for _ in range(200):
             size = random.randint(10, 30)
             color = generate_matte_color()
             shape = random.choice(["circle", "square"])
@@ -191,17 +215,15 @@ class EntityScene(Scene):
         pass
 
     def update(self):
-        if self.fade_in and self.alpha < 255:
-            self.alpha += FADE_SPEED
-        else:
-            for entity in self.entities:
-                entity["pos"][0] += entity["speed"][0]
-                entity["pos"][1] += entity["speed"][1]
+        for entity in self.entities:
+            entity["pos"][0] += entity["speed"][0]
+            entity["pos"][1] += entity["speed"][1]
 
-                if entity["pos"][0] <= 0 or entity["pos"][0] >= SCREEN_WIDTH - entity["size"]:
-                    entity["speed"][0] *= -1
-                if entity["pos"][1] <= 0 or entity["pos"][1] >= SCREEN_HEIGHT - entity["size"]:
-                    entity["speed"][1] *= -1
+            if entity["pos"][0] <= 0 or entity["pos"][0] >= SCREEN_WIDTH - entity["size"]:
+                entity["speed"][0] *= -1
+            if entity["pos"][1] <= 0 or entity["pos"][1] >= SCREEN_HEIGHT - entity["size"]:
+                entity["speed"][1] *= -1
+
 
     def render(self, screen):
         screen.fill(MATT_BLACK)
@@ -210,12 +232,6 @@ class EntityScene(Scene):
                 pygame.draw.circle(screen, entity["color"], (int(entity["pos"][0]), int(entity["pos"][1])), entity["size"] // 2)
             elif entity["shape"] == "square":
                 pygame.draw.rect(screen, entity["color"], (*entity["pos"], entity["size"], entity["size"]))
-
-        if self.fade_in:
-            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-            overlay.set_alpha(255 - self.alpha)
-            overlay.fill((0, 0, 0))
-            screen.blit(overlay, (0, 0))
 
 
 class TransitionScene(Scene):
