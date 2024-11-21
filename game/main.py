@@ -3,7 +3,7 @@ from enum import Enum
 import pygame
 import sys
 
-from config.config import Config
+from config.settings import Settings
 from game.scripts.scenes.intro import IntroScene
 from game.systems.scenes.scene_manager import SceneManager
 from utils.dependecy_injector import dependency_injector
@@ -19,13 +19,22 @@ MATT_BLACK = (30, 30, 30)
 BRIGHT_WHITE = (255, 255, 255)
 
 
-
 class Game:
     def __init__(self):
-        self.config = dependency_injector.get("config")
+        try:
+            self.settings = dependency_injector.get("settings")
+        except KeyError as e:
+            print(f"Critical error: Missing dependency - {e}")
+            sys.exit(1)
+
+        self._logger = self.settings.get_logger("game")
+
+        self._logger.info("Initializing game...")
+
         pygame.init()
         pygame.mixer.init()
-        screen_width, screen_height = self.config.get_resolution()
+        screen_width, screen_height = self.settings.get_resolution()
+        self._logger.info(f"Screen resolution: {screen_width}x{screen_height}")
         self.screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
@@ -35,9 +44,11 @@ class Game:
         pygame.mixer.music.load(AUDIO_FILE)
         pygame.mixer.music.play(-1)
 
+        self._logger.info("Game initialized.")
+
     def run(self):
         while self.running:
-            diff = self.clock.tick(60)
+            diff = self.clock.tick(60)  # TODO: Calcular delta time para movimientos, si asumo en px/s, diff/1000
             self.handle_events()
             self.update(diff)
             self.render()
@@ -61,8 +72,7 @@ class Game:
         pygame.display.flip()
 
 
-
 if __name__ == "__main__":
-    dependency_injector.register("config", Config())
+    dependency_injector.register("settings", Settings())
     game = Game()
     game.run()
