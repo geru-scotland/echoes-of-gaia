@@ -2,7 +2,10 @@ from game.scripts.scenes.transition import TransitionScene
 
 
 class SceneManager:
-    def __init__(self, scene=None):
+    def __init__(self):
+        self.current_scene = None
+
+    def set_scene(self, scene):
         self.current_scene = scene(self)
 
     def change_scene(self, new_scene, transition_scene=TransitionScene):
