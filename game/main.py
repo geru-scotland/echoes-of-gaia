@@ -1,16 +1,13 @@
-from enum import Enum
-
 import pygame
 import sys
 
 from config.settings import Settings
+from game.scripts.scenes.intro import IntroScene
 from game.systems.scenes.scene_manager import SceneManager
 from utils.dependecy_injector import dependency_injector
 
 SCREEN_WIDTH = None
 SCREEN_HEIGHT = None
-TITLE = "Echoes of Gaia"
-FADE_SPEED = 0.8
 AUDIO_FILE = "assets/audio/intro.mp3"
 
 
@@ -28,10 +25,12 @@ class Game:
         screen_width, screen_height = self.settings.screen_width, self.settings.screen_height
         self._logger.info(f"Screen resolution: {screen_width}x{screen_height}")
         self.screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
-        pygame.display.set_caption(TITLE)
+        pygame.display.set_caption(self.settings.title)
         self.clock = pygame.time.Clock()
         self.running = True
         self.scene_manager = SceneManager()
+        self.scene_manager.set_scene(IntroScene)  # a enum esto
+        dependency_injector.register("scene_manager", self.scene_manager)
 
         pygame.mixer.music.load(AUDIO_FILE)
         pygame.mixer.music.play(-1)

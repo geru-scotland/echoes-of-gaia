@@ -1,4 +1,8 @@
 import logging
+import os
+from pathlib import Path
+
+from utils.paths import LOGS_DIR
 
 
 def setup_logger(name: str, log_file: str, level=logging.INFO):
@@ -6,9 +10,13 @@ def setup_logger(name: str, log_file: str, level=logging.INFO):
     logger.setLevel(level)
 
     if not logger.handlers:
-        formatter = logging.Formatter(f'[{name.upper()}]%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(f'[{name.upper()}] %(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-        file_handler = logging.FileHandler(log_file)
+        logs_dir = Path(LOGS_DIR)
+        logs_dir.mkdir(parents=True, exist_ok=True)
+        file_path = os.path.join(LOGS_DIR, log_file)
+
+        file_handler = logging.FileHandler(file_path)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 

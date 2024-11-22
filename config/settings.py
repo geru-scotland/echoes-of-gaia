@@ -5,7 +5,7 @@ import pygame
 import yaml
 
 from utils.loggers import setup_logger
-from utils.paths import CONFIG_DIR
+from utils.paths import CONFIG_DIR, ASSETS_DIR
 
 
 class Settings:
@@ -16,9 +16,9 @@ class Settings:
             self._setup_logger()
 
         def _setup_logger(self):
-            self._loggers["game"] = setup_logger("game", "logs/game.log")
-            self._loggers["bioma"] = setup_logger("bioma", "logs/bioma.log")
-            self._loggers["research"] = setup_logger("research", "logs/research.log")
+            self._loggers["game"] = setup_logger("game", "game.log")
+            self._loggers["bioma"] = setup_logger("bioma", "bioma.log")
+            self._loggers["research"] = setup_logger("research", "research.log")
 
         def get_logger(self, name):
             try:
@@ -29,7 +29,7 @@ class Settings:
     class GameSettings(DefaultSettings):
         def __init__(self, config):
             super().__init__(config)
-            # self.title = config.get("title")
+            self.title = config.get("title")
 
     class SceneSettings(DefaultSettings):
         def __init__(self, config):
@@ -37,9 +37,16 @@ class Settings:
             self.scene_data = {}
 
         def load_scene_data(self, scene_name):
-            file_path = os.path.join("assets/data/scenes", f"{scene_name}.json")
-            with open(file_path, "r") as file:
-                self.scene_data = json.load(file)
+            file_path = os.path.join(f"{ASSETS_DIR}/data/scenes/", f"{scene_name}.json")
+            try:
+                with open(file_path, "r") as file:
+                    self.scene_data = json.load(file) or {}
+            except FileNotFoundError:
+                print(f"File not found: {file_path}")
+                self.scene_data = {}
+            except json.JSONDecodeError:
+                print(f"Invalid JSON format in file: {file_path}")
+                self.scene_data = {}
 
         def get_scene_data(self):
             return self.scene_data
