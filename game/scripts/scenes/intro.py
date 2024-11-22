@@ -32,20 +32,8 @@ class IntroScene(Scene):
         super().__init__(__class__.__name__)
 
         self._on_finish_callback = on_finish_callback
-        self._title = self._scene_data.get("title")
-        self._fade_speed = self._scene_data.get("fade-speed")
-        print(self._assets)
-        self.title_surface = self._assets.get("title-font").render(self._title, True, Colors.Text.PRIMARY_TEXT)
-        self.press_key_surface = self._assets.get("title-font").render("Press any key to continue", True, Colors.Text.PRIMARY_TEXT)
-
-        self.text_rect = self.title_surface.get_rect(center=(self._screen_width // 2, self._screen_height // 2))
-        self.press_key_rect = self.press_key_surface.get_rect(
-            center=(self._screen_width // 2, self._screen_height // 2 + 300))
-
-        self._start_music()
 
         self.state = IntroSceneState.STATE_LOADING
-        self.start_timer = int(IntroSceneTimers.START_FADE_IN)
 
         self.alpha = 0
         self.blink_alpha = 0
@@ -54,24 +42,38 @@ class IntroScene(Scene):
 
     def _load_assets(self):
         try:
-            assets = {}
             fonts_dir = os.path.join(ASSETS_DIR, "fonts")
             audio_dir = os.path.join(ASSETS_DIR, "audio")
-            assets['title-font'] = pygame.font.Font(f"{fonts_dir}/{self._scene_data["title-font"]}", self._scene_data["title-size"])
-            assets['small-font'] = pygame.font.Font(None, self._scene_data["small-text-size"])
-            assets['main-song'] = pygame.mixer.Sound(f"{audio_dir}/songs/{self._scene_data["audio"]["main-song"]}")
-            assets['sound-effect'] = pygame.font.Font(f"{audio_dir}/effects/{self._scene_data["audio"]["sound-effect"]}")
-            return assets
+            self._assets['title-font'] = pygame.font.Font(f"{fonts_dir}/{self._scene_data["title-font"]}",
+                                                          self._scene_data["title-size"])
+            self._assets['small-font'] = pygame.font.Font(None, self._scene_data["small-text-size"])
+            self._assets['main-song'] = f"{audio_dir}/songs/{self._scene_data["audio"][0]["main-song"]}"
+            self._assets['sound-effect'] = pygame.mixer.Sound(
+                f"{audio_dir}/effects/{self._scene_data["audio"][0]["sound-effect"]}")
         except Exception as e:
-            print(f"Error loading assets: {e}")
-            return {}
+            self._logger.error(f"Error loading assets: {e}")
 
-    def _show_texts(self):
-        pass
+    def _build_scene(self):
+        self._title = self._scene_data.get("title")
+        self._fade_speed = self._scene_data.get("fade-speed")
+        self.title_surface = self._assets.get("title-font").render(self._title, True, Colors.Text.PRIMARY_TEXT)
+        self.press_key_surface = self._assets.get("small-font").render("Press any key to continue", True,
+                                                                       Colors.Text.PRIMARY_TEXT)
+
+        self.text_rect = self.title_surface.get_rect(center=(self._screen_width // 2, self._screen_height // 2))
+        self.press_key_rect = self.press_key_surface.get_rect(
+            center=(self._screen_width // 2, self._screen_height // 2 + 300))
+
+    def _start(self):
+        self._start_music()
+        self.start_timer = int(IntroSceneTimers.START_FADE_IN)
 
     def _start_music(self):
-        pygame.mixer.music.load(self._assets.get("main-song"))
-        pygame.mixer.music.play(-1)
+        try:
+            pygame.mixer.music.load(self._assets.get("main-song"))
+            pygame.mixer.music.play(-1)
+        except Exception as e:
+            self._logger.error(f"Error loading music: {e}")
 
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN and self.state == IntroSceneState.STATE_IDLE:
