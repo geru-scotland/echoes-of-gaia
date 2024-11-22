@@ -47,8 +47,6 @@ class Settings:
             except json.JSONDecodeError:
                 print(f"Invalid JSON format in file: {file_path}")
                 self.scene_data = {}
-
-        def get_scene_data(self):
             return self.scene_data
 
     class Config:

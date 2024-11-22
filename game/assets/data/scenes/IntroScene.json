@@ -1,4 +1,13 @@
 {
   "title": "Echoes of Gaia",
-  "fade_speed": 0.8
+  "fade-speed": 0.8,
+  "title-font": "orbitron/Orbitron-VariableFont_wght.ttf",
+  "title-size": 100,
+  "small-text-size": 30,
+  "audio": [
+    {
+        "main-song": "choes_of_gaia_intro.mp3",
+        "sound-effect": "ff_menu.ogg"
+    }
+  ]
 }

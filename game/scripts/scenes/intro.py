@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 import pygame
@@ -5,6 +6,7 @@ import pygame
 from game.scripts.scenes.test import EntityScene
 from game.systems.scenes.base_scene import Scene
 from game.theme.colors import Colors
+from utils.paths import ASSETS_DIR
 
 
 class IntValueEnum(Enum):
@@ -28,32 +30,55 @@ class IntroSceneTimers(IntValueEnum):
 class IntroScene(Scene):
     def __init__(self, on_finish_callback=None, args=None, **kwargs):
         super().__init__(__class__.__name__)
+
         self._on_finish_callback = on_finish_callback
-        self.font = pygame.font.Font(None, 100)
-        self.small_font = pygame.font.Font(None, 30)
-        font = pygame.font.Font("assets/fonts/orbitron/Orbitron-VariableFont_wght.ttf", 100)
-        title = self._scene_data.get("title")
-        self._fade_speed = self._scene_data.get("fade_speed")
-        self.title_surface = font.render(title, True, Colors.Text.PRIMARY_TEXT)
-        self.press_key_surface = self.small_font.render("Press any key to continue", True, Colors.Text.PRIMARY_TEXT)
-        self.alpha = 0
-        self.blink_alpha = 0
-        self.blink_increasing = False
+        self._title = self._scene_data.get("title")
+        self._fade_speed = self._scene_data.get("fade-speed")
+        print(self._assets)
+        self.title_surface = self._assets.get("title-font").render(self._title, True, Colors.Text.PRIMARY_TEXT)
+        self.press_key_surface = self._assets.get("title-font").render("Press any key to continue", True, Colors.Text.PRIMARY_TEXT)
+
         self.text_rect = self.title_surface.get_rect(center=(self._screen_width // 2, self._screen_height // 2))
         self.press_key_rect = self.press_key_surface.get_rect(
             center=(self._screen_width // 2, self._screen_height // 2 + 300))
-        self.sound = pygame.mixer.Sound("assets/audio/effects/ff_menu.ogg")
-        self.sound_played = False
+
+        self._start_music()
 
         self.state = IntroSceneState.STATE_LOADING
         self.start_timer = int(IntroSceneTimers.START_FADE_IN)
+
+        self.alpha = 0
+        self.blink_alpha = 0
+        self.blink_increasing = False
+        self.sound_played = False
+
+    def _load_assets(self):
+        try:
+            assets = {}
+            fonts_dir = os.path.join(ASSETS_DIR, "fonts")
+            audio_dir = os.path.join(ASSETS_DIR, "audio")
+            assets['title-font'] = pygame.font.Font(f"{fonts_dir}/{self._scene_data["title-font"]}", self._scene_data["title-size"])
+            assets['small-font'] = pygame.font.Font(None, self._scene_data["small-text-size"])
+            assets['main-song'] = pygame.mixer.Sound(f"{audio_dir}/songs/{self._scene_data["audio"]["main-song"]}")
+            assets['sound-effect'] = pygame.font.Font(f"{audio_dir}/effects/{self._scene_data["audio"]["sound-effect"]}")
+            return assets
+        except Exception as e:
+            print(f"Error loading assets: {e}")
+            return {}
+
+    def _show_texts(self):
+        pass
+
+    def _start_music(self):
+        pygame.mixer.music.load(self._assets.get("main-song"))
+        pygame.mixer.music.play(-1)
 
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN and self.state == IntroSceneState.STATE_IDLE:
             self.state = IntroSceneState.STATE_FADE_OUT
 
             if not self.sound_played:
-                self.sound.play()
+                self._assets.get("sound-effect").play()
                 self.sound_played = True
 
     def update(self, diff):

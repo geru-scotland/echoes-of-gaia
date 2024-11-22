@@ -8,7 +8,7 @@ from utils.dependecy_injector import dependency_injector
 
 SCREEN_WIDTH = None
 SCREEN_HEIGHT = None
-AUDIO_FILE = "assets/audio/intro.mp3"
+AUDIO_FILE = "assets/audio/songs/intro.mp3"
 
 
 class Game:
@@ -30,10 +30,6 @@ class Game:
         self.running = True
         self.scene_manager = SceneManager()
         self.scene_manager.set_scene(IntroScene)  # a enum esto
-        dependency_injector.register("scene_manager", self.scene_manager)
-
-        pygame.mixer.music.load(AUDIO_FILE)
-        pygame.mixer.music.play(-1)
 
         self._logger.info("Game initialized.")
 
