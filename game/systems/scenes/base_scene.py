@@ -18,7 +18,7 @@ class Scene:
         self.settings = dependency_injector.get("scene_settings")
         self._scene_data = self.settings.load_scene_data(self._scene_name)
         self._screen_width, self._screen_height = self.settings.screen_width, self.settings.screen_height
-        self._logger = self.settings.get_logger("game")
+        self._logger = self.settings.get_logger("scene")
 
         self._load_assets()
         self._build_scene()

@@ -13,12 +13,11 @@ class Settings:
         def __init__(self, config):
             self._loggers = {}
             self.screen_width, self.screen_height = config.get_resolution()
-            self._setup_logger()
+            self._setup_default_loggers()
 
-        def _setup_logger(self):
-            self._loggers["game"] = setup_logger("game", "game.log")
-            self._loggers["bioma"] = setup_logger("bioma", "bioma.log")
-            self._loggers["research"] = setup_logger("research", "research.log")
+        def _setup_default_loggers(self):
+           # Meter algún logger default, a modo de app
+            pass
 
         def get_logger(self, name):
             try:
@@ -29,11 +28,13 @@ class Settings:
     class GameSettings(DefaultSettings):
         def __init__(self, config):
             super().__init__(config)
+            self._loggers["game"] = setup_logger("game", "game.log")
             self.title = config.get("title")
 
     class SceneSettings(DefaultSettings):
         def __init__(self, config):
             super().__init__(config)
+            self._loggers["scene"] = setup_logger("scene", "scene.log")
             self.scene_data = {}
 
         def load_scene_data(self, scene_name):
@@ -48,6 +49,16 @@ class Settings:
                 print(f"Invalid JSON format in file: {file_path}")
                 self.scene_data = {}
             return self.scene_data
+
+    class BiomeSettings(DefaultSettings):
+        def __init__(self, config):
+            super().__init__(config)
+            self._loggers["biome"] = setup_logger("biome", "biome.log")
+
+    class ResearchSettings(DefaultSettings):
+        def __init__(self, config):
+            super().__init__(config)
+            self._loggers["research"] = setup_logger("research", "research.log")
 
     class Config:
         def __init__(self, config_path="config.yaml"):
@@ -86,3 +97,7 @@ class Settings:
     @property
     def scene_settings(self):
         return self.SceneSettings(self._config)
+
+    @property
+    def biome_settings(self):
+        return self.BiomeSettings(self._config)
