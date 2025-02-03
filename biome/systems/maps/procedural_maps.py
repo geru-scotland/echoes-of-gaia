@@ -1,12 +1,16 @@
+import logging
+
 
 class Map:
     def __init__(self):
-        print("[Map] Initialising a new map.")
+        self._logger = logging.getLogger("bootstrap")
+        self._logger.info("[Map] Initialising a new map.")
 
 class MapGenerator:
     def __init__(self):
-        print("[MapGenerator] Initialising Map generator")
+        self._logger = logging.getLogger("bootstrap")
+        self._logger.info("[MapGenerator] Initialising Map generator")
 
     def generate(self):
         map: Map = Map()
-        print("[MapGenerator] Generating new map")
+        self._logger.info("[MapGenerator] Generating new map")

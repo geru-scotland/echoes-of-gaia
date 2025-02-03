@@ -7,8 +7,3 @@ class SimulationEngine:
 
     def run(self):
         print("[SimulationEngine] Running simulation...")
-
-
-
-simulation = SimulationEngine()
-simulation.run()

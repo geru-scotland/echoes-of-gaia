@@ -1,8 +1,10 @@
+import logging
 from typing import Any, Dict
 
 class Context:
     def __init__(self, **kwargs: Any) -> None:
-        print("[Context] Creating context.")
+        self._logger = logging.getLogger("bootstrap")
+        self._logger.info("[Context] Creating context.")
         self.data: Dict[str, Any] = kwargs
 
     def get(self, key: str, default: Any = None) -> Any:
