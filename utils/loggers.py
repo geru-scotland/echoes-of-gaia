@@ -20,7 +20,10 @@ class ColorFormatter(logging.Formatter):
 
     def format(self, record):
         color = LogColors.RESET
-        if record.levelname == "INFO":
+
+        if record.name == "bootstrap":
+            color = LogColors.CYAN
+        elif record.levelname == "INFO":
             color = LogColors.GREEN
         elif record.levelname == "WARNING":
             color = LogColors.YELLOW
