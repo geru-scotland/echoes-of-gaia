@@ -1,6 +1,5 @@
 import json
 import os
-import pygame
 import yaml
 
 from utils.loggers import setup_logger
@@ -52,6 +51,7 @@ class DisplaySettings:
         width = self.config.get("screen_width")
         height = self.config.get("screen_height")
         if not width or not height:
+            import pygame
             width, height = pygame.display.get_desktop_sizes()[0]
         return width, height
 
