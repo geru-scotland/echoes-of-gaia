@@ -1,5 +1,6 @@
 from simulation.bootstrap.builders.biome_builder import BiomeBuilder
 from simulation.bootstrap.context.context import Context
+from utils.exceptions import BootstrapError
 from utils.loggers import setup_logger
 
 
@@ -15,7 +16,7 @@ class Bootstrap:
             self._context.set("biome_ctx", biome_builder.build())
             # TODO: Repetir para el sim context
         except Exception as e:
-            self._logger.exception(f"There was an error building the context: {e}")
+            raise BootstrapError(f"There was an error building the context: {e}")
 
     def get_context(self) -> Context:
         return self._context
