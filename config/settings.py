@@ -25,6 +25,9 @@ class Config:
     def get(self, key, default=None):
         return self.config.get(key, default)
 
+    def __repr__(self) -> str:
+        return f"Config({self.config})"
+
 
 class DefaultSettings:
     def __init__(self, config_file):
@@ -40,7 +43,6 @@ class DefaultSettings:
 
     def get_config(self):
         return self.config
-
 
 class DisplaySettings:
     def __init__(self, config):

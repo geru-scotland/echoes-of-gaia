@@ -1,1 +1,4 @@
-biome: "Biome Data"
+biome:
+  map:
+    size: 10
+  type: "tropical"
