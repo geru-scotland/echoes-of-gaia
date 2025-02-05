@@ -27,4 +27,4 @@ class BiomeBuilder:
             config: Config = self._biome_settings.get_config()
             return BiomeContextData(map=map, config=config, logger=logger)
         except Exception as e:
-            self._logger.exception("There was a problem building the context from the Biome")
+            self._logger.exception(f"There was a problem building the context from the Biome: {e}")

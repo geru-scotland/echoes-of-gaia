@@ -1,5 +1,7 @@
 import logging
 
+from utils.exceptions import MapGenerationError
+
 
 class Map:
     def __init__(self):
@@ -12,5 +14,8 @@ class MapGenerator:
         self._logger.info("[MapGenerator] Initialising Map generator")
 
     def generate(self):
-        map: Map = Map()
-        self._logger.info("[MapGenerator] Generating new map")
+        try:
+            map: Map = Map()
+            self._logger.info("[MapGenerator] Generating new map")
+        except Exception as e:
+            raise MapGenerationError(f"{e}")
