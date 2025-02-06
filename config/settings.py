@@ -25,10 +25,13 @@ class Config:
     def get(self, key, default=None):
         return self.config.get(key, default)
 
+    def __repr__(self) -> str:
+        return f"Config({self.config})"
+
 
 class DefaultSettings:
     def __init__(self, config_file):
-        self.config = Config(config_file)
+        self._config = Config(config_file)
         self._loggers = {}
         self._setup_default_loggers()
 
@@ -38,9 +41,9 @@ class DefaultSettings:
     def get_logger(self, name):
         return self._loggers.get(name, None)
 
-    def get_config(self):
-        return self.config
-
+    @property
+    def config(self):
+        return self._config
 
 class DisplaySettings:
     def __init__(self, config):

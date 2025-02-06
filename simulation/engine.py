@@ -17,6 +17,7 @@ class SimulationEngine:
             bootstrap: Bootstrap = Bootstrap()
             self._context = bootstrap.get_context()
             biome_context = cast(BiomeContextData, self._context.get("biome_ctx"))
+            self._logger.debug(biome_context)
             self.biome_api = BiomeAPI(biome_context)
         except Exception as e:
             self._logger = setup_logger("bootstrap", "bootstrap.log")
