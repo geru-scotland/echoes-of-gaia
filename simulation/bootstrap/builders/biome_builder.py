@@ -3,7 +3,7 @@ from logging import Logger
 from typing import Optional, Dict, Any, Tuple
 
 from config.settings import BiomeSettings, Config, Settings
-from biome.systems.maps.procedural_maps import MapGenerator, Map
+from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
 from shared.constants import BIOME_TYPE_WEIGHTS, MAP_DEFAULT_SIZE
 from simulation.bootstrap.context.context_data import BiomeContextData
 from simulation.bootstrap.builders.builder import Builder, ConfiguratorStrategy
@@ -27,7 +27,8 @@ class MapConfigurator(ConfiguratorStrategy):
             "weights": BIOME_TYPE_WEIGHTS[config.get("type", {})]
         }
         try:
-            self._map = MapGenerator().generate(map_data=map_data)
+            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data)
+            self._logger.debug(self._map.tile_map)
         except Exception as e:
             raise
 
