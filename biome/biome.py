@@ -11,7 +11,7 @@ class Biome:
             # Del contexto, habrá que pasar datos de clima de los config
             self._climate = Climate()
             self._logger.info("Biome is ready!")
-            self._logger.info(self._context.config.get("biome"))
-        except:
-            print("There was an error creating the Biome.")
+            self._logger.info(self._context.config.get("type"))
+        except Exception as e:
+            print(f"There was an error creating the Biome: {e}")
 
