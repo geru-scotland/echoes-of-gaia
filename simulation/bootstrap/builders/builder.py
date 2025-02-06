@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from logging import Logger
 from typing import Dict, Any, Optional
 
@@ -7,6 +7,7 @@ from simulation.bootstrap.context.context import Context
 
 
 class ConfiguratorStrategy(ABC):
+    @abstractmethod
     def configure(self, settings: Settings, **kwargs: Any) -> None:
         raise NotImplementedError
 
