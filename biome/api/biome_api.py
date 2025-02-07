@@ -1,5 +1,5 @@
 from biome.biome import Biome
-from simulation.bootstrap.context.context_data import BiomeContextData
+from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 
 class BiomeAPI:

@@ -1,7 +1,7 @@
 from logging import Logger
 
 from biome.components.climate.climate import Climate
-from simulation.bootstrap.context.context_data import BiomeContextData
+from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 class Biome:
     def __init__(self, context: BiomeContextData):

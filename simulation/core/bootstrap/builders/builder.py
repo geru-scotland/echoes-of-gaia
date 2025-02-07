@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from logging import Logger
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 
 from config.settings import Settings
-from simulation.bootstrap.context.context import Context
+from simulation.core.bootstrap.context.context import Context
 
 
 class ConfiguratorStrategy(ABC):

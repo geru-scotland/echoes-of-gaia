@@ -2,12 +2,11 @@ import logging
 from logging import Logger
 from typing import Optional, Dict, Any, Tuple
 
-from config.settings import BiomeSettings, Config, Settings
+from config.settings import BiomeSettings, Config
 from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
 from shared.constants import BIOME_TYPE_WEIGHTS, MAP_DEFAULT_SIZE
-from simulation.bootstrap.context.context_data import BiomeContextData
-from simulation.bootstrap.builders.builder import Builder, ConfiguratorStrategy
-from utils.exceptions import MapGenerationError
+from simulation.core.bootstrap.context.context_data import BiomeContextData
+from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy
 
 
 class MapConfigurator(ConfiguratorStrategy):
