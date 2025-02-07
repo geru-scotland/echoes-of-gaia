@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Optional
 
-from simulation.engine import SimulationEngine
+from simulation.core.engine import SimulationEngine
 from utils.loggers import setup_logger
 
 
