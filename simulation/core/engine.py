@@ -5,6 +5,7 @@ from biome.api.biome_api import BiomeAPI
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData
+from simulation.core.systems.events.dispatcher import EventDispatcher
 from utils.loggers import setup_logger
 
 
@@ -18,6 +19,7 @@ class SimulationEngine:
             self._context = bootstrap.get_context()
             biome_context = cast(BiomeContextData, self._context.get("biome_ctx"))
             self.biome_api = BiomeAPI(biome_context)
+            EventDispatcher.dispatch("biome_loaded")
         except Exception as e:
             self._logger = setup_logger("bootstrap", "bootstrap.log")
             self._logger.exception(f"[Simulation Engine] There was an error bootstraping: {e}")
