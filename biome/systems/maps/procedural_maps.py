@@ -112,7 +112,6 @@ class PerlinNoiseGenerator(ProceduralMethod):
         return self._map.tile_map
 
 
-
 class MapGenerator:
     def __init__(self, algorithm: Type[ProceduralMethod]):
         self._algorithm = algorithm

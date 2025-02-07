@@ -27,6 +27,7 @@ class Bootstrap:
             self._setup_builders()
             self._build()
             self._context.set(Strings.BIOME_CONTEXT, self._builders[Strings.BIOME_BUILDER].context)
+            print(self._context)
             # TODO: Repetir para el sim context
         except Exception as e:
             raise BootstrapError(f"There was an error building the context: {e}")
