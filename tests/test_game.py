@@ -7,6 +7,7 @@ from game.main import init_systems, Game
 
 if os.getenv("CI"):
     os.environ["SDL_VIDEODRIVER"] = "dummy"
+    os.environ["SDL_AUDIODRIVER"] = "dummy"
 
 @patch.object(Game, 'run', side_effect=lambda: None)
 def test_game_runs(mock_run):
