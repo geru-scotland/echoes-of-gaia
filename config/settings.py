@@ -47,19 +47,19 @@ class DefaultSettings:
 
 class DisplaySettings:
     def __init__(self, config):
-        self.config = config
+        self._settings = config
         self.screen_width, self.screen_height = self._get_resolution()
 
     def _get_resolution(self):
-        width = self.config.get("screen_width")
-        height = self.config.get("screen_height")
+        width = self._settings.get("screen_width")
+        height = self._settings.get("screen_height")
         if not width or not height:
             import pygame
             width, height = pygame.display.get_desktop_sizes()[0]
         return width, height
 
     def update_resolution(self, width, height):
-        self.config.update_resolution(width, height)
+        self._settings.update_resolution(width, height)
         self.screen_width, self.screen_height = width, height
 
 class GameSettings(DefaultSettings, DisplaySettings):
