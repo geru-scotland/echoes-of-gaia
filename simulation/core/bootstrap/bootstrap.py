@@ -1,7 +1,7 @@
 from typing import Dict, Any
 
 from shared.enums import Strings
-from config.settings import Settings
+from config.settings import Settings, SimulationSettings
 from simulation.core.bootstrap.builders.biome_builder import BiomeBuilder
 from simulation.core.bootstrap.context.context import Context
 from utils.exceptions import BootstrapError
@@ -9,8 +9,8 @@ from utils.loggers import setup_logger
 
 
 class Bootstrap:
-    def __init__(self):
-        self._settings = Settings()
+    def __init__(self, settings: Settings):
+        self._settings = settings
         self._logger = setup_logger("bootstrap", "bootstrap.log")
         self._context: Context = Context(self._logger)
         self._builders: Dict[str, Any] = {}

@@ -45,7 +45,7 @@ class DefaultSettings:
     def config(self):
         return self._config
 
-class DisplaySettings:
+class GameDisplaySettings:
     def __init__(self, config):
         self._settings = config
         self.screen_width, self.screen_height = self._get_resolution()
@@ -58,22 +58,36 @@ class DisplaySettings:
             width, height = pygame.display.get_desktop_sizes()[0]
         return width, height
 
-    def update_resolution(self, width, height):
-        self._settings.update_resolution(width, height)
-        self.screen_width, self.screen_height = width, height
+class RenderDisplaySettings:
+    def __init__(self, config):
+        self._settings = config
+        self.window_width, self.window_height = self._get_resolution()
 
-class GameSettings(DefaultSettings, DisplaySettings):
+    def _get_resolution(self):
+        width = self._settings.get("window_width")
+        height = self._settings.get("window_height")
+        return width, height
+
+
+class RenderSettings(DefaultSettings, RenderDisplaySettings):
+    def __init__(self, config_file="render.yaml"):
+        DefaultSettings.__init__(self, config_file)
+        RenderDisplaySettings.__init__(self, self.config)
+        self._loggers["render"] = setup_logger("render_engine", "render_engine.log")
+        self.title = self.config.get("title")
+
+class GameSettings(DefaultSettings, GameDisplaySettings):
     def __init__(self, config_file="game.yaml"):
         DefaultSettings.__init__(self, config_file)
-        DisplaySettings.__init__(self, self.config)
+        GameDisplaySettings.__init__(self, self.config)
         self._loggers["game"] = setup_logger("game", "game.log")
         self.title = self.config.get("title")
 
 
-class SceneSettings(DefaultSettings, DisplaySettings):
+class SceneSettings(DefaultSettings, GameDisplaySettings):
     def __init__(self, config_file="game.yaml"):
         DefaultSettings.__init__(self, config_file)
-        DisplaySettings.__init__(self, self.config)
+        GameDisplaySettings.__init__(self, self.config)
         self._loggers["scene"] = setup_logger("scene", "scene.log")
         self.scene_data = {}
 
@@ -109,6 +123,7 @@ class Settings:
         self._scene_settings = None
         self._biome_settings = None
         self._simulation_settings = None
+        self._render_settings = None
 
     @property
     def game_settings(self):
@@ -129,7 +144,13 @@ class Settings:
         return self._biome_settings
 
     @property
-    def simulation_hsettings(self):
+    def simulation_settings(self):
         if self._simulation_settings is None:
             self._simulation_settings = SimulationSettings()
         return self._simulation_settings
+
+    @property
+    def render_settings(self):
+        if self._render_settings is None:
+            self._render_settings = RenderSettings()
+        return self._render_settings

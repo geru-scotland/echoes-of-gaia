@@ -4,7 +4,6 @@ from game.main import init_systems, Game
 
 # Para evitar cuando lo ponga en GH actions
 # que falle por no disponer de video mode.
-
 if os.getenv("CI"):
     os.environ["SDL_VIDEODRIVER"] = "dummy"
     os.environ["SDL_AUDIODRIVER"] = "dummy"
