@@ -6,6 +6,7 @@ from simulation.render.manager import RenderManager
 from utils.loggers import setup_logger
 
 settings = Settings()
+# TODO: Pasar a config esto
 HEADLESS: bool = False
 if not HEADLESS:
     render_manager = RenderManager(settings=settings.render_settings)

@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Dict, Type
+from typing import Dict
 
 import pygame
 

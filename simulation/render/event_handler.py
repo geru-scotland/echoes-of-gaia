@@ -1,14 +1,15 @@
 from biome.systems.maps.procedural_maps import Map
 from simulation.core.systems.events.dispatcher import EventDispatcher
+from simulation.core.systems.events.handler import EventHandler
 from simulation.render.components import MapComponent
 from simulation.render.engine import RenderEngine
 
 
-class RenderEventHandler:
+class RenderEventHandler(EventHandler):
     def __init__(self, engine: RenderEngine):
+        super().__init__()
         self._engine = engine
         self._settings = engine.settings
-        self._register_events()
 
     def _register_events(self):
         EventDispatcher.register("biome_loaded", self.on_biome_loaded)
