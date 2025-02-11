@@ -30,11 +30,13 @@ class RenderEngine:
     def run(self):
         running: bool = True
         while running:
-            # TODO: Render components.
+            for name, component in self._components.items():
+                component.render(self._screen)
             event = pygame.event.wait()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
                     break
+            pygame.display.flip()
         pygame.quit()
 
     def add_component(self, component: Component):

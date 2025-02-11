@@ -5,6 +5,8 @@ from typing import Dict, List, Tuple, Optional, Any, TextIO
 from pygame import Surface
 import pygame
 import yaml
+
+from shared.constants import TERRAIN_TYPES
 from shared.enums import TerrainType
 
 # Tipos, me acabo de enterar que puedo definir tipos custom en Python,
@@ -49,3 +51,40 @@ class TerrainTileManager:
         except Exception as e:
             self._logger.exception(f"There was a problem extracting terrain's sprites: {e}")
 
+    def get_tile_index_for_type(self, tile_corners: List[TerrainType], terrain_type: TerrainType) -> int:
+        tile_index = 0
+        for power, corner_type in enumerate(tile_corners):
+            if corner_type == terrain_type:
+                tile_index += 2 ** power
+        return tile_index
+
+    def calculate_map(self, terrain_type_map: List[List[TerrainType]]) -> List[Tuple[Surface, Tuple[int, int]]]:
+        sprites_with_positions: List[Tuple[Surface, Tuple[int, int]]] = []
+        rows = len(terrain_type_map)
+        if rows < 2:
+            return sprites_with_positions
+        cols = len(terrain_type_map[0])
+        if cols < 2:
+            return sprites_with_positions
+
+        for y in range(rows - 1):
+            for x in range(cols - 1):
+
+                tile_corner_types = [
+                    terrain_type_map[y + 1][x + 1],
+                    terrain_type_map[y + 1][x],
+                    terrain_type_map[y][x + 1],
+                    terrain_type_map[y][x]
+                ]
+
+                for terrain_type in TERRAIN_TYPES:
+                    if terrain_type in tile_corner_types:
+                        tile_index = self.get_tile_index_for_type(tile_corner_types, terrain_type)
+                        image = self._terrain_sprites[terrain_type][tile_index]
+                        break
+
+                pos_x = x * self._tile_size
+                pos_y = y * self._tile_size
+                sprites_with_positions.append((image, (pos_x, pos_y)))
+
+        return sprites_with_positions

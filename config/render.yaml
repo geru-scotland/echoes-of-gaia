@@ -1,7 +1,9 @@
 title: "Biome Simulation"
-window_width: 800
-window_height: 600
+window_width: 1200
+window_height: 1200
 tiles:
+  tiles_x: 25
+  tiles_y: 25
   assets:
     tilesheets:
        map: "simulation/render/assets/overworld-tileset-perlin.png"

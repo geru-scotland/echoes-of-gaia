@@ -23,11 +23,11 @@ class RenderEventHandler(EventHandler):
         print(f"Render title: {self._settings.title}")
         try:
             if not self._engine.is_initialized():
+                tile_config: Dict[str, Any] = self._settings.config.get("tiles", {})
+                map_component: MapComponent = MapComponent(map, self._settings.window_width,
+                                                           self._settings.window_height,
+                                                           tile_config)
+                self._engine.add_component(map_component)
                 self._engine.init()
-            tile_config: Dict[str, Any] = self._settings.config.get("tiles", {})
-            map_component: MapComponent = MapComponent(map, self._settings.window_width,
-                                                       self._settings.window_height,
-                                                       tile_config)
-            self._engine.add_component(map_component)
         except Exception as e:
             self._logger.exception(f"There was an error adding the Map component to the Render Engine: {e}")
