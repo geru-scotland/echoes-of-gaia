@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 from pathlib import Path
 
 from utils.paths import LOGS_DIR
@@ -36,13 +37,17 @@ class ColorFormatter(logging.Formatter):
         formatted_message = super().format(record)
         return f"{color}{formatted_message}{LogColors.RESET}"
 
+class ThreadNameFilter(logging.Filter):
+    def filter(self, record):
+        record.threadname = "Main thread" if threading.current_thread() == threading.main_thread() else "Secondary thread"
+        return True
 
 def setup_logger(name: str, log_file: str, level=logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(level)
 
     if not logger.handlers:
-        formatter = logging.Formatter(f'[{name.upper()}] %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(f'[{name.upper()}][%(threadname)s] %(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         logs_dir = Path(LOGS_DIR)
         logs_dir.mkdir(parents=True, exist_ok=True)
@@ -51,12 +56,14 @@ def setup_logger(name: str, log_file: str, level=logging.INFO):
         # sin colores
         file_handler = logging.FileHandler(file_path)
         file_handler.setFormatter(formatter)
+        file_handler.addFilter(ThreadNameFilter())
         logger.addHandler(file_handler)
 
         # console, con colores
-        color_formatter = ColorFormatter(name, f'[{name.upper()}] %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        color_formatter = ColorFormatter(name, f'[{name.upper()}][%(threadname)s] %(asctime)s - %(name)s - %(levelname)s - %(message)s')
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(color_formatter)
+        console_handler.addFilter(ThreadNameFilter())
         logger.addHandler(console_handler)
 
     return logger

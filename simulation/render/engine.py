@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Dict, Tuple, Any
+from typing import Dict
 import queue
 
 import pygame

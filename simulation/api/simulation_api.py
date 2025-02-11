@@ -1,9 +1,7 @@
-from logging import Logger
 from typing import Optional, Type
 
-from config.settings import SimulationSettings, Settings
+from config.settings import Settings
 from simulation.core.engine import SimulationEngine
-from utils.loggers import setup_logger
 
 
 class SimulationAPI:
