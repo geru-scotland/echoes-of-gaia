@@ -1,6 +1,5 @@
-from typing import Optional, List, Dict, Any
+from typing import Dict, Any
 
-import pygame
 from biome.systems.maps.procedural_maps import Map
 from simulation.render.tiles.manager import TerrainTileManager, TerrainSpritesMapping
 
@@ -19,7 +18,7 @@ class Component:
 
 
 class MapComponent(Component):
-    def __init__(self, map: Map, width: int, height: int, tile_config: Dict[str, Any]):
+    def __init__(self, map: Map, tile_config: Dict[str, Any]):
         super().__init__("map")
         self._map: Map = map
         self._tile_manager: TerrainTileManager = TerrainTileManager(tile_config)

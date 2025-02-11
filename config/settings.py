@@ -45,6 +45,7 @@ class DefaultSettings:
     def config(self):
         return self._config
 
+
 class GameDisplaySettings:
     def __init__(self, config):
         self._settings = config
@@ -57,6 +58,7 @@ class GameDisplaySettings:
             import pygame
             width, height = pygame.display.get_desktop_sizes()[0]
         return width, height
+
 
 class RenderDisplaySettings:
     def __init__(self, config):
@@ -75,6 +77,7 @@ class RenderSettings(DefaultSettings, RenderDisplaySettings):
         RenderDisplaySettings.__init__(self, self.config)
         self._loggers["render"] = setup_logger("render_engine", "render_engine.log")
         self.title = self.config.get("title")
+
 
 class GameSettings(DefaultSettings, GameDisplaySettings):
     def __init__(self, config_file="game.yaml"):

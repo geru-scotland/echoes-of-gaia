@@ -8,6 +8,9 @@ class RenderManager:
         self._engine = RenderEngine(settings)
         self._event_handler = RenderEventHandler(self._engine)
 
+    def start_engine(self):
+        self._engine.init()
+
     @property
     def engine(self) -> RenderEngine:
         return self._engine

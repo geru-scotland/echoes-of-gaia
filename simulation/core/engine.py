@@ -1,3 +1,4 @@
+import time
 from logging import Logger
 from typing import Optional, cast
 
@@ -27,3 +28,6 @@ class SimulationEngine:
 
     def run(self):
         self._logger.info("Running simulation...")
+        time.sleep(2)
+        self._logger.info("Finishing simulation")
+        EventDispatcher.dispatch("simulation_finished")

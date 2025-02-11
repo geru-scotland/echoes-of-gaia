@@ -17,17 +17,18 @@ class RenderEventHandler(EventHandler):
 
     def _register_events(self):
         EventDispatcher.register("biome_loaded", self.on_biome_loaded)
+        EventDispatcher.register("simulation_finished", self.on_simulation_finished)
 
     def on_biome_loaded(self, map: Map):
         print("[Render] Biome Loaded! Now biome image should be projected")
         print(f"Render title: {self._settings.title}")
         try:
-            if not self._engine.is_initialized():
+            if self._engine.is_initialized():
                 tile_config: Dict[str, Any] = self._settings.config.get("tiles", {})
-                map_component: MapComponent = MapComponent(map, self._settings.window_width,
-                                                           self._settings.window_height,
-                                                           tile_config)
-                self._engine.add_component(map_component)
-                self._engine.init()
+                map_component: MapComponent = MapComponent(map, tile_config)
+                self._engine.enqueue_task(self._engine.add_component, map_component)
         except Exception as e:
             self._logger.exception(f"There was an error adding the Map component to the Render Engine: {e}")
+
+    def on_simulation_finished(self):
+        self._logger.info("Finishing simulation")
