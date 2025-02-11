@@ -1,6 +1,6 @@
 biome:
   map:
     size:
-      - 10 # width
-      - 10 # height
+      - 75 # width
+      - 75 # height
   type: "tropical"

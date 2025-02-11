@@ -1,4 +1,5 @@
 import logging
+import random
 from logging import Logger
 from typing import Optional, Dict, Any, Tuple
 
@@ -26,7 +27,7 @@ class MapConfigurator(ConfiguratorStrategy):
             "weights": BIOME_TYPE_WEIGHTS[config.get("type", {})]
         }
         try:
-            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data)
+            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=random.randint(1, 99))
             self._logger.debug(self._map.tile_map)
         except Exception as e:
             raise

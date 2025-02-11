@@ -118,11 +118,11 @@ class MapGenerator:
         self._logger = logging.getLogger("bootstrap")
         self._logger.info("[MapGenerator] Initialising Map generator")
 
-    def generate(self, map_data: Dict[str, Any]) -> Map:
+    def generate(self, map_data: Dict[str, Any], seed: int = 3) -> Map:
         try:
             self._logger.info("[MapGenerator] Generating new map...")
             map: Map = Map(**map_data)
-            perlin = self._algorithm(map=map, seed=3)
+            perlin = self._algorithm(map=map, seed=seed)
             return perlin.generate()
         except Exception as e:
             raise MapGenerationError(f"{e}")
