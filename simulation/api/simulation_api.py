@@ -15,4 +15,5 @@ class SimulationAPI:
         self._engine = SimulationEngine(settings=self._settings)
 
     def run(self):
+        self.initialise()
         self._engine.run()

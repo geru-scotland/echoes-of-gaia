@@ -1,5 +1,6 @@
 from logging import Logger
-from typing import Dict
+from typing import Dict, Tuple, Any
+import queue
 
 import pygame
 
@@ -14,9 +15,13 @@ class RenderEngine:
         self._logger: Logger = self._settings.get_logger("render")
         self._components: Dict[str, Component] = {}
         self._screen = None
+        self._task_queue = queue.Queue()
 
     def is_initialized(self) -> bool:
         return self._initialized
+
+    def enqueue_task(self, task, *args, **kwargs):
+        self._task_queue.put((task, args, kwargs))
 
     def init(self):
         self._logger.info("Initialising Rendering Engine")
@@ -26,22 +31,46 @@ class RenderEngine:
         pygame.display.set_caption(self._settings.title)
         self._initialized = True
         self.run()
+    def _process_task_queue(self):
+        try:
+            while True:
+                task, args, kwargs = self._task_queue.get_nowait()
+                task(*args, **kwargs)
+        # en python, entornos multhithread, ojo, es para evitar problemas con .empty entre hilos.
+        except queue.Empty:
+            pass
 
     def run(self):
         running: bool = True
         while running:
+            self._process_task_queue()
+
+            # Render de componentes
+            self._screen.fill((0, 0, 0))
             for name, component in self._components.items():
                 component.render(self._screen)
-            event = pygame.event.wait()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
-                    break
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
+                        running = False
             pygame.display.flip()
         pygame.quit()
 
     def add_component(self, component: Component):
-        if component.name not in self._components:
-            self._components[component.name] = component
+        try:
+            if component.name not in self._components:
+                self._components[component.name] = component
+        except Exception as e:
+            self._logger.exception(f"There was an error deleting a component: {e}")
+
+    def remove_component(self, name: str):
+        try:
+            if name in self._components:
+                del self._components[name]
+        except Exception as e:
+            self._logger.exception(f"There was an error deleting a component: {e}")
+
 
     @property
     def settings(self) -> RenderSettings:
