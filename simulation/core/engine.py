@@ -3,7 +3,7 @@ from logging import Logger
 from typing import Optional, cast
 
 from biome.api.biome_api import BiomeAPI
-from config.settings import SimulationSettings, Settings
+from config.settings import Settings
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData

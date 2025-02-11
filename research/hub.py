@@ -10,15 +10,17 @@ settings = Settings()
 # TODO: Pasar a config esto
 HEADLESS: bool = False
 
-simulation_api: SimulationAPI = SimulationAPI(settings)
-# simulation_api .initialise()
-sim_thread = Thread(target=simulation_api.run, daemon=True)
-sim_thread.start()
+simulation = SimulationAPI(settings)
 
-logger: Logger = setup_logger("research", "research.log")
-logger.info("Welcome too the Research Hub")
+logger = setup_logger("research", "research.log")
+logger.info("Welcome to the Research Hub")
 
-if not HEADLESS:
+
+if HEADLESS:
+    simulation.run()
+else:
+    sim_thread = Thread(target=simulation.run, daemon=True)
+    sim_thread.start()
     # Es bloqueante del hilo principal, lo pongo al final
     render_manager = RenderManager(settings=settings.render_settings)
     render_manager.start_engine()
