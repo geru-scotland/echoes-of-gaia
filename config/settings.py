@@ -119,6 +119,9 @@ class SimulationSettings(DefaultSettings):
         super().__init__(config_file)
         self._loggers["simulation"] = setup_logger("simulation", "simulation.log")
 
+    def get_logger(self, name="simulation"):
+        return self._loggers.get(name)
+
 
 class Settings:
     def __init__(self):

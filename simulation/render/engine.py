@@ -5,7 +5,7 @@ import queue
 import pygame
 
 from config.settings import RenderSettings
-from simulation.render.components import Component
+from simulation.render.components import RenderComponent
 
 
 class RenderEngine:
@@ -13,7 +13,7 @@ class RenderEngine:
         self._initialized = False
         self._settings = settings
         self._logger: Logger = self._settings.get_logger("render")
-        self._components: Dict[str, Component] = {}
+        self._components: Dict[str, RenderComponent] = {}
         self._screen = None
         self._task_queue = queue.Queue()
 
@@ -57,7 +57,7 @@ class RenderEngine:
             pygame.display.flip()
         pygame.quit()
 
-    def add_component(self, component: Component):
+    def add_component(self, component: RenderComponent):
         try:
             if component.name not in self._components:
                 self._components[component.name] = component

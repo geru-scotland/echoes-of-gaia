@@ -8,12 +8,8 @@ import yaml
 
 from shared.constants import TERRAIN_TYPES
 from shared.enums import TerrainType
+from shared.types import TileMappings, TerrainSpritesMapping
 
-# Tipos, me acabo de enterar que puedo definir tipos custom en Python,
-# algo parecido al typedef de c++; y soy un poco más feliz:
-Coords = Tuple[int, int]
-TileMappings = Dict[TerrainType, List[Coords]]
-TerrainSpritesMapping = Dict[TerrainType, List[Surface]]
 
 class TerrainTileManager:
     def __init__(self, tile_config: Dict[str, Any]):

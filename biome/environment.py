@@ -1,0 +1,42 @@
+from abc import abstractmethod
+from logging import Logger
+from typing import TypeVar, Generic
+
+from simpy import Environment as simpyEnv
+
+from biome.components.component import Component
+from shared.enums import ComponentType
+from shared.types import EntityList, ComponentDict
+from simulation.core.bootstrap.context.context_data import ContextData
+
+T = TypeVar("T", bound=ContextData)
+
+
+class Environment(Generic[T]):
+
+    def __init__(self, context: T, env: simpyEnv):
+        self._context: T = context
+        self._env: simpyEnv = env
+        self._logger: Logger = self._context.logger
+        self._entities: EntityList = []
+        self._components: ComponentDict = {}
+
+        try:
+            self._initialize_environment()
+            self._logger.info(f"{self.__class__.__name__} initialized successfully!")
+        except Exception as e:
+            self._logger.error(f"Error initializing {self.__class__.__name__}: {e}")
+
+    def _initialize_environment(self):
+        self._logger.info(f"Setting up environment: {self.__class__.__name__}")
+
+    @abstractmethod
+    def update(self, delay: int):
+        pass
+
+    def add_component(self, component: Component) -> None:
+        self._components[component.type] = component
+        self._logger.info(f"Component {component.type} added to {self.__class__.__name__}")
+
+    def get_component(self, type: ComponentType) -> Component:
+        return self._components.get(type, None)

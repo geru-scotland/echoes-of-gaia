@@ -4,7 +4,7 @@ from biome.systems.maps.procedural_maps import Map
 from simulation.render.tiles.manager import TerrainTileManager, TerrainSpritesMapping
 
 
-class Component:
+class RenderComponent:
     name = None
 
     def __init__(self, name: str):
@@ -17,7 +17,7 @@ class Component:
         pass
 
 
-class MapComponent(Component):
+class MapComponent(RenderComponent):
     def __init__(self, map: Map, tile_config: Dict[str, Any]):
         super().__init__("map")
         self._map: Map = map

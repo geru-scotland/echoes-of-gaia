@@ -2,6 +2,7 @@ from logging import Logger
 from typing import Dict, Any
 
 from biome.systems.maps.procedural_maps import Map
+from shared.strings import Loggers
 from simulation.core.systems.events.dispatcher import EventDispatcher
 from simulation.core.systems.events.handler import EventHandler
 from simulation.render.components import MapComponent
@@ -13,7 +14,7 @@ class RenderEventHandler(EventHandler):
         super().__init__()
         self._engine = engine
         self._settings = engine.settings
-        self._logger: Logger = self._settings.get_logger("render")
+        self._logger: Logger = self._settings.get_logger(Loggers.RENDER)
 
     def _register_events(self):
         EventDispatcher.register("biome_loaded", self.on_biome_loaded)

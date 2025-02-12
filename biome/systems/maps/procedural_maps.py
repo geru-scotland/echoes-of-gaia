@@ -8,14 +8,15 @@ from perlin_noise import PerlinNoise
 from shared.enums import TerrainType
 from shared.constants import TERRAIN_TYPES
 from shared.constants import MAP_DEFAULT_SIZE
+from shared.types import TileMap, NoiseMap
 from utils.exceptions import MapGenerationError
 
 @dataclass
 class Map:
     size: Tuple[int, int] = MAP_DEFAULT_SIZE,
     weights: List[int] = field(default_factory=list)
-    tile_map: List[List[TerrainType]] = field(default_factory=list)
-    noise_map: List[List[float]] = field(default_factory=list)
+    tile_map: TileMap = field(default_factory=list)
+    noise_map: NoiseMap = field(default_factory=list)
 
     def __post_init__(self):
         logger = logging.getLogger("bootstrap")
