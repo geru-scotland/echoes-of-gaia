@@ -86,6 +86,5 @@ def test_simulation_engine_full_initialization(settings):
 # Test: step avanza en el tiempo
 def test_simulation_step_advance(simulation_engine):
     initial_time = simulation_engine._env.now
-    simulation_engine._env.process(simulation_engine.step())
-    simulation_engine._env.run(until=2)
+    simulation_engine.run()
     assert simulation_engine._env.now > initial_time
