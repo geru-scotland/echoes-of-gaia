@@ -15,7 +15,7 @@ class EventDispatcher:
         cls._listeners[event_name].append(callback)
 
     @classmethod
-    def dispatch(cls, event_name, *args, **kwargs):
+    def trigger(cls, event_name, *args, **kwargs):
         for callback in cls._listeners.get(event_name, []):
             callback(*args, **kwargs)
 

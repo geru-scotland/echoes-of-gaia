@@ -20,10 +20,13 @@ class SimulationEngine:
         # TODO: El logger tiene que ser cargado por el builder y el contexto
         try:
             biome_context, simulation_context = self._boot_and_get_contexts(settings)
-            self._biome_api = BiomeAPI(biome_context)
+            self._biome_api = BiomeAPI(biome_context, self._env)
             self._context = simulation_context
             self._logger: Logger = self._context.logger
-            EventDispatcher.dispatch("biome_loaded", biome_context.map)
+            self._eras = self._context.config.get("eras", {}).get("amount",{})
+            self._steps = self._context.config.get("eras", {}).get("steps", {})
+            self._step_duration = self._context.config.get("eras", {}).get("step-duration", {})
+            EventDispatcher.trigger("biome_loaded", biome_context.map)
         except Exception as e:
             self._logger = setup_logger("bootstrap", "bootstrap.log")
             self._logger.exception(f"[Simulation Engine] There was an error bootstraping: {e}")
@@ -37,8 +40,4 @@ class SimulationEngine:
 
     def run(self):
         self._logger.info("Running simulation...")
-        print(self._context)
-        self._env.process(self.step())
-
-    def step(self):
-        yield self._env.timeout(1)
+        self._env.run(until=201)

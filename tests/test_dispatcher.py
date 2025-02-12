@@ -13,7 +13,7 @@ def test_event_dispatcher():
         x = x + n
 
     EventDispatcher.register("test_add", add)
-    EventDispatcher.dispatch("test_add", 14)
+    EventDispatcher.trigger("test_add", 14)
 
     assert x == 14
 
@@ -29,6 +29,6 @@ def test_multiple_listeners():
 
     EventDispatcher.register("multi_event", listener1)
     EventDispatcher.register("multi_event", listener2)
-    EventDispatcher.dispatch("multi_event", "Event received")
+    EventDispatcher.trigger("multi_event", "Event received")
 
     assert resultado == ["L1: Event received", "L2: Event received"]

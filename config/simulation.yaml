@@ -1,2 +1,5 @@
 simulation:
-  eras: 10
+  eras:
+    amount: 10
+    steps: 1000
+    step-duration: 1
