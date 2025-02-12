@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 
 from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
-from shared.enums import Strings
+from shared.strings import Strings
 from simulation.api.simulation_api import SimulationAPI
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
 from simulation.core.engine import SimulationEngine
