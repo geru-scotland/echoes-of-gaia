@@ -8,14 +8,14 @@ from shared.enums import ComponentType
 
 class Climate(Component):
     def __init__(self, env: simpy.Environment):
-        super().__init__(env, ComponentType.CLIMATE)
+        super().__init__(ComponentType.CLIMATE, env)
         self._env.process(self._update(25))
 
     # Cambios drásticos de clima, deberían de ser dispatcheados mejor, esto para probar solo.
     def _update(self, delay: Optional[int] = None):
         yield self._env.timeout(delay)
         while True:
-            print(f"Updating Climate: t={self._env.now}")
+            self._logger.info(f"Updating Climate: t={self._env.now}")
             yield self._env.timeout(25)
 
     def get_state(self):

@@ -6,11 +6,12 @@ import simpy
 
 from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
-from shared.enums import Strings
+from shared.strings import Strings
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
 from simulation.core.systems.events.dispatcher import EventDispatcher
+from simulation.core.systems.time.time import SimulationTime
 from utils.loggers import setup_logger
 
 
@@ -23,9 +24,9 @@ class SimulationEngine:
             self._biome_api = BiomeAPI(biome_context, self._env)
             self._context = simulation_context
             self._logger: Logger = self._context.logger
-            self._eras = self._context.config.get("eras", {}).get("amount",{})
-            self._steps = self._context.config.get("eras", {}).get("steps", {})
-            self._step_duration = self._context.config.get("eras", {}).get("step-duration", {})
+            self._eras = self._context.config.get("eras", {}).get("amount", 0)  # Número total de eras
+            self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)  # Eventos por era
+            self._time: SimulationTime = SimulationTime(self._events_per_era)
             EventDispatcher.trigger("biome_loaded", biome_context.map)
         except Exception as e:
             self._logger = setup_logger("bootstrap", "bootstrap.log")
@@ -40,4 +41,6 @@ class SimulationEngine:
 
     def run(self):
         self._logger.info("Running simulation...")
-        self._env.run(until=201)
+        self._time.log_time(self._env.now)
+        self._env.run(until=self._eras * self._events_per_era)
+        self._time.log_time(self._env.now)

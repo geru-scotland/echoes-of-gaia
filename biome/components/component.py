@@ -1,14 +1,17 @@
+import logging
 from abc import abstractmethod
 from typing import Optional
 
 from simpy import Environment as simpyEnv
 
 from shared.enums import ComponentType
+from shared.strings import Loggers
 
 
 class Component:
-    def __init__(self, env: simpyEnv, type: ComponentType):
-        self._component_type: ComponentType = type
+    def __init__(self, type: ComponentType, env: simpyEnv):
+        self._logger: logging.Logger = logging.getLogger(Loggers.BIOME)
+        self._type: ComponentType = type
         self._env: simpyEnv = env
 
     @abstractmethod
@@ -21,4 +24,4 @@ class Component:
 
     @property
     def type(self):
-        return self._component_type
+        return self._type

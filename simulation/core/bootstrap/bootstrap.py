@@ -1,6 +1,6 @@
 from typing import Dict, Any
 
-from shared.enums import Strings
+from shared.strings import Strings
 from config.settings import Settings
 from simulation.core.bootstrap.builders.biome_builder import BiomeBuilder
 from simulation.core.bootstrap.builders.simulation_builder import SimulationBuilder

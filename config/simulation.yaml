@@ -1,5 +1,4 @@
 simulation:
   eras:
     amount: 10
-    steps: 1000
-    step-duration: 1
+    events-per-era: 30000

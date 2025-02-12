@@ -16,11 +16,11 @@ class Biome(Environment):
             self._logger.info("Biome is ready!")
             self._logger.info(self._context.config.get("type"))
         except Exception as e:
-            print(f"There was an error creating the Biome: {e}")
+            self._logger.info(f"There was an error creating the Biome: {e}")
 
     def update(self, delay: int):
         yield self._env.timeout(delay)
         while True:
-            print(f"BIOMA UPDATE!... t={self._env.now}")
+            self._logger.info(f"BIOMA UPDATE!... t={self._env.now}")
             yield self._env.timeout(25)
 
