@@ -7,15 +7,13 @@ from config.settings import Config
 
 @dataclass
 class ContextData(ABC):
-    pass
+    logger: logging.Logger
 
 @dataclass
 class BiomeContextData(ContextData):
-    logger: logging.Logger
     map: Map
     config: Config
 
 @dataclass
 class SimulationContextData(ContextData):
-    logger: logging.Logger
     config: Config

@@ -1,22 +1,25 @@
+from typing import Optional
+
 import simpy
 
+from biome.components.component import Component
+from shared.enums import ComponentType
 
-class Climate:
+
+class Climate(Component):
     def __init__(self, env: simpy.Environment):
-        self._env = env
+        super().__init__(env, ComponentType.CLIMATE)
         self._env.process(self._update(25))
-        self._env.process(self._evolve(100))
 
     # Cambios drásticos de clima, deberían de ser dispatcheados mejor, esto para probar solo.
-    def _update(self, delay: int):
+    def _update(self, delay: Optional[int] = None):
         yield self._env.timeout(delay)
         while True:
             print(f"Updating Climate: t={self._env.now}")
             yield self._env.timeout(25)
 
-    def _evolve(self, delay: int):
-        yield self._env.timeout(delay)
-        while True:
-            print(f"Evolving... t={self._env.now}")
-            yield self._env.timeout(100)
+    def get_state(self):
+        pass
 
+    def update(self):
+        pass
