@@ -19,7 +19,7 @@ class Biome(Environment):
             self._logger.info(self._context.config.get("type"))
             flora: Spawns = self._context.flora_spawns
             fauna: Spawns = self._context.fauna_spawns
-            self._map_manager: WorldMapManager = WorldMapManager(map=self._context.map.tile_map,
+            self._map_manager: WorldMapManager = WorldMapManager(self._env, map=self._context.map.tile_map,
                                                                  flora_spawns=flora, fauna_spawns=fauna)
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")

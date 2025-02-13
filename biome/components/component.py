@@ -25,3 +25,30 @@ class Component:
     @property
     def type(self):
         return self._type
+
+
+class BiomeComponent(Component):
+    def __int__(self, type: ComponentType, env: simpyEnv):
+        super().__init__(type, env)
+
+    def get_state(self):
+        pass
+
+    def _update(self, delay: Optional[int] = None):
+        pass
+
+
+class EntityComponent(Component):
+    def __int__(self, type: ComponentType, env: simpyEnv):
+        super().__init__(type, env)
+
+    def get_state(self):
+        pass
+
+    def _update(self, delay: Optional[int] = None):
+        pass
+
+
+
+
+

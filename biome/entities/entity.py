@@ -1,14 +1,16 @@
 import logging
+from abc import ABC
 
 from simpy import Environment as simpyEnv
 
+from biome.systems.state.handler import StateHandler
 from shared.enums import ComponentType, EntityType
 from shared.strings import Loggers
 from shared.types import ComponentDict
 from simulation.core.systems.events.handler import EventHandler
 from biome.components.component import Component
 
-class Entity(EventHandler):
+class Entity(EventHandler, StateHandler, ABC):
 
     def __init__(self, type: EntityType, env: simpyEnv):
         super().__init__()

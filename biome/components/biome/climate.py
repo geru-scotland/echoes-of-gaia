@@ -2,11 +2,11 @@ from typing import Optional
 
 import simpy
 
-from biome.components.component import Component
+from biome.components.component import BiomeComponent
 from shared.enums import ComponentType
 
 
-class Climate(Component):
+class Climate(BiomeComponent):
     def __init__(self, env: simpy.Environment):
         super().__init__(ComponentType.CLIMATE, env)
         self._env.process(self._update(25))
@@ -19,7 +19,4 @@ class Climate(Component):
             yield self._env.timeout(25)
 
     def get_state(self):
-        pass
-
-    def update(self):
         pass
