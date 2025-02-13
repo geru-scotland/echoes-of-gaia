@@ -6,9 +6,9 @@ from pygame import Surface
 import pygame
 import yaml
 
-from shared.constants import TERRAIN_TYPES
 from shared.enums import TerrainType
-from shared.types import TileMappings, TerrainSpritesMapping
+from shared.stores.biome_store import BiomeStore
+from shared.types import TileMappings, TerrainSpritesMapping, TerrainList
 
 
 class TerrainTileManager:
@@ -55,6 +55,7 @@ class TerrainTileManager:
         return tile_index
 
     def calculate_map(self, terrain_type_map: List[List[TerrainType]]) -> List[Tuple[Surface, Tuple[int, int]]]:
+        terrain_types: TerrainList = BiomeStore.terrains
         sprites_with_positions: List[Tuple[Surface, Tuple[int, int]]] = []
         rows = len(terrain_type_map)
         if rows < 2:
@@ -73,7 +74,7 @@ class TerrainTileManager:
                     terrain_type_map[y][x]
                 ]
 
-                for terrain_type in TERRAIN_TYPES:
+                for terrain_type in terrain_types:
                     if terrain_type in tile_corner_types:
                         tile_index = self.get_tile_index_for_type(tile_corner_types, terrain_type)
                         image = self._terrain_sprites[terrain_type][tile_index]

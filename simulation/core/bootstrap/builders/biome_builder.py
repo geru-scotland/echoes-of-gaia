@@ -5,7 +5,9 @@ from typing import Optional, Dict, Any, Tuple
 
 from config.settings import BiomeSettings, Config
 from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
-from shared.constants import BIOME_TYPE_WEIGHTS, MAP_DEFAULT_SIZE
+from shared.constants import MAP_DEFAULT_SIZE
+from shared.stores.biome_store import BiomeStore
+from shared.types import Spawns
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy
 
@@ -18,14 +20,18 @@ class MapConfigurator(ConfiguratorStrategy):
     def configure(self, settings: BiomeSettings, **kwargs: Any) -> None:
         map_size: Tuple[int, int]
         config: Config = kwargs.get("config")
+
         try:
             map_size = config.get("map").get("size")
         except:
             map_size = MAP_DEFAULT_SIZE
+
+        biomes = BiomeStore.biomes
         map_data: Dict[str, Any] = {
             "size": map_size,
-            "weights": BIOME_TYPE_WEIGHTS[config.get("type", {})]
+            "weights": biomes[config.get("type", {})]
         }
+
         try:
             self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=random.randint(1, 99))
             self._logger.debug(self._map.tile_map)
@@ -55,8 +61,12 @@ class BiomeBuilder(Builder):
         try:
             logger = self._settings.get_logger()
             config: Config = self._settings.config.get("biome")
+            flora: Spawns = config.get("flora", {})
+            fauna: Spawns = config.get("fauna", {})
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
-            self._context = BiomeContextData(map=map_configurator.get_map(), config=config, logger=logger)
+            self._context = BiomeContextData(map=map_configurator.get_map(),
+                                             config=config, logger=logger,
+                                             flora_spawns=flora, fauna_spawns=fauna)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Biome: {e}")

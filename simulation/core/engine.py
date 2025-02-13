@@ -24,8 +24,8 @@ class SimulationEngine:
             self._biome_api = BiomeAPI(biome_context, self._env)
             self._context = simulation_context
             self._logger: Logger = self._context.logger
-            self._eras = self._context.config.get("eras", {}).get("amount", 0)  # Número total de eras
-            self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)  # Eventos por era
+            self._eras = self._context.config.get("eras", {}).get("amount", 0)
+            self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._time: SimulationTime = SimulationTime(self._events_per_era)
             EventDispatcher.trigger("biome_loaded", biome_context.map)
         except Exception as e:

@@ -1,7 +1,4 @@
-from typing import Dict
-
-from shared.enums import EntityType
-from shared.types import TileMap
+from shared.types import TileMap, Spawns
 
 
 class WorldMapManager:
@@ -14,5 +11,6 @@ class WorldMapManager:
 
     # Desde config, Entities: Flora: 30
     # Bueno control de max, min etc. Primero pocos, 10 cada o asi, max, min 1.
-    def __init__(self, map: TileMap, entity_info: Dict[EntityType, int]):
-        pass
+    def __init__(self, map: TileMap, flora_spawns: Spawns, fauna_spawns: Spawns):
+        print(flora_spawns)
+        print(fauna_spawns)

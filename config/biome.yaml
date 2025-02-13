@@ -4,3 +4,18 @@ biome:
       - 75 # width
       - 75 # height
   type: "tropical"
+  flora:
+    - type: "oak_tree"
+      spawns: 1
+    - type: "bramble"
+      spawns: 2
+    - type: "mushroom"
+      spawns: 4
+
+  fauna:
+    - type: "deer"
+      spawns: 1
+    - type: "boar"
+      spawns: 1
+    - type: "fox"
+      spawns: 2

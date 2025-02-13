@@ -9,4 +9,5 @@ LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 ASSETS_DIR = os.path.join(GAME_DIR, 'assets')
 RESEARCH_DIR = os.path.join(GAME_DIR, 'research')
 UTILS_DIR = os.path.join(GAME_DIR, 'utils')
+BIOME_DATA_DIR = os.path.join(BIOME_DIR, 'data')
 
