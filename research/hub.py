@@ -8,7 +8,7 @@ from utils.loggers import setup_logger
 
 settings = Settings()
 # TODO: Pasar a config esto
-HEADLESS: bool = True
+HEADLESS: bool = False
 
 simulation = SimulationAPI(settings)
 

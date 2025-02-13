@@ -1,9 +1,14 @@
 import pytest
+
+from shared.stores.biome_store import BiomeStore
 from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
-from shared.constants import MAP_DEFAULT_SIZE, TERRAIN_TYPES
+from shared.constants import MAP_DEFAULT_SIZE
 
+@pytest.fixture
+def bioma_store_load():
+    BiomeStore.load_ecosystem_data()
 
-def test_map_generation():
+def test_map_generation(bioma_store_load):
 
     map_data = {
         "size": MAP_DEFAULT_SIZE,
@@ -23,7 +28,7 @@ def test_map_generation():
         for noise_value in row
     ), "The values within the noise map are not within the expected range (-1.0 a 1.0)"
 
-    valid_terrain_types = set(TERRAIN_TYPES)
+    valid_terrain_types = BiomeStore.terrains
     assert all(
         tile in valid_terrain_types
         for row in generated_map.tile_map
