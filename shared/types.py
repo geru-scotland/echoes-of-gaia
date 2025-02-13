@@ -22,3 +22,5 @@ TerrainSpritesMapping = Dict[TerrainType, List[Surface]]
 # Listas
 EntityList = List["Entity"]
 ComponentDict = Dict["ComponentType", "Component"]
+TerrainList = List["TerrainType"]
+Spawns = List[Dict[str, Any]]

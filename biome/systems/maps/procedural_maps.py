@@ -6,9 +6,9 @@ from typing import Dict, Any, Tuple, List, Type
 from perlin_noise import PerlinNoise
 
 from shared.enums import TerrainType
-from shared.constants import TERRAIN_TYPES
 from shared.constants import MAP_DEFAULT_SIZE
-from shared.types import TileMap, NoiseMap
+from shared.stores.biome_store import BiomeStore
+from shared.types import TileMap, NoiseMap, TerrainList
 from utils.exceptions import MapGenerationError
 
 @dataclass
@@ -86,6 +86,7 @@ class PerlinNoiseGenerator(ProceduralMethod):
                 self._map.noise_map[y][x] = noise_value
 
     def _generate_tilemap(self):
+        terrain_types: TerrainList = BiomeStore.terrains
         total_weights: int = sum(self._map.weights)
         vector: List[float] = [ item for row in self._map.noise_map for item in row ]
         min_value: float = min(vector)
@@ -94,7 +95,7 @@ class PerlinNoiseGenerator(ProceduralMethod):
 
         max_terrain_heights: List[float] = []
         previous_range_height: float = min_value
-        for terrain_type in TERRAIN_TYPES:
+        for terrain_type in terrain_types:
             height = total_range * (self._map.weights[int(terrain_type)] / total_weights) + previous_range_height
             max_terrain_heights.append(height)
             previous_range_height = height
@@ -104,7 +105,7 @@ class PerlinNoiseGenerator(ProceduralMethod):
         self._map.tile_map = [ [ TerrainType.GRASS for item in row] for row in self._map.noise_map ]
         for y in range(len(self._map.tile_map)):
             for x in range(len(self._map.tile_map[0])):
-                for terrain_type in TERRAIN_TYPES:
+                for terrain_type in terrain_types:
                     if self._map.noise_map[y][x] <= max_terrain_heights[int(terrain_type)]:
                         self._map.tile_map[y][x] = terrain_type
                         break

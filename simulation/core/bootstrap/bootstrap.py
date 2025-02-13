@@ -1,5 +1,6 @@
 from typing import Dict, Any
 
+from shared.stores.biome_store import BiomeStore
 from shared.strings import Strings
 from config.settings import Settings
 from simulation.core.bootstrap.builders.biome_builder import BiomeBuilder
@@ -11,10 +12,11 @@ from utils.loggers import setup_logger
 
 class Bootstrap:
     def __init__(self, settings: Settings):
-        self._settings = settings
+        self._settings: Settings = settings
         self._logger = setup_logger("bootstrap", "bootstrap.log")
         self._context: Context = Context(self._logger)
         self._builders: Dict[str, Any] = {}
+        BiomeStore.load_ecosystem_data()
         self._build_context()
 
     def _setup_builders(self):
