@@ -26,6 +26,7 @@ class BiomeStore:
                 cls.biomes = data.get("biomes", {})
                 cls.flora = data.get("flora", {})
                 cls.fauna = data.get("fauna", {})
+                cls.components = data.get("components", {})
 
                 cls._initialized = True
         except (FileNotFoundError, json.JSONDecodeError):

@@ -1,5 +1,5 @@
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from simpy import Environment as simpyEnv
 
@@ -15,7 +15,7 @@ class Entity(EventHandler, StateHandler, ABC):
     def __init__(self, type: EntityType, env: simpyEnv):
         super().__init__()
         self._logger: logging.Logger = logging.getLogger(Loggers.BIOME)
-        self._type: EntityType = type
+        self._entity_type: EntityType = type
         self_env: simpyEnv = env
         self._components: ComponentDict = {}
 
@@ -28,6 +28,13 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def get_component(self, type: ComponentType):
         return self._components.get(type, None)
+
+    def get_components_size(self) -> int:
+        return len(self._components)
+
+    @abstractmethod
+    def dump_components(self) -> None:
+        raise NotImplementedError
 
     def update(self):
         pass

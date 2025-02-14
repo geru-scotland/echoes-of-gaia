@@ -41,7 +41,11 @@ class SimulationEngine:
         return biome_context, simulation_context
 
     def _montly_update(self, timer: int):
-        """ TODO: DECORATOR para este tipo de updataes."""
+        """
+         TODO: DECORATOR para este tipo de updataes.
+         TODO 2: Hacer SNAPSHOT AQUI, CADA X TIEMPO.
+         Con biome api, hacer que haga un compute state o snapshot.
+        """
         yield self._env.timeout(timer)
         while True:
             self._logger.info("[SIMULATION] Monthly update.")

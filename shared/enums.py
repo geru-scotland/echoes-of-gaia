@@ -12,6 +12,7 @@ class TerrainType(EnumBaseStr):
 
 class ComponentType(EnumBaseStr):
     GROWTH = "growth"
+    NUTRITIONAL = "nutritional"
     MOVEMENT = "movement"
     STATE = "state"
     CLIMATE = "climate"
@@ -32,10 +33,14 @@ class EntityType(EnumBaseStr):
     HUMAN = "human"
 
 class FloraType(EnumBaseStr):
-    pass
+    OAK_TREE = "oak_tree"
+    BRAMBLE = "bramble"
+    MUSHROOM = "mushroom"
 
 class FaunaType(EnumBaseStr):
-    pass
+    DEER = "deer"
+    BOAR = "boar"
+    FOX = "fox"
 
 class Timers:
     class Agents(EnumBaseInt):
@@ -43,6 +48,7 @@ class Timers:
 
     class Entity(EnumBaseInt):
         GROWTH = 25
+        NUTRITIONAL_VALUE_DECAY = 50
         ENERGY = 3
 
     class Biome(EnumBaseInt):
