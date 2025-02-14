@@ -20,17 +20,17 @@ class WorldMapManager:
         def __init__(self, env: simpyEnv, flora_spawns: Spawns = None, fauna_spawns: Spawns = None):
             self._logger: Logger = setup_logger("spawn_system", "spawns.log")
             self._env: simpyEnv = env
-            self._spawned_flora: EntityList = self._spawn_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
-            self._spawned_fauna: EntityList = self._spawn_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
+            self._created_flora: EntityList = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
+            self._created_fauna: EntityList = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
 
 
-        def _spawn_entities(self, spawns: Spawns, entity_class, entity_type_enum, biome_store) -> EntityList:
+        def _create_entities(self, spawns: Spawns, entity_class, entity_type_enum, biome_store) -> EntityList:
             if not spawns:
                 return []
 
             self._logger.info(f"Spawning {entity_class.__name__}...")
 
-            spawned_entities = []
+            spawned_entities: EntityList = []
 
             for spawn in spawns:
                 try:
@@ -84,8 +84,16 @@ class WorldMapManager:
 
             return spawned_entities
 
-    # Desde config, Entities: Flora: 30
-    # Bueno control de max, min etc. Primero pocos, 10 cada o asi, max, min 1.
+        def position_flora_in_world(self):
+            # basarme en reglas para cada tipo de flora.
+            pass
+
+        def position_fauna_in_world(self):
+            # simplemente posicines válidas
+            # todos terrestres por ahora
+            # quizá en un futuro hacer acuáticos.
+            pass
+
     def __init__(self, env: simpyEnv, map: TileMap, flora_spawns: Spawns, fauna_spawns: Spawns):
         self._env: simpyEnv = env
         self._logger: Logger = logging.getLogger(Loggers.BIOME)
