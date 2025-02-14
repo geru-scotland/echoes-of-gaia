@@ -6,6 +6,7 @@ import simpy
 
 from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
+from shared.enums import Timers
 from shared.strings import Strings
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
@@ -39,8 +40,22 @@ class SimulationEngine:
         simulation_context = cast(SimulationContextData, context.get(Strings.SIMULATION_CONTEXT))
         return biome_context, simulation_context
 
+    def _montly_update(self, timer: int):
+        """
+         TODO: DECORATOR para este tipo de updataes.
+         TODO 2: Hacer SNAPSHOT AQUI, CADA X TIEMPO.
+         Con biome api, hacer que haga un compute state o snapshot.
+        """
+        yield self._env.timeout(timer)
+        while True:
+            self._logger.info("[SIMULATION] Monthly update.")
+            self._time.log_time(self._env.now)
+            yield self._env.timeout(timer)
+
     def run(self):
         self._logger.info("Running simulation...")
+        self._env.process(self._montly_update(Timers.Simulation.MONTH))
         self._time.log_time(self._env.now)
         self._env.run(until=self._eras * self._events_per_era)
         self._time.log_time(self._env.now)
+

@@ -1,9 +1,22 @@
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums import EntityType
+from shared.enums import EntityType, FaunaType
 
 
 class Fauna(Entity):
-    def __init__(self, env: simpyEnv):
+
+    def __init__(self, env: simpyEnv, fauna_type: FaunaType):
         super().__init__(EntityType.FAUNA, env)
+        self._fauna_type = fauna_type
+        self._logger.error(f"FAUNA CREATED: {fauna_type}")
+
+    def dump_components(self) -> None:
+        pass
+
+    def compute_state(self):
+        pass
+
+    @property
+    def type(self):
+        return self._fauna_type

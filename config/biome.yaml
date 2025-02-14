@@ -6,16 +6,30 @@ biome:
   type: "tropical"
   flora:
     - type: "oak_tree"
-      spawns: 1
+      spawns: 4
+      components:
+        - GrowthComponent:
+            growth_rate: 7
+            decay: 0.1
+        - NutritionalValueComponent:
+            nutritive_value: 0.4
+            nutritional_decay_rate: 0.1
+
     - type: "bramble"
       spawns: 2
+      components:
+        - DefenseComponent:
+        - NutritionalValueComponent:
+            nutritive_value: 0.9
+            toxicity: 99
+
     - type: "mushroom"
       spawns: 4
 
   fauna:
     - type: "deer"
       spawns: 1
+      components:
+        - NutritionalValueComponent:
     - type: "boar"
       spawns: 1
-    - type: "fox"
-      spawns: 2

@@ -24,3 +24,5 @@ EntityList = List["Entity"]
 ComponentDict = Dict["ComponentType", "Component"]
 TerrainList = List["TerrainType"]
 Spawns = List[Dict[str, Any]]
+
+ComponentData = Dict[str, Any]

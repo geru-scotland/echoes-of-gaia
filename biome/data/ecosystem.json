@@ -15,40 +15,62 @@
     "savanna": [0, 5, 10, 10, 70, 5, 0]
   },
   "flora": {
-      "oak_tree": {
-        "growth_rate": "medium",
-        "nutritional_value": 8,
-        "hardines": 5
-      },
-      "bramble": {
-        "growth_rate": "fast",
-        "nutritional_value": 3,
-        "hardiness": 2
-      },
-      "mushroom": {
-        "growth_rate": "very_fast",
-        "nutritional_value": 5,
-        "hardiness": 1
-      }
+    "oak_tree": {
+      "components": [
+        "GrowthComponent",
+        "HealthComponent"
+      ]
     },
+    "bramble": {
+      "components": []
+    },
+    "mushroom": {
+      "components": ["NutritionalValueComponent"]
+    }
+  },
   "fauna": {
       "deer": {
-        "diet": "herbivore",
-        "hunger": 5,
-        "thirst": 8,
-        "energy": 6
+        "components": []
       },
       "boar": {
-        "diet": "omnivore",
-        "hunger": 8,
-        "thirst": 6,
-        "energy": 9
+        "components": ["GrowthComponent", "NutritionalValueComponent"]
       },
       "fox": {
-        "diet": "carnivore",
-        "hunger": 3,
-        "thirst": 2,
-        "energy": 10
+        "components": []
+      }
+  },
+  "components": {
+    "GrowthComponent": {
+      "parameters": {
+        "growth_rate": "float",
+        "decay": "float"
+      },
+      "defaults": {
+        "growth_rate": 1.0,
+        "decay": 0.5
+      }
+    },
+    "NutritionalValueComponent": {
+      "parameters": {
+        "nutritive_value": "float",
+        "nutritional_decay_rate": "float",
+        "toxicity": "float"
+      },
+      "defaults": {
+        "nutritive_value": 0.5,
+        "nutritional_decay_rate": 0.5,
+        "toxicity": 0.0
+      }
+    },
+    "DefenseComponent": {
+      "parameters": {
+        "hardiness": "int",
+        "resistance": "float"
+      },
+      "defaults": {
+        "hardiness": 5,
+        "resistance": 0.2
       }
     }
+  }
 }
