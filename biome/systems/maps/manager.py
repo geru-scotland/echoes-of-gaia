@@ -8,6 +8,7 @@ from biome.components.registry import get_component_class
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
 from biome.entities.flora import Flora
+from biome.systems.maps.worldmap import WorldMap
 from shared.enums import FloraType, FaunaType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
@@ -98,3 +99,4 @@ class WorldMapManager:
         self._env: simpyEnv = env
         self._logger: Logger = logging.getLogger(Loggers.BIOME)
         self.spawn_system = WorldMapManager.SpawnSystem(env, flora_spawns, fauna_spawns)
+        self.world_map = WorldMap(tile_map=map)
