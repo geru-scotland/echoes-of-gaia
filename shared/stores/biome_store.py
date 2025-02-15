@@ -1,5 +1,8 @@
 import json
 import os
+
+import numpy as np
+
 from shared.enums import TerrainType
 from shared.types import TerrainList
 from utils.paths import BIOME_DATA_DIR
@@ -21,7 +24,7 @@ class BiomeStore:
             with open(file_path, "r") as file:
                 data = json.load(file) or {}
 
-                cls.terrains: TerrainList = [getattr(TerrainType, t, None) for t in data.get("terrains", [])]
+                cls.terrains: TerrainList = np.array([getattr(TerrainType, t, None) for t in data.get("terrains", [])], dtype=object)
 
                 cls.biomes = data.get("biomes", {})
                 cls.flora = data.get("flora", {})

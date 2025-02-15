@@ -1,5 +1,6 @@
 from typing import List, Tuple, Dict, TYPE_CHECKING, Any
 
+import numpy as np
 from pygame import Surface
 
 from shared.enums import TerrainType, ComponentType
@@ -11,8 +12,9 @@ if TYPE_CHECKING:
 # algo parecido al typedef de c++; y soy un poco más feliz:
 
 # Mapas
-TileMap = List[List[TerrainType]]
-NoiseMap = List[List[float]]
+TileMap = np.ndarray
+NoiseMap = np.ndarray
+
 
 # Coordenadas y mapeoss de terrenos
 Coords = Tuple[int, int]
@@ -22,7 +24,7 @@ TerrainSpritesMapping = Dict[TerrainType, List[Surface]]
 # Listas
 EntityList = List["Entity"]
 ComponentDict = Dict["ComponentType", "Component"]
-TerrainList = List["TerrainType"]
+TerrainList = np.ndarray
 Spawns = List[Dict[str, Any]]
 
 ComponentData = Dict[str, Any]

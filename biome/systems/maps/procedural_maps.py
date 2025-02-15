@@ -1,8 +1,10 @@
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, Any, Tuple, List, Type
+from typing import Dict, Any, Tuple, List, Type, Callable
 
+import numpy as np
+from numpy import ndarray
 from perlin_noise import PerlinNoise
 
 from shared.enums import TerrainType
@@ -14,7 +16,7 @@ from utils.exceptions import MapGenerationError
 @dataclass
 class Map:
     size: Tuple[int, int] = MAP_DEFAULT_SIZE,
-    weights: List[int] = field(default_factory=list)
+    weights: ndarray = field(default_factory=list)
     tile_map: TileMap = field(default_factory=list)
     noise_map: NoiseMap = field(default_factory=list)
 
@@ -58,57 +60,64 @@ class PerlinNoiseGenerator(ProceduralMethod):
         super().__init__(map, seed)
         self._generate_noisemap()
 
-
-    def _normalize_coordinates(self, coordinates: Tuple[int, int], size: Tuple[int, int]) -> List[float]:
-        x, y = coordinates
-        width, height = size
-        return [x / width, y / height]
+    def _normalize_coordinates(self, coordinates: Tuple[int, int], size: Tuple[int, int]) -> Tuple[float, float]:
+        pass
 
     def _generate_noisemap(self) -> None:
-        perlin_3_freq = PerlinNoise(octaves=3, seed=self._seed)
-        perlin_6_freq = PerlinNoise(octaves=6, seed=self._seed)
-        perlin_12_freq = PerlinNoise(octaves=12, seed=self._seed)
-        perlin_24_freq = PerlinNoise(octaves=24, seed=self._seed)
+        perlin_3_freq: Callable = PerlinNoise(octaves=3, seed=self._seed)
+        perlin_6_freq: Callable = PerlinNoise(octaves=6, seed=self._seed)
+        perlin_12_freq: Callable = PerlinNoise(octaves=12, seed=self._seed)
+        perlin_24_freq: Callable = PerlinNoise(octaves=24, seed=self._seed)
 
         grid_width, grid_height = self._map.size
         grid_width += 1
         grid_height += 1
 
-        self._map.noise_map =  [ [0.0 for x in range(grid_width)] for y in range(grid_height)]
+        # Extraigo indices para montar una matriz con coordenadas
+        # para poder vectorizar cálculos en lugar de ir recorriendo
+        # coordenada a coordenada para pasar las normalizadas a perlin
+        y_indices, x_indices = np.indices((grid_height, grid_width))
+        coords: ndarray = np.stack([x_indices, y_indices], axis=-1)
 
+        normalized_coords: ndarray = coords / np.array([grid_height, grid_width])
+
+        self._map.noise_map = np.zeros((grid_height, grid_width))
+
+        # No puedo vectorizar, perlin functions no aceptan np arrays
         for y in range(grid_height):
             for x in range(grid_width):
-                normalized_coordinates: List[float] = self._normalize_coordinates((x,y), (grid_width, grid_height))
-                noise_value = perlin_3_freq(normalized_coordinates)
-                noise_value += 0.5 * perlin_6_freq(normalized_coordinates)
-                noise_value += 0.25 * perlin_12_freq(normalized_coordinates)
-                noise_value += 0.125 * perlin_24_freq(normalized_coordinates)
-                self._map.noise_map[y][x] = noise_value
+                noise_value = perlin_3_freq(tuple(normalized_coords[y, x]))
+                noise_value += 0.5 * perlin_6_freq(tuple(normalized_coords[y, x]))
+                noise_value += 0.25 * perlin_12_freq(tuple(normalized_coords[y, x]))
+                noise_value += 0.125 * perlin_24_freq(tuple(normalized_coords[y, x]))
+                self._map.noise_map[y, x] = noise_value
 
     def _generate_tilemap(self):
         terrain_types: TerrainList = BiomeStore.terrains
-        total_weights: int = sum(self._map.weights)
-        vector: List[float] = [ item for row in self._map.noise_map for item in row ]
-        min_value: float = min(vector)
-        max_value: float = max(vector)
+        total_weights: int = np.sum(self._map.weights)
+        min_value: float = self._map.noise_map.min()
+        max_value: float = self._map.noise_map.max()
         total_range: float = max_value - min_value
 
-        max_terrain_heights: List[float] = []
-        previous_range_height: float = min_value
-        for terrain_type in terrain_types:
-            height = total_range * (self._map.weights[int(terrain_type)] / total_weights) + previous_range_height
-            max_terrain_heights.append(height)
-            previous_range_height = height
-
+        normalized_weights: ndarray = self._map.weights / total_weights
+        # empieza en min value y voy sumando acumjulativamente los valores escalados
+        # el autor original, acumulaba en iteración, pero como yo vectorizo con numpy
+        # utilizo cumsum
+        max_terrain_heights = min_value + np.cumsum(total_range * normalized_weights)
         max_terrain_heights[int(TerrainType.SNOW)] = max_value
 
-        self._map.tile_map = [ [ TerrainType.GRASS for item in row] for row in self._map.noise_map ]
-        for y in range(len(self._map.tile_map)):
-            for x in range(len(self._map.tile_map[0])):
-                for terrain_type in terrain_types:
-                    if self._map.noise_map[y][x] <= max_terrain_heights[int(terrain_type)]:
-                        self._map.tile_map[y][x] = terrain_type
-                        break
+        # Copio shape del noise map y lo inicializo con grass
+        self._map.tile_map = np.full_like(self._map.noise_map, TerrainType.GRASS, dtype=object)
+
+
+        # Monto np array de shape noisemap, y para cada celda del noisemap selecciono
+        # el terreno que lo cubre, es decir, el terreno ha de tener un valor max tal que
+        # el valor del noisemap entre en ese rango. Por eso uso searchsorted, selecciona
+        # el primer indice que lo cumple.
+        terrain_indices: ndarray = np.searchsorted(max_terrain_heights, self._map.noise_map)
+
+        # A cada celda del tile map, le asigno el tipo de terreno que diga su indice
+        self._map.tile_map = terrain_types[terrain_indices]
     @property
     def tile_map(self):
         return self._map.tile_map
