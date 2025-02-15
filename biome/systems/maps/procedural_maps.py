@@ -114,9 +114,17 @@ class PerlinNoiseGenerator(ProceduralMethod):
         # el terreno que lo cubre, es decir, el terreno ha de tener un valor max tal que
         # el valor del noisemap entre en ese rango. Por eso uso searchsorted, selecciona
         # el primer indice que lo cumple.
+        # Es decir, para cada celda en noise_map, se busca el primer índice en max_terrain_heights
+        # donde el valor de ruido es menor o igual.
         terrain_indices: ndarray = np.searchsorted(max_terrain_heights, self._map.noise_map)
 
         # A cada celda del tile map, le asigno el tipo de terreno que diga su indice
+        # Magia de numpy: indexo un array 2d en terrain types (también array, pero 1d)
+        # terrain_types = np.array(["OCEAN", "BEACH", "GRASS", "MOUNTAIN"])
+        # Cada índice se usa para seleccionar un terreno en terrain_types, como si fueran coordenadas.
+        # Matriz 2D con índices de los terrenos
+        # terrain_indices = np.array([[0, 1, 2],
+        #                             [1, 3, 0]])
         self._map.tile_map = terrain_types[terrain_indices]
     @property
     def tile_map(self):
