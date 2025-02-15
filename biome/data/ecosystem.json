@@ -1,76 +1,106 @@
 {
   "terrains": [
-    "OCEAN_DEEP",
-    "OCEAN_MID",
-    "OCEAN_SHALLOW",
-    "BEACH",
-    "GRASS",
-    "MOUNTAIN",
-    "SNOW"
+      "OCEAN_DEEP",
+      "OCEAN_MID",
+      "OCEAN_SHALLOW",
+      "BEACH",
+      "GRASS",
+      "MOUNTAIN",
+      "SNOW"
   ],
+
   "biomes": {
-    "tropical": [10, 10, 19, 5, 55, 30, 5],
-    "desert": [0, 5, 5, 10, 80, 10, 0],
-    "taiga": [5, 10, 15, 10, 30, 25, 5],
-    "savanna": [0, 5, 10, 10, 70, 5, 0]
+      "tropical": [10, 10, 19, 5, 55, 30, 5],
+      "desert": [0, 5, 5, 10, 80, 10, 0],
+      "taiga": [5, 10, 15, 10, 30, 25, 5],
+      "savanna": [0, 5, 10, 10, 70, 5, 0]
   },
+
+  "habitats": {
+      "forest": {
+          "IN": ["GRASS", "MOUNTAIN"],
+          "NEARBY": []
+      },
+      "thicket": {
+          "IN": ["GRASS"],
+          "NEARBY": []
+      },
+      "fungal_zone": {
+          "IN": ["GRASS", "MOUNTAIN"],
+          "NEARBY": ["SNOW"]
+      },
+      "coastal": {
+          "IN": ["BEACH"],
+          "NEARBY": ["OCEAN_SHALLOW", "OCEAN_MID"]
+      },
+      "alpine": {
+          "IN": ["MOUNTAIN"],
+          "NEARBY": ["SNOW"]
+      }
+  },
+
   "flora": {
-    "oak_tree": {
-      "components": [
-        "GrowthComponent",
-        "HealthComponent"
-      ]
-    },
-    "bramble": {
-      "components": []
-    },
-    "mushroom": {
-      "components": ["NutritionalValueComponent"]
-    }
+      "oak_tree": {
+          "components": [
+              "GrowthComponent",
+              "HealthComponent"
+          ],
+          "habitat": ["forest"]
+      },
+      "bramble": {
+          "components": [],
+          "habitat": ["thicket"]
+      },
+      "mushroom": {
+          "components": ["NutritionalValueComponent"],
+          "habitat": ["fungal_zone"]
+      }
   },
+
   "fauna": {
       "deer": {
-        "components": []
+          "components": []
       },
       "boar": {
-        "components": ["GrowthComponent", "NutritionalValueComponent"]
+          "components": ["GrowthComponent", "NutritionalValueComponent"]
       },
       "fox": {
-        "components": []
+          "components": []
       }
   },
+
   "components": {
-    "GrowthComponent": {
-      "parameters": {
-        "growth_rate": "float",
-        "decay": "float"
+      "GrowthComponent": {
+          "parameters": {
+              "growth_rate": "float",
+              "decay": "float"
+          },
+          "defaults": {
+              "growth_rate": 1.0,
+              "decay": 0.5
+          }
       },
-      "defaults": {
-        "growth_rate": 1.0,
-        "decay": 0.5
-      }
-    },
-    "NutritionalValueComponent": {
-      "parameters": {
-        "nutritive_value": "float",
-        "nutritional_decay_rate": "float",
-        "toxicity": "float"
+      "NutritionalValueComponent": {
+          "parameters": {
+              "nutritive_value": "float",
+              "nutritional_decay_rate": "float",
+              "toxicity": "float"
+          },
+          "defaults": {
+              "nutritive_value": 0.5,
+              "nutritional_decay_rate": 0.5,
+              "toxicity": 0.0
+          }
       },
-      "defaults": {
-        "nutritive_value": 0.5,
-        "nutritional_decay_rate": 0.5,
-        "toxicity": 0.0
+      "DefenseComponent": {
+          "parameters": {
+              "hardiness": "int",
+              "resistance": "float"
+          },
+          "defaults": {
+              "hardiness": 5,
+              "resistance": 0.2
+          }
       }
-    },
-    "DefenseComponent": {
-      "parameters": {
-        "hardiness": "int",
-        "resistance": "float"
-      },
-      "defaults": {
-        "hardiness": 5,
-        "resistance": 0.2
-      }
-    }
   }
 }

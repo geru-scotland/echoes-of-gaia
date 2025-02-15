@@ -3,6 +3,8 @@ import random
 from logging import Logger
 from typing import Optional, Dict, Any, Tuple
 
+import numpy as np
+
 from config.settings import BiomeSettings, Config
 from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
 from shared.constants import MAP_DEFAULT_SIZE
@@ -29,11 +31,11 @@ class MapConfigurator(ConfiguratorStrategy):
         biomes = BiomeStore.biomes
         map_data: Dict[str, Any] = {
             "size": map_size,
-            "weights": biomes[config.get("type", {})]
+            "weights": np.array(biomes.get(config.get("type", {}), []))
         }
 
         try:
-            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=random.randint(1, 99))
+            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=3)
             self._logger.debug(self._map.tile_map)
         except Exception as e:
             raise
