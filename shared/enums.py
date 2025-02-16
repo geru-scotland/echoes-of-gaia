@@ -65,7 +65,7 @@ class Timers:
 
     class Entity(EnumBaseInt):
         GROWTH = 25
-        NUTRITIONAL_VALUE_DECAY = 50
+        NUTRITIONAL_VALUE_DECAY = 5
         ENERGY = 3
 
     class Biome(EnumBaseInt):

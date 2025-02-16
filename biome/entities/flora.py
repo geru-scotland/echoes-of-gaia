@@ -15,6 +15,8 @@
 #                                                                        #
 ##########################################################################
 """
+from typing import Any
+
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
@@ -40,6 +42,11 @@ class Flora(Entity):
             component_attrs = vars(component)
             formatted_attrs = ", ".join(f"{k}={v.__class__}" for k, v in component_attrs.items() if not k.startswith("_"))
             self._logger.info(f" - {component_type}: {formatted_attrs}")
+
+    def handle_component_update(self, **kwargs: Any):
+        print(f"{self._flora_type}({self._entity_type}) - {kwargs}")
+
+
     @property
     def type(self):
         return self._flora_type

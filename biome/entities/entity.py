@@ -17,6 +17,7 @@
 """
 import logging
 from abc import ABC, abstractmethod
+from typing import Any
 
 from simpy import Environment as simpyEnv
 
@@ -25,7 +26,8 @@ from shared.enums import ComponentType, EntityType
 from shared.strings import Loggers
 from shared.types import ComponentDict
 from simulation.core.systems.events.handler import EventHandler
-from biome.components.component import Component
+from biome.components.component import EntityComponent
+
 
 class Entity(EventHandler, StateHandler, ABC):
 
@@ -39,7 +41,7 @@ class Entity(EventHandler, StateHandler, ABC):
     def _register_events(self):
         pass
 
-    def add_component(self, component: Component):
+    def add_component(self, component: EntityComponent):
         self._components[component.type] = component
         component.entity = self
 
@@ -48,6 +50,10 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def get_components_size(self) -> int:
         return len(self._components)
+
+    @abstractmethod
+    def handle_component_update(self, **kwargs: Any):
+        raise NotImplementedError
 
     @abstractmethod
     def dump_components(self) -> None:

@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Optional
+from typing import Optional, Callable
 
 from simpy import Environment as simpyEnv
 
@@ -24,9 +24,9 @@ from shared.enums import ComponentType, Timers
 
 
 class NutritionalValueComponent(EntityComponent):
-    def __init__(self, env: simpyEnv, nutritive_value: float, nutritional_decay_rate: float,
+    def __init__(self, env: simpyEnv, callback: Callable, nutritive_value: float, nutritional_decay_rate: float,
                  toxicity: float):
-        super().__init__(ComponentType.NUTRITIONAL, env)
+        super().__init__(ComponentType.NUTRITIONAL, env, callback)
         # Por ahora, ha de ser exacto y coincidir con atributos
         # en biome/data/ecosystem.json... TODO: Cambiar esto
         self._nutritive_value = nutritive_value
@@ -40,7 +40,8 @@ class NutritionalValueComponent(EntityComponent):
     def _update(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._logger.info(f"[Component][NUTRITIONAL][t={self._env.now}] Nutritional value is decaying.")
+            message: str = f"[Component][{self._type}][t={self._env.now}] Entity is changing, nutrition_value: {self._nutritive_value}"
+            self._handle_component_update(data=message)
             yield self._env.timeout(timer)
 
     def get_state(self):

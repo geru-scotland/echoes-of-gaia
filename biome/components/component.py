@@ -16,8 +16,8 @@
 ##########################################################################
 """
 import logging
-from abc import abstractmethod
-from typing import Optional
+from abc import abstractmethod, ABC
+from typing import Optional, Callable
 
 from simpy import Environment as simpyEnv
 
@@ -25,7 +25,7 @@ from shared.enums import ComponentType
 from shared.strings import Loggers
 
 
-class Component:
+class Component(ABC):
     def __init__(self, type: ComponentType, env: simpyEnv):
         self._logger: logging.Logger = logging.getLogger(Loggers.BIOME)
         self._type: ComponentType = type
@@ -45,7 +45,7 @@ class Component:
 
 
 class BiomeComponent(Component):
-    def __int__(self, type: ComponentType, env: simpyEnv):
+    def __init__(self, type: ComponentType, env: simpyEnv):
         super().__init__(type, env)
 
     def get_state(self):
@@ -56,8 +56,9 @@ class BiomeComponent(Component):
 
 
 class EntityComponent(Component):
-    def __int__(self, type: ComponentType, env: simpyEnv):
+    def __init__(self, type: ComponentType, env: simpyEnv, callback: Callable):
         super().__init__(type, env)
+        self._handle_component_update: Callable = callback 
 
     def get_state(self):
         pass

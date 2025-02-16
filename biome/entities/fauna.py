@@ -15,6 +15,8 @@
 #                                                                        #
 ##########################################################################
 """
+from typing import Any
+
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
@@ -30,6 +32,9 @@ class Fauna(Entity):
 
     def dump_components(self) -> None:
         pass
+
+    def handle_component_update(self, **kwargs: Any):
+        print(f"{self._fauna_type}({self._entity_type}) - {kwargs}")
 
     def compute_state(self):
         pass

@@ -91,7 +91,7 @@ class WorldMapManager:
                             if data:
                                 component_class = get_component_class(class_name)
                                 if component_class:
-                                    component_instance = component_class(self._env, **data)
+                                    component_instance = component_class(self._env, entity.handle_component_update, **data)
                                     self._logger.info(
                                         f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                                     entity.add_component(component_instance)

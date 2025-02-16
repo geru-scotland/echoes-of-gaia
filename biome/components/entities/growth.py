@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Optional
+from typing import Optional, Callable
 
 from simpy import Environment as simpyEnv
 
@@ -25,8 +25,8 @@ from shared.types import ComponentData
 
 
 class GrowthComponent(EntityComponent):
-    def __init__(self, env: simpyEnv, growth_rate: int = 0, decay = 0):
-        super().__init__(ComponentType.GROWTH, env)
+    def __init__(self, env: simpyEnv, callback: Callable, growth_rate: int = 0, decay = 0):
+        super().__init__(ComponentType.GROWTH, env, callback)
         # Por ahora, ha de ser exacto y coincidir con atributos
         # en biome/data/ecosystem.json... TODO: Cambiar esto
         self._growth_rate: int = growth_rate
@@ -38,7 +38,8 @@ class GrowthComponent(EntityComponent):
     def _update(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._logger.info(f"[Component][Growth][t={self._env.now}] Entity is growing.")
+            message: str = f"[Component][{self._type}][t={self._env.now}] Entity is growing, rate: {self._growth_rate}"
+            self._handle_component_update(data=message)
             yield self._env.timeout(timer)
 
     def get_state(self):

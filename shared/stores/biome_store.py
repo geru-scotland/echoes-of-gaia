@@ -17,6 +17,7 @@
 """
 import json
 import os
+from typing import Dict, Any
 
 import numpy as np
 
@@ -28,6 +29,7 @@ class BiomeStore:
     _initialized = False
     terrains = []
     biomes = {}
+    habitats = {}
     flora = {}
     fauna = {}
 
@@ -42,11 +44,11 @@ class BiomeStore:
                 data = json.load(file) or {}
 
                 cls.terrains: TerrainList = np.array([getattr(TerrainType, t, None) for t in data.get("terrains", [])], dtype=object)
-
-                cls.biomes = data.get("biomes", {})
-                cls.flora = data.get("flora", {})
-                cls.fauna = data.get("fauna", {})
-                cls.components = data.get("components", {})
+                cls.habitats: Dict[str, Any] = data.get("habitats", {})
+                cls.biomes: Dict[str, Any] = data.get("biomes", {})
+                cls.flora: Dict[str, Any] = data.get("flora", {})
+                cls.fauna: Dict[str, Any] = data.get("fauna", {})
+                cls.components: Dict[str, Any] = data.get("components", {})
 
                 cls._initialized = True
         except (FileNotFoundError, json.JSONDecodeError):
