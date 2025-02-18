@@ -24,6 +24,7 @@ import numpy as np
 
 from config.settings import BiomeSettings, Config
 from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
+from exceptions.custom import MapGenerationError
 from shared.constants import MAP_DEFAULT_SIZE
 from shared.stores.biome_store import BiomeStore
 from shared.types import Spawns
@@ -54,7 +55,9 @@ class MapConfigurator(ConfiguratorStrategy):
         try:
             self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=random.randint(1, 99))
             self._logger.debug(self._map.tile_map)
-        except Exception as e:
+        except MapGenerationError as e:
+            logging.error(f"[ERROR] Map generation failed: {e}")
+            self._map = None
             raise
 
     def get_map(self) -> Map:

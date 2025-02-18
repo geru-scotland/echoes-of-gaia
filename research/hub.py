@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+import sys
 from logging import Logger
 from threading import Thread
 
@@ -22,10 +23,13 @@ from config.settings import Settings
 from simulation.api.simulation_api import SimulationAPI
 from simulation.render.manager import RenderManager
 from utils.loggers import setup_logger
+from exceptions.general import global_exception_handler
+
+sys.excepthook = global_exception_handler
 
 settings = Settings()
 # TODO: Pasar a config esto
-HEADLESS: bool = True
+HEADLESS: bool = False
 
 simulation = SimulationAPI(settings)
 

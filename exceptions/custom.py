@@ -15,12 +15,20 @@
 #                                                                        #
 ##########################################################################
 """
-class SimulationError(Exception):
-    """Excepción base para todos los errores de la simulación."""
+
+class EchoesOfGaiaException(Exception):
     pass
 
-class BiomeError(Exception):
-    """Excepción base para todos los errores de el Bioma"""
+class SimulationError(EchoesOfGaiaException):
+    pass
+
+class BiomeError(EchoesOfGaiaException):
+    pass
+
+class DataLoadingError(EchoesOfGaiaException):
+    pass
+
+class AgentError(EchoesOfGaiaException):
     pass
 
 class BootstrapError(SimulationError):
@@ -45,3 +53,5 @@ class SimulationRunError(SimulationError):
 class MapGenerationError(BiomeError):
     def __init__(self, message: str):
         super().__init__(f"Map generation error: {message}")
+
+
