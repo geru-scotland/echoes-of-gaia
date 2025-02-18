@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 # Mapas
 TileMap = np.ndarray
 NoiseMap = np.ndarray
+EntityLayer = np.ndarray
 
 
 # Coordenadas y mapeoss de terrenos

@@ -19,6 +19,7 @@ import logging
 from logging import Logger
 from typing import List, Dict, Any
 
+import numpy as np
 from simpy import Environment as simpyEnv
 
 from biome.components.registry import get_component_class
@@ -29,7 +30,7 @@ from biome.systems.maps.worldmap import WorldMap
 from shared.enums import FloraType, FaunaType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
-from shared.types import TileMap, Spawns, EntityList
+from shared.types import TileMap, Spawns, EntityList, EntityLayer
 from utils.loggers import setup_logger
 
 
@@ -112,8 +113,15 @@ class WorldMapManager:
             # quizá en un futuro hacer acuáticos.
             pass
 
+        def spawn(self):
+            pass
+
     def __init__(self, env: simpyEnv, map: TileMap, flora_spawns: Spawns, fauna_spawns: Spawns):
         self._env: simpyEnv = env
         self._logger: Logger = logging.getLogger(Loggers.BIOME)
-        self.spawn_system = WorldMapManager.SpawnSystem(env, flora_spawns, fauna_spawns)
-        self.world_map = WorldMap(tile_map=map)
+        self._spawn_system = WorldMapManager.SpawnSystem(env, flora_spawns, fauna_spawns)
+        self._world_map = WorldMap(tile_map=map)
+        self._entity_layer: EntityLayer = np.zeros(map.shape)
+
+    def _is_valid_position(self):
+        pass
