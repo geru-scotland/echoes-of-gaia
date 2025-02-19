@@ -18,11 +18,9 @@
 import logging
 from abc import ABC
 from dataclasses import dataclass
-from typing import Dict, Any
 
-from biome.systems.maps.procedural_maps import Map
 from config.settings import Config
-from shared.types import Spawns
+from shared.types import Spawns, TileMap
 
 
 @dataclass
@@ -31,7 +29,7 @@ class ContextData(ABC):
 
 @dataclass
 class BiomeContextData(ContextData):
-    map: Map
+    tile_map: TileMap
     config: Config
     flora_spawns: Spawns
     fauna_spawns: Spawns

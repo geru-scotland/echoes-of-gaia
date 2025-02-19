@@ -30,7 +30,7 @@ from biome.systems.maps.worldmap import WorldMap
 from shared.enums import FloraType, FaunaType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
-from shared.types import TileMap, Spawns, EntityList, EntityLayer
+from shared.types import TileMap, Spawns, EntityList, EntityLayer, HabitatCache, BiomeStoreData
 from utils.loggers import setup_logger
 
 
@@ -39,6 +39,7 @@ class WorldMapManager:
         def __init__(self, env: simpyEnv, flora_spawns: Spawns = None, fauna_spawns: Spawns = None):
             self._logger: Logger = setup_logger("spawn_system", "spawns.log")
             self._env: simpyEnv = env
+            self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
             self._created_flora: EntityList = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
             self._created_fauna: EntityList = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
 
@@ -47,7 +48,7 @@ class WorldMapManager:
             if not spawns:
                 return []
 
-            self._logger.info(f"Spawning {entity_class.__name__}...")
+            self._logger.info(f"Creating entities... {entity_class.__name__}...")
 
             spawned_entities: EntityList = []
 
@@ -93,7 +94,7 @@ class WorldMapManager:
                                 component_class = get_component_class(class_name)
                                 if component_class:
                                     component_instance = component_class(self._env, entity.handle_component_update, **data)
-                                    self._logger.info(
+                                    self._logger.debug(
                                         f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                                     entity.add_component(component_instance)
                                 else:
@@ -102,6 +103,9 @@ class WorldMapManager:
                     spawned_entities.append(entity)
 
             return spawned_entities
+
+        def _precompute_habitat_cache(self, habitat_data: BiomeStoreData) -> HabitatCache:
+            pass
 
         def position_flora_in_world(self):
             # basarme en reglas para cada tipo de flora.
@@ -116,12 +120,11 @@ class WorldMapManager:
         def spawn(self):
             pass
 
-    def __init__(self, env: simpyEnv, map: TileMap, flora_spawns: Spawns, fauna_spawns: Spawns):
+    def __init__(self, env: simpyEnv, tile_map: TileMap, flora_spawns: Spawns, fauna_spawns: Spawns):
         self._env: simpyEnv = env
         self._logger: Logger = logging.getLogger(Loggers.BIOME)
         self._spawn_system = WorldMapManager.SpawnSystem(env, flora_spawns, fauna_spawns)
-        self._world_map = WorldMap(tile_map=map)
-        self._entity_layer: EntityLayer = np.zeros(map.shape)
+        self._world_map = WorldMap(tile_map=tile_map, habitat_data=BiomeStore.habitats)
 
     def _is_valid_position(self):
         pass

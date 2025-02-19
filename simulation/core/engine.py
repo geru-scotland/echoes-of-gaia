@@ -45,7 +45,7 @@ class SimulationEngine:
             self._eras = self._context.config.get("eras", {}).get("amount", 0)
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._time: SimulationTime = SimulationTime(self._events_per_era)
-            EventDispatcher.trigger("biome_loaded", biome_context.map)
+            EventDispatcher.trigger("biome_loaded", biome_context.tile_map)
         except Exception as e:
             self._logger = setup_logger("bootstrap", "bootstrap.log")
             self._logger.exception(f"[Simulation Engine] There was an error bootstraping: {e}")

@@ -31,7 +31,7 @@ class GrowthComponent(EntityComponent):
         # en biome/data/ecosystem.json... TODO: Cambiar esto
         self._growth_rate: int = growth_rate
         self._decay: int = decay
-        self._logger.warning(f"GR: {self._growth_rate}, decay: {self._decay}")
+        self._logger.debug(f"GR: {self._growth_rate}, decay: {self._decay}")
         self._env.process(self._update(Timers.Entity.GROWTH))
 
 

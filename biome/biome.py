@@ -33,7 +33,7 @@ class Biome(Environment, StateHandler):
             self._env.process(self.update(25))
             self.add_component(Climate(self._env))
             self._logger.info(self._context.config.get("type"))
-            self._map_manager: WorldMapManager = WorldMapManager(self._env, map=self._context.map.tile_map,
+            self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_spawns=self._context.flora_spawns,
                                                                  fauna_spawns=self._context.fauna_spawns)
             self._logger.info("Biome is ready!")

@@ -17,10 +17,13 @@
 """
 import numpy as np
 
-from shared.types import TileMap
+from shared.types import TileMap, BiomeStoreData
 
 
 class WorldMap:
-    def __init__(self, tile_map: TileMap):
-        self._map = tile_map
-        self._entity_layer = None
+    def __init__(self, tile_map: TileMap, habitat_data: BiomeStoreData):
+        self._tile_map = tile_map
+        self._entity_layer = np.zeros(self._tile_map.shape)
+
+
+

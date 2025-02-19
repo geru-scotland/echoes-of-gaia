@@ -29,7 +29,7 @@ sys.excepthook = global_exception_handler
 
 settings = Settings()
 # TODO: Pasar a config esto
-HEADLESS: bool = False
+HEADLESS: bool = True
 
 simulation = SimulationAPI(settings)
 

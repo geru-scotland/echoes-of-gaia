@@ -18,6 +18,7 @@
 from typing import List, Tuple, Dict, TYPE_CHECKING, Any
 
 import numpy as np
+from numpy import ndarray
 from pygame import Surface
 
 from shared.enums import TerrainType, ComponentType
@@ -46,3 +47,7 @@ TerrainList = np.ndarray
 Spawns = List[Dict[str, Any]]
 
 ComponentData = Dict[str, Any]
+
+
+BiomeStoreData = Dict[str, Any]
+HabitatCache = Dict[str, ndarray]

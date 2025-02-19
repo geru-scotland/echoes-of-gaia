@@ -22,7 +22,7 @@ from typing import Dict, Any
 import numpy as np
 
 from shared.enums import TerrainType
-from shared.types import TerrainList
+from shared.types import TerrainList, BiomeStoreData
 from utils.paths import BIOME_DATA_DIR
 
 class BiomeStore:
@@ -44,11 +44,11 @@ class BiomeStore:
                 data = json.load(file) or {}
 
                 cls.terrains: TerrainList = np.array([getattr(TerrainType, t, None) for t in data.get("terrains", [])], dtype=object)
-                cls.habitats: Dict[str, Any] = data.get("habitats", {})
-                cls.biomes: Dict[str, Any] = data.get("biomes", {})
-                cls.flora: Dict[str, Any] = data.get("flora", {})
-                cls.fauna: Dict[str, Any] = data.get("fauna", {})
-                cls.components: Dict[str, Any] = data.get("components", {})
+                cls.habitats: BiomeStoreData = data.get("habitats", {})
+                cls.biomes: BiomeStoreData = data.get("biomes", {})
+                cls.flora: BiomeStoreData = data.get("flora", {})
+                cls.fauna: BiomeStoreData = data.get("fauna", {})
+                cls.components: BiomeStoreData = data.get("components", {})
 
                 cls._initialized = True
         except (FileNotFoundError, json.JSONDecodeError):

@@ -18,8 +18,9 @@
 from logging import Logger
 from typing import Dict, Any
 
-from biome.systems.maps.procedural_maps import Map
+from biome.systems.maps.procedural_maps import MapGenData
 from shared.strings import Loggers
+from shared.types import TileMap
 from simulation.core.systems.events.dispatcher import EventDispatcher
 from simulation.core.systems.events.handler import EventHandler
 from simulation.render.components import MapComponent
@@ -37,13 +38,13 @@ class RenderEventHandler(EventHandler):
         EventDispatcher.register("biome_loaded", self.on_biome_loaded)
         EventDispatcher.register("simulation_finished", self.on_simulation_finished)
 
-    def on_biome_loaded(self, map: Map):
+    def on_biome_loaded(self, tile_map: TileMap):
         print("[Render] Biome Loaded! Now biome image should be projected")
         print(f"Render title: {self._settings.title}")
         try:
             if self._engine.is_initialized():
                 tile_config: Dict[str, Any] = self._settings.config.get("tiles", {})
-                map_component: MapComponent = MapComponent(map, tile_config)
+                map_component: MapComponent = MapComponent(tile_map, tile_config)
                 self._engine.enqueue_task(self._engine.add_component, map_component)
         except Exception as e:
             self._logger.exception(f"There was an error adding the Map component to the Render Engine: {e}")
