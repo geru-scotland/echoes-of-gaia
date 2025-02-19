@@ -30,8 +30,7 @@ class ConfiguratorStrategy(ABC):
 
 
 class Builder(ABC):
-    def __init__(self, logger: Logger):
-        self._logger = logger
+    def __init__(self):
         self._context: Optional[Context] = None
 
     def _initialise(self):

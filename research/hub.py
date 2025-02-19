@@ -20,22 +20,24 @@ from logging import Logger
 from threading import Thread
 
 from config.settings import Settings
+from shared.strings import Loggers
 from simulation.api.simulation_api import SimulationAPI
 from simulation.render.manager import RenderManager
-from utils.loggers import setup_logger
+from utils.loggers import LoggerManager
 from exceptions.general import global_exception_handler
 
 sys.excepthook = global_exception_handler
 
-settings = Settings()
+settings: Settings = Settings()
+LoggerManager.initialize(settings.log_level)
 # TODO: Pasar a config esto
-HEADLESS: bool = True
+HEADLESS: bool = False
 
 simulation = SimulationAPI(settings)
 
-logger = setup_logger("research", "research.log")
-logger.info("Welcome to the Research Hub")
+logger: Logger = LoggerManager.get_logger(Loggers.RESEARCH)
 
+logger.info("Welcome to the Research Hub")
 
 if HEADLESS:
     simulation.run()

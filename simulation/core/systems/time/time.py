@@ -18,11 +18,12 @@
 import logging
 
 from shared.strings import Loggers
+from utils.loggers import LoggerManager
 
 
 class SimulationTime:
     def __init__(self, events_per_era: int = 30000):
-        self._logger: logging.Logger = logging.getLogger(Loggers.SIMULATION)
+        self._logger: logging.Logger = LoggerManager.get_logger(Loggers.SIMULATION)
         self.events_per_era = events_per_era
 
     def get_current_era(self, event_count: int) -> int:

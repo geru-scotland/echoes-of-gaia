@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-import logging
+from logging import Logger
 from abc import abstractmethod, ABC
 from typing import Optional, Callable
 
@@ -23,11 +23,12 @@ from simpy import Environment as simpyEnv
 
 from shared.enums import ComponentType
 from shared.strings import Loggers
+from utils.loggers import LoggerManager
 
 
 class Component(ABC):
     def __init__(self, type: ComponentType, env: simpyEnv):
-        self._logger: logging.Logger = logging.getLogger(Loggers.BIOME)
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._type: ComponentType = type
         self._env: simpyEnv = env
 

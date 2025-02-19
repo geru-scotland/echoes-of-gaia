@@ -25,7 +25,7 @@ from shared.types import Spawns, TileMap
 
 @dataclass
 class ContextData(ABC):
-    logger: logging.Logger
+    logger_name: str
 
 @dataclass
 class BiomeContextData(ContextData):
