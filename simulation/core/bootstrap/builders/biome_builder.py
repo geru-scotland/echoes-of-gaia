@@ -28,10 +28,11 @@ from exceptions.custom import MapGenerationError
 from shared.constants import MAP_DEFAULT_SIZE
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
-from shared.types import Spawns, TileMap
+from shared.types import EntityDefinitions, TileMap
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy
 from utils.loggers import LoggerManager
+from utils.middleware import log_execution_time
 
 
 class MapConfigurator(ConfiguratorStrategy):
@@ -39,6 +40,7 @@ class MapConfigurator(ConfiguratorStrategy):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._map: Optional[MapGenData] = None
 
+    @log_execution_time("Map Generation")
     def configure(self, settings: BiomeSettings, **kwargs: Any) -> None:
         map_size: Tuple[int, int]
         config: Config = kwargs.get("config")
@@ -89,12 +91,12 @@ class BiomeBuilder(Builder):
         try:
             logger = self._settings.get_logger()
             config: Config = self._settings.config.get("biome")
-            flora: Spawns = config.get("flora", {})
-            fauna: Spawns = config.get("fauna", {})
+            flora: EntityDefinitions = config.get("flora", {})
+            fauna: EntityDefinitions = config.get("fauna", {})
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
             self._context = BiomeContextData(tile_map=map_configurator.get_tile_map(),
                                              config=config, logger_name=Loggers.BIOME,
-                                             flora_spawns=flora, fauna_spawns=fauna)
+                                             flora_definitions=flora, fauna_definitions=fauna)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Biome: {e}")

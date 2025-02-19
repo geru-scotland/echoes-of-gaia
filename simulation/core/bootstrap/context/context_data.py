@@ -20,7 +20,7 @@ from abc import ABC
 from dataclasses import dataclass
 
 from config.settings import Config
-from shared.types import Spawns, TileMap
+from shared.types import TileMap, EntityDefinitions
 
 
 @dataclass
@@ -31,8 +31,8 @@ class ContextData(ABC):
 class BiomeContextData(ContextData):
     tile_map: TileMap
     config: Config
-    flora_spawns: Spawns
-    fauna_spawns: Spawns
+    flora_definitions: EntityDefinitions
+    fauna_definitions: EntityDefinitions
 
 @dataclass
 class SimulationContextData(ContextData):

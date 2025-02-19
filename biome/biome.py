@@ -21,7 +21,6 @@ from biome.components.biome.climate import Climate
 from biome.environment import Environment
 from biome.systems.maps.manager import WorldMapManager
 from biome.systems.state.handler import StateHandler
-from shared.types import Spawns
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 
@@ -34,8 +33,8 @@ class Biome(Environment, StateHandler):
             self.add_component(Climate(self._env))
             self._logger.info(self._context.config.get("type"))
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
-                                                                 flora_spawns=self._context.flora_spawns,
-                                                                 fauna_spawns=self._context.fauna_spawns)
+                                                                 flora_definitions=self._context.flora_definitions,
+                                                                 fauna_definitions=self._context.fauna_definitions)
             self._logger.info("Biome is ready!")
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
