@@ -44,7 +44,7 @@ TerrainSpritesMapping = Dict[TerrainType, List[Surface]]
 EntityList = List["Entity"]
 ComponentDict = Dict["ComponentType", "Component"]
 TerrainList = np.ndarray
-Spawns = List[Dict[str, Any]]
+EntityDefinitions = List[Dict[str, Any]]
 
 ComponentData = Dict[str, Any]
 

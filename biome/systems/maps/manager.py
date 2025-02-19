@@ -17,7 +17,7 @@
 """
 import logging
 from logging import Logger
-from typing import List
+from typing import List, Tuple
 
 from simpy import Environment as simpyEnv
 
@@ -29,21 +29,21 @@ from biome.systems.maps.worldmap import WorldMap
 from shared.enums import FloraType, FaunaType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
-from shared.types import TileMap, Spawns, EntityList, HabitatCache, BiomeStoreData
+from shared.types import TileMap, EntityList, HabitatCache, BiomeStoreData, EntityDefinitions
 from utils.loggers import LoggerManager
 
 
 class WorldMapManager:
     class SpawnSystem:
-        def __init__(self, env: simpyEnv, flora_spawns: Spawns = None, fauna_spawns: Spawns = None):
-            self._logger: Logger = LoggerManager.get_logger("world_manager")
+        def __init__(self, env: simpyEnv, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
+            self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
             self._env: simpyEnv = env
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
             self._created_flora: EntityList = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
             self._created_fauna: EntityList = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
 
 
-        def _create_entities(self, spawns: Spawns, entity_class, entity_type_enum, biome_store) -> EntityList:
+        def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_type_enum, biome_store) -> EntityList:
             if not spawns:
                 return []
 
@@ -116,13 +116,15 @@ class WorldMapManager:
             # quizá en un futuro hacer acuáticos.
             pass
 
-        def spawn(self):
+        def spawn(self) -> Tuple[EntityList, EntityList]:
             pass
 
-    def __init__(self, env: simpyEnv, tile_map: TileMap, flora_spawns: Spawns, fauna_spawns: Spawns):
+    def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions, fauna_definitions: EntityDefinitions):
         self._env: simpyEnv = env
-        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self._spawn_system = WorldMapManager.SpawnSystem(env, flora_spawns, fauna_spawns)
+        # Quizá worldmapmanager
+        self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
+        self._spawn_system = WorldMapManager.SpawnSystem(env, flora_definitions, fauna_definitions)
+        flora_spawns, fauna_spawns = self._spawn_system.spawn()
         self._world_map = WorldMap(tile_map=tile_map, habitat_data=BiomeStore.habitats)
 
     def _is_valid_position(self):
