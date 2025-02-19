@@ -21,7 +21,9 @@ import sys
 from config.settings import Settings
 from game.scripts.scenes.intro import IntroScene
 from game.systems.scenes.scene_manager import SceneManager
+from shared.strings import Loggers
 from utils.dependecy_injector import dependency_injector
+from utils.loggers import LoggerManager
 
 SCREEN_WIDTH = None
 SCREEN_HEIGHT = None
@@ -36,7 +38,7 @@ class Game:
             print(f"Critical error: Missing dependency - {e}")
             sys.exit(1)
 
-        self._logger = self.settings.get_logger("game")
+        self._logger = LoggerManager.get_logger(Loggers.GAME)
 
         self._logger.info("Initializing game...")
         screen_width, screen_height = self.settings.screen_width, self.settings.screen_height

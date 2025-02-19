@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-import logging
+from logging import Logger
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -27,13 +27,14 @@ from shared.strings import Loggers
 from shared.types import ComponentDict
 from simulation.core.systems.events.handler import EventHandler
 from biome.components.component import EntityComponent
+from utils.loggers import LoggerManager
 
 
 class Entity(EventHandler, StateHandler, ABC):
 
     def __init__(self, type: EntityType, env: simpyEnv):
         super().__init__()
-        self._logger: logging.Logger = logging.getLogger(Loggers.BIOME)
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._entity_type: EntityType = type
         self_env: simpyEnv = env
         self._components: ComponentDict = {}

@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-import logging
+from logging import Logger
 
 from typing import Dict, List, Tuple, Optional, Any, TextIO
 
@@ -25,13 +25,15 @@ import yaml
 
 from shared.enums import TerrainType
 from shared.stores.biome_store import BiomeStore
+from shared.strings import Loggers
 from shared.types import TileMappings, TerrainSpritesMapping, TerrainList
+from utils.loggers import LoggerManager
 
 
 class TerrainTileManager:
     def __init__(self, tile_config: Dict[str, Any]):
         # TODO: Nombres de loggers, a constantes, chapuza esto.
-        self._logger: logging.Logger = logging.getLogger("render_engine")
+        self._logger: Logger = LoggerManager.get_logger(Loggers.RENDER)
         self._tilesheet: Optional[Surface] = None
         self._tile_size: Optional[int] = None
         self._terrain_tiles_file: Optional[TextIO] = None

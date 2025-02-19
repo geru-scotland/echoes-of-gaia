@@ -25,21 +25,21 @@ from simulation.core.bootstrap.builders.biome_builder import BiomeBuilder
 from simulation.core.bootstrap.builders.simulation_builder import SimulationBuilder
 from simulation.core.bootstrap.context.context import Context
 from exceptions.custom import BootstrapError, MapGenerationError
-from utils.loggers import setup_logger
+from utils.loggers import LoggerManager
 
 
 class Bootstrap:
     def __init__(self, settings: Settings):
         self._settings: Settings = settings
-        self._logger = setup_logger("bootstrap", "bootstrap.log")
+        self._logger = LoggerManager.get_logger("bootstrap")
         self._context: Context = Context(self._logger)
         self._builders: Dict[str, Any] = {}
         BiomeStore.load_ecosystem_data()
         self._build_context()
 
     def _setup_builders(self):
-         self._builders[Strings.BIOME_BUILDER] = BiomeBuilder(self._settings.biome_settings, self._logger)
-         self._builders[Strings.SIMULATION_BUILDER] = SimulationBuilder(self._settings.simulation_settings, self._logger)
+         self._builders[Strings.BIOME_BUILDER] = BiomeBuilder(self._settings.biome_settings)
+         self._builders[Strings.SIMULATION_BUILDER] = SimulationBuilder(self._settings.simulation_settings)
 
     def _build(self):
          self._builders[Strings.BIOME_BUILDER].build()

@@ -17,9 +17,8 @@
 """
 import logging
 from logging import Logger
-from typing import List, Dict, Any
+from typing import List
 
-import numpy as np
 from simpy import Environment as simpyEnv
 
 from biome.components.registry import get_component_class
@@ -30,14 +29,14 @@ from biome.systems.maps.worldmap import WorldMap
 from shared.enums import FloraType, FaunaType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
-from shared.types import TileMap, Spawns, EntityList, EntityLayer, HabitatCache, BiomeStoreData
-from utils.loggers import setup_logger
+from shared.types import TileMap, Spawns, EntityList, HabitatCache, BiomeStoreData
+from utils.loggers import LoggerManager
 
 
 class WorldMapManager:
     class SpawnSystem:
         def __init__(self, env: simpyEnv, flora_spawns: Spawns = None, fauna_spawns: Spawns = None):
-            self._logger: Logger = setup_logger("spawn_system", "spawns.log")
+            self._logger: Logger = LoggerManager.get_logger("world_manager")
             self._env: simpyEnv = env
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
             self._created_flora: EntityList = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
@@ -122,7 +121,7 @@ class WorldMapManager:
 
     def __init__(self, env: simpyEnv, tile_map: TileMap, flora_spawns: Spawns, fauna_spawns: Spawns):
         self._env: simpyEnv = env
-        self._logger: Logger = logging.getLogger(Loggers.BIOME)
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._spawn_system = WorldMapManager.SpawnSystem(env, flora_spawns, fauna_spawns)
         self._world_map = WorldMap(tile_map=tile_map, habitat_data=BiomeStore.habitats)
 

@@ -27,14 +27,16 @@ from biome.systems.maps.procedural_maps import MapGenerator, MapGenData, PerlinN
 from exceptions.custom import MapGenerationError
 from shared.constants import MAP_DEFAULT_SIZE
 from shared.stores.biome_store import BiomeStore
+from shared.strings import Loggers
 from shared.types import Spawns, TileMap
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy
+from utils.loggers import LoggerManager
 
 
 class MapConfigurator(ConfiguratorStrategy):
     def __init__(self):
-        self._logger = logging.getLogger()
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._map: Optional[MapGenData] = None
 
     def configure(self, settings: BiomeSettings, **kwargs: Any) -> None:
@@ -70,9 +72,10 @@ class BiomeBuilder(Builder):
     """
     Cargar settings, inicializar sistemas de eventosGra
     """
-    def __init__(self, settings: BiomeSettings, logger: Logger):
-        super().__init__(logger)
+    def __init__(self, settings: BiomeSettings):
+        super().__init__()
         self._settings = settings
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._logger.info("[Biome Builder] Initialising BiomeBuilder...")
         self._context_data: Optional[BiomeContextData] = None
         self._initialise()
@@ -91,7 +94,7 @@ class BiomeBuilder(Builder):
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
             self._context = BiomeContextData(tile_map=map_configurator.get_tile_map(),
-                                             config=config, logger=logger,
+                                             config=config, logger_name=Loggers.BIOME,
                                              flora_spawns=flora, fauna_spawns=fauna)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Biome: {e}")

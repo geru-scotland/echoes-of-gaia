@@ -20,16 +20,21 @@ from unittest.mock import patch, MagicMock
 
 from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
-from shared.strings import Strings
+from shared.strings import Strings, Loggers
 from simulation.api.simulation_api import SimulationAPI
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
 from simulation.core.engine import SimulationEngine
 from simulation.core.bootstrap.bootstrap import Bootstrap
 import simpy
 
+from utils.loggers import LoggerManager
+
+
 @pytest.fixture
 def settings():
-    return Settings()
+    settings: Settings = Settings()
+    LoggerManager.initialize(settings.log_level)
+    return settings
 
 @pytest.fixture
 def simulation_api(settings):
@@ -63,24 +68,23 @@ def test_simulation_run(mock_run, simulation_api):
 # Test: El contexto del bootstrap se inicializa correctamente con datos reales
 @patch.object(Bootstrap, 'get_context')
 def test_bootstrap_context(mock_get_context, settings):
-
-    logger = MagicMock()
     mock_map = MagicMock()
     mock_config = MagicMock()
     flora_spawns = MagicMock()
     fauna_spawns = MagicMock()
 
     # instancias válidas de los contextos
-    biome_context_data = BiomeContextData(logger=logger, tile_map=mock_map, config=mock_config,
+    biome_context_data = BiomeContextData(logger_name=Loggers.BIOME, tile_map=mock_map, config=mock_config,
                                           flora_spawns=flora_spawns, fauna_spawns=fauna_spawns)
-    simulation_context_data = SimulationContextData(logger=logger, config=mock_config)
+    simulation_context_data = SimulationContextData(logger_name=Loggers.SIMULATION, config=mock_config)
 
     mock_context = MagicMock()
     mock_context.get.side_effect = lambda key: {
         Strings.BIOME_CONTEXT: biome_context_data,
         Strings.SIMULATION_CONTEXT: simulation_context_data
     }.get(key, None)
-    mock_context.logger = logger
+    logger = LoggerManager.get_logger(Loggers.SIMULATION)
+    mock_context.logger = LoggerManager.get_logger(Loggers.SIMULATION)
 
     mock_get_context.return_value = mock_context
 

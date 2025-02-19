@@ -18,8 +18,8 @@
 import json
 import os
 import yaml
+from dotenv import load_dotenv
 
-from utils.loggers import setup_logger
 from utils.paths import CONFIG_DIR, ASSETS_DIR
 
 
@@ -50,13 +50,6 @@ class DefaultSettings:
     def __init__(self, config_file):
         self._config = Config(config_file)
         self._loggers = {}
-        self._setup_default_loggers()
-
-    def _setup_default_loggers(self):
-        pass
-
-    def get_logger(self, name):
-        return self._loggers.get(name, None)
 
     @property
     def config(self):
@@ -92,7 +85,6 @@ class RenderSettings(DefaultSettings, RenderDisplaySettings):
     def __init__(self, config_file="render.yaml"):
         DefaultSettings.__init__(self, config_file)
         RenderDisplaySettings.__init__(self, self.config)
-        self._loggers["render"] = setup_logger("render_engine", "render_engine.log")
         self.title = self.config.get("title")
 
 
@@ -100,7 +92,6 @@ class GameSettings(DefaultSettings, GameDisplaySettings):
     def __init__(self, config_file="game.yaml"):
         DefaultSettings.__init__(self, config_file)
         GameDisplaySettings.__init__(self, self.config)
-        self._loggers["game"] = setup_logger("game", "game.log")
         self.title = self.config.get("title")
 
 
@@ -108,7 +99,6 @@ class SceneSettings(DefaultSettings, GameDisplaySettings):
     def __init__(self, config_file="game.yaml"):
         DefaultSettings.__init__(self, config_file)
         GameDisplaySettings.__init__(self, self.config)
-        self._loggers["scene"] = setup_logger("scene", "scene.log")
         self.scene_data = {}
 
     def load_scene_data(self, scene_name):
@@ -125,7 +115,6 @@ class SceneSettings(DefaultSettings, GameDisplaySettings):
 class BiomeSettings(DefaultSettings):
     def __init__(self, config_file="biome.yaml"):
         super().__init__(config_file)
-        self._loggers["biome"] = setup_logger("biome", "biome.log")
 
     def get_logger(self, name="biome"):
         return self._loggers.get(name)
@@ -134,7 +123,6 @@ class BiomeSettings(DefaultSettings):
 class SimulationSettings(DefaultSettings):
     def __init__(self, config_file="simulation.yaml"):
         super().__init__(config_file)
-        self._loggers["simulation"] = setup_logger("simulation", "simulation.log")
 
     def get_logger(self, name="simulation"):
         return self._loggers.get(name)
@@ -142,11 +130,18 @@ class SimulationSettings(DefaultSettings):
 
 class Settings:
     def __init__(self):
+        load_dotenv()
+        self._log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+
         self._game_settings = None
         self._scene_settings = None
         self._biome_settings = None
         self._simulation_settings = None
         self._render_settings = None
+
+    @property
+    def log_level(self):
+        return self._log_level
 
     @property
     def game_settings(self):

@@ -22,14 +22,16 @@ import queue
 import pygame
 
 from config.settings import RenderSettings
+from shared.strings import Loggers
 from simulation.render.components import RenderComponent
+from utils.loggers import LoggerManager
 
 
 class RenderEngine:
     def __init__(self, settings: RenderSettings):
         self._initialized = False
         self._settings = settings
-        self._logger: Logger = self._settings.get_logger("render")
+        self._logger: Logger = LoggerManager.get_logger(Loggers.RENDER)
         self._components: Dict[str, RenderComponent] = {}
         self._screen = None
         self._task_queue = queue.Queue()

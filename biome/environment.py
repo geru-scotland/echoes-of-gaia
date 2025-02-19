@@ -25,6 +25,7 @@ from biome.components.component import Component
 from shared.enums import ComponentType
 from shared.types import EntityList, ComponentDict
 from simulation.core.bootstrap.context.context_data import ContextData
+from utils.loggers import LoggerManager
 
 T = TypeVar("T", bound=ContextData)
 
@@ -34,7 +35,7 @@ class Environment(Generic[T]):
     def __init__(self, context: T, env: simpyEnv):
         self._context: T = context
         self._env: simpyEnv = env
-        self._logger: Logger = self._context.logger
+        self._logger: Logger = LoggerManager.get_logger(self._context.logger_name)
         self._entities: EntityList = []
         self._components: ComponentDict = {}
 

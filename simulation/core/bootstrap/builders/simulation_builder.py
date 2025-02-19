@@ -19,14 +19,17 @@ from logging import Logger
 from typing import Optional
 
 from config.settings import Config, SimulationSettings
+from shared.strings import Loggers
 from simulation.core.bootstrap.context.context_data import SimulationContextData
 from simulation.core.bootstrap.builders.builder import Builder
+from utils.loggers import LoggerManager
 
 
 class SimulationBuilder(Builder):
-    def __init__(self, settings: SimulationSettings, logger: Logger):
-        super().__init__(logger)
+    def __init__(self, settings: SimulationSettings):
+        super().__init__()
         self._settings = settings
+        self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
         self._logger.info("[Simulation Builder] Initialising SimulationBuilder...")
         self._context_data: Optional[SimulationContextData] = None
         self._initialise()
@@ -37,8 +40,7 @@ class SimulationBuilder(Builder):
     def build(self) -> None:
         self._logger.info("[Simulation Builder] Simulation builder...")
         try:
-            logger = self._settings.get_logger()
             config: Config = self._settings.config.get("simulation")
-            self._context = SimulationContextData(config=config, logger=logger)
+            self._context = SimulationContextData(config=config, logger_name=Loggers.SIMULATION)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Simulation: {e}")

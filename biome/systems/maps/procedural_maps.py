@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-import logging
+from logging import Logger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Dict, Any, Tuple, Type, Callable
@@ -27,8 +27,11 @@ from perlin_noise import PerlinNoise
 from shared.enums import TerrainType
 from shared.constants import MAP_DEFAULT_SIZE
 from shared.stores.biome_store import BiomeStore
+from shared.strings import Loggers
 from shared.types import TileMap, NoiseMap, TerrainList
 from exceptions.custom import MapGenerationError
+from utils.loggers import LoggerManager
+
 
 @dataclass
 class MapGenData:
@@ -38,7 +41,7 @@ class MapGenData:
     noise_map: NoiseMap = field(default_factory=list)
 
     def __post_init__(self):
-        logger = logging.getLogger("bootstrap")
+        logger: Logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
         logger.info(f"[Map] Initialised with size={self.size} and weights={self.weights}")
 
 class ProceduralMethod(ABC):
@@ -151,7 +154,7 @@ class PerlinNoiseGenerator(ProceduralMethod):
 class MapGenerator:
     def __init__(self, algorithm: Type[ProceduralMethod]):
         self._algorithm = algorithm
-        self._logger = logging.getLogger("bootstrap")
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
         self._logger.info("[MapGenerator] Initialising Map generator")
 
     def generate(self, map_data: Dict[str, Any], seed: int = 3) -> MapGenData:
