@@ -17,7 +17,8 @@
 """
 from typing import Dict, Any
 
-from biome.systems.maps.procedural_maps import Map
+from biome.systems.maps.procedural_maps import MapGenData
+from shared.types import TileMap
 from simulation.render.tiles.manager import TerrainTileManager, TerrainSpritesMapping
 
 
@@ -35,12 +36,12 @@ class RenderComponent:
 
 
 class MapComponent(RenderComponent):
-    def __init__(self, map: Map, tile_config: Dict[str, Any]):
+    def __init__(self, tile_map: TileMap, tile_config: Dict[str, Any]):
         super().__init__("map")
-        self._map: Map = map
+        self._tile_map: TileMap= tile_map
         self._tile_manager: TerrainTileManager = TerrainTileManager(tile_config)
         self._terrain_sprites: TerrainSpritesMapping = self._tile_manager.extract_terrain_sprites()
-        self._map_surface = self._tile_manager.calculate_map(map.tile_map)
+        self._map_surface = self._tile_manager.calculate_map(self._tile_map)
 
     def render(self, screen):
         for image, coords in self._map_surface:
@@ -48,4 +49,4 @@ class MapComponent(RenderComponent):
 
     @property
     def data(self):
-        return self._map
+        return self._tile_map

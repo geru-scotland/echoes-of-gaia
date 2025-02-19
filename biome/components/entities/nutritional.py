@@ -32,7 +32,7 @@ class NutritionalValueComponent(EntityComponent):
         self._nutritive_value = nutritive_value
         self._nutritional_decay_rate = nutritional_decay_rate
         self._toxicity = toxicity
-        self._logger.warning(f"NV: {self._nutritive_value}, decay rate : {self._nutritional_decay_rate}"
+        self._logger.debug(f"NV: {self._nutritive_value}, decay rate : {self._nutritional_decay_rate}"
                              f" toxicity: {self._toxicity}")
         self._env.process(self._update(Timers.Entity.NUTRITIONAL_VALUE_DECAY))
 

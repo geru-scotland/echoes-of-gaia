@@ -18,7 +18,7 @@
 import pytest
 
 from shared.stores.biome_store import BiomeStore
-from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
+from biome.systems.maps.procedural_maps import MapGenerator, MapGenData, PerlinNoiseGenerator
 from shared.constants import MAP_DEFAULT_SIZE
 
 @pytest.fixture
@@ -35,7 +35,7 @@ def test_map_generation(bioma_store_load):
     generator = MapGenerator(PerlinNoiseGenerator)
     generated_map = generator.generate(map_data=map_data)
 
-    assert isinstance(generated_map, Map), "The object is not an instance from the Map class"
+    assert isinstance(generated_map, MapGenData), "The object is not an instance from the Map class"
     assert len(generated_map.tile_map) == MAP_DEFAULT_SIZE[1]+1, "The height is not correct"
     assert len(generated_map.tile_map[0]) == MAP_DEFAULT_SIZE[0]+1, "The width is not correct"
 

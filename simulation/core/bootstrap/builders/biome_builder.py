@@ -23,11 +23,11 @@ from typing import Optional, Dict, Any, Tuple
 import numpy as np
 
 from config.settings import BiomeSettings, Config
-from biome.systems.maps.procedural_maps import MapGenerator, Map, PerlinNoiseGenerator
+from biome.systems.maps.procedural_maps import MapGenerator, MapGenData, PerlinNoiseGenerator
 from exceptions.custom import MapGenerationError
 from shared.constants import MAP_DEFAULT_SIZE
 from shared.stores.biome_store import BiomeStore
-from shared.types import Spawns
+from shared.types import Spawns, TileMap
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy
 
@@ -35,7 +35,7 @@ from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStra
 class MapConfigurator(ConfiguratorStrategy):
     def __init__(self):
         self._logger = logging.getLogger()
-        self._map: Optional[Map] = None
+        self._map: Optional[MapGenData] = None
 
     def configure(self, settings: BiomeSettings, **kwargs: Any) -> None:
         map_size: Tuple[int, int]
@@ -60,8 +60,11 @@ class MapConfigurator(ConfiguratorStrategy):
             self._map = None
             raise
 
-    def get_map(self) -> Map:
+    def get_map_gen_data(self) -> MapGenData:
         return self._map
+
+    def get_tile_map(self) -> TileMap:
+        return self._map.tile_map
 
 class BiomeBuilder(Builder):
     """
@@ -87,7 +90,7 @@ class BiomeBuilder(Builder):
             fauna: Spawns = config.get("fauna", {})
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
-            self._context = BiomeContextData(map=map_configurator.get_map(),
+            self._context = BiomeContextData(tile_map=map_configurator.get_tile_map(),
                                              config=config, logger=logger,
                                              flora_spawns=flora, fauna_spawns=fauna)
         except Exception as e:

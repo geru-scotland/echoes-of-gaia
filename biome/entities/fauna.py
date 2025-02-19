@@ -28,13 +28,13 @@ class Fauna(Entity):
     def __init__(self, env: simpyEnv, fauna_type: FaunaType):
         super().__init__(EntityType.FAUNA, env)
         self._fauna_type = fauna_type
-        self._logger.error(f"FAUNA CREATED: {fauna_type}")
+        self._logger.debug(f"FAUNA CREATED: {fauna_type}")
 
     def dump_components(self) -> None:
         pass
 
     def handle_component_update(self, **kwargs: Any):
-        print(f"{self._fauna_type}({self._entity_type}) - {kwargs}")
+        self._logger.debug(f"{self._fauna_type}({self._entity_type}) - {kwargs}")
 
     def compute_state(self):
         pass

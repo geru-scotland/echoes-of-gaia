@@ -71,7 +71,7 @@ def test_bootstrap_context(mock_get_context, settings):
     fauna_spawns = MagicMock()
 
     # instancias válidas de los contextos
-    biome_context_data = BiomeContextData(logger=logger, map=mock_map, config=mock_config,
+    biome_context_data = BiomeContextData(logger=logger, tile_map=mock_map, config=mock_config,
                                           flora_spawns=flora_spawns, fauna_spawns=fauna_spawns)
     simulation_context_data = SimulationContextData(logger=logger, config=mock_config)
 

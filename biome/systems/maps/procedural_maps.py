@@ -18,7 +18,7 @@
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, Any, Tuple, List, Type, Callable
+from typing import Dict, Any, Tuple, Type, Callable
 
 import numpy as np
 from numpy import ndarray
@@ -28,10 +28,10 @@ from shared.enums import TerrainType
 from shared.constants import MAP_DEFAULT_SIZE
 from shared.stores.biome_store import BiomeStore
 from shared.types import TileMap, NoiseMap, TerrainList
-from utils.exceptions import MapGenerationError
+from exceptions.custom import MapGenerationError
 
 @dataclass
-class Map:
+class MapGenData:
     size: Tuple[int, int] = MAP_DEFAULT_SIZE,
     weights: ndarray = field(default_factory=list)
     tile_map: TileMap = field(default_factory=list)
@@ -42,7 +42,7 @@ class Map:
         logger.info(f"[Map] Initialised with size={self.size} and weights={self.weights}")
 
 class ProceduralMethod(ABC):
-    def __init__(self, map: Map, seed: int ):
+    def __init__(self, map: MapGenData, seed: int):
         self._map = map
         self._seed = seed
 
@@ -63,7 +63,7 @@ class ProceduralMethod(ABC):
     def tile_map(self):
         raise NotImplementedError
 
-    def generate(self) -> Map:
+    def generate(self) -> MapGenData:
         self._generate_tilemap()
         return self._map
 
@@ -73,7 +73,7 @@ class PerlinNoiseGenerator(ProceduralMethod):
     Código inspirado en:
     https://github.com/CodingQuest2023/Algorithms
     """
-    def __init__(self, map: Map, seed: int):
+    def __init__(self, map: MapGenData, seed: int):
         super().__init__(map, seed)
         self._generate_noisemap()
 
@@ -154,10 +154,10 @@ class MapGenerator:
         self._logger = logging.getLogger("bootstrap")
         self._logger.info("[MapGenerator] Initialising Map generator")
 
-    def generate(self, map_data: Dict[str, Any], seed: int = 3) -> Map:
+    def generate(self, map_data: Dict[str, Any], seed: int = 3) -> MapGenData:
         try:
             self._logger.info("[MapGenerator] Generating new map...")
-            map: Map = Map(**map_data)
+            map: MapGenData = MapGenData(**map_data)
             perlin = self._algorithm(map=map, seed=seed)
             return perlin.generate()
         except Exception as e:
