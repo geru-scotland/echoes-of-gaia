@@ -34,3 +34,4 @@ class Loggers(EnumBaseStr):
     RESEARCH = "research"
     BOOTSTRAP = "bootstrap"
     WORLDMAP = "world_map"
+    TIME = "time"

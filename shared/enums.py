@@ -74,3 +74,15 @@ class Timers:
 
     class Simulation(EnumBaseInt):
         MONTH = 30
+
+class Habitats:
+    class Relations(EnumBaseStr):
+        IN = "IN"
+        NEARBY = "NEARBY"
+
+    class Type(EnumBaseStr):
+        FOREST = "forest"
+        THICKET = "thicket"
+        FUNGAL = "fungal_zone"
+        COASTAL = "coastal"
+        ALPINE = "alpine"

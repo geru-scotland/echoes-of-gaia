@@ -19,42 +19,92 @@ import logging
 import os
 import threading
 from pathlib import Path
+from typing import Dict
 
 from utils.paths import LOGS_DIR
 
 
 class LogColors:
     RESET = "\033[0m"
+
+    BLACK = "\033[30m"
+    RED = "\033[31m"
     GREEN = "\033[32m"
     YELLOW = "\033[33m"
-    RED = "\033[31m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
     CYAN = "\033[36m"
+    WHITE = "\033[37m"
+    GRAY = "\033[90m"
+
+    BRIGHT_RED = "\033[91m"
+    BRIGHT_GREEN = "\033[92m"
+    BRIGHT_YELLOW = "\033[93m"
+    BRIGHT_BLUE = "\033[94m"
+    BRIGHT_MAGENTA = "\033[95m"
+    BRIGHT_CYAN = "\033[96m"
+    BRIGHT_WHITE = "\033[97m"
+    ORANGE = "\033[38;5;208m"
+
+    DEEP_PURPLE = "\033[38;5;60m"
+    SLATE_BLUE = "\033[38;5;68m"
+    STEEL_BLUE = "\033[38;5;67m"
+    OLIVE_GREEN = "\033[38;5;100m"
+    MOSS_GREEN = "\033[38;5;65m"
+    BURNT_ORANGE = "\033[38;5;130m"
+    COPPER = "\033[38;5;136m"
+    DARK_RED = "\033[38;5;88m"
+    CHARCOAL = "\033[38;5;240m"
+    STONE_GRAY = "\033[38;5;244m"
+
+    LOGGER_COLORS: Dict[str, str] = {
+        "bootstrap": CYAN,
+        "simulation": ORANGE,
+        "render": BRIGHT_BLUE,
+        "game": BRIGHT_GREEN,
+        "scene": BRIGHT_WHITE,
+        "biome": GREEN,
+        "research": DEEP_PURPLE,
+        "world_map": SLATE_BLUE,
+        "time": YELLOW,
+    }
+
+    LEVEL_COLORS: Dict[str, str] = {
+        "DEBUG": BRIGHT_MAGENTA,
+        "INFO": GRAY,
+        "WARNING": ORANGE,
+        "ERROR": BRIGHT_RED,
+        "CRITICAL": BRIGHT_RED,
+    }
 
 
 class ColorFormatter(logging.Formatter):
-    def __init__(self, name, fmt):
+    def __init__(self, name: str, fmt: str):
         super().__init__(fmt)
         self.name = name
 
-    def format(self, record):
-        color = LogColors.RESET
+    def format(self, record: logging.LogRecord) -> str:
+        logger_color = LogColors.LOGGER_COLORS.get(record.name, LogColors.RESET)
+        level_color = LogColors.LEVEL_COLORS.get(record.levelname, LogColors.RESET)
 
-        if record.name == "bootstrap":
-            color = LogColors.CYAN
-        elif record.levelname == "INFO":
-            color = LogColors.GREEN
-        elif record.levelname == "WARNING":
-            color = LogColors.YELLOW
-        elif record.levelname == "ERROR":
-            color = LogColors.RED
-        elif record.levelname == "DEBUG":
-            color = LogColors.CYAN
+        original_msg = record.getMessage()
+        original_level = record.levelname
+        original_time = self.formatTime(record, self.datefmt)
+        threadname = getattr(record, 'threadname', 'Main thread')
 
-        formatted_message = super().format(record)
-        return f"{color}{formatted_message}{LogColors.RESET}"
+        log_line = (
+            f"{logger_color}[{record.name.upper()}][{threadname}] {original_time} "
+            f"- {record.name} - "
+            f"{level_color}{original_level}"
+            f"{logger_color} - "
+            f"{level_color}{original_msg}"
+            f"{LogColors.RESET}"
+        )
 
+        return log_line
 
 class ThreadNameFilter(logging.Filter):
+
     def filter(self, record):
         record.threadname = "Main thread" if threading.current_thread() == threading.main_thread() else "Secondary thread"
         return True
