@@ -15,7 +15,9 @@
 #                                                                        #
 ##########################################################################
 """
+import logging
 import time
+from functools import wraps
 from logging import Logger
 from typing import Optional, cast, Tuple
 
@@ -31,9 +33,11 @@ from simulation.core.bootstrap.context.context_data import BiomeContextData, Sim
 from simulation.core.systems.events.dispatcher import EventDispatcher
 from simulation.core.systems.time.time import SimulationTime
 from utils.loggers import LoggerManager
+from utils.middleware import log_execution_time
 
 
 class SimulationEngine:
+    @log_execution_time(context="Biome loading")
     def __init__(self, settings: Settings):
         self._env: simpy.Environment = simpy.Environment()
         # TODO: El logger tiene que ser cargado por el builder y el contexto

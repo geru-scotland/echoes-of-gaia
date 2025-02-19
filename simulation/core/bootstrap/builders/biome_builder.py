@@ -32,6 +32,7 @@ from shared.types import EntityDefinitions, TileMap
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy
 from utils.loggers import LoggerManager
+from utils.middleware import log_execution_time
 
 
 class MapConfigurator(ConfiguratorStrategy):
@@ -39,6 +40,7 @@ class MapConfigurator(ConfiguratorStrategy):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._map: Optional[MapGenData] = None
 
+    @log_execution_time("Map Generation")
     def configure(self, settings: BiomeSettings, **kwargs: Any) -> None:
         map_size: Tuple[int, int]
         config: Config = kwargs.get("config")
