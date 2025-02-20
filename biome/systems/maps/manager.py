@@ -38,17 +38,17 @@ from utils.loggers import LoggerManager
 
 class WorldMapManager:
     class SpawnSystem:
-        def __init__(self, env: simpyEnv, tile_map: TileMap, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
+        def __init__(self, env: simpyEnv, tile_map: TileMap, flora_spawns: EntityDefinitions = None,
+                     fauna_spawns: EntityDefinitions = None):
             self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
             self._env: simpyEnv = env
             self._tile_map = tile_map
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
-            print(self._habitat_cache)
             self._created_flora: EntityList = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
             self._created_fauna: EntityList = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
 
-
-        def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_type_enum, biome_store) -> EntityList:
+        def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_type_enum,
+                             biome_store) -> EntityList:
             if not spawns:
                 return []
 
@@ -97,7 +97,8 @@ class WorldMapManager:
                             if data:
                                 component_class = get_component_class(class_name)
                                 if component_class:
-                                    component_instance = component_class(self._env, entity.handle_component_update, **data)
+                                    component_instance = component_class(self._env, entity.handle_component_update,
+                                                                         **data)
                                     self._logger.debug(
                                         f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                                     entity.add_component(component_instance)
@@ -109,6 +110,7 @@ class WorldMapManager:
             return spawned_entities
 
         def _precompute_habitat_cache(self, habitat_data: BiomeStoreData) -> HabitatCache:
+            self._logger.info("Precomputing habitat cache...")
             try:
                 habitat_positions: HabitatCache = {
                     Habitats.Type(habitat): np.array([[0, 0]], dtype=np.int8) for habitat, _ in habitat_data.items()
@@ -122,24 +124,24 @@ class WorldMapManager:
                                                       [1, 1, 1]])
                 for habitat, rules in habitat_data.items():
                     in_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
-                                                     for terrain in rules.get(Habitats.Relations.IN, {})], dtype=np.int8)
+                                                     for terrain in rules.get(Habitats.Relations.IN, {})],
+                                                    dtype=np.int8)
                     nearby_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
-                                                         for terrain in rules.get(Habitats.Relations.NEARBY, {})], dtype=np.int8)
+                                                         for terrain in rules.get(Habitats.Relations.NEARBY, {})],
+                                                        dtype=np.int8)
                     in_mask: ndarray = np.isin(terrain_map, in_terrains).astype(np.int8)
                     nearby_mask: ndarray = np.isin(terrain_map, nearby_terrains).astype(np.int8)
-                    valid_positions: ndarray = np.empty( (0, 2), dtype=np.int8)
-
-                    print(f"Habitat {habitat}:")
-                    print(terrain_map)
+                    valid_positions: ndarray = np.empty((0, 2), dtype=np.int8)
                     if nearby_mask.any():
-                        nearby_convolved: ndarray = convolve(nearby_mask.astype(np.int8), kernel_neighbour, mode="constant", cval=0)
-                        print("Convoluted")
-                        print(nearby_convolved)
-                        print("IN")
-                        print(in_mask)
-                        print(in_mask & nearby_convolved)
-                        valid_positions = np.argwhere(in_mask & nearby_convolved)
-                        print(valid_positions)
+                        nearby_convolved: ndarray = convolve(nearby_mask.astype(np.int8), kernel_neighbour,
+                                                             mode="constant", cval=0)
+                        habitat_mask: ndarray = in_mask & nearby_convolved
+                        valid_positions = np.argwhere(habitat_mask)
+                        self._logger.debug(f"Habitat {habitat}. \n {terrain_map}")
+                        self._logger.debug(f"Habitat mask: \n {habitat_mask}")
+                        self._logger.debug(f"Convolved map: \n {nearby_convolved}")
+                        self._logger.debug(f"IN mask: \n {in_mask}")
+                        self._logger.debug(f"Valid positions for  {habitat}: \n {valid_positions}")
                     elif in_mask.any():
                         valid_positions = np.argwhere(in_mask)
 
@@ -160,16 +162,23 @@ class WorldMapManager:
             # quizá en un futuro hacer acuáticos.
             pass
 
-        def spawn(self) -> Tuple[EntityList, EntityList]:
+        def spawn(self):
             return None, None
 
-    def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions, fauna_definitions: EntityDefinitions):
+        def get_entities(self) -> EntityList:
+            return self._created_flora + self._created_fauna
+
+    def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions,
+                 fauna_definitions: EntityDefinitions):
         self._env: simpyEnv = env
         # Quizá worldmapmanager
         self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
         self._spawn_system = WorldMapManager.SpawnSystem(env, tile_map, flora_definitions, fauna_definitions)
-        flora_spawns, fauna_spawns = self._spawn_system.spawn()
-        self._world_map = WorldMap(tile_map=tile_map, habitat_data=BiomeStore.habitats)
+        self._spawn_system.spawn()
+        entities: EntityList = self._spawn_system.get_entities()
+        # quitar habitatds de worldmap, no compete al mapa tener las especificaciones
+        # quizá, como mucho, habitat cache
+        self._world_map = WorldMap(tile_map=tile_map, entities=entities)
 
     def _is_valid_position(self):
         pass

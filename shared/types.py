@@ -29,12 +29,6 @@ if TYPE_CHECKING:
 # Tipos, me acabo de enterar que puedo definir tipos custom en Python,
 # algo parecido al typedef de c++; y soy un poco más feliz:
 
-# Mapas
-TileMap = np.ndarray
-NoiseMap = np.ndarray
-EntityLayer = np.ndarray
-
-
 # Coordenadas y mapeoss de terrenos
 Coords = Tuple[int, int]
 TileMappings = Dict[TerrainType, List[Coords]]
@@ -45,8 +39,12 @@ EntityList = List["Entity"]
 ComponentDict = Dict["ComponentType", "Component"]
 TerrainList = np.ndarray
 EntityDefinitions = List[Dict[str, Any]]
-
 ComponentData = Dict[str, Any]
+
+# Mapas
+TileMap = np.ndarray
+NoiseMap = np.ndarray
+EntityLayer = List[EntityList]
 
 
 BiomeStoreData = Dict[str, Any]
