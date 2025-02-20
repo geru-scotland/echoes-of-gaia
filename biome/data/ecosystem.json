@@ -18,8 +18,8 @@
 
   "habitats": {
       "forest": {
-          "IN": ["GRASS", "MOUNTAIN"],
-          "NEARBY": []
+          "IN": ["GRASS" ],
+          "NEARBY": ["MOUNTAIN"]
       },
       "thicket": {
           "IN": ["GRASS"],
@@ -31,7 +31,7 @@
       },
       "coastal": {
           "IN": ["BEACH"],
-          "NEARBY": ["OCEAN_SHALLOW", "OCEAN_MID"]
+          "NEARBY": ["OCEAN_DEEP", "OCEAN_SHALLOW", "OCEAN_MID"]
       },
       "alpine": {
           "IN": ["MOUNTAIN"],

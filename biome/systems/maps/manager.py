@@ -19,14 +19,17 @@ import logging
 from logging import Logger
 from typing import List, Tuple
 
+import numpy as np
+from numpy import ndarray
 from simpy import Environment as simpyEnv
+from scipy.ndimage import convolve
 
 from biome.components.registry import get_component_class
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
 from biome.entities.flora import Flora
 from biome.systems.maps.worldmap import WorldMap
-from shared.enums import FloraType, FaunaType
+from shared.enums import FloraType, FaunaType, Habitats, TerrainType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
 from shared.types import TileMap, EntityList, HabitatCache, BiomeStoreData, EntityDefinitions
@@ -35,10 +38,12 @@ from utils.loggers import LoggerManager
 
 class WorldMapManager:
     class SpawnSystem:
-        def __init__(self, env: simpyEnv, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
+        def __init__(self, env: simpyEnv, tile_map: TileMap, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
             self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
             self._env: simpyEnv = env
+            self._tile_map = tile_map
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
+            print(self._habitat_cache)
             self._created_flora: EntityList = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
             self._created_fauna: EntityList = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
 
@@ -104,7 +109,46 @@ class WorldMapManager:
             return spawned_entities
 
         def _precompute_habitat_cache(self, habitat_data: BiomeStoreData) -> HabitatCache:
-            pass
+            try:
+                habitat_positions: HabitatCache = {
+                    Habitats.Type(habitat): np.array([[0, 0]], dtype=np.int8) for habitat, _ in habitat_data.items()
+                }
+                # es np, pero con terraintype, para optimizar convierto a int8
+                terrain_map: ndarray = self._tile_map.astype(np.int8)
+
+                # para convolución una celda, cuenta sus vecinas y no así misma
+                kernel_neighbour: ndarray = np.array([[1, 1, 1],
+                                                      [1, 0, 1],
+                                                      [1, 1, 1]])
+                for habitat, rules in habitat_data.items():
+                    in_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
+                                                     for terrain in rules.get(Habitats.Relations.IN, {})], dtype=np.int8)
+                    nearby_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
+                                                         for terrain in rules.get(Habitats.Relations.NEARBY, {})], dtype=np.int8)
+                    in_mask: ndarray = np.isin(terrain_map, in_terrains).astype(np.int8)
+                    nearby_mask: ndarray = np.isin(terrain_map, nearby_terrains).astype(np.int8)
+                    valid_positions: ndarray = np.empty( (0, 2), dtype=np.int8)
+
+                    print(f"Habitat {habitat}:")
+                    print(terrain_map)
+                    if nearby_mask.any():
+                        nearby_convolved: ndarray = convolve(nearby_mask.astype(np.int8), kernel_neighbour, mode="constant", cval=0)
+                        print("Convoluted")
+                        print(nearby_convolved)
+                        print("IN")
+                        print(in_mask)
+                        print(in_mask & nearby_convolved)
+                        valid_positions = np.argwhere(in_mask & nearby_convolved)
+                        print(valid_positions)
+                    elif in_mask.any():
+                        valid_positions = np.argwhere(in_mask)
+
+                    habitat_positions[Habitats.Type(habitat)] = np.array(valid_positions)
+
+                return habitat_positions
+
+            except Exception as e:
+                self._logger.error(f"Error precomputing habitat cache: {e}")
 
         def position_flora_in_world(self):
             # basarme en reglas para cada tipo de flora.
@@ -117,13 +161,13 @@ class WorldMapManager:
             pass
 
         def spawn(self) -> Tuple[EntityList, EntityList]:
-            pass
+            return None, None
 
     def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions, fauna_definitions: EntityDefinitions):
         self._env: simpyEnv = env
         # Quizá worldmapmanager
         self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
-        self._spawn_system = WorldMapManager.SpawnSystem(env, flora_definitions, fauna_definitions)
+        self._spawn_system = WorldMapManager.SpawnSystem(env, tile_map, flora_definitions, fauna_definitions)
         flora_spawns, fauna_spawns = self._spawn_system.spawn()
         self._world_map = WorldMap(tile_map=tile_map, habitat_data=BiomeStore.habitats)
 

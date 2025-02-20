@@ -15,13 +15,13 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import List, Tuple, Dict, TYPE_CHECKING, Any
+from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional
 
 import numpy as np
 from numpy import ndarray
 from pygame import Surface
 
-from shared.enums import TerrainType, ComponentType
+from shared.enums import TerrainType, ComponentType, Habitats
 
 if TYPE_CHECKING:
     from biome.entities.entity import Entity
@@ -50,4 +50,4 @@ ComponentData = Dict[str, Any]
 
 
 BiomeStoreData = Dict[str, Any]
-HabitatCache = Dict[str, ndarray]
+HabitatCache = Dict[Habitats.Type, ndarray]
