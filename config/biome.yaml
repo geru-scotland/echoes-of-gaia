@@ -1,8 +1,8 @@
 biome:
   map:
     size:
-      - 75 # width
-      - 75 # height
+      - 5 # width
+      - 5 # height
   type: "tropical"
   flora:
     - type: "oak_tree"
