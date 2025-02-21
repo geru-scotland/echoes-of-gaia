@@ -20,6 +20,7 @@ from logging import Logger
 from typing import List, Tuple
 
 import numpy as np
+import itertools
 from numpy import ndarray
 from simpy import Environment as simpyEnv
 from scipy.ndimage import convolve
@@ -32,33 +33,36 @@ from biome.systems.maps.worldmap import WorldMap
 from shared.enums import FloraType, FaunaType, Habitats, TerrainType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
-from shared.types import TileMap, EntityList, HabitatCache, BiomeStoreData, EntityDefinitions
+from shared.types import TileMap, EntityList, HabitatCache, BiomeStoreData, EntityDefinitions, EntityRegistry, \
+    TerrainMap, EntityIndexMap, HabitatList
 from utils.loggers import LoggerManager
 
 
 class WorldMapManager:
     class SpawnSystem:
-        def __init__(self, env: simpyEnv, tile_map: TileMap, flora_spawns: EntityDefinitions = None,
-                     fauna_spawns: EntityDefinitions = None):
+        def __init__(self, env: simpyEnv, tile_map: TileMap ):
+            self._flora_registry: EntityRegistry = {}
+            self._fauna_registry: EntityRegistry = {}
+            self._entity_index_map: EntityIndexMap = np.full(tile_map.shape, -1, dtype=int)
+            self._id_generator = itertools.count(0)
             self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
             self._env: simpyEnv = env
-            self._tile_map = tile_map
+            self._tile_map: TileMap = tile_map
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
-            self._created_flora: EntityList = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
-            self._created_fauna: EntityList = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
 
         def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_type_enum,
-                             biome_store) -> EntityList:
+                             biome_store) -> EntityRegistry:
             if not spawns:
-                return []
+                return {}
 
             self._logger.info(f"Creating entities... {entity_class.__name__}...")
 
-            spawned_entities: EntityList = []
+            entity_registry: EntityRegistry = {}
 
             for spawn in spawns:
                 try:
                     entity_type = entity_type_enum(str(spawn.get("type")).lower())
+                    habitats: HabitatList = biome_store.get(entity_type, {}).get("habitat", {})
                     amount = spawn.get("spawns")
 
                     if amount < 1 or amount > 30:
@@ -74,7 +78,10 @@ class WorldMapManager:
                     store_components: List[str] = biome_store.get(spawn.get("type"), None).get("components", [])
                     if not store_components:
                         self._logger.warning(f"Spawn doesn't have components: {spawn}")
-                        spawned_entities.extend([entity_class(self._env, entity_type) for _ in range(amount)])
+                        entity_registry.update({
+                            (id := next(self._id_generator)): entity_class(id, self._env, entity_type, habitats)
+                            for _ in range(amount)
+                        })
                         continue
                     components = [
                         {cmp: BiomeStore.components.get(cmp, {}).get("defaults", {})}
@@ -83,8 +90,11 @@ class WorldMapManager:
                     ]
 
                 for _ in range(amount):
-                    entity: Entity = entity_class(self._env, entity_type)
-
+                    id: int = next(self._id_generator)
+                    entity: Entity = entity_class(id, self._env, entity_type, habitats)
+                    # aqui, crear el mapeo de { id: ref }
+                    # y luego, al adjudicar posiciones por habitat, en un mapa np
+                    # le indico los ids, que es lo que pongo en cada celda.
                     for component in components:
                         for class_name, attribute_dict in component.items():
                             defaults = BiomeStore.components.get(class_name, {}).get("defaults", {}).copy()
@@ -104,10 +114,25 @@ class WorldMapManager:
                                     entity.add_component(component_instance)
                                 else:
                                     self._logger.error(f"Class not found: {class_name}")
+                    entity_registry[id] = entity
+                    self._add_to_index_map(entity)
 
-                    spawned_entities.append(entity)
+            return entity_registry
 
-            return spawned_entities
+        def _add_to_index_map(self, entity: Entity):
+            self._logger.info(f"Adding to index map: {entity.get_id()}, habitats: {entity.get_habitats()}")
+            for habitat in entity.get_habitats():
+                # Una vez gestionado, return.
+                habitat_positions: ndarray = self._habitat_cache.get(habitat, np.array([]))
+                if habitat_positions.shape[0] == 0:
+                    self._logger.warning(f"Habitat: {habitat} doesn't have available tiles! Can't spawn here.")
+                    continue
+                random_index: int = np.random.randint(0, habitat_positions.shape[0])
+                random_position = habitat_positions[random_index]
+                self._habitat_cache[habitat] = np.delete(habitat_positions, random_index, axis=0)
+                self._entity_index_map[random_position[0], random_position[1]] = entity.get_id()
+                return
+
 
         def _precompute_habitat_cache(self, habitat_data: BiomeStoreData) -> HabitatCache:
             self._logger.info("Precomputing habitat cache...")
@@ -152,6 +177,9 @@ class WorldMapManager:
             except Exception as e:
                 self._logger.error(f"Error precomputing habitat cache: {e}")
 
+        def _compute_index_map(self):
+            pass
+
         def position_flora_in_world(self):
             # basarme en reglas para cada tipo de flora.
             pass
@@ -162,23 +190,32 @@ class WorldMapManager:
             # quizá en un futuro hacer acuáticos.
             pass
 
-        def spawn(self):
-            return None, None
+        def spawn(self,flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
+            self._flora_registry = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
+            self._fauna_registry = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
 
-        def get_entities(self) -> EntityList:
-            return self._created_flora + self._created_fauna
+        def get_entity_registry(self) -> EntityRegistry:
+            return {**self._flora_registry, **self._fauna_registry}
+
+        def get_entity_index_map(self) -> EntityIndexMap:
+            return self._entity_index_map
 
     def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions,
                  fauna_definitions: EntityDefinitions):
         self._env: simpyEnv = env
+        self._terrain_map: TerrainMap = tile_map
         # Quizá worldmapmanager
         self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
-        self._spawn_system = WorldMapManager.SpawnSystem(env, tile_map, flora_definitions, fauna_definitions)
-        self._spawn_system.spawn()
-        entities: EntityList = self._spawn_system.get_entities()
-        # quitar habitatds de worldmap, no compete al mapa tener las especificaciones
-        # quizá, como mucho, habitat cache
-        self._world_map = WorldMap(tile_map=tile_map, entities=entities)
+        try:
+            self._spawn_system = WorldMapManager.SpawnSystem(env, tile_map)
+            self._spawn_system.spawn(flora_definitions, fauna_definitions)
+            # quitar habitatds de worldmap, no compete al mapa tener las especificaciones
+            # quizá, como mucho, habitat cache
+            self._entity_registry: EntityRegistry = self._spawn_system.get_entity_registry()
+            self._entity_index_map: EntityIndexMap = self._spawn_system.get_entity_index_map()
+            self._world_map = WorldMap(tile_map=tile_map, entity_registry=self._entity_registry, entity_index_map=self._entity_index_map)
+        except Exception as e:
+            self._logger.exception(f"There was an en exception spawning entities: {e}")
 
     def _is_valid_position(self):
         pass

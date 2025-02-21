@@ -49,6 +49,10 @@ class EntityType(EnumBaseStr):
     FAUNA = "fauna"
     HUMAN = "human"
 
+class EntityIndex(EnumBaseInt):
+    FLORA = 1
+    FAUNA = 2
+
 class FloraType(EnumBaseStr):
     OAK_TREE = "oak_tree"
     BRAMBLE = "bramble"

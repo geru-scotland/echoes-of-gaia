@@ -21,11 +21,12 @@ from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
 from shared.enums import EntityType, FloraType
+from shared.types import HabitatList
 
 
 class Flora(Entity):
-    def __init__(self, env: simpyEnv, flora_type: FloraType):
-        super().__init__(EntityType.FLORA, env)
+    def __init__(self, id: int, env: simpyEnv, flora_type: FloraType, habitats: HabitatList):
+        super().__init__(id, EntityType.FLORA, env, habitats)
         self._logger.debug(f"Flora entity initialized: {flora_type}")
         self._flora_type: FloraType = flora_type
 
