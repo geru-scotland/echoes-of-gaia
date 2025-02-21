@@ -17,15 +17,17 @@
 """
 import numpy as np
 
-from shared.types import TileMap, BiomeStoreData, EntityList
+from shared.types import TerrainMap, EntityRegistry, EntityIndexMap
 
 
 class WorldMap:
-    def __init__(self, tile_map: TileMap, entities: EntityList):
-        self._terrain_layer = tile_map
-        print(tile_map)
-        print(len(entities))
-        self._entity_layer = np.zeros(self._terrain_layer.shape)
-
+    def __init__(self, tile_map: TerrainMap, entity_registry: EntityRegistry, entity_index_map: EntityIndexMap):
+        self._terrain_map: TerrainMap = tile_map.astype(np.int8)
+        self._entity_registry: EntityRegistry  = entity_registry
+        self._entity_index_map: EntityIndexMap = entity_index_map
+        # mapeo ids de entidad a referencia objeto
+        # y ahora, el entity map no es de index, si no de id
+        print(self._terrain_map)
+        print(self._entity_index_map)
 
 

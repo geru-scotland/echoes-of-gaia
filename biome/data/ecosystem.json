@@ -27,7 +27,7 @@
       },
       "fungal_zone": {
           "IN": ["GRASS", "MOUNTAIN"],
-          "NEARBY": ["SNOW"]
+          "NEARBY": ["SNOW", "OCEAN_SHALLOW"]
       },
       "coastal": {
           "IN": ["BEACH"],

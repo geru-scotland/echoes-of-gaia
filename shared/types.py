@@ -40,12 +40,15 @@ ComponentDict = Dict["ComponentType", "Component"]
 TerrainList = np.ndarray
 EntityDefinitions = List[Dict[str, Any]]
 ComponentData = Dict[str, Any]
+HabitatList = List[Habitats.Type]
 
 # Mapas
 TileMap = np.ndarray
 NoiseMap = np.ndarray
 EntityLayer = List[EntityList]
-
+TerrainMap = np.ndarray
+EntityIndexMap = np.ndarray
+EntityRegistry = Dict[int, "Entity"]
 
 BiomeStoreData = Dict[str, Any]
 HabitatCache = Dict[Habitats.Type, ndarray]
