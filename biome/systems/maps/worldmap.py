@@ -22,6 +22,7 @@ from shared.types import TerrainMap, EntityRegistry, EntityIndexMap
 
 class WorldMap:
     def __init__(self, tile_map: TerrainMap, entity_registry: EntityRegistry, entity_index_map: EntityIndexMap):
+        np.set_printoptions(threshold=np.inf)
         self._terrain_map: TerrainMap = tile_map.astype(np.int8)
         self._entity_registry: EntityRegistry  = entity_registry
         self._entity_index_map: EntityIndexMap = entity_index_map
