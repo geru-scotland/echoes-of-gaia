@@ -1,13 +1,14 @@
 biome:
   map:
     size:
-      - 5 # width
-      - 5 # height
+      - 10 # width
+      - 10 # height
   type: "tropical"
   flora:
     - type: "oak_tree"
       spawns: 4
       components:
+        - TransformComponent:
         - GrowthComponent:
             growth_rate: 7
             decay: 0.1

@@ -42,30 +42,44 @@
   "flora": {
       "oak_tree": {
           "components": [
+              "TransformComponent",
               "GrowthComponent",
               "HealthComponent"
           ],
           "habitat": ["forest"]
       },
       "bramble": {
-          "components": [],
+          "components": [
+              "TransformComponent"
+          ],
           "habitat": ["thicket"]
       },
       "mushroom": {
-          "components": ["NutritionalValueComponent"],
+          "components": [
+              "TransformComponent",
+              "NutritionalValueComponent"
+          ],
           "habitat": ["fungal_zone"]
       }
   },
 
   "fauna": {
       "deer": {
-          "components": []
+          "components": [
+              "TransformComponent"
+          ]
       },
       "boar": {
-          "components": ["GrowthComponent", "NutritionalValueComponent"]
+          "components": [
+              "TransformComponent",
+              "GrowthComponent",
+              "NutritionalValueComponent"
+          ]
       },
       "fox": {
-          "components": []
+          "components": [
+              "TransformComponent"
+          ]
       }
   },
 
@@ -100,6 +114,16 @@
           "defaults": {
               "hardiness": 5,
               "resistance": 0.2
+          }
+      },
+      "TransformCompnent": {
+          "parameters": {
+              "x": "int",
+              "y": "int"
+          },
+          "defaults": {
+              "x": -1,
+              "y": -1
           }
       }
   }

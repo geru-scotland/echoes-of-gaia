@@ -96,6 +96,9 @@ class WorldMapManager:
                     # y luego, al adjudicar posiciones por habitat, en un mapa np
                     # le indico los ids, que es lo que pongo en cada celda.
                     for component in components:
+                        print(f"Component: {component}")
+                        # TODO: Hacer que, a parte de en el bioime.yaml, revise en ecosystem para los componentes
+                        # de la entidad, biomestore. importante, es TAMBIÉN.
                         for class_name, attribute_dict in component.items():
                             defaults = BiomeStore.components.get(class_name, {}).get("defaults", {}).copy()
                             # Primera vez con esta sintaxis
@@ -216,6 +219,9 @@ class WorldMapManager:
             self._world_map = WorldMap(tile_map=tile_map, entity_registry=self._entity_registry, entity_index_map=self._entity_index_map)
         except Exception as e:
             self._logger.exception(f"There was an en exception spawning entities: {e}")
+
+    def _get_world_map(self):
+        return self._world_map
 
     def _is_valid_position(self):
         pass
