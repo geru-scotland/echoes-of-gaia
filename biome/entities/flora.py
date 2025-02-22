@@ -45,7 +45,7 @@ class Flora(Entity):
             self._logger.debug(f" - {component_type}: {formatted_attrs}")
 
     def handle_component_update(self, **kwargs: Any):
-        self._logger.debug(f"{self._flora_type}({self._entity_type}) - {kwargs}")
+        self._logger.info(f"Tick: {self._env.now} {self._flora_type}({self._entity_type}) - {kwargs}")
 
     def get_type(self):
         return self._flora_type

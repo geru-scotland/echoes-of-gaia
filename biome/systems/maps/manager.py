@@ -142,7 +142,7 @@ class WorldMapManager:
                     self._logger.debug(f"Random position selected: {selected_position}")
 
             if selected_position is None:
-                self._logger.warning("No valid position found for entity!")
+                self._logger.warning(f"No valid position found for entity {entity.get_type()} (id: {entity.get_id()})!")
                 return
 
             # Quizá, para evitar este bucle, pasar a mapa de habitats directamente
