@@ -28,6 +28,7 @@ class TerrainType(EnumBaseStr):
     SNOW = 6
 
 class ComponentType(EnumBaseStr):
+    TRANSFORM = "transform"
     GROWTH = "growth"
     NUTRITIONAL = "nutritional"
     MOVEMENT = "movement"

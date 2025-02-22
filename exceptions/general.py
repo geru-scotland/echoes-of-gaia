@@ -25,5 +25,5 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
         logging.error(f"[Handled exception]: {exc_value}", exc_info=(exc_type, exc_value, exc_traceback))
     else:
         logging.critical(f"[Critical exception]: {exc_value}", exc_info=(exc_type, exc_value, exc_traceback))
-        sys.exit(1)
+        # sys.exit(1)
 

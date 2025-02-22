@@ -37,5 +37,5 @@ class SimulationAPI:
         self.initialise()
         if not self._engine:
             self._logger.critical("[CRITICAL] Simulation can not be launched, engine failed.")
-            sys.exit(1)
+            # sys.exit(1)
         self._engine.run()

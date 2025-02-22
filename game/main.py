@@ -36,7 +36,7 @@ class Game:
             self.settings = dependency_injector.get("game_settings")
         except KeyError as e:
             print(f"Critical error: Missing dependency - {e}")
-            sys.exit(1)
+            # sys.exit(1)
 
         self._logger = LoggerManager.get_logger(Loggers.GAME)
 
@@ -59,7 +59,7 @@ class Game:
             self.update(diff)
             self.render()
         pygame.quit()
-        sys.exit()
+        # sys.exit()
 
     def handle_events(self):
         for event in pygame.event.get():

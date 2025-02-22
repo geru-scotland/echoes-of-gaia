@@ -47,6 +47,8 @@ class Flora(Entity):
     def handle_component_update(self, **kwargs: Any):
         self._logger.debug(f"{self._flora_type}({self._entity_type}) - {kwargs}")
 
+    def get_type(self):
+        return self._flora_type
 
     @property
     def type(self):

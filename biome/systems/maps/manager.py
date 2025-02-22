@@ -72,8 +72,9 @@ class WorldMapManager:
                     self._logger.exception(f"There was an error loading {entity_class.__name__} spawns: {e}")
                     continue
 
-                components = spawn.get("components")
-
+                components = spawn.get("components", [])
+                fixed_components = BiomeStore.components.get("fixed_components", [])
+                components.append(fixed_components)
                 if not components:
                     store_components: List[str] = biome_store.get(spawn.get("type"), None).get("components", [])
                     if not store_components:
@@ -96,7 +97,6 @@ class WorldMapManager:
                     # y luego, al adjudicar posiciones por habitat, en un mapa np
                     # le indico los ids, que es lo que pongo en cada celda.
                     for component in components:
-                        print(f"Component: {component}")
                         # TODO: Hacer que, a parte de en el bioime.yaml, revise en ecosystem para los componentes
                         # de la entidad, biomestore. importante, es TAMBIÉN.
                         for class_name, attribute_dict in component.items():
@@ -123,19 +123,38 @@ class WorldMapManager:
             return entity_registry
 
         def _add_to_index_map(self, entity: Entity):
-            self._logger.info(f"Adding to index map: {entity.get_id()}, habitats: {entity.get_habitats()}")
+            self._logger.debug(
+                f"Adding {entity.get_type()} to index map: {entity.get_id()}, habitats: {entity.get_habitats()}")
+
+            selected_position = None
+
+            # Buscar una posición válida en cualquier hábitat
             for habitat in entity.get_habitats():
-                # Una vez gestionado, return.
                 habitat_positions: ndarray = self._habitat_cache.get(habitat, np.array([]))
+
                 if habitat_positions.shape[0] == 0:
                     self._logger.warning(f"Habitat: {habitat} doesn't have available tiles! Can't spawn here.")
                     continue
-                random_index: int = np.random.randint(0, habitat_positions.shape[0])
-                random_position = habitat_positions[random_index]
-                self._habitat_cache[habitat] = np.delete(habitat_positions, random_index, axis=0)
-                self._entity_index_map[random_position[0], random_position[1]] = entity.get_id()
+
+                if selected_position is None:
+                    random_index = np.random.randint(0, habitat_positions.shape[0])
+                    selected_position = habitat_positions[random_index]
+                    self._logger.debug(f"Random position selected: {selected_position}")
+
+            if selected_position is None:
+                self._logger.warning("No valid position found for entity!")
                 return
 
+            # Quizá, para evitar este bucle, pasar a mapa de habitats directamente
+            # que a cada celda se le asigne un habitat y listo, el resto de habitats
+            # que no la tengan disponible al estar rellena
+            for habitat, _ in self._habitat_cache.items():
+                habitat_positions: ndarray = self._habitat_cache.get(habitat, np.array([]))
+                self._habitat_cache[habitat] = np.array(
+                    [pos for pos in habitat_positions if not np.array_equal(pos, selected_position)])
+
+            self._entity_index_map[selected_position[0], selected_position[1]] = entity.get_id()
+            entity.set_position(selected_position[0], selected_position[1])
 
         def _precompute_habitat_cache(self, habitat_data: BiomeStoreData) -> HabitatCache:
             self._logger.info("Precomputing habitat cache...")

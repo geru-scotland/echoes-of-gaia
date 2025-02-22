@@ -42,7 +42,6 @@
   "flora": {
       "oak_tree": {
           "components": [
-              "TransformComponent",
               "GrowthComponent",
               "HealthComponent"
           ],
@@ -56,7 +55,6 @@
       },
       "mushroom": {
           "components": [
-              "TransformComponent",
               "NutritionalValueComponent"
           ],
           "habitat": ["fungal_zone"]
@@ -66,24 +64,24 @@
   "fauna": {
       "deer": {
           "components": [
-              "TransformComponent"
           ]
       },
       "boar": {
           "components": [
-              "TransformComponent",
               "GrowthComponent",
               "NutritionalValueComponent"
           ]
       },
       "fox": {
           "components": [
-              "TransformComponent"
           ]
       }
   },
 
   "components": {
+      "fixed_components": {
+          "TransformComponent": {}
+      },
       "GrowthComponent": {
           "parameters": {
               "growth_rate": "float",
@@ -116,7 +114,7 @@
               "resistance": 0.2
           }
       },
-      "TransformCompnent": {
+      "TransformComponent": {
           "parameters": {
               "x": "int",
               "y": "int"
