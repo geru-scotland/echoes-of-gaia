@@ -60,12 +60,22 @@ class Entity(EventHandler, StateHandler, ABC):
     def get_habitats(self) -> HabitatList:
         return self._habitats
 
+    def get_position(self):
+        return self._components[ComponentType.TRANSFORM].get_position()
+
+    def set_position(self, x, y):
+        self._components[ComponentType.TRANSFORM].set_position(x, y)
+
     @abstractmethod
     def handle_component_update(self, **kwargs: Any):
         raise NotImplementedError
 
     @abstractmethod
     def dump_components(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_type(self):
         raise NotImplementedError
 
     def update(self):

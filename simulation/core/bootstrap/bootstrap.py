@@ -55,7 +55,7 @@ class Bootstrap:
                 raise BootstrapError("[CRITICAL] Null context, aborting bootstrap.")
         except (BootstrapError, MapGenerationError, TypeError) as e:
             self._logger.critical(f"[CRITICAL] Error while building the context: {e}")
-            sys.exit(1)
+            # sys.exit(1)
 
     def get_context(self) -> Context:
         return self._context

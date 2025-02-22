@@ -41,6 +41,9 @@ class Fauna(Entity):
     def compute_state(self):
         pass
 
+    def get_type(self):
+        return self._fauna_type
+
     @property
     def type(self):
         return self._fauna_type
