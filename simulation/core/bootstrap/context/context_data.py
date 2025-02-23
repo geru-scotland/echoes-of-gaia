@@ -21,6 +21,7 @@ from dataclasses import dataclass
 
 from config.settings import Config
 from shared.types import TileMap, EntityDefinitions
+from simulation.core.systems.metrics.manager import InfluxDBManager
 
 
 @dataclass
@@ -37,3 +38,4 @@ class BiomeContextData(ContextData):
 @dataclass
 class SimulationContextData(ContextData):
     config: Config
+    influxdb: InfluxDBManager

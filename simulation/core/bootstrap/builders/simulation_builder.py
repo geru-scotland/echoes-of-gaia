@@ -22,6 +22,7 @@ from config.settings import Config, SimulationSettings
 from shared.strings import Loggers
 from simulation.core.bootstrap.context.context_data import SimulationContextData
 from simulation.core.bootstrap.builders.builder import Builder
+from simulation.core.systems.metrics.manager import InfluxDBManager
 from utils.loggers import LoggerManager
 
 
@@ -41,6 +42,8 @@ class SimulationBuilder(Builder):
         self._logger.info("[Simulation Builder] Simulation builder...")
         try:
             config: Config = self._settings.config.get("simulation")
-            self._context = SimulationContextData(config=config, logger_name=Loggers.SIMULATION)
+            influxdb_mgr: InfluxDBManager = InfluxDBManager()
+            self._context = SimulationContextData(config=config, logger_name=Loggers.SIMULATION,
+                                                  influxdb=influxdb_mgr)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Simulation: {e}")

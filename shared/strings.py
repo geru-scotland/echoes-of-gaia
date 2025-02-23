@@ -35,3 +35,4 @@ class Loggers(EnumBaseStr):
     BOOTSTRAP = "bootstrap"
     WORLDMAP = "world_map"
     TIME = "time"
+    INFLUXDB = "influxdb"

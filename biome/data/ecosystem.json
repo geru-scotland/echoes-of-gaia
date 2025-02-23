@@ -72,7 +72,7 @@
               "GrowthComponent",
               "NutritionalValueComponent"
           ],
-          "habitat": ["forest"]
+          "habitat": ["thicket"]
       },
       "fox": {
           "components": [

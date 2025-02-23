@@ -19,12 +19,17 @@
 import simpy
 
 from biome.biome import Biome
+from shared.types import BiomeStateData
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 
 class BiomeAPI:
     def __init__(self, context: BiomeContextData, env: simpy.Environment):
        self.biome = Biome(context, env)
+
+    def create_datapoint(self) -> BiomeStateData:
+        self.biome.resolve_pending_components()
+        return self.biome.collect_data()
 
     def update(self, era: int, step: int):
         pass

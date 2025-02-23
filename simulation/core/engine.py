@@ -27,6 +27,7 @@ from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
 from shared.enums import Timers
 from shared.strings import Strings, Loggers
+from shared.types import BiomeStateData
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
@@ -43,11 +44,14 @@ class SimulationEngine:
         # TODO: El logger tiene que ser cargado por el builder y el contexto
         try:
             biome_context, simulation_context = self._boot_and_get_contexts(settings)
-            self._biome_api = BiomeAPI(biome_context, self._env)
             self._context = simulation_context
+            self._context.influxdb.start()
+
+            self._biome_api = BiomeAPI(biome_context, self._env)
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
             self._eras = self._context.config.get("eras", {}).get("amount", 0)
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
+
             self._time: SimulationTime = SimulationTime(self._events_per_era)
             EventDispatcher.trigger("biome_loaded", biome_context.tile_map)
         except Exception as e:
@@ -69,7 +73,9 @@ class SimulationEngine:
         """
         yield self._env.timeout(timer)
         while True:
-            self._logger.info("[SIMULATION] Monthly update.")
+            self._logger.warning("[SIMULATION] Monthly state log.")
+            biome_state_data: BiomeStateData = self._biome_api.create_datapoint()
+            EventDispatcher.trigger("on_biome_data_collected", biome_state_data)
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)
 
