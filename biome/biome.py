@@ -15,12 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+from typing import Dict, Any
+
 import simpy
 
 from biome.components.biome.climate import Climate
 from biome.environment import Environment
 from biome.systems.maps.manager import WorldMapManager
 from biome.systems.state.handler import StateHandler
+from shared.types import BiomeStateData
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 
@@ -44,6 +47,15 @@ class Biome(Environment, StateHandler):
         while True:
             self._logger.info(f"BIOMA UPDATE!... t={self._env.now}")
             yield self._env.timeout(25)
+
+    def resolve_pending_components(self):
+        self._logger.info("Resolving pending components...")
+
+    def collect_data(self) -> BiomeStateData:
+        data: BiomeStateData = {}
+        self._logger.info("Creating datapoint...")
+        self._logger.info("Collecting Biome data...")
+        return data
 
     def compute_state(self):
         pass

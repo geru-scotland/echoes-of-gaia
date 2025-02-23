@@ -67,6 +67,7 @@ class LogColors:
         "research": DEEP_PURPLE,
         "world_map": SLATE_BLUE,
         "time": YELLOW,
+        "influxdb": MOSS_GREEN
     }
 
     LEVEL_COLORS: Dict[str, str] = {

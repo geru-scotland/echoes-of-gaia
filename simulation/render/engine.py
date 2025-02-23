@@ -50,6 +50,7 @@ class RenderEngine:
         pygame.display.set_caption(self._settings.title)
         self._initialized = True
         self.run()
+
     def _process_task_queue(self):
         try:
             while True:
@@ -89,7 +90,6 @@ class RenderEngine:
                 del self._components[name]
         except Exception as e:
             self._logger.exception(f"There was an error deleting a component: {e}")
-
 
     @property
     def settings(self) -> RenderSettings:

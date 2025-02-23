@@ -37,7 +37,7 @@ class Entity(EventHandler, StateHandler, ABC):
         self._id: int = id
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._entity_type: EntityType = type
-        self_env: simpyEnv = env
+        self._env: simpyEnv = env
         self._components: ComponentDict = {}
         self._habitats: HabitatList = habitats
 

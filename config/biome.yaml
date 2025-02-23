@@ -28,8 +28,12 @@ biome:
 
   fauna:
     - type: "deer"
-      spawns: 0
+      spawns: 4
       components:
         - NutritionalValueComponent:
+        - GrowthComponent:
     - type: "boar"
-      spawns: 0
+      spawns: 3
+      components:
+        - NutritionalValueComponent:
+        - GrowthComponent:

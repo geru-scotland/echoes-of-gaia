@@ -28,6 +28,6 @@ class WorldMap:
         self._entity_index_map: EntityIndexMap = entity_index_map
         # mapeo ids de entidad a referencia objeto
         # y ahora, el entity map no es de index, si no de id
-
+        print(entity_index_map)
 
 

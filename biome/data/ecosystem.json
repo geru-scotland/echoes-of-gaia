@@ -64,17 +64,20 @@
   "fauna": {
       "deer": {
           "components": [
-          ]
+          ],
+          "habitat": ["forest"]
       },
       "boar": {
           "components": [
               "GrowthComponent",
               "NutritionalValueComponent"
-          ]
+          ],
+          "habitat": ["thicket"]
       },
       "fox": {
           "components": [
-          ]
+          ],
+          "habitat": ["forest"]
       }
   },
 

@@ -21,7 +21,6 @@ from simpy import Environment as simpyEnv
 
 from biome.components.component import EntityComponent
 from shared.enums import ComponentType, Timers
-from shared.types import ComponentData
 
 
 class GrowthComponent(EntityComponent):
