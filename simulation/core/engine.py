@@ -27,11 +27,11 @@ from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
 from shared.enums import Timers
 from shared.strings import Strings, Loggers
-from shared.types import BiomeStateData
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
 from simulation.core.systems.events.dispatcher import EventDispatcher
+from simulation.core.systems.metrics.datapoint import Datapoint
 from simulation.core.systems.time.time import SimulationTime
 from utils.loggers import LoggerManager
 from utils.middleware import log_execution_time
@@ -74,8 +74,8 @@ class SimulationEngine:
         yield self._env.timeout(timer)
         while True:
             self._logger.warning("[SIMULATION] Monthly state log.")
-            biome_state_data: BiomeStateData = self._biome_api.create_datapoint()
-            EventDispatcher.trigger("on_biome_data_collected", biome_state_data)
+            biome_datapoint: Datapoint = self._biome_api.create_datapoint()
+            EventDispatcher.trigger("on_biome_data_collected", biome_datapoint)
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)
 
@@ -84,5 +84,6 @@ class SimulationEngine:
         self._env.process(self._montly_update(Timers.Simulation.MONTH))
         self._time.log_time(self._env.now)
         self._env.run(until=self._eras * self._events_per_era)
+        self._context.influxdb.close()
         self._time.log_time(self._env.now)
 

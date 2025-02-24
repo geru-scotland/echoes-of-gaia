@@ -35,9 +35,6 @@ class Fauna(Entity):
     def dump_components(self) -> None:
         pass
 
-    def handle_component_update(self, **kwargs: Any):
-        self._logger.info(f"Tick: {self._env.now} {self._fauna_type}({self._entity_type}) - {kwargs}")
-
     def compute_state(self):
         pass
 

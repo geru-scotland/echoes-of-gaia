@@ -52,4 +52,3 @@ EntityRegistry = Dict[int, "Entity"]
 
 BiomeStoreData = Dict[str, Any]
 HabitatCache = Dict[Habitats.Type, ndarray]
-BiomeStateData = Dict[str, Any]
