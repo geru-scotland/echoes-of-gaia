@@ -44,9 +44,6 @@ class Flora(Entity):
             formatted_attrs = ", ".join(f"{k}={v.__class__}" for k, v in component_attrs.items() if not k.startswith("_"))
             self._logger.debug(f" - {component_type}: {formatted_attrs}")
 
-    def handle_component_update(self, **kwargs: Any):
-        self._logger.info(f"Tick: {self._env.now} {self._flora_type}({self._entity_type}) - {kwargs}")
-
     def get_type(self):
         return self._flora_type
 

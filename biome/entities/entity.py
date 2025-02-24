@@ -17,10 +17,11 @@
 """
 from logging import Logger
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 
 from simpy import Environment as simpyEnv
 
+from biome.entities.state import EntityState
 from biome.systems.state.handler import StateHandler
 from shared.enums import ComponentType, EntityType, Habitats
 from shared.strings import Loggers
@@ -40,13 +41,14 @@ class Entity(EventHandler, StateHandler, ABC):
         self._env: simpyEnv = env
         self._components: ComponentDict = {}
         self._habitats: HabitatList = habitats
+        self.state: EntityState = EntityState()
 
     def _register_events(self):
         pass
 
     def add_component(self, component: EntityComponent):
         self._components[component.type] = component
-        component.entity = self
+        component.set_update_callback(self.handle_component_update)
 
     def get_component(self, type: ComponentType):
         return self._components.get(type, None)
@@ -66,9 +68,9 @@ class Entity(EventHandler, StateHandler, ABC):
     def set_position(self, x, y):
         self._components[ComponentType.TRANSFORM].set_position(x, y)
 
-    @abstractmethod
     def handle_component_update(self, **kwargs: Any):
-        raise NotImplementedError
+        for key, value in kwargs.items():
+            self.state.update(key, value)
 
     @abstractmethod
     def dump_components(self) -> None:

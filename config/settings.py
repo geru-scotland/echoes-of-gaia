@@ -17,6 +17,8 @@
 """
 import json
 import os
+from typing import Dict, Any
+
 import yaml
 from dotenv import load_dotenv
 
@@ -123,6 +125,22 @@ class BiomeSettings(DefaultSettings):
 class SimulationSettings(DefaultSettings):
     def __init__(self, config_file="simulation.yaml"):
         super().__init__(config_file)
+        self._influxdb_config: Dict[str, Any] = self._load_influxdb_config()
+
+    def _load_influxdb_config(self):
+        try:
+            return {
+                "url": os.getenv("INFLUXDB_URL"),
+                "token": os.getenv("INFLUXDB_TOKEN"),
+                "org": os.getenv("INFLUXDB_ORG"),
+                "bucket": os.getenv("INFLUXDB_BUCKET")
+            }
+        except:
+            raise
+
+    @property
+    def influxdb_config(self) -> Dict[str, Any]:
+        return self._influxdb_config
 
     def get_logger(self, name="simulation"):
         return self._loggers.get(name)

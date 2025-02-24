@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Optional, Callable
+from typing import Optional
 
 from simpy import Environment as simpyEnv
 
@@ -24,8 +24,8 @@ from shared.enums import ComponentType, Timers
 
 
 class GrowthComponent(EntityComponent):
-    def __init__(self, env: simpyEnv, callback: Callable, growth_rate: int = 0, decay = 0):
-        super().__init__(ComponentType.GROWTH, env, callback)
+    def __init__(self, env: simpyEnv, growth_rate: int = 0, decay = 0):
+        super().__init__(ComponentType.GROWTH, env)
         # Por ahora, ha de ser exacto y coincidir con atributos
         # en biome/data/ecosystem.json... TODO: Cambiar esto
         self._growth_rate: int = growth_rate
@@ -38,7 +38,7 @@ class GrowthComponent(EntityComponent):
         yield self._env.timeout(timer)
         while True:
             message: str = f"[Component][{self._type}][t={self._env.now}] Entity is growing, rate: {self._growth_rate}"
-            self._handle_component_update(data=message)
+            self._notify_update(data=message)
             yield self._env.timeout(timer)
 
     def get_state(self):

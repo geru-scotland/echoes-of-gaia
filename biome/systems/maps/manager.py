@@ -110,8 +110,7 @@ class WorldMapManager:
                             if data:
                                 component_class = get_component_class(class_name)
                                 if component_class:
-                                    component_instance = component_class(self._env, entity.handle_component_update,
-                                                                         **data)
+                                    component_instance = component_class(self._env, **data)
                                     self._logger.debug(
                                         f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                                     entity.add_component(component_instance)
@@ -241,6 +240,9 @@ class WorldMapManager:
 
     def _get_world_map(self):
         return self._world_map
+
+    def get_entities(self) -> List[Entity]:
+        return self._world_map.get_entities()
 
     def _is_valid_position(self):
         pass

@@ -78,7 +78,7 @@ class Timers:
         TEMPERATURE = 10
 
     class Simulation(EnumBaseInt):
-        MONTH = 60 # 2 ticks/updates al día. Quizá es demasiado para escala evolutiva.
+        MONTH = 30 # 2 ticks/updates al día. Quizá es demasiado para escala evolutiva.
 
 class Habitats:
     class Relations(EnumBaseStr):

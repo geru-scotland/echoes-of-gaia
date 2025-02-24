@@ -15,9 +15,12 @@
 #                                                                        #
 ##########################################################################
 """
+from typing import List
+
 import numpy as np
 
-from shared.types import TerrainMap, EntityRegistry, EntityIndexMap
+from biome.entities.entity import Entity
+from shared.types import TerrainMap, EntityRegistry, EntityIndexMap, EntityList
 
 
 class WorldMap:
@@ -30,4 +33,9 @@ class WorldMap:
         # y ahora, el entity map no es de index, si no de id
         print(entity_index_map)
 
+    def get_entities(self) -> EntityList:
+        entities: EntityList = []
+        for _, entity in self._entity_registry:
+            entities.append(entity)
+        return entities
 

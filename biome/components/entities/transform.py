@@ -23,8 +23,8 @@ from shared.enums import ComponentType
 
 
 class TransformComponent(EntityComponent):
-    def __init__(self, env: simpyEnv = None, callback: Callable = None, x: int = -1, y: int = -1):
-        super().__init__(ComponentType.TRANSFORM, env, callback)
+    def __init__(self, env: simpyEnv = None, x: int = -1, y: int = -1):
+        super().__init__(ComponentType.TRANSFORM, env)
         self.x = x
         self.y = y
 

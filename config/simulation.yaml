@@ -3,4 +3,4 @@ simulation:
   snapshots: True
   eras:
     amount: 10
-    events-per-era: 100
+    events-per-era: 500

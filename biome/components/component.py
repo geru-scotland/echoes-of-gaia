@@ -17,7 +17,7 @@
 """
 from logging import Logger
 from abc import abstractmethod, ABC
-from typing import Optional, Callable
+from typing import Optional, Callable, Any
 
 from simpy import Environment as simpyEnv
 
@@ -57,9 +57,16 @@ class BiomeComponent(Component):
 
 
 class EntityComponent(Component):
-    def __init__(self, type: ComponentType, env: simpyEnv, callback: Callable):
+    def __init__(self, type: ComponentType, env: simpyEnv):
         super().__init__(type, env)
-        self._handle_component_update: Callable = callback 
+        self._update_callback: Optional[Callable] = None
+
+    def set_update_callback(self, callback: Callable):
+        self._update_callback = callback
+
+    def _notify_update(self, **kwargs: Any):
+        if self._update_callback:
+            self._update_callback(**kwargs)
 
     def get_state(self):
         pass

@@ -15,6 +15,8 @@
 #                                                                        #
 ##########################################################################
 """
+import random
+import time
 from typing import Dict, Any
 
 import simpy
@@ -23,8 +25,9 @@ from biome.components.biome.climate import Climate
 from biome.environment import Environment
 from biome.systems.maps.manager import WorldMapManager
 from biome.systems.state.handler import StateHandler
-from shared.types import BiomeStateData
+from shared.types import EntityList
 from simulation.core.bootstrap.context.context_data import BiomeContextData
+from simulation.core.systems.metrics.datapoint import Datapoint
 
 
 class Biome(Environment, StateHandler):
@@ -51,11 +54,19 @@ class Biome(Environment, StateHandler):
     def resolve_pending_components(self):
         self._logger.info("Resolving pending components...")
 
-    def collect_data(self) -> BiomeStateData:
-        data: BiomeStateData = {}
-        self._logger.info("Creating datapoint...")
-        self._logger.info("Collecting Biome data...")
-        return data
+    def collect_data(self) -> Datapoint:
+        try:
+            # entities: EntityList = self._map_manager.get_entities()
+
+            data: Datapoint = Datapoint(measurement="biome_ASYNC_REAL_5",
+                                        tags={"id": random.randint(1, 10000)},
+                                        timestamp=int(time.time() * 1e9),
+                                        fields={"num_fauna": random.randint(1, 9999), "state": "good"})
+            self._logger.info("Creating datapoint...")
+            self._logger.info("Collecting Biome data...")
+            return data
+        except Exception as e:
+            self._logger.exception(f"There was an error creating the Biome state datapoint: {e}")
 
     def compute_state(self):
         pass

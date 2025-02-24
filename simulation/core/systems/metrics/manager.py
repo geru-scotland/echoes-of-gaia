@@ -15,14 +15,19 @@
 #                                                                              #
 # =============================================================================
 """
+from typing import Dict, Any
+
 from simulation.core.systems.metrics.event_handler import InfluxEventHandler
 from simulation.core.systems.metrics.influxdb import InfluxDB
 
 
 class InfluxDBManager:
-    def __init__(self):
-        self._influxdb: InfluxDB = InfluxDB()
+    def __init__(self, config: Dict[str, Any]):
+        self._influxdb: InfluxDB = InfluxDB(config)
         self._event_handler: InfluxEventHandler = InfluxEventHandler(self._influxdb)
 
     def start(self) -> None:
         self._influxdb.listen()
+
+    def close(self):
+        self._influxdb.close()
