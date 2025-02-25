@@ -241,7 +241,7 @@ class WorldMapManager:
     def _get_world_map(self):
         return self._world_map
 
-    def get_entities(self) -> List[Entity]:
+    def get_entities(self) -> EntityList:
         return self._world_map.get_entities()
 
     def _is_valid_position(self):

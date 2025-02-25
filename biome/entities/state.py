@@ -31,3 +31,7 @@ class EntityState:
 
     def dump(self) -> Dict[str, Any]:
         return self.values.copy()
+
+    @property
+    def fields(self) -> Dict[str, Any]:
+        return self.values

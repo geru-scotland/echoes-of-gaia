@@ -15,9 +15,8 @@
 #                                                                        #
 ##########################################################################
 """
-import logging
+import itertools
 import time
-from functools import wraps
 from logging import Logger
 from typing import Optional, cast, Tuple
 
@@ -40,19 +39,25 @@ from utils.middleware import log_execution_time
 class SimulationEngine:
     @log_execution_time(context="Biome loading")
     def __init__(self, settings: Settings):
+
         self._env: simpy.Environment = simpy.Environment()
-        # TODO: El logger tiene que ser cargado por el builder y el contexto
+        self._id_generator = itertools.count(0)
+
         try:
             biome_context, simulation_context = self._boot_and_get_contexts(settings)
             self._context = simulation_context
-            self._context.influxdb.start()
 
-            self._biome_api = BiomeAPI(biome_context, self._env)
-            self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
             self._eras = self._context.config.get("eras", {}).get("amount", 0)
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
+            self._datapoints: bool = self._context.config.get("datapoints", False)
 
+            if self._datapoints:
+                self._context.influxdb.start()
+
+            self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
+            self._biome_api = BiomeAPI(biome_context, self._env)
             self._time: SimulationTime = SimulationTime(self._events_per_era)
+
             EventDispatcher.trigger("biome_loaded", biome_context.tile_map)
         except Exception as e:
             self._logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
@@ -65,6 +70,7 @@ class SimulationEngine:
         simulation_context = cast(SimulationContextData, context.get(Strings.SIMULATION_CONTEXT))
         return biome_context, simulation_context
 
+
     def _montly_update(self, timer: int):
         """
          TODO: DECORATOR para este tipo de updataes.
@@ -74,8 +80,15 @@ class SimulationEngine:
         yield self._env.timeout(timer)
         while True:
             self._logger.warning("[SIMULATION] Monthly state log.")
-            biome_datapoint: Datapoint = self._biome_api.create_datapoint()
-            EventDispatcher.trigger("on_biome_data_collected", biome_datapoint)
+
+            if self._datapoints:
+                simulated_timestamp = int(time.time() * 1000)
+                biome_datapoint: Optional[Datapoint] = self._biome_api.create_datapoint(next(self._id_generator), simulated_timestamp)
+                # Asumamos que el datapoint tiene un atributo 'timestamp' que usaremos para InfluxDB.
+                # En caso de que no lo tenga, deberías modificar la definición de Datapoint.
+                if biome_datapoint:
+                    EventDispatcher.trigger("on_biome_data_collected", biome_datapoint)
+
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)
 
@@ -84,6 +97,9 @@ class SimulationEngine:
         self._env.process(self._montly_update(Timers.Simulation.MONTH))
         self._time.log_time(self._env.now)
         self._env.run(until=self._eras * self._events_per_era)
-        self._context.influxdb.close()
+
+        if self._datapoints:
+            self._context.influxdb.close()
+
         self._time.log_time(self._env.now)
 

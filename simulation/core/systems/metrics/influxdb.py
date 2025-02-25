@@ -69,7 +69,7 @@ class InfluxDB:
                 self._logger.info(f"Escribiendo punto: {point}. Tamaño de cola: {queue_size} -> {self._queue.qsize()}")
                 try:
                     self._write_api.write(bucket=self._bucket, org=self._org, record=point,
-                                          write_precision=WritePrecision.S)
+                                          write_precision=WritePrecision.MS)
                 except Exception as e:
                     self._logger.error(f"Error al escribir: {e}")
                 finally:
@@ -101,7 +101,7 @@ class InfluxDB:
             point.field(field, value)
 
         if datapoint.timestamp:
-            point.time(int(datapoint.timestamp))
+            point.time(datapoint.timestamp, WritePrecision.MS)
 
         self._queue.put(point)
 

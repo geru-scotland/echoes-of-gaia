@@ -16,11 +16,12 @@
 # =============================================================================
 """
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
 class Datapoint:
     measurement: str
     tags: dict
-    timestamp: int
     fields: dict
+    timestamp: Optional[int] = None

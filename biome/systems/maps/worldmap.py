@@ -35,7 +35,7 @@ class WorldMap:
 
     def get_entities(self) -> EntityList:
         entities: EntityList = []
-        for _, entity in self._entity_registry:
+        for _, entity in self._entity_registry.items():
             entities.append(entity)
         return entities
 

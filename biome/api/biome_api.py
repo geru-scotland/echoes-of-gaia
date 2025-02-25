@@ -27,9 +27,9 @@ class BiomeAPI:
     def __init__(self, context: BiomeContextData, env: simpy.Environment):
        self.biome = Biome(context, env)
 
-    def create_datapoint(self) -> Datapoint:
+    def create_datapoint(self, datapoint_id: int, timestamp: int) -> Datapoint:
         self.biome.resolve_pending_components()
-        return self.biome.collect_data()
+        return self.biome.collect_data(datapoint_id, timestamp)
 
     def update(self, era: int, step: int):
         pass

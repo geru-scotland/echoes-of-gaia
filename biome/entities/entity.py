@@ -69,8 +69,12 @@ class Entity(EventHandler, StateHandler, ABC):
         self._components[ComponentType.TRANSFORM].set_position(x, y)
 
     def handle_component_update(self, **kwargs: Any):
-        for key, value in kwargs.items():
-            self.state.update(key, value)
+        if kwargs:
+            for key, value in kwargs.items():
+                self.state.update(key, value)
+
+    def get_state_fields(self) -> Dict[str, Any]:
+        return self.state.fields
 
     @abstractmethod
     def dump_components(self) -> None:
