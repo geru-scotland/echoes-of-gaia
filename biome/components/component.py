@@ -64,9 +64,9 @@ class EntityComponent(Component):
     def set_update_callback(self, callback: Callable):
         self._update_callback = callback
 
-    def _notify_update(self, **kwargs: Any):
+    def _notify_update(self, component_class, **kwargs: Any):
         if self._update_callback:
-            self._update_callback(**kwargs)
+            self._update_callback(component_class, **kwargs)
 
     def get_state(self):
         pass

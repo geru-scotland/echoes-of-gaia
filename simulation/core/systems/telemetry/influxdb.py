@@ -25,7 +25,7 @@ from influxdb_client import InfluxDBClient, Point, WriteApi, WritePrecision
 from influxdb_client.client.write_api import ASYNCHRONOUS, SYNCHRONOUS
 
 from shared.strings import Loggers
-from simulation.core.systems.metrics.datapoint import Datapoint
+from simulation.core.systems.telemetry.datapoint import Datapoint
 from utils.loggers import LoggerManager
 
 

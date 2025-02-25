@@ -20,7 +20,7 @@ import simpy
 
 from biome.biome import Biome
 from simulation.core.bootstrap.context.context_data import BiomeContextData
-from simulation.core.systems.metrics.datapoint import Datapoint
+from simulation.core.systems.telemetry.datapoint import Datapoint
 
 
 class BiomeAPI:

@@ -17,17 +17,19 @@
 """
 from typing import Any
 
+from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums import EntityType, FaunaType
+from shared.enums import FaunaType
 from shared.types import HabitatList
 
 
 class Fauna(Entity):
 
     def __init__(self, id: int, env: simpyEnv, fauna_type: FaunaType, habitats: HabitatList):
-        super().__init__(id, EntityType.FAUNA, env, habitats)
+        descriptor: EntityDescriptor = EntityDescriptor.create_fauna(fauna_type)
+        super().__init__(id, env, descriptor, habitats)
         self._fauna_type = fauna_type
         self._logger.debug(f"FAUNA CREATED: {fauna_type}")
         self._habitats: HabitatList = habitats
@@ -37,10 +39,3 @@ class Fauna(Entity):
 
     def compute_state(self):
         pass
-
-    def get_type(self):
-        return self._fauna_type
-
-    @property
-    def type(self):
-        return self._fauna_type

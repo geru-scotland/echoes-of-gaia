@@ -17,6 +17,7 @@
 """
 from typing import Any
 
+from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
@@ -26,7 +27,8 @@ from shared.types import HabitatList
 
 class Flora(Entity):
     def __init__(self, id: int, env: simpyEnv, flora_type: FloraType, habitats: HabitatList):
-        super().__init__(id, EntityType.FLORA, env, habitats)
+        descriptor: EntityDescriptor = EntityDescriptor.create_flora(flora_type)
+        super().__init__(id, env, descriptor, habitats)
         self._logger.debug(f"Flora entity initialized: {flora_type}")
         self._flora_type: FloraType = flora_type
 
@@ -43,10 +45,3 @@ class Flora(Entity):
             component_attrs = vars(component)
             formatted_attrs = ", ".join(f"{k}={v.__class__}" for k, v in component_attrs.items() if not k.startswith("_"))
             self._logger.debug(f" - {component_type}: {formatted_attrs}")
-
-    def get_type(self):
-        return self._flora_type
-
-    @property
-    def type(self):
-        return self._flora_type

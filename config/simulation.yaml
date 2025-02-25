@@ -1,5 +1,5 @@
 simulation:
-  datapoints: False
+  datapoints: True
   eras:
     amount: 10
     events-per-era: 80

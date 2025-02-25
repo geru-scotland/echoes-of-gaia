@@ -30,7 +30,7 @@ from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
 from simulation.core.systems.events.dispatcher import EventDispatcher
-from simulation.core.systems.metrics.datapoint import Datapoint
+from simulation.core.systems.telemetry.datapoint import Datapoint
 from simulation.core.systems.time.time import SimulationTime
 from utils.loggers import LoggerManager
 from utils.middleware import log_execution_time

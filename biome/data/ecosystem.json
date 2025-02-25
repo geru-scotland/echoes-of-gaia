@@ -88,11 +88,17 @@
       "GrowthComponent": {
           "parameters": {
               "growth_rate": "float",
-              "decay": "float"
+              "growth_stage": "int",
+              "stages": "int",
+              "size": "float",
+              "max_size": "float"
           },
           "defaults": {
-              "growth_rate": 1.0,
-              "decay": 0.5
+              "growth_rate": 0.1,
+              "growth_stage": 0,
+              "stages": 3,
+              "size": 1.0,
+              "max_size": 10.0
           }
       },
       "NutritionalValueComponent": {
