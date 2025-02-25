@@ -72,11 +72,12 @@ def test_bootstrap_context(mock_get_context, settings):
     mock_config = MagicMock()
     flora_spawns = MagicMock()
     fauna_spawns = MagicMock()
+    influxdb = MagicMock()
 
     # instancias válidas de los contextos
     biome_context_data = BiomeContextData(logger_name=Loggers.BIOME, tile_map=mock_map, config=mock_config,
                                           flora_definitions=flora_spawns, fauna_definitions=fauna_spawns)
-    simulation_context_data = SimulationContextData(logger_name=Loggers.SIMULATION, config=mock_config)
+    simulation_context_data = SimulationContextData(logger_name=Loggers.SIMULATION, config=mock_config, influxdb=influxdb)
 
     mock_context = MagicMock()
     mock_context.get.side_effect = lambda key: {
