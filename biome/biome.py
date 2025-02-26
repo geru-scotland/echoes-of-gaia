@@ -58,23 +58,18 @@ class Biome(Environment, StateHandler):
 
     def collect_data(self, datapoint_id: int, timestamp: int) -> Datapoint:
         try:
-            self._entity_collector.collect_data()
-            # data: Datapoint = Datapoint(
-            #     measurement="biome_states_14",
-            #     tags={"state_id": str(datapoint_id)},
-            #     timestamp=int(timestamp),
-            #     fields={
-            #         "num_fauna": random.randint(4, 9),
-            #         "avg_nutrition_fauna": round(random.uniform(0.5, 1.0), 2),
-            #         "avg_hydration_flora": round(random.uniform(0.5, 1.0), 2),
-            #         "temp_media": round(random.uniform(20, 30), 2),
-            #         "score": random.randint(1, 10),
-            #         "quality": random.choice(["good", "bad"])
-            #     }
-            # )
+            statistics: Dict[str, int|float] = self._entity_collector.collect_data()
+            datapoint: Datapoint = Datapoint(
+                measurement="biome_states_15",
+                tags={"state_id": str(datapoint_id)},
+                timestamp=timestamp,
+                fields={**statistics}
+            )
+
             self._logger.info("Creating datapoint...")
+            self._logger.error(datapoint)
             self._logger.info("Collecting Biome data...")
-            return None
+            return datapoint
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome state datapoint: {e}")
 
