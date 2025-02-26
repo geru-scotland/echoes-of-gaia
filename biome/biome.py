@@ -23,6 +23,7 @@ from biome.components.biome.climate import Climate
 from biome.environment import Environment
 from biome.systems.managers.entity_manager import EntityManager
 from biome.systems.managers.worldmap_manager import WorldMapManager
+from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
 from shared.types import EntityList
@@ -43,6 +44,8 @@ class Biome(Environment, StateHandler):
                                                                  fauna_definitions=self._context.fauna_definitions)
             self._entity_manager: EntityManager = EntityManager(self._map_manager.get_world_map())
             self._entity_collector: EntityDataCollector = EntityDataCollector(entity_manager=self._entity_manager)
+            self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
+
             self._logger.info("Biome is ready!")
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
@@ -58,23 +61,21 @@ class Biome(Environment, StateHandler):
 
     def collect_data(self, datapoint_id: int, timestamp: int) -> Datapoint:
         try:
-            self._entity_collector.collect_data()
-            # data: Datapoint = Datapoint(
-            #     measurement="biome_states_14",
-            #     tags={"state_id": str(datapoint_id)},
-            #     timestamp=int(timestamp),
-            #     fields={
-            #         "num_fauna": random.randint(4, 9),
-            #         "avg_nutrition_fauna": round(random.uniform(0.5, 1.0), 2),
-            #         "avg_hydration_flora": round(random.uniform(0.5, 1.0), 2),
-            #         "temp_media": round(random.uniform(20, 30), 2),
-            #         "score": random.randint(1, 10),
-            #         "quality": random.choice(["good", "bad"])
-            #     }
-            # )
+            biome_statistics: Dict[str, int|float] = self._entity_collector.collect_data()
+            biome_score_result, contributor_scores = self._score_analyzer.calculate_score(biome_statistics)
+
+            datapoint: Datapoint = Datapoint(
+                measurement="biome_states_16",
+                tags={"state_id": str(datapoint_id)},
+                timestamp=timestamp,
+                fields={**biome_statistics, **biome_score_result.to_dict()}
+            )
+
             self._logger.info("Creating datapoint...")
+            self._logger.error(datapoint)
             self._logger.info("Collecting Biome data...")
-            return None
+
+            return datapoint
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome state datapoint: {e}")
 

@@ -9,7 +9,7 @@ biome:
       spawns: 4
       components:
         - GrowthComponent:
-            growth_rate: 7
+            growth_rate: 0.3
         - NutritionalValueComponent:
             nutritive_value: 0.4
             nutritional_decay_rate: 0.1

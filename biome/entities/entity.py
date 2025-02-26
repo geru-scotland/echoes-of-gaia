@@ -92,6 +92,9 @@ class Entity(EventHandler, StateHandler, ABC):
     def get_type(self):
         return self._descriptor.entity_type
 
+    def get_specific_type(self):
+        return self._descriptor.specific_type
+
     @property
     def type(self):
         return self.get_type()
