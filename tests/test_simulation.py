@@ -44,6 +44,18 @@ def simulation_api(settings):
 def simulation_engine(settings):
     return SimulationEngine(settings)
 
+@pytest.fixture
+def mock_influxdb():
+    with patch('simulation.core.systems.telemetry.manager.InfluxDBManager') as mock:
+        mock_instance = MagicMock()
+        mock.return_value = mock_instance
+        yield mock_instance
+
+
+def test_simulation_engine_full_initialization(settings, mock_influxdb):
+    engine = SimulationEngine(settings)
+    assert engine._context is not None
+
 # ---------------- UNIT TEST ---------------- #
 
 # Test: API se inicializa correctamente
