@@ -15,19 +15,19 @@
 #                                                                        #
 ##########################################################################
 """
-import random
-import time
 from typing import Dict, Any
 
 import simpy
 
 from biome.components.biome.climate import Climate
 from biome.environment import Environment
-from biome.systems.maps.manager import WorldMapManager
+from biome.systems.managers.entity_manager import EntityManager
+from biome.systems.managers.worldmap_manager import WorldMapManager
+from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
 from shared.types import EntityList
 from simulation.core.bootstrap.context.context_data import BiomeContextData
-from simulation.core.systems.metrics.datapoint import Datapoint
+from simulation.core.systems.telemetry.datapoint import Datapoint
 
 
 class Biome(Environment, StateHandler):
@@ -41,6 +41,8 @@ class Biome(Environment, StateHandler):
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions)
+            self._entity_manager: EntityManager = EntityManager(self._map_manager.get_world_map())
+            self._entity_collector: EntityDataCollector = EntityDataCollector(entity_manager=self._entity_manager)
             self._logger.info("Biome is ready!")
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
@@ -54,17 +56,25 @@ class Biome(Environment, StateHandler):
     def resolve_pending_components(self):
         self._logger.info("Resolving pending components...")
 
-    def collect_data(self) -> Datapoint:
+    def collect_data(self, datapoint_id: int, timestamp: int) -> Datapoint:
         try:
-            # entities: EntityList = self._map_manager.get_entities()
-
-            data: Datapoint = Datapoint(measurement="biome_ASYNC_REAL_5",
-                                        tags={"id": random.randint(1, 10000)},
-                                        timestamp=int(time.time() * 1e9),
-                                        fields={"num_fauna": random.randint(1, 9999), "state": "good"})
+            self._entity_collector.collect_data()
+            # data: Datapoint = Datapoint(
+            #     measurement="biome_states_14",
+            #     tags={"state_id": str(datapoint_id)},
+            #     timestamp=int(timestamp),
+            #     fields={
+            #         "num_fauna": random.randint(4, 9),
+            #         "avg_nutrition_fauna": round(random.uniform(0.5, 1.0), 2),
+            #         "avg_hydration_flora": round(random.uniform(0.5, 1.0), 2),
+            #         "temp_media": round(random.uniform(20, 30), 2),
+            #         "score": random.randint(1, 10),
+            #         "quality": random.choice(["good", "bad"])
+            #     }
+            # )
             self._logger.info("Creating datapoint...")
             self._logger.info("Collecting Biome data...")
-            return data
+            return None
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome state datapoint: {e}")
 

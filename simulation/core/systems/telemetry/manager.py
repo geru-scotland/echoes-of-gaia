@@ -15,23 +15,19 @@
 #                                                                              #
 # =============================================================================
 """
-from dataclasses import dataclass, field
 from typing import Dict, Any
 
+from simulation.core.systems.telemetry.event_handler import InfluxEventHandler
+from simulation.core.systems.telemetry.influxdb import InfluxDB
 
-@dataclass
-class EntityState:
-    values: Dict[str, Any] = field(default_factory=dict)
 
-    def update(self, key: str, value: Any):
-        self.values[key] = value
+class InfluxDBManager:
+    def __init__(self, config: Dict[str, Any]):
+        self._influxdb: InfluxDB = InfluxDB(config)
+        self._event_handler: InfluxEventHandler = InfluxEventHandler(self._influxdb)
 
-    def get(self, key: str, default=None):
-        return self.values.get(key, default)
+    def start(self) -> None:
+        self._influxdb.listen()
 
-    def dump(self) -> Dict[str, Any]:
-        return self.values.copy()
-
-    @property
-    def fields(self) -> Dict[str, Any]:
-        return self.values
+    def close(self):
+        self._influxdb.close()

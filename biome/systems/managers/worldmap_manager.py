@@ -223,10 +223,11 @@ class WorldMapManager:
 
     def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions,
                  fauna_definitions: EntityDefinitions):
-        self._env: simpyEnv = env
-        self._terrain_map: TerrainMap = tile_map
         # Quizá worldmapmanager
         self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
+        self._logger.info("Creating Worldmap...")
+        self._env: simpyEnv = env
+        self._terrain_map: TerrainMap = tile_map
         try:
             self._spawn_system = WorldMapManager.SpawnSystem(env, tile_map)
             self._spawn_system.spawn(flora_definitions, fauna_definitions)
@@ -238,10 +239,10 @@ class WorldMapManager:
         except Exception as e:
             self._logger.exception(f"There was an en exception spawning entities: {e}")
 
-    def _get_world_map(self):
+    def get_world_map(self):
         return self._world_map
 
-    def get_entities(self) -> List[Entity]:
+    def get_entities(self) -> EntityList:
         return self._world_map.get_entities()
 
     def _is_valid_position(self):

@@ -29,9 +29,9 @@ class NutritionalValueComponent(EntityComponent):
         super().__init__(ComponentType.NUTRITIONAL, env)
         # Por ahora, ha de ser exacto y coincidir con atributos
         # en biome/data/ecosystem.json... TODO: Cambiar esto
-        self._nutritive_value = nutritive_value
-        self._nutritional_decay_rate = nutritional_decay_rate
-        self._toxicity = toxicity
+        self._nutritive_value = round(nutritive_value, 2)
+        self._nutritional_decay_rate = round(nutritional_decay_rate, 2)
+        self._toxicity = round(toxicity, 2)
         self._logger.debug(f"NV: {self._nutritive_value}, decay rate : {self._nutritional_decay_rate}"
                              f" toxicity: {self._toxicity}")
         self._env.process(self._update(Timers.Entity.NUTRITIONAL_VALUE_DECAY))
@@ -40,8 +40,8 @@ class NutritionalValueComponent(EntityComponent):
     def _update(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            message: str = f"[Component][{self._type}][t={self._env.now}] Entity is changing, nutrition_value: {self._nutritive_value}"
-            self._notify_update(data=message)
+            self._notify_update(NutritionalValueComponent, toxicity=self._toxicity)
+            self._toxicity += 0.01
             yield self._env.timeout(timer)
 
     def get_state(self):

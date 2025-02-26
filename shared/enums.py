@@ -33,6 +33,7 @@ class ComponentType(EnumBaseStr):
     NUTRITIONAL = "nutritional"
     MOVEMENT = "movement"
     STATE = "state"
+    VITAL = "vital"
     CLIMATE = "climate"
 
 class EntityState(EnumBaseStr):
@@ -72,13 +73,15 @@ class Timers:
         GROWTH = 25
         NUTRITIONAL_VALUE_DECAY = 5
         ENERGY = 3
+        AGING = 30
+        HEALTH_DECAY = 5
 
     class Biome(EnumBaseInt):
         CLIMATE = 50
         TEMPERATURE = 10
 
     class Simulation(EnumBaseInt):
-        MONTH = 30 # 2 ticks/updates al día. Quizá es demasiado para escala evolutiva.
+        MONTH = 30
 
 class Habitats:
     class Relations(EnumBaseStr):

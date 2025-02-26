@@ -21,7 +21,7 @@ from dataclasses import dataclass
 
 from config.settings import Config
 from shared.types import TileMap, EntityDefinitions
-from simulation.core.systems.metrics.manager import InfluxDBManager
+from simulation.core.systems.telemetry.manager import InfluxDBManager
 
 
 @dataclass

@@ -17,8 +17,8 @@
 """
 from simulation.core.systems.events.dispatcher import EventDispatcher
 from simulation.core.systems.events.handler import EventHandler
-from simulation.core.systems.metrics.datapoint import Datapoint
-from simulation.core.systems.metrics.influxdb import InfluxDB
+from simulation.core.systems.telemetry.datapoint import Datapoint
+from simulation.core.systems.telemetry.influxdb import InfluxDB
 
 
 class InfluxEventHandler(EventHandler):

@@ -22,7 +22,7 @@ from config.settings import Config, SimulationSettings
 from shared.strings import Loggers
 from simulation.core.bootstrap.context.context_data import SimulationContextData
 from simulation.core.bootstrap.builders.builder import Builder
-from simulation.core.systems.metrics.manager import InfluxDBManager
+from simulation.core.systems.telemetry.manager import InfluxDBManager
 from utils.loggers import LoggerManager
 
 

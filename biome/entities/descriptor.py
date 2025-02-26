@@ -15,23 +15,21 @@
 #                                                                              #
 # =============================================================================
 """
-from dataclasses import dataclass, field
-from typing import Dict, Any
+from dataclasses import dataclass
+
+from shared.base import EnumBaseStr
+from shared.enums import EntityType, FloraType, FaunaType
 
 
 @dataclass
-class EntityState:
-    values: Dict[str, Any] = field(default_factory=dict)
+class EntityDescriptor:
+    entity_type: EntityType
+    specific_type: EnumBaseStr #flora o fauna
 
-    def update(self, key: str, value: Any):
-        self.values[key] = value
+    @classmethod
+    def create_flora(cls, flora_type: FloraType):
+        return cls(entity_type=EntityType.FLORA, specific_type=flora_type)
 
-    def get(self, key: str, default=None):
-        return self.values.get(key, default)
-
-    def dump(self) -> Dict[str, Any]:
-        return self.values.copy()
-
-    @property
-    def fields(self) -> Dict[str, Any]:
-        return self.values
+    @classmethod
+    def create_fauna(cls, fauna_type: FaunaType):
+        return cls(entity_type=EntityType.FAUNA, specific_type=fauna_type)

@@ -15,23 +15,28 @@
 #                                                                              #
 # =============================================================================
 """
-from dataclasses import dataclass, field
-from typing import Dict, Any
+from typing import Tuple
+
+from biome.systems.maps.worldmap import WorldMap
+from shared.enums import EntityType
+from shared.types import EntityList
 
 
-@dataclass
-class EntityState:
-    values: Dict[str, Any] = field(default_factory=dict)
+class EntityManager:
+    def __init__(self, world_map: WorldMap):
+        self.world_map: WorldMap = world_map
 
-    def update(self, key: str, value: Any):
-        self.values[key] = value
+    def get_entities(self) -> Tuple[EntityList, EntityList]:
+        entities = self.world_map.get_entities()
+        return self.get_flora(entities), self.get_fauna(entities)
 
-    def get(self, key: str, default=None):
-        return self.values.get(key, default)
+    def get_entities_by_type(self, entity_type: EntityType,
+                             entities: EntityList) -> EntityList:
+        return [entity for entity in entities if entity.get_type() == entity_type]
 
-    def dump(self) -> Dict[str, Any]:
-        return self.values.copy()
+    def get_flora(self, entities: EntityList) -> EntityList:
+        return self.get_entities_by_type(EntityType.FLORA, entities)
 
-    @property
-    def fields(self) -> Dict[str, Any]:
-        return self.values
+    def get_fauna(self, entities: EntityList) -> EntityList:
+        return self.get_entities_by_type(EntityType.FAUNA, entities)
+

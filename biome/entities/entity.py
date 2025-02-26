@@ -17,10 +17,11 @@
 """
 from logging import Logger
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Dict
+from typing import Any, Optional, Dict, Type
 
 from simpy import Environment as simpyEnv
 
+from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
 from biome.systems.state.handler import StateHandler
 from shared.enums import ComponentType, EntityType, Habitats
@@ -33,15 +34,15 @@ from utils.loggers import LoggerManager
 
 class Entity(EventHandler, StateHandler, ABC):
 
-    def __init__(self, id: int, type: EntityType, env: simpyEnv, habitats: HabitatList):
+    def __init__(self, id: int, env: simpyEnv, descriptor: EntityDescriptor, habitats: HabitatList):
         super().__init__()
         self._id: int = id
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self._entity_type: EntityType = type
+        self._descriptor: EntityDescriptor = descriptor
         self._env: simpyEnv = env
         self._components: ComponentDict = {}
         self._habitats: HabitatList = habitats
-        self.state: EntityState = EntityState()
+        self._state: EntityState = EntityState()
 
     def _register_events(self):
         pass
@@ -68,17 +69,32 @@ class Entity(EventHandler, StateHandler, ABC):
     def set_position(self, x, y):
         self._components[ComponentType.TRANSFORM].set_position(x, y)
 
-    def handle_component_update(self, **kwargs: Any):
-        for key, value in kwargs.items():
-            self.state.update(key, value)
+    def handle_component_update(self, component_class: Type, **kwargs: Any):
+        if kwargs:
+            self._logger.debug(f"Updating entity: {self._descriptor.specific_type} ({self._descriptor.entity_type}),"
+                               f" [component: {component_class.__name__}]: {kwargs}")
+            for key, value in kwargs.items():
+                self._state.update(key, value)
+
+    def has_attribute(self, attribute: str) -> bool:
+        return attribute in self._state
+
+    def get_attribute(self, attribute: str) -> Any:
+        return self._state.get(attribute)
+
+    def get_state_fields(self) -> Dict[str, Any]:
+        return self._state.fields
 
     @abstractmethod
     def dump_components(self) -> None:
         raise NotImplementedError
 
-    @abstractmethod
     def get_type(self):
-        raise NotImplementedError
+        return self._descriptor.entity_type
+
+    @property
+    def type(self):
+        return self.get_type()
 
     def update(self):
         pass

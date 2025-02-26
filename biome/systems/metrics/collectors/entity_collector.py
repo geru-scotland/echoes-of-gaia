@@ -15,12 +15,32 @@
 #                                                                              #
 # =============================================================================
 """
-from dataclasses import dataclass
+from typing import Dict, Any
+
+from biome.systems.managers.entity_manager import EntityManager
 
 
-@dataclass
-class Datapoint:
-    measurement: str
-    tags: dict
-    timestamp: int
-    fields: dict
+class EntityDataCollector:
+
+    def __init__(self, entity_manager: EntityManager):
+        self.entity_manager: EntityManager = entity_manager
+
+    def collect_data(self) -> Dict[str, Any]:
+        flora, fauna = self.entity_manager.get_entities()
+        if not flora and not fauna:
+            return self._get_empty_stats()
+
+        # stats
+        for ent in flora:
+            print(ent.get_state_fields())
+
+    def _get_empty_stats(self) -> Dict[str, Any]:
+        return {
+            "num_flora": 0,
+            "num_fauna": 0,
+            "avg_health": 0,
+            "avg_age": 0,
+            "avg_energy": 0,
+            "biodiversity_index": 0,
+            "unique_species": 0,
+        }
