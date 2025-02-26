@@ -94,3 +94,20 @@ class Habitats:
         FUNGAL = "fungal_zone"
         COASTAL = "coastal"
         ALPINE = "alpine"
+
+class CapturePeriod(EnumBaseInt):
+    MONTHLY = 60
+    WEEKLY = 15
+    DAILY = 2
+    CUSTOM = -1
+
+class CaptureFormat(EnumBaseStr):
+    JSON = "json"
+    JSONL = "jsonl"
+    YAML = "yaml"
+
+class CaptureType(EnumBaseStr):
+    FULL = "full"
+    ENTITIES_ONLY = "entities_only"
+    TERRAIN_ONLY = "terrain_only"
+    METRICS_ONLY = "metrics_only"

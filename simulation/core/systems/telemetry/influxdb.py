@@ -54,7 +54,7 @@ class InfluxDB:
 
     def listen(self) -> None:
         self._logger.info("InfluxDB worker process listening for writing events.")
-        self._worker_thread = Thread(target=self._worker)
+        self._worker_thread = Thread(target=self._worker, name="InfluxWorkerThread")
         self._worker_thread.start()
 
     def _worker(self):

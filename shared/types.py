@@ -15,7 +15,8 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional
+from pathlib import Path
+from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional, Callable
 
 import numpy as np
 from numpy import ndarray
@@ -52,3 +53,15 @@ EntityRegistry = Dict[int, "Entity"]
 
 BiomeStoreData = Dict[str, Any]
 HabitatCache = Dict[Habitats.Type, ndarray]
+
+# Snapshots
+SnapshotID = str
+TimeStamp = int
+SimulationTime = int
+EntityData = Dict[str, Any]
+TerrainData = Dict[str, Any]
+BiomeScoreData = Dict[str, Any]
+MetricsData = Dict[str, Any]
+ClimateData = Dict[str, Any]
+PositionData = Tuple[int, int]
+CallbackType = Optional[Callable[[Optional[Path]], None]]

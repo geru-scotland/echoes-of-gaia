@@ -1,5 +1,15 @@
 simulation:
-  datapoints: False
+  datapoints: true
   eras:
     amount: 10
     events-per-era: 80
+
+  data:
+    snapshots:
+      enabled: true
+      period_type: "CUSTOM"
+      custom_period: 60
+      storage_directory: "simulation_records"
+      filename_prefix: "biome_snapshot"
+      pretty_print: true
+      include_real_timestamp: true

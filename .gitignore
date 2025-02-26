@@ -94,3 +94,5 @@ tmp/
 temp/
 
 __pycache__/
+
+simulation_records/

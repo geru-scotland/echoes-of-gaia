@@ -46,6 +46,7 @@ class EntityDataCollector:
         stats["num_flora"] = len(flora)
         stats["num_fauna"] = len(fauna)
         self._logger.debug(f"Final stats: {stats}")
+
         return stats
 
     def _collect_all_attributes(self, all_entities: EntityList) -> Dict[str, List[Any]]:
@@ -78,6 +79,7 @@ class EntityDataCollector:
             except (TypeError, ValueError):
                 # para que no pete si attr no numérico
                 continue
+
         return stats
 
 

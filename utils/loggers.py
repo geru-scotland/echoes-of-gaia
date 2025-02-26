@@ -19,7 +19,7 @@ import logging
 import os
 import threading
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 from utils.paths import LOGS_DIR
 
@@ -104,13 +104,36 @@ class ColorFormatter(logging.Formatter):
 
         return log_line
 
+
 class ThreadNameFilter(logging.Filter):
+    """
+    Filtro que añade información detallada del hilo al registro de logs.
+    Identifica el hilo principal y asigna nombres únicos a hilos secundarios.
+    """
+
+    def __init__(self, thread_prefix: str = "Thread"):
+        super().__init__()
+        self._thread_prefix = thread_prefix
 
     def filter(self, record):
-        record.threadname = "Main thread" if threading.current_thread() == threading.main_thread() else "Secondary thread"
+        current_thread = threading.current_thread()
+
+        if current_thread == threading.main_thread():
+            record.threadname = "Main thread"
+        else:
+            thread_name = current_thread.name
+            thread_id = current_thread.ident
+
+            if thread_name and thread_name != "Thread-" + str(thread_id):
+                record.threadname = thread_name
+            else:
+                record.threadname = f"{self._thread_prefix}-{thread_id}"
+
         return True
 
-
+    def register_thread_name(self, thread_id: int, name: str) -> None:
+        """Registra un nombre personalizado para un hilo específico."""
+        self._naming_map[thread_id] = name
 class LoggerManager:
 
     _loggers = {}

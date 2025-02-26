@@ -21,8 +21,10 @@ import simpy
 
 from biome.components.biome.climate import Climate
 from biome.environment import Environment
+from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.managers.entity_manager import EntityManager
 from biome.systems.managers.worldmap_manager import WorldMapManager
+from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
@@ -31,12 +33,12 @@ from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.systems.telemetry.datapoint import Datapoint
 
 
-class Biome(Environment, StateHandler):
+class Biome(Environment, StateHandler, BiomeDataProvider):
+
     def __init__(self, context: BiomeContextData, env: simpy.Environment):
         super().__init__(context, env)
         try:
             # Del contexto, habrá que pasar datos de clima de los config
-            self._env.process(self.update(25))
             self.add_component(Climate(self._env))
             self._logger.info(self._context.config.get("type"))
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
@@ -59,25 +61,17 @@ class Biome(Environment, StateHandler):
     def resolve_pending_components(self):
         self._logger.info("Resolving pending components...")
 
-    def collect_data(self, datapoint_id: int, timestamp: int) -> Datapoint:
-        try:
-            biome_statistics: Dict[str, int|float] = self._entity_collector.collect_data()
-            biome_score_result, contributor_scores = self._score_analyzer.calculate_score(biome_statistics)
+    def get_entity_manager(self) -> EntityManager:
+        return self._entity_manager
 
-            datapoint: Datapoint = Datapoint(
-                measurement="biome_states_16",
-                tags={"state_id": str(datapoint_id)},
-                timestamp=timestamp,
-                fields={**biome_statistics, **biome_score_result.to_dict()}
-            )
+    def get_world_map(self) -> WorldMap:
+        return self._map_manager.get_world_map()
 
-            self._logger.info("Creating datapoint...")
-            self._logger.error(datapoint)
-            self._logger.info("Collecting Biome data...")
+    def get_entity_collector(self) -> EntityDataCollector:
+        return self._entity_collector
 
-            return datapoint
-        except Exception as e:
-            self._logger.exception(f"There was an error creating the Biome state datapoint: {e}")
+    def get_score_analyzer(self) -> BiomeScoreAnalyzer:
+        return self._score_analyzer
 
     def compute_state(self):
         pass

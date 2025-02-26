@@ -23,6 +23,7 @@ from typing import Optional, cast, Tuple
 import simpy
 
 from biome.api.biome_api import BiomeAPI
+from biome.systems.data.data_manager import BiomeDataManager
 from config.settings import Settings
 from shared.enums import Timers
 from shared.strings import Strings, Loggers
@@ -56,6 +57,14 @@ class SimulationEngine:
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
             self._biome_api = BiomeAPI(biome_context, self._env)
+
+            self._data_manager = BiomeDataManager(
+                env=self._env,
+                config=self._context.config
+            )
+
+            self._data_manager.configure(self._biome_api.biome)
+
             self._time: SimulationTime = SimulationTime(self._events_per_era)
 
             EventDispatcher.trigger("biome_loaded", biome_context.tile_map)
@@ -83,7 +92,10 @@ class SimulationEngine:
 
             if self._datapoints:
                 simulated_timestamp = int(time.time() * 1000)
-                biome_datapoint: Optional[Datapoint] = self._biome_api.create_datapoint(next(self._id_generator), simulated_timestamp)
+                datapoint_id = next(self._id_generator)
+                biome_datapoint: Optional[Datapoint] = self._data_manager.collect_data_for_telemetry(
+                    datapoint_id, simulated_timestamp
+                )
                 # Asumamos que el datapoint tiene un atributo 'timestamp' que usaremos para InfluxDB.
                 # En caso de que no lo tenga, deberías modificar la definición de Datapoint.
                 if biome_datapoint:
@@ -100,6 +112,9 @@ class SimulationEngine:
 
         if self._datapoints:
             self._context.influxdb.close()
+
+        if self._data_manager:
+            self._data_manager.shutdown()
 
         self._time.log_time(self._env.now)
 
