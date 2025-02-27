@@ -15,12 +15,12 @@
 #                                                                        #
 ##########################################################################
 """
-import logging
 from logging import Logger
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 import itertools
+
 from numpy import ndarray
 from simpy import Environment as simpyEnv
 from scipy.ndimage import convolve
@@ -50,6 +50,7 @@ class WorldMapManager:
             self._tile_map: TileMap = tile_map
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
 
+
         def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_type_enum,
                              biome_store) -> EntityRegistry:
             if not spawns:
@@ -65,8 +66,8 @@ class WorldMapManager:
                     habitats: HabitatList = biome_store.get(entity_type, {}).get("habitat", {})
                     amount = spawn.get("spawns")
 
-                    if amount < 1 or amount > 30:
-                        raise ValueError(f"Invalid spawn amount: {amount}. Must be between 1 and 30.")
+                    if amount < 1 or amount > 50:
+                        raise ValueError(f"Invalid spawn amount: {amount}. Must be between 1 and 50.")
 
                 except (AttributeError, ValueError) as e:
                     self._logger.exception(f"There was an error loading {entity_class.__name__} spawns: {e}")
@@ -123,10 +124,9 @@ class WorldMapManager:
 
         def _add_to_index_map(self, entity: Entity):
             self._logger.debug(
-                f"Adding {entity.get_type()} to index map: {entity.get_id()}, habitats: {entity.get_habitats()}")
+                f"Adding {entity.get_type()} to index map: {entity.get_id()} , habitats: {entity.get_habitats()}")
 
             selected_position = None
-
             # Buscar una posición válida en cualquier hábitat
             for habitat in entity.get_habitats():
                 habitat_positions: ndarray = self._habitat_cache.get(habitat, np.array([]))
@@ -141,7 +141,7 @@ class WorldMapManager:
                     self._logger.debug(f"Random position selected: {selected_position}")
 
             if selected_position is None:
-                self._logger.warning(f"No valid position found for entity {entity.get_type()} (id: {entity.get_id()})!")
+                self._logger.warning(f"No valid position found for entity {entity.get_type()} ({entity.get_specific_type()})(id: {entity.get_id()})!")
                 return
 
             # Quizá, para evitar este bucle, pasar a mapa de habitats directamente
@@ -181,7 +181,12 @@ class WorldMapManager:
                     if nearby_mask.any():
                         nearby_convolved: ndarray = convolve(nearby_mask.astype(np.int8), kernel_neighbour,
                                                              mode="constant", cval=0)
-                        habitat_mask: ndarray = in_mask & nearby_convolved
+                        # Mecaguen la leche, qué dolor de cabeza me ha dado esto.
+                        # Si una celda tiene 2 nearby, 1 & 2 dará 0. Necesito
+                        # que la máscara proporcione valor true, 1, para todo aquello
+                        # que sea mayor que 1... Lo hago con broadcasting y convierto a 0/1 int8
+                        nearby_presence = (nearby_convolved > 0).astype(np.int8)
+                        habitat_mask: ndarray = in_mask & nearby_presence
                         valid_positions = np.argwhere(habitat_mask)
                         self._logger.debug(f"Habitat {habitat}. \n {terrain_map}")
                         self._logger.debug(f"Habitat mask: \n {habitat_mask}")
@@ -220,6 +225,7 @@ class WorldMapManager:
 
         def get_entity_index_map(self) -> EntityIndexMap:
             return self._entity_index_map
+
 
     def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions,
                  fauna_definitions: EntityDefinitions):
