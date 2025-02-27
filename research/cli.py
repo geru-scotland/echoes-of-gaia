@@ -137,31 +137,24 @@ class CLIMenuManager:
         self._clear_screen()
         print(f"\n{LogColors.GREEN}=== Biome Simulation ==={LogColors.RESET}\n")
 
-        sys.stdout.write(f"{LogColors.BRIGHT_WHITE}Enable visualization? (y/n): {LogColors.RESET}")
-        sys.stdout.flush()
-        render_option = input().lower()
-        headless = render_option not in ['y', 'yes']
+        print(f"{LogColors.BRIGHT_BLUE}Initializing simulation...{LogColors.RESET}")
+        self._logger.info("Starting simulation script")
 
-        print(f"\n{LogColors.BRIGHT_BLUE}Initializing simulation...{LogColors.RESET}")
-        self._logger.info("Starting simulation with visualization: %s", not headless)
+        simulation_script = os.path.join("simulation", "main.py")
 
-        simulation = SimulationAPI(self._settings)
-
-        if headless:
-            print(f"\n{LogColors.BRIGHT_YELLOW}Running simulation in headless mode...{LogColors.RESET}")
-            print(f"{LogColors.GRAY}Press Ctrl+C to abort{LogColors.RESET}")
-            try:
-                simulation.run()
-            except KeyboardInterrupt:
-                print(f"\n{LogColors.BRIGHT_RED}Simulation aborted by user{LogColors.RESET}")
-        else:
-            print(f"\n{LogColors.BRIGHT_YELLOW}Running simulation with visualization...{LogColors.RESET}")
-
-            sim_thread = Thread(target=simulation.run, daemon=True)
-            sim_thread.start()
-
-            render_manager = RenderManager(settings=self._settings.render_settings)
-            render_manager.start_engine()
+        try:
+            if os.path.exists(simulation_script):
+                print(f"{LogColors.BRIGHT_YELLOW}Running simulation...{LogColors.RESET}")
+                print(f"{LogColors.GRAY}Press Ctrl+C to abort{LogColors.RESET}")
+                subprocess.run([sys.executable, simulation_script], check=True)
+            else:
+                print(
+                    f"{LogColors.BRIGHT_RED}Error: Simulation script not found at {simulation_script}{LogColors.RESET}")
+                print(f"{LogColors.GRAY}Make sure the project structure is correct.{LogColors.RESET}")
+        except subprocess.CalledProcessError as e:
+            print(f"{LogColors.BRIGHT_RED}Error running simulation script: {e}{LogColors.RESET}")
+        except Exception as e:
+            print(f"{LogColors.BRIGHT_RED}Unexpected error: {e}{LogColors.RESET}")
 
         sys.stdout.write(
             f"\n{LogColors.GREEN}Simulation complete. Press Enter to return to the main menu...{LogColors.RESET}")
