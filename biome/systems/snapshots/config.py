@@ -30,6 +30,7 @@ class SnapshotConfig:
     storage_directory: Path = field(default_factory=lambda: Path(SIMULATION_DIR) / "simulation_records")
     capture_types: Set[CaptureType] = field(default_factory=lambda: {CaptureType.FULL})
     filename_prefix: str = "biome_snapshot"
+    terrain_prefix: str = "biome_terrain"
     custom_period: Optional[int] = None
     include_real_timestamp: bool = True
     pretty_print: bool = True

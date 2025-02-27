@@ -29,22 +29,35 @@ class SnapshotLoader:
         self._file_path = snapshot_file
         self._snapshots: List[SnapshotData] = []
         self._current_index: int = 0
+        self._common_terrain = None
 
     def load(self) -> bool:
         try:
             self._logger.info(f"Loading snapshots from {self._file_path}")
-            with open(self._file_path, 'r') as f:
-                data = json.load(f)
 
-            if isinstance(data, list):
-                self._snapshots = data
-                self._common_terrain = None
-            elif isinstance(data, dict) and "terrain" in data and "snapshots" in data:
-                self._common_terrain = data["terrain"]
-                self._snapshots = data["snapshots"]
-            else:
-                self._logger.error("Formato de archivo no reconocido")
-                return False
+            filename_parts = self._file_path.stem.split('_')
+            if len(filename_parts) >= 3:
+                timestamp_part = '_'.join(filename_parts[2:])
+
+                terrain_path = self._file_path.parent / f"{filename_parts[0]}_terrain_{timestamp_part}.json"
+                self._logger.info(f"Looking for terrain file: {terrain_path}")
+
+                if terrain_path.exists():
+                    with open(terrain_path, 'r') as f:
+                        self._common_terrain = json.load(f)
+                        self._logger.info(f"Loaded terrain data from {terrain_path}")
+                else:
+                    terrain_files = list(self._file_path.parent.glob(f"{filename_parts[0]}_terrain_*.json"))
+                    if terrain_files:
+                        latest_terrain = max(terrain_files, key=lambda p: p.stat().st_mtime)
+                        with open(latest_terrain, 'r') as f:
+                            self._common_terrain = json.load(f)
+                            self._logger.info(f"Loaded terrain data from {latest_terrain}")
+                    else:
+                        self._logger.warning("No terrain file found")
+
+            with open(self._file_path, 'r') as f:
+                self._snapshots = json.load(f)
 
             self._current_index = 0
             self._logger.info(f"Successfully loaded {len(self._snapshots)} snapshots")

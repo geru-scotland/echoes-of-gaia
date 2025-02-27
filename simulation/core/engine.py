@@ -88,7 +88,7 @@ class SimulationEngine:
         """
         yield self._env.timeout(timer)
         while True:
-            self._logger.warning("[SIMULATION] Monthly state log.")
+            self._logger.info("[SIMULATION] Monthly state log.")
 
             if self._datapoints:
                 simulated_timestamp = int(time.time() * 1000)

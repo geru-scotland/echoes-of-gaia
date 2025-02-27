@@ -111,7 +111,16 @@ class SnapshotViewer:
             return
 
         try:
-            self._map_renderer.set_map_data(snapshot["terrain"])
+            if "terrain" not in snapshot:
+                self._logger.error("Error al cargar el snapshot: 'terrain' no encontrado")
+                return
+
+            terrain_data = snapshot["terrain"]
+            if not terrain_data:
+                self._logger.error("Error al cargar el snapshot: datos de terreno vacíos")
+                return
+
+            self._map_renderer.set_map_data(terrain_data)
 
             if "entities" in snapshot:
                 self._entity_renderer.set_entities_data(snapshot["entities"])
@@ -131,9 +140,9 @@ class SnapshotViewer:
             self._info_panel.set_selected_entity(None)
             self._info_panel.set_selected_terrain(None)
 
-            self._logger.info(f"Snapshot {snapshot['snapshot_id']} cargado")
+            self._logger.info(f"Snapshot {snapshot['snapshot_id']} cargado correctamente")
         except Exception as e:
-            self._logger.error(f"Error al cargar el snapshot: {e}")
+            self._logger.error(f"Error al cargar el snapshot: {e}", exc_info=True)
 
     def _prev_snapshot(self) -> None:
         snapshot = self._loader.previous_snapshot()

@@ -115,7 +115,7 @@ class WorldMapManager:
                                         f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                                     entity.add_component(component_instance)
                                 else:
-                                    self._logger.error(f"Class not found: {class_name}")
+                                    self._logger.warning(f"Class not found: {class_name}")
                     entity_registry[id] = entity
                     self._add_to_index_map(entity)
 
