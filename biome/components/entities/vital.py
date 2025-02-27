@@ -43,7 +43,7 @@ class VitalComponent(EntityComponent):
             # TODO: el decay rate ha de ser escalado con _age
             # pensar bien en formulación / valores.
             self._age += self._aging_rate
-            self._notify_update(age=self._age)
+            self._notify_update(VitalComponent, age=self._age)
             yield self._env.timeout(timer)
 
     def _update_health(self, timer: Optional[int] = None):
@@ -54,8 +54,8 @@ class VitalComponent(EntityComponent):
                 if self._health <= 0:
                     self._health = 0
                     self._alive = False
-                    self._notify_update(alive=self._alive)
-                self._notify_update(health=self._health)
+                    self._notify_update(VitalComponent, alive=self._alive)
+                self._notify_update(VitalComponent, health=self._health)
             yield self._env.timeout(timer)
 
     # TODO: Métodos con soporte para recibir daño/heals

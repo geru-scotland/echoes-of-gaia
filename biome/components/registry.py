@@ -18,11 +18,13 @@
 from biome.components.entities.growth import GrowthComponent
 from biome.components.entities.nutritional import NutritionalValueComponent
 from biome.components.entities.transform import TransformComponent
+from biome.components.entities.vital import VitalComponent
 
 CLASS_REGISTRY = {
     "GrowthComponent": GrowthComponent,
     "NutritionalValueComponent": NutritionalValueComponent,
-    "TransformComponent": TransformComponent
+    "TransformComponent": TransformComponent,
+    "VitalComponent": VitalComponent
 }
 
 def register_component(name: str, cls):

@@ -64,6 +64,7 @@
   "fauna": {
       "deer": {
           "components": [
+              "VitalComponent"
           ],
           "habitat": ["forest"]
       },
@@ -83,16 +84,19 @@
 
   "components": {
       "fixed_components": {
-          "TransformComponent": {}
+          "TransformComponent": {},
+          "VitalComponent": {}
+      },
+      "VitalComponent": {
+          "defaults": {
+              "health": 100.0,
+              "max_health": 100.0,
+              "age": 0.0,
+              "aging_rate": 0.01,
+              "health_decay_rate": 0.005
+          }
       },
       "GrowthComponent": {
-          "parameters": {
-              "growth_rate": "float",
-              "growth_stage": "int",
-              "stages": "int",
-              "size": "float",
-              "max_size": "float"
-          },
           "defaults": {
               "growth_rate": 0.1,
               "growth_stage": 0,
@@ -102,11 +106,6 @@
           }
       },
       "NutritionalValueComponent": {
-          "parameters": {
-              "nutritive_value": "float",
-              "nutritional_decay_rate": "float",
-              "toxicity": "float"
-          },
           "defaults": {
               "nutritive_value": 0.5,
               "nutritional_decay_rate": 0.5,
@@ -114,20 +113,12 @@
           }
       },
       "DefenseComponent": {
-          "parameters": {
-              "hardiness": "int",
-              "resistance": "float"
-          },
           "defaults": {
               "hardiness": 5,
               "resistance": 0.2
           }
       },
       "TransformComponent": {
-          "parameters": {
-              "x": "int",
-              "y": "int"
-          },
           "defaults": {
               "x": -1,
               "y": -1
