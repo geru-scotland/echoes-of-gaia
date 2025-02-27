@@ -34,7 +34,7 @@ class EntityDataCollector:
         self.entity_manager: EntityManager = entity_manager
 
     def collect_data(self) -> Dict[str, int|float]:
-        self._logger.info("EntityDataCollectar has started collecting data...")
+        self._logger.debug("EntityDataCollectar has started collecting data...")
         flora, fauna = self.entity_manager.get_entities()
 
         if not flora and not fauna:
@@ -51,7 +51,7 @@ class EntityDataCollector:
 
     def _collect_all_attributes(self, all_entities: EntityList) -> Dict[str, List[Any]]:
         attributes: Dict[str, List[Any]] = defaultdict(list)
-        self._logger.info("Collecting attributes")
+        self._logger.debug("Collecting attributes")
 
         for entity in all_entities:
             entity_state: Dict[str, Any] = entity.get_state_fields()
@@ -63,7 +63,7 @@ class EntityDataCollector:
     def _compute_statistics(self, all_attributes: Dict[str, Any]):
         stats: Dict[str, int|float] = {}
 
-        self._logger.info("Computing state's statistics...")
+        self._logger.debug("Computing state's statistics...")
         self._logger.debug(f"All attributes: {all_attributes}")
         for attribute, values in all_attributes.items():
             try:

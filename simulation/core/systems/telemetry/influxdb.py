@@ -58,7 +58,7 @@ class InfluxDB:
         self._worker_thread.start()
 
     def _worker(self):
-        self._logger.info("Worker thread creado.")
+        self._logger.info("Worker thread created")
         while True:
             try:
                 point = self._queue.get(timeout=1)
@@ -66,7 +66,7 @@ class InfluxDB:
                     self._logger.info("Sentinel sentinel received, closing worker thred.")
                     break
                 queue_size = self._queue.qsize()
-                self._logger.info(f"Escribiendo punto: {point}. Tamaño de cola: {queue_size} -> {self._queue.qsize()}")
+                self._logger.debug(f"Escribiendo punto: {point}. Tamaño de cola: {queue_size} -> {self._queue.qsize()}")
                 try:
                     self._write_api.write(bucket=self._bucket, org=self._org, record=point,
                                           write_precision=WritePrecision.MS)
@@ -86,10 +86,10 @@ class InfluxDB:
             self._logger.warning("No fields in datapoint, skipping write.")
             return
 
-        self._logger.info(
+        self._logger.debug(
             f"Attempting to write: {datapoint.measurement}, Fields: {datapoint.fields}"
         )
-        self._logger.info(
+        self._logger.debug(
             f"Enqueuing datapoint: {datapoint.measurement}, Fields: {datapoint.fields}, Queue Size: {self._queue.qsize()}"
         )
         point = Point(datapoint.measurement)
@@ -106,7 +106,7 @@ class InfluxDB:
         self._queue.put(point)
 
     def close(self):
-        self._logger.info("Closing resources...")
+        self._logger.debug("Closing resources...")
         self.running = False
         self._queue.put(None)
         if self._worker_thread:

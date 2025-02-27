@@ -32,7 +32,7 @@ class Climate(BiomeComponent):
     def _update(self, delay: Optional[int] = None):
         yield self._env.timeout(delay)
         while True:
-            self._logger.info(f"Updating Climate: t={self._env.now}")
+            self._logger.debug(f"Updating Climate: t={self._env.now}")
             yield self._env.timeout(25)
 
     def get_state(self):

@@ -43,7 +43,7 @@ class BiomeDataManager:
         self._data_provider = None
         self._snapshot_process = None
 
-        self._logger.info("BiomeDataManager initialized with config")
+        self._logger.debug("BiomeDataManager initialized with config")
 
     def configure(self, data_provider: BiomeDataProvider) -> None:
         if self._initialized:
@@ -53,7 +53,7 @@ class BiomeDataManager:
         self._data_provider = data_provider
         self._initialize_snapshot_system()
         self._initialized = True
-        self._logger.info("BiomeDataManager configured with data provider")
+        self._logger.debug("BiomeDataManager configured with data provider")
 
     def _initialize_snapshot_system(self) -> None:
         try:
@@ -61,7 +61,7 @@ class BiomeDataManager:
             snapshot_enabled = snapshot_config.get("enabled", False)
 
             if not snapshot_enabled:
-                self._logger.info("Snapshot system is disabled in configuration")
+                self._logger.debug("Snapshot system is disabled in configuration")
                 return
 
             config = self._create_snapshot_config(snapshot_config)
@@ -76,7 +76,7 @@ class BiomeDataManager:
 
             capture_period = self._get_capture_period(config)
             if capture_period > 0:
-                self._logger.info(f"Starting scheduled snapshots every {capture_period} ticks")
+                self._logger.debug(f"Starting scheduled snapshots every {capture_period} ticks")
                 self._snapshot_process = self._env.process(
                     self._scheduled_snapshot_process(capture_period)
                 )
@@ -118,7 +118,7 @@ class BiomeDataManager:
         yield self._env.timeout(period)
 
         while True:
-            self._logger.info(f"Taking scheduled snapshot at tick {self._env.now}")
+            self._logger.debug(f"Taking scheduled snapshot at tick {self._env.now}")
             self.capture_snapshot(self._env.now)
             yield self._env.timeout(period)
 
@@ -142,7 +142,7 @@ class BiomeDataManager:
                 fields={**biome_statistics, **biome_score_result.to_dict()}
             )
 
-            self._logger.info(f"Collected telemetry data for datapoint {datapoint_id}")
+            self._logger.debug(f"Collected telemetry data for datapoint {datapoint_id}")
 
             return datapoint
         except Exception as e:
@@ -156,7 +156,7 @@ class BiomeDataManager:
 
         try:
             self._snapshot_system.capture_snapshot(simulation_time, callback)
-            self._logger.info(f"Snapshot capture initiated for time {simulation_time}")
+            self._logger.debug(f"Snapshot capture initiated for time {simulation_time}")
         except Exception as e:
             self._logger.error(f"Failed to capture snapshot: {e}", exc_info=True)
             if callback:
@@ -164,6 +164,6 @@ class BiomeDataManager:
 
     def shutdown(self) -> None:
         if self._snapshot_system:
-            self._logger.info("Shutting down BiomeDataManager...")
+            self._logger.debug("Shutting down BiomeDataManager...")
             self._snapshot_system.shutdown()
-            self._logger.info("BiomeDataManager shutdown complete")
+            self._logger.debug("BiomeDataManager shutdown complete")

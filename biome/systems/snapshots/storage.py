@@ -62,7 +62,7 @@ class SnapshotStorage:
             self._snapshot_counter += 1
 
             filepath = self._save_snapshot_internal(snapshot)
-            self._logger.info(f"Successfully saved snapshot to {filepath}")
+            self._logger.debug(f"Successfully saved snapshot to {filepath}")
         except Exception as e:
             self._logger.error(f"Error saving snapshot: {e}")
         finally:
@@ -79,7 +79,7 @@ class SnapshotStorage:
                 filename = self._generate_filename()
                 self._snapshot_filepath = self._config.storage_directory / filename
                 self._snapshot_file_exists = False
-                self._logger.info(f"Created new snapshot file: {self._snapshot_filepath}")
+                self._logger.debug(f"Created new snapshot file: {self._snapshot_filepath}")
 
             snapshot_data = snapshot.to_dict()
             if 'terrain' in snapshot_data:
@@ -117,7 +117,7 @@ class SnapshotStorage:
                           indent=2 if self._config.pretty_print else None,
                           default=self._json_serializer)
 
-            self._logger.info(f"Saved terrain data to {terrain_filepath}")
+            self._logger.debug(f"Saved terrain data to {terrain_filepath}")
             self._terrain_filename = terrain_filename
             return terrain_filepath
 

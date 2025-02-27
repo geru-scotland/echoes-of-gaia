@@ -88,7 +88,7 @@ class SimulationEngine:
         """
         yield self._env.timeout(timer)
         while True:
-            self._logger.info("[SIMULATION] Monthly state log.")
+            self._logger.debug("[SIMULATION] Monthly state log.")
 
             if self._datapoints:
                 simulated_timestamp = int(time.time() * 1000)
@@ -104,6 +104,7 @@ class SimulationEngine:
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)
 
+    @log_execution_time(context="Simulation executed in")
     def run(self):
         self._logger.info("Running simulation...")
         self._env.process(self._montly_update(Timers.Simulation.MONTH))

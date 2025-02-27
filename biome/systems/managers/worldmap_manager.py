@@ -36,6 +36,7 @@ from shared.strings import Loggers
 from shared.types import TileMap, EntityList, HabitatCache, BiomeStoreData, EntityDefinitions, EntityRegistry, \
     TerrainMap, EntityIndexMap, HabitatList
 from utils.loggers import LoggerManager
+from utils.middleware import log_execution_time
 
 
 class WorldMapManager:
@@ -50,7 +51,7 @@ class WorldMapManager:
             self._tile_map: TileMap = tile_map
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
 
-
+        @log_execution_time(context="Entities created")
         def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_type_enum,
                              biome_store) -> EntityRegistry:
             if not spawns:
@@ -66,8 +67,8 @@ class WorldMapManager:
                     habitats: HabitatList = biome_store.get(entity_type, {}).get("habitat", {})
                     amount = spawn.get("spawns")
 
-                    if amount < 1 or amount > 50:
-                        raise ValueError(f"Invalid spawn amount: {amount}. Must be between 1 and 50.")
+                    if amount < 1 or amount > 150:
+                        raise ValueError(f"Invalid spawn amount: {amount}. Must be between 1 and 150.")
 
                 except (AttributeError, ValueError) as e:
                     self._logger.exception(f"There was an error loading {entity_class.__name__} spawns: {e}")
@@ -116,7 +117,7 @@ class WorldMapManager:
                                         f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                                     entity.add_component(component_instance)
                                 else:
-                                    self._logger.warning(f"Class not found: {class_name}")
+                                    self._logger.debug(f"Class not found: {class_name}")
                     entity_registry[id] = entity
                     self._add_to_index_map(entity)
 

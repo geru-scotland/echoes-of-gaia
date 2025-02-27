@@ -57,7 +57,7 @@ class BiomeSnapshotSystem:
         try:
             snapshot = self.collect_snapshot_data(simulation_time)
             self._storage.save_snapshot(snapshot, callback)
-            self._logger.info(f"Snapshot capture initiated for time {simulation_time}")
+            self._logger.debug(f"Snapshot capture initiated for time {simulation_time}")
         except Exception as e:
             self._logger.error(f"Failed to capture snapshot: {e}", exc_info=True)
             if callback:
