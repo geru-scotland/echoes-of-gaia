@@ -81,14 +81,9 @@ class SimulationEngine:
 
 
     def _montly_update(self, timer: int):
-        """
-         TODO: DECORATOR para este tipo de updataes.
-         TODO 2: Hacer SNAPSHOT AQUI, CADA X TIEMPO.
-         Con biome api, hacer que haga un compute state o snapshot.
-        """
         yield self._env.timeout(timer)
         while True:
-            self._logger.debug("[SIMULATION] Monthly state log.")
+            self._logger.debug("Monthly state log.")
 
             if self._datapoints:
                 simulated_timestamp = int(time.time() * 1000)
@@ -96,8 +91,6 @@ class SimulationEngine:
                 biome_datapoint: Optional[Datapoint] = self._data_manager.collect_data_for_telemetry(
                     datapoint_id, simulated_timestamp
                 )
-                # Asumamos que el datapoint tiene un atributo 'timestamp' que usaremos para InfluxDB.
-                # En caso de que no lo tenga, deberías modificar la definición de Datapoint.
                 if biome_datapoint:
                     EventDispatcher.trigger("on_biome_data_collected", biome_datapoint)
 
