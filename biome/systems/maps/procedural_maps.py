@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+import random
 from logging import Logger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -157,7 +158,7 @@ class MapGenerator:
         self._logger: Logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
         self._logger.info("[MapGenerator] Initialising Map generator")
 
-    def generate(self, map_data: Dict[str, Any], seed: int = 3) -> MapGenData:
+    def generate(self, map_data: Dict[str, Any], seed: int = random.randint(1, 99)) -> MapGenData:
         try:
             self._logger.info("[MapGenerator] Generating new map...")
             map: MapGenData = MapGenData(**map_data)

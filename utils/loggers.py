@@ -131,9 +131,6 @@ class ThreadNameFilter(logging.Filter):
 
         return True
 
-    def register_thread_name(self, thread_id: int, name: str) -> None:
-        """Registra un nombre personalizado para un hilo específico."""
-        self._naming_map[thread_id] = name
 class LoggerManager:
 
     _loggers = {}

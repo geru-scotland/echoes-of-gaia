@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import os
 from logging import Logger
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -29,7 +30,7 @@ from shared.strings import Loggers
 from shared.types import CallbackType
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from utils.loggers import LoggerManager
-
+from utils.paths import SIMULATION_DIR
 
 
 class BiomeDataManager:
@@ -100,7 +101,7 @@ class BiomeDataManager:
             capture_period=period,
             custom_period=custom_period,
             filename_prefix=snapshot_config.get("filename_prefix", "biome_snapshot"),
-            storage_directory=Path(snapshot_config.get("storage_directory", "simulation_records")),
+            storage_directory=Path(os.path.join(SIMULATION_DIR, snapshot_config.get("storage_directory", "simulation_records"))),
             pretty_print=snapshot_config.get("pretty_print", True),
             include_real_timestamp=snapshot_config.get("include_real_timestamp", True)
         )

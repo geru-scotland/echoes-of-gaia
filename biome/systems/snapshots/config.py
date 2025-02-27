@@ -20,15 +20,15 @@ from pathlib import Path
 from typing import Set, Optional
 
 from shared.enums import CapturePeriod, CaptureFormat, CaptureType
-from utils.paths import BASE_DIR
+from utils.paths import SIMULATION_DIR
 
 
 @dataclass
 class SnapshotConfig:
     capture_period: CapturePeriod = CapturePeriod.MONTHLY
     capture_format: CaptureFormat = CaptureFormat.JSON
+    storage_directory: Path = field(default_factory=lambda: Path(SIMULATION_DIR) / "simulation_records")
     capture_types: Set[CaptureType] = field(default_factory=lambda: {CaptureType.FULL})
-    storage_directory: Path = field(default_factory=lambda: Path(BASE_DIR) / "simulation_records")
     filename_prefix: str = "biome_snapshot"
     custom_period: Optional[int] = None
     include_real_timestamp: bool = True

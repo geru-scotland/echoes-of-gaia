@@ -52,7 +52,7 @@ class SnapshotStorage:
     def _ensure_storage_directory(self) -> None:
         try:
             self._config.storage_directory.mkdir(parents=True, exist_ok=True)
-            self._logger.debug(f"Ensured storage directory exists: {self._config.storage_directory}")
+            self._logger.error(f"Ensured storage directory exists: {self._config.storage_directory}")
         except Exception as e:
             self._logger.error(f"Failed to create storage directory: {e}")
             raise
@@ -85,6 +85,44 @@ class SnapshotStorage:
 
         if hasattr(self, '_snapshot_file_exists') and self._snapshot_file_exists:
             if self._config.capture_format == CaptureFormat.JSON:
+                # Leer todo el archivo
+                with open(self._snapshot_filepath, 'r') as f:
+                    content = f.read()
+
+                if content.endswith(']'):
+                    content = content[:-1]
+                elif content.endswith(',\n'):
+                    content = content[:-2]
+                elif content.endswith('\n'):
+                    content = content[:-1]
+
+                try:
+                    json_content = content + ']'
+                    snapshots = json.loads(json_content)
+
+                    if snapshots and len(snapshots) > 0:
+                        terrain = snapshots[0].get("terrain")
+                        if terrain:
+                            optimized_snapshots = []
+                            for snapshot in snapshots:
+                                s_copy = snapshot.copy()
+                                if "terrain" in s_copy:
+                                    del s_copy["terrain"]
+                                optimized_snapshots.append(s_copy)
+
+                            optimized_content = json.dumps({
+                                "terrain": terrain,
+                                "snapshots": optimized_snapshots
+                            }, indent=2 if self._config.pretty_print else None, default=self._json_serializer)
+
+                            with open(self._snapshot_filepath, 'w') as f:
+                                f.write(optimized_content)
+
+                            self._logger.info(f"Optimized snapshots in {self._snapshot_filepath}")
+                            return
+                except Exception as e:
+                    self._logger.warning(f"Could not optimize snapshots: {e}")
+
                 with open(self._snapshot_filepath, 'a') as f:
                     f.write('\n]')
                 self._logger.info(f"Closed JSON array in {self._snapshot_filepath}")
@@ -99,7 +137,7 @@ class SnapshotStorage:
                 filename = self._generate_filename()
                 self._snapshot_filepath = self._config.storage_directory / filename
                 self._snapshot_file_exists = False
-                self._logger.info(f"Created new snapshot file: {self._snapshot_filepath}")
+                self._logger.error(f"Created new snapshot file: {self._snapshot_filepath}")
 
             data = snapshot.to_dict()
 

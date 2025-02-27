@@ -1,8 +1,8 @@
 biome:
   map:
     size:
-      - 5 # width
-      - 5 # height
+      - 75 # width
+      - 75 # height
   type: "tropical"
   flora:
     - type: "oak_tree"
@@ -23,7 +23,7 @@ biome:
             toxicity: 99
 
     - type: "mushroom"
-      spawns: 0
+      spawns: 4
 
   fauna:
     - type: "deer"

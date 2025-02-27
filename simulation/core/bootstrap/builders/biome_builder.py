@@ -57,7 +57,7 @@ class MapConfigurator(ConfiguratorStrategy):
         }
 
         try:
-            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=3)
+            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=random.randint(1, 99))
             self._logger.debug(self._map.tile_map)
         except MapGenerationError as e:
             logging.error(f"[ERROR] Map generation failed: {e}")

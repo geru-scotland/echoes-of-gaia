@@ -95,4 +95,4 @@ temp/
 
 __pycache__/
 
-simulation_records/
+simulation/simulation_records/
