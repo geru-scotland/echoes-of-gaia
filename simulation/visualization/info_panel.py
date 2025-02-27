@@ -30,8 +30,8 @@ class InfoPanel:
             width: int,
             height: int,
             background_color: Color,
-            text_color: Color = (255, 255, 255),
-            font_size: int = 16
+            text_color: Color = (220, 220, 225),
+            font_size: int = 30
     ):
         self._logger = logging.getLogger("info_panel")
         self._width = width
@@ -44,7 +44,7 @@ class InfoPanel:
         self._font = pygame.font.SysFont(None, font_size)
         self._font_bold = pygame.font.SysFont(None, font_size)
         self._font_bold.set_bold(True)
-        self._font_title = pygame.font.SysFont(None, font_size + 4)
+        self._font_title = pygame.font.SysFont(None, font_size + 6)
         self._font_title.set_bold(True)
 
         self._surface = pygame.Surface((width, height))
@@ -56,11 +56,11 @@ class InfoPanel:
         self._selected_terrain: Optional[TerrainTypeInfo] = None
 
         self._quality_colors = {
-            "critical": (255, 0, 0),  # Rojo
-            "unstable": (255, 128, 0),  # Naranja
-            "moderate": (255, 255, 0),  # Amarillo
-            "healthy": (128, 255, 0),  # Verde claro
-            "eden": (0, 255, 0)  # Verde
+            "critical": (180, 50, 50),      # Rojo mate
+            "unstable": (180, 100, 50),     # Naranja mate
+            "moderate": (180, 160, 50),     # Amarillo mate
+            "healthy": (100, 160, 50),      # Verde claro mate
+            "eden": (50, 160, 80)           # Verde mate
         }
 
     def set_simulation_time(self, simulation_time: SnapshotTimeInfo) -> None:
@@ -94,14 +94,24 @@ class InfoPanel:
     def render(self, surface: pygame.Surface, position: Tuple[int, int] = (0, 0)) -> None:
         self._surface.fill(self._background_color)
 
+        panel_rect = pygame.Rect(0, 0, self._width, self._height)
+        pygame.draw.rect(self._surface, (45, 45, 50), panel_rect, 1)
+        shadow_surface = pygame.Surface((self._width, 4), pygame.SRCALPHA)
+        shadow_surface.fill((0, 0, 0, 40))  # Negro semitransparente
+        self._surface.blit(shadow_surface, (0, 0))
         x, y = 10, 10
+
+        def add_section_separator(y_pos):
+            separator_rect = pygame.Rect(15, y_pos, self._width - 30, 1)
+            pygame.draw.rect(self._surface, (50, 50, 55), separator_rect)
+            return y_pos + 15
 
         if self._simulation_time:
             y = self._render_text_line(self._surface, "TIEMPO DE SIMULACIÓN", (x, y), font=self._font_title)
             y = self._render_text_line(self._surface, f"Año: {self._simulation_time['year']}", (x, y))
             y = self._render_text_line(self._surface, f"Mes: {self._simulation_time['month']}", (x, y))
             y = self._render_text_line(self._surface, f"Ticks: {self._simulation_time['raw_ticks']}", (x, y))
-            y += 10
+            y = add_section_separator(y + 5)
 
         if self._metrics:
             y = self._render_text_line(self._surface, "MÉTRICAS DEL BIOMA", (x, y), font=self._font_title)
@@ -115,7 +125,7 @@ class InfoPanel:
             if 'avg_size' in self._metrics:
                 y = self._render_text_line(self._surface, f"Tamaño medio: {self._metrics['avg_size']:.2f}", (x, y))
 
-            y += 10
+        y = add_section_separator(y + 5)
 
         if self._biome_score:
             y = self._render_text_line(self._surface, "PUNTUACIÓN DEL BIOMA", (x, y), font=self._font_title)
@@ -144,7 +154,7 @@ class InfoPanel:
                     factor_name = factor.replace('_', ' ').title()
                     y = self._render_text_line(self._surface, f"  - {factor_name}: {score:.2f}", (x, y))
 
-            y += 10
+        y = add_section_separator(y + 5)
 
         if self._selected_entity:
             y = self._render_text_line(self._surface, "ENTIDAD SELECCIONADA", (x, y), font=self._font_title)

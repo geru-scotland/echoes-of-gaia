@@ -26,26 +26,26 @@ from utils.loggers import LoggerManager
 from utils.paths import SIMULATION_DIR
 
 TERRAIN_COLORS = {
-    0: (0, 0, 139),  # OCEAN_DEEP: Azul oscuro
-    1: (30, 144, 255),  # OCEAN_MID: Azul medio
-    2: (135, 206, 250),  # OCEAN_SHALLOW: Azul claro
-    3: (238, 214, 175),  # BEACH: Beige
-    4: (34, 139, 34),  # GRASS: Verde
-    5: (139, 137, 137),  # MOUNTAIN: Gris
-    6: (248, 248, 255)  # SNOW: Blanco
+    0: (12, 36, 97),      # OCEAN_DEEP: Azul oscuro mate
+    1: (32, 80, 160),     # OCEAN_MID: Azul medio mate
+    2: (65, 132, 190),    # OCEAN_SHALLOW: Azul claro mate
+    3: (222, 209, 175),   # BEACH: Arena mate
+    4: (59, 122, 87),     # GRASS: Verde oscuro mate
+    5: (115, 115, 115),   # MOUNTAIN: Gris piedra mate
+    6: (230, 232, 250)    # SNOW: Blanco grisáceo mate
 }
 
 ENTITY_COLORS = {
-    "flora": (0, 128, 0),  # Verde
-    "fauna": (128, 0, 0),  # Rojo
-    "human": (0, 0, 128),  # Azul
+    "flora": (67, 124, 23),       # Verde bosque mate
+    "fauna": (153, 76, 0),        # Marrón mate
+    "human": (55, 65, 120),       # Azul grisáceo mate
 
-    "oak_tree": (0, 100, 0),  # Verde oscuro
-    "bramble": (85, 107, 47),  # Verde oliva
-    "mushroom": (160, 82, 45),  # Marrón
-    "deer": (160, 82, 45),  # Marrón
-    "boar": (139, 69, 19),  # Marrón oscuro
-    "fox": (255, 69, 0)  # Naranja rojizo
+    "oak_tree": (25, 80, 20),     # Verde oscuro mate
+    "bramble": (95, 117, 57),     # Verde oliva mate
+    "mushroom": (140, 82, 45),    # Marrón mate
+    "deer": (140, 94, 72),        # Marrón claro mate
+    "boar": (119, 69, 19),        # Marrón oscuro mate
+    "fox": (180, 80, 45)          # Naranja rojizo mate
 }
 
 
@@ -111,8 +111,8 @@ def parse_args():
     parser.add_argument(
         "--font-size",
         type=int,
-        default=16,
-        help="Font size (default: 16)"
+        default=22,  # Aumentado de 16 a 18
+        help="Font size (default: 18)"
     )
 
     parser.add_argument(
@@ -153,8 +153,8 @@ def main():
         "fps": args.fps,
         "font_size": args.font_size,
         "title": "Echoes of Gaia - Snapshot Viewer",
-        "background_color": (20, 20, 20),
-        "grid_color": (50, 50, 50),
+        "background_color": (28, 28, 32),
+        "grid_color":(45, 45, 50),
         "terrain_colors": TERRAIN_COLORS,
         "entity_colors": ENTITY_COLORS,
         "navigation_button_size": (40, 40),

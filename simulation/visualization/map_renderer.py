@@ -88,6 +88,14 @@ class MapRenderer:
         if self._map_surface is None:
             return
 
+        map_rect = pygame.Rect(
+            offset[0], offset[1],
+            self._map_surface.get_width(),
+            self._map_surface.get_height()
+        )
+        shadow_rect = map_rect.inflate(8, 8)
+        pygame.draw.rect(surface, (20, 20, 24), shadow_rect)  
+
         surface.blit(self._map_surface, offset)
 
     def get_cell_at_pos(self, pos: Point) -> Optional[Tuple[int, int]]:

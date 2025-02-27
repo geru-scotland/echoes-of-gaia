@@ -204,7 +204,17 @@ class SnapshotViewer:
             self._drag_start = mouse_pos
 
         self._navigation.update(mouse_pos)
+        mouse_pos = pygame.mouse.get_pos()
+        panel_width = self._config["panel_width"]
+        window_width, window_height = self._window_size
 
+        if (mouse_pos[0] < window_width - panel_width and
+                mouse_pos[1] < window_height - 60):
+            map_pos = (mouse_pos[0] - self._map_offset[0],
+                       mouse_pos[1] - self._map_offset[1])
+            self._hover_cell = self._map_renderer.get_cell_at_pos(map_pos)
+        else:
+            self._hover_cell = None
         if not self._paused and self._navigation.is_playing:
             current_time = time.time()
             if current_time - self._last_frame_time > 1.0:
@@ -215,7 +225,6 @@ class SnapshotViewer:
         self._screen.fill(self._config["background_color"])
 
         self._map_renderer.render(self._screen, self._map_offset)
-
         self._entity_renderer.render(self._screen, self._map_offset)
 
         if self._selected_cell:
@@ -229,19 +238,55 @@ class SnapshotViewer:
             )
             pygame.draw.rect(self._screen, (255, 255, 255), rect, 2)
 
+        if self._hover_cell and self._hover_cell != self._selected_cell:
+            y, x = self._hover_cell
+            cell_size = self._map_renderer.get_cell_size()
+            hover_rect = pygame.Rect(
+                x * cell_size + self._map_offset[0],
+                y * cell_size + self._map_offset[1],
+                cell_size,
+                cell_size
+            )
+            pygame.draw.rect(self._screen, (180, 180, 200, 120), hover_rect, 1)
+
         panel_width = self._config["panel_width"]
         window_width, _ = self._window_size
         self._info_panel.render(self._screen, (window_width - panel_width, 0))
-
         self._navigation.render(self._screen)
 
-        pygame.display.flip()
+        if self._hover_cell:
+            y, x = self._hover_cell
+            terrain_info = self._map_renderer.get_terrain_info(self._hover_cell)
 
-        panel_width = self._config["panel_width"]
-        window_width, _ = self._window_size
-        self._info_panel.render(self._screen, (window_width - panel_width, 0))
+            if terrain_info:
+                tooltip_text = f"{terrain_info['name']}"
+                entity_id = self._entity_renderer.get_entity_at_pos(
+                    (self._last_mouse_pos[0] - self._map_offset[0],
+                     self._last_mouse_pos[1] - self._map_offset[1]),
+                    self._hover_cell
+                )
 
-        self._navigation.render(self._screen)
+                if entity_id is not None:
+                    entity_info = self._entity_renderer.get_entity_info(entity_id)
+                    if entity_info:
+                        tooltip_text += f" | {entity_info.specific_type}"
+
+                font = pygame.font.SysFont(None, self._config["font_size"])
+                text_surface = font.render(tooltip_text, True, (220, 220, 225))
+                text_rect = text_surface.get_rect()
+                text_rect.bottomleft = (
+                    self._last_mouse_pos[0] + 15,
+                    self._last_mouse_pos[1] - 5
+                )
+
+                bg_rect = text_rect.inflate(10, 6)
+                bg_surface = pygame.Surface(bg_rect.size, pygame.SRCALPHA)
+                bg_surface.fill((40, 40, 45, 220))
+                self._screen.blit(bg_surface, bg_rect)
+
+                pygame.draw.rect(self._screen, (60, 60, 65), bg_rect, 1)
+
+                self._screen.blit(text_surface, text_rect)
 
         pygame.display.flip()
 

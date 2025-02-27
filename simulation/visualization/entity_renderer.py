@@ -100,13 +100,34 @@ class EntityRenderer:
                     surface,
                     entity_info.color,
                     (pixel_x, pixel_y),
-                    radius
+                    radius,
+                    0
                 )
-
+                border_color = tuple(max(0, c - 30) for c in entity_info.color)
+                pygame.draw.circle(
+                    surface,
+                    border_color,
+                    (pixel_x, pixel_y),
+                    radius,
+                    1
+                )
                 if self._selected_entity == entity_info.id:
+                    glow_radius = radius + 4
+                    glow_surface = pygame.Surface((glow_radius * 2, glow_radius * 2), pygame.SRCALPHA)
+                    pygame.draw.circle(
+                        glow_surface,
+                        (255, 255, 255, 80),
+                        (glow_radius, glow_radius),
+                        glow_radius
+                    )
+                    surface.blit(
+                        glow_surface,
+                        (pixel_x - glow_radius, pixel_y - glow_radius)
+                    )
+
                     pygame.draw.circle(
                         surface,
-                        (255, 255, 255),
+                        (230, 230, 250),
                         (pixel_x, pixel_y),
                         radius + 2,
                         2
