@@ -17,8 +17,14 @@
 """
 from shared.base import EnumBaseStr, EnumBaseInt
 
+class BiomeType(EnumBaseStr):
+    TROPICAL = 0
+    DESERT = 1
+    TAIGA = 3
+    SAVANNA = 2
+
 # Maps
-class TerrainType(EnumBaseStr):
+class TerrainType(EnumBaseInt):
     OCEAN_DEEP = 0
     OCEAN_MID = 1
     OCEAN_SHALLOW = 2
@@ -111,3 +117,23 @@ class CaptureType(EnumBaseStr):
     ENTITIES_ONLY = "entities_only"
     TERRAIN_ONLY = "terrain_only"
     METRICS_ONLY = "metrics_only"
+
+class WeatherEvent(EnumBaseInt):
+    CLEAR = 0
+    CLOUDY = 1
+    RAIN = 2
+    HEAVY_RAIN = 3
+    STORM = 4
+    SNOW = 5
+    HEATWAVE = 6
+    DROUGHT = 7
+
+class Season(EnumBaseInt):
+    SPRING = 0
+    SUMMER = 1
+    AUTUMN = 2
+    WINTER = 3
+
+class Agents:
+    class Reinforcement(EnumBaseStr):
+        NAIVE_CLIMATE = 0

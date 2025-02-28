@@ -1,12 +1,12 @@
 biome:
   map:
     size:
-      - 75 # width
-      - 75 # height
+      - 60 # width
+      - 60 # height
   type: "tropical"
   flora:
     - type: "oak_tree"
-      spawns: 30
+      spawns: 150
       components:
         - GrowthComponent:
             growth_rate: 0.3
@@ -15,7 +15,7 @@ biome:
             nutritional_decay_rate: 0.1
 
     - type: "bramble"
-      spawns: 30
+      spawns: 150
       components:
         - DefenseComponent:
         - NutritionalValueComponent:
@@ -23,17 +23,21 @@ biome:
             toxicity: 99
 
     - type: "mushroom"
-      spawns: 15
+      spawns: 100
 
   fauna:
     - type: "deer"
-      spawns: 20
+      spawns: 110
       components:
         - NutritionalValueComponent:
         - GrowthComponent:
         - VitalComponent:
     - type: "boar"
-      spawns: 15
+      spawns: 50
+      components:
+        - NutritionalValueComponent:
+    - type: "fox"
+      spawns: 40
       components:
         - NutritionalValueComponent:
         - GrowthComponent:

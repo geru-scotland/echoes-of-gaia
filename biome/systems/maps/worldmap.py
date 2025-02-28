@@ -19,7 +19,6 @@ from typing import List
 
 import numpy as np
 
-from biome.entities.entity import Entity
 from shared.types import TerrainMap, EntityRegistry, EntityIndexMap, EntityList
 
 

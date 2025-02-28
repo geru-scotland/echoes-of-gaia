@@ -10,10 +10,22 @@
   ],
 
   "biomes": {
-      "tropical": [10, 10, 19, 5, 55, 30, 5],
-      "desert": [0, 5, 5, 10, 80, 10, 0],
-      "taiga": [5, 10, 15, 10, 30, 25, 5],
-      "savanna": [0, 5, 10, 10, 70, 5, 0]
+      "tropical": {
+          "weights": [10, 10, 19, 5, 55, 30, 5],
+          "latitude": 1.0
+      },
+      "desert": {
+          "weights": [0, 5, 5, 10, 80, 10, 0],
+          "latitude": 1.0
+      } ,
+      "taiga": {
+          "weights": [5, 10, 15, 10, 30, 25, 5],
+          "latitude": 1.0
+      },
+      "savanna": {
+          "weights": [0, 5, 10, 10, 70, 5, 0],
+          "latitude": 1.0
+      }
   },
 
   "habitats": {
@@ -66,7 +78,7 @@
           "components": [
               "VitalComponent"
           ],
-          "habitat": ["forest"]
+          "habitat": ["thicket"]
       },
       "boar": {
           "components": [
@@ -78,7 +90,7 @@
       "fox": {
           "components": [
           ],
-          "habitat": ["forest"]
+          "habitat": ["thicket"]
       }
   },
 

@@ -36,3 +36,4 @@ class Loggers(EnumBaseStr):
     WORLDMAP = "world_map"
     TIME = "time"
     INFLUXDB = "influxdb"
+    REINFORCEMENT = "reinforcement"

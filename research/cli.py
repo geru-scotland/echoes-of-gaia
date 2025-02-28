@@ -201,6 +201,7 @@ class CLIMenuManager:
         input()
 
     def _train_climate_model(self) -> None:
+
         print(f"\n{LogColors.YELLOW}Climate Model Training - Not yet implemented{LogColors.RESET}")
         print(
             f"{LogColors.GRAY}This feature will allow training climate prediction and variation models{LogColors.RESET}")
