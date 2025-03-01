@@ -32,7 +32,6 @@ class ReinforcementTrainingAgent:
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         try:
             environment_class_name: Type = EnvironmentRegistry.get(agent_type)
-            print(environment_class_name)
             self._model = environment_class_name()
         except Exception as e:
             self._logger.exception(f"Error when getting {agent_type} from the Environent Registry: {e}")
@@ -45,7 +44,7 @@ class ReinforcementTrainingAgent:
         pass
 
     def train(self) -> None:
-        self._logger.info(f"Training...{self._model}")
+        self._logger.info(f"Training...")
 
     def predict(self) -> None:
         pass

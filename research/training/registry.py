@@ -29,7 +29,6 @@ class EnvironmentRegistry:
 
     @classmethod
     def register(cls, agent_type: Agents.Reinforcement) -> Type[T]:
-        print("CALLING REGISTER")
         def wrapper(environment_class_name: Type[T]):
             cls._environments[agent_type] = environment_class_name
             return environment_class_name
@@ -37,5 +36,4 @@ class EnvironmentRegistry:
 
     @classmethod
     def get(cls, agent_type: Agents.Reinforcement) -> Type[T]:
-        print(cls._environments)
         return cls._environments.get(agent_type, None)

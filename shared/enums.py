@@ -118,15 +118,15 @@ class CaptureType(EnumBaseStr):
     TERRAIN_ONLY = "terrain_only"
     METRICS_ONLY = "metrics_only"
 
-class WeatherEvent(EnumBaseInt):
-    CLEAR = 0
-    CLOUDY = 1
-    RAIN = 2
-    HEAVY_RAIN = 3
-    STORM = 4
-    SNOW = 5
-    HEATWAVE = 6
-    DROUGHT = 7
+class WeatherEvent(EnumBaseStr):
+    CLEAR = "clear"
+    CLOUDY = "cloudy"
+    RAIN = "rain"
+    HEAVY_RAIN = "heavy_rain"
+    STORM = "storm"
+    SNOW =  "snow"
+    HEATWAVE = "heatwave"
+    DROUGHT =  "drought"
 
 class Season(EnumBaseStr):
     SPRING = "spring"

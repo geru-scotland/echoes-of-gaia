@@ -9,6 +9,17 @@
       "SNOW"
   ],
 
+  "weather_event_deltas": {
+    "clear": 0,
+    "cloudy": -1.5,
+    "rain": -2,
+    "heavy_rain": -2.5,
+    "storm": -3.5,
+    "snow": -5,
+    "heatwave": 8,
+    "drought": 6
+  },
+
   "biomes": {
     "tropical": {
       "weights": [10, 10, 19, 5, 55, 30, 5],
