@@ -16,8 +16,9 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import Dict, Any, Type
+from typing import Type
 
+# No borrar este import, es necesario para el EnvironmentRegistry.
 import research.training.reinforcement.environments
 
 from research.training.registry import EnvironmentRegistry

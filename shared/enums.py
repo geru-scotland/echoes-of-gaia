@@ -18,10 +18,10 @@
 from shared.base import EnumBaseStr, EnumBaseInt
 
 class BiomeType(EnumBaseStr):
-    TROPICAL = 0
-    DESERT = 1
-    TAIGA = 3
-    SAVANNA = 2
+    TROPICAL = "tropical"
+    DESERT = "desert"
+    TAIGA = "taiga"
+    SAVANNA = "savanna"
 
 # Maps
 class TerrainType(EnumBaseInt):
@@ -128,11 +128,11 @@ class WeatherEvent(EnumBaseInt):
     HEATWAVE = 6
     DROUGHT = 7
 
-class Season(EnumBaseInt):
-    SPRING = 0
-    SUMMER = 1
-    AUTUMN = 2
-    WINTER = 3
+class Season(EnumBaseStr):
+    SPRING = "spring"
+    SUMMER = "summer"
+    AUTUMN = "autumn"
+    WINTER = "winter"
 
 class Agents:
     class Reinforcement(EnumBaseStr):

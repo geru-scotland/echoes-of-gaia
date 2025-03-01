@@ -31,6 +31,7 @@ class Loggers(EnumBaseStr):
     SCENE = "scene"
     BIOME = "biome"
     SIMULATION = "simulation"
+    CLIMATE = "climate"
     RESEARCH = "research"
     BOOTSTRAP = "bootstrap"
     WORLDMAP = "world_map"

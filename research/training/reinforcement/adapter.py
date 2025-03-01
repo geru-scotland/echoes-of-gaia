@@ -15,15 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
-class SeasonSystem:
-    def __init__(self):
-        self.day: int = 1
+from abc import ABC, abstractmethod
 
 
-    # Tiene que tener advance() o similar
-    # para ser llamado por simpy / gym
-    def _advance_season(self, ticks: int = 1):
-        pass
+class EnvironmentAdapter(ABC):
 
-    def update(self):
-        self.day += 1
+    @abstractmethod
+    def compute_reward(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_observation(self):
+        raise NotImplementedError

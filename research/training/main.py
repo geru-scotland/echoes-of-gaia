@@ -18,6 +18,8 @@
 
 from research.training.reinforcement.train_agent import ReinforcementTrainingAgent
 from shared.enums import Agents
+from shared.stores.biome_store import BiomeStore
 
+BiomeStore.load_ecosystem_data()
 train_agent: ReinforcementTrainingAgent = ReinforcementTrainingAgent(Agents.Reinforcement.NAIVE_CLIMATE)
 train_agent.train()

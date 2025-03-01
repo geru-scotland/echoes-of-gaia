@@ -23,7 +23,9 @@ class ClimateState:
     temperature: float
     humidity: float
     precipitation: float
-    biomass: float
+    biomass_density: float
+    fauna_density: float
     co2_level: float
+    atm_pressure: float
 
 
