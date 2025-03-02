@@ -9,11 +9,284 @@
       "SNOW"
   ],
 
+  "weather_event_deltas": {
+    "clear": 0,
+    "cloudy": -1.5,
+    "rain": -2,
+    "heavy_rain": -2.5,
+    "storm": -3.5,
+    "snow": -5,
+    "heatwave": 8,
+    "drought": 6
+  },
+
   "biomes": {
-      "tropical": [10, 10, 19, 5, 55, 30, 5],
-      "desert": [0, 5, 5, 10, 80, 10, 0],
-      "taiga": [5, 10, 15, 10, 30, 25, 5],
-      "savanna": [0, 5, 10, 10, 70, 5, 0]
+    "tropical": {
+      "weights": [10, 10, 19, 5, 55, 30, 5],
+      "environmental_factors": {
+        "temperature": 27,
+        "humidity": 80,
+        "precipitation": 3000,
+        "biomass_density": 90,
+        "fauna_density": 90,
+        "co2_level": 400,
+        "atm_pressure": 1012
+      },
+      "seasonal_deltas": {
+        "spring": {
+          "temperature": 0,
+          "humidity": 5,
+          "precipitation": 500,
+          "atm_pressure": -2
+        },
+        "summer": {
+          "temperature": 2,
+          "humidity": 0,
+          "precipitation": -300,
+          "atm_pressure": 1
+        },
+        "autumn": {
+          "temperature": 0,
+          "humidity": 2,
+          "precipitation": 300,
+          "atm_pressure": -1
+        },
+        "winter": {
+          "temperature": -2,
+          "humidity": -7,
+          "precipitation": -500,
+          "atm_pressure": 2
+        }
+      }
+    },
+    "desert": {
+      "weights": [0, 5, 5, 10, 80, 10, 0],
+      "environmental_factors": {
+        "temperature": 35,
+        "humidity": 20,
+        "precipitation": 50,
+        "biomass_density": 10,
+        "fauna_density": 15,
+        "co2_level": 380,
+        "atm_pressure": 1018
+      },
+      "seasonal_deltas": {
+        "spring": {
+          "temperature": 3,
+          "humidity": 5,
+          "precipitation": 15,
+          "atm_pressure": -3
+        },
+        "summer": {
+          "temperature": 7,
+          "humidity": -10,
+          "precipitation": -20,
+          "atm_pressure": 5
+        },
+        "autumn": {
+          "temperature": -5,
+          "humidity": 3,
+          "precipitation": 10,
+          "atm_pressure": -3
+        },
+        "winter": {
+          "temperature": -5,
+          "humidity": 2,
+          "precipitation": -5,
+          "atm_pressure": 1
+        }
+      }
+    },
+    "taiga": {
+      "weights": [5, 10, 15, 10, 30, 25, 5],
+      "environmental_factors": {
+        "temperature": -5,
+        "humidity": 60,
+        "precipitation": 500,
+        "biomass_density": 50,
+        "fauna_density": 40,
+        "co2_level": 390,
+        "atm_pressure": 1010
+      },
+      "seasonal_deltas": {
+        "spring": {
+          "temperature": 10,
+          "humidity": 5,
+          "precipitation": 100,
+          "atm_pressure": -5
+        },
+        "summer": {
+          "temperature": 15,
+          "humidity": 0,
+          "precipitation": 0,
+          "atm_pressure": 0
+        },
+        "autumn": {
+          "temperature": -12,
+          "humidity": 10,
+          "precipitation": 50,
+          "atm_pressure": -2
+        },
+        "winter": {
+          "temperature": -13,
+          "humidity": -15,
+          "precipitation": -150,
+          "atm_pressure": 7
+        }
+      }
+    },
+    "savanna": {
+      "weights": [0, 5, 10, 10, 70, 5, 0],
+      "environmental_factors": {
+        "temperature": 30,
+        "humidity": 50,
+        "precipitation": 1000,
+        "biomass_density": 60,
+        "fauna_density": 75,
+        "co2_level": 395,
+        "atm_pressure": 1011
+      },
+      "seasonal_deltas": {
+        "spring": {
+          "temperature": 1,
+          "humidity": 15,
+          "precipitation": 400,
+          "atm_pressure": -3
+        },
+        "summer": {
+          "temperature": 3,
+          "humidity": -20,
+          "precipitation": -600,
+          "atm_pressure": 2
+        },
+        "autumn": {
+          "temperature": -1,
+          "humidity": -10,
+          "precipitation": -300,
+          "atm_pressure": 1
+        },
+        "winter": {
+          "temperature": -3,
+          "humidity": 15,
+          "precipitation": 500,
+          "atm_pressure": 0
+        }
+      }
+    },
+    "tundra": {
+      "weights": [0, 5, 10, 10, 20, 20, 35],
+      "environmental_factors": {
+        "temperature": -10,
+        "humidity": 40,
+        "precipitation": 300,
+        "biomass_density": 20,
+        "fauna_density": 25,
+        "co2_level": 385,
+        "atm_pressure": 1005
+      },
+      "seasonal_deltas": {
+        "spring": {
+          "temperature": 8,
+          "humidity": 10,
+          "precipitation": 50,
+          "atm_pressure": -7
+        },
+        "summer": {
+          "temperature": 12,
+          "humidity": 5,
+          "precipitation": 100,
+          "atm_pressure": -3
+        },
+        "autumn": {
+          "temperature": -7,
+          "humidity": -5,
+          "precipitation": -50,
+          "atm_pressure": 5
+        },
+        "winter": {
+          "temperature": -13,
+          "humidity": -10,
+          "precipitation": -100,
+          "atm_pressure": 5
+        }
+      }
+    },
+    "wetlands": {
+      "weights": [5, 10, 15, 20, 40, 5, 5],
+      "environmental_factors": {
+        "temperature": 22,
+        "humidity": 90,
+        "precipitation": 2500,
+        "biomass_density": 85,
+        "fauna_density": 80,
+        "co2_level": 410,
+        "atm_pressure": 1013
+      },
+      "seasonal_deltas": {
+        "spring": {
+          "temperature": 3,
+          "humidity": -5,
+          "precipitation": 300,
+          "atm_pressure": -4
+        },
+        "summer": {
+          "temperature": 5,
+          "humidity": -10,
+          "precipitation": -500,
+          "atm_pressure": 2
+        },
+        "autumn": {
+          "temperature": -2,
+          "humidity": 5,
+          "precipitation": 400,
+          "atm_pressure": -1
+        },
+        "winter": {
+          "temperature": -6,
+          "humidity": 10,
+          "precipitation": -200,
+          "atm_pressure": 3
+        }
+      }
+    },
+    "mediterranean": {
+      "weights": [0, 5, 10, 10, 50, 15, 10],
+      "environmental_factors": {
+        "temperature": 18,
+        "humidity": 55,
+        "precipitation": 600,
+        "biomass_density": 70,
+        "fauna_density": 65,
+        "co2_level": 400,
+        "atm_pressure": 1012
+      },
+      "seasonal_deltas": {
+        "spring": {
+          "temperature": 4,
+          "humidity": 10,
+          "precipitation": 100,
+          "atm_pressure": -3
+        },
+        "summer": {
+          "temperature": 8,
+          "humidity": -20,
+          "precipitation": -400,
+          "atm_pressure": 5
+        },
+        "autumn": {
+          "temperature": -5,
+          "humidity": 15,
+          "precipitation": 300,
+          "atm_pressure": -4
+        },
+        "winter": {
+          "temperature": -7,
+          "humidity": -5,
+          "precipitation": 0,
+          "atm_pressure": 2
+        }
+      }
+    }
   },
 
   "habitats": {
@@ -66,7 +339,7 @@
           "components": [
               "VitalComponent"
           ],
-          "habitat": ["forest"]
+          "habitat": ["thicket"]
       },
       "boar": {
           "components": [
@@ -78,7 +351,7 @@
       "fox": {
           "components": [
           ],
-          "habitat": ["forest"]
+          "habitat": ["thicket"]
       }
   },
 

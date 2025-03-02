@@ -46,6 +46,7 @@ class BiomeStore:
                 cls.terrains: TerrainList = np.array([getattr(TerrainType, t, None) for t in data.get("terrains", [])], dtype=object)
                 cls.habitats: BiomeStoreData = data.get("habitats", {})
                 cls.biomes: BiomeStoreData = data.get("biomes", {})
+                cls.weather_deltas: BiomeStoreData = data.get("weather_deltas", {})
                 cls.flora: BiomeStoreData = data.get("flora", {})
                 cls.fauna: BiomeStoreData = data.get("fauna", {})
                 cls.components: BiomeStoreData = data.get("components", {})

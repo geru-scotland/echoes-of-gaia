@@ -26,6 +26,7 @@ from config.settings import BiomeSettings, Config
 from biome.systems.maps.procedural_maps import MapGenerator, MapGenData, PerlinNoiseGenerator
 from exceptions.custom import MapGenerationError
 from shared.constants import MAP_DEFAULT_SIZE
+from shared.enums import BiomeType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
 from shared.types import EntityDefinitions, TileMap
@@ -53,7 +54,7 @@ class MapConfigurator(ConfiguratorStrategy):
         biomes = BiomeStore.biomes
         map_data: Dict[str, Any] = {
             "size": map_size,
-            "weights": np.array(biomes.get(config.get("type", {}), []))
+            "weights": np.array(biomes.get(config.get("type", {}), BiomeType.TROPICAL).get("weights", []))
         }
 
         try:
