@@ -24,8 +24,13 @@ CONFIG_DIR = os.path.join(BASE_DIR, 'config')
 GAME_DIR = os.path.join(BASE_DIR, 'game')
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 SIMULATION_DIR = os.path.join(BASE_DIR, 'simulation')
+RESEARCH_DIR = os.path.join(BASE_DIR, 'research')
 ASSETS_DIR = os.path.join(GAME_DIR, 'assets')
-RESEARCH_DIR = os.path.join(GAME_DIR, 'research')
 UTILS_DIR = os.path.join(GAME_DIR, 'utils')
 BIOME_DATA_DIR = os.path.join(BIOME_DIR, 'data')
 
+TRAINING_DIR = os.path.join(RESEARCH_DIR, 'training')
+MODELS_DIR = os.path.join(TRAINING_DIR, 'models')
+
+def get_model_path(model_name: str) -> str:
+    return os.path.join(MODELS_DIR, model_name)

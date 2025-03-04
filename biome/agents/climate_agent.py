@@ -1,0 +1,65 @@
+""" 
+# =============================================================================
+#                                                                              #
+#                              ✦ ECHOES OF GAIA ✦                              #
+#                                                                              #
+#    Trabajo Fin de Grado (TFG)                                                #
+#    Facultad de Ingeniería Informática - Donostia                             #
+#    UPV/EHU - Euskal Herriko Unibertsitatea                                   #
+#                                                                              #
+#    Área de Computación e Inteligencia Artificial                             #
+#                                                                              #
+#    Autor:  Aingeru García Blas                                               #
+#    GitHub: https://github.com/geru-scotland                                  #
+#    Repo:   https://github.com/geru-scotland/echoes-of-gaia                   #
+#                                                                              #
+# =============================================================================
+"""
+from logging import Logger
+
+import numpy as np
+from stable_baselines3 import PPO
+from stable_baselines3.common.base_class import SelfBaseAlgorithm
+
+from biome.agents.base import Agent
+from biome.systems.climate.state import ClimateState
+from biome.systems.climate.system import ClimateSystem
+from research.training.reinforcement.rl_model import ReinforcementModel
+from shared.enums import WeatherEvent, BiomeType, Season
+from shared.strings import Loggers
+from shared.types import Observation
+from utils.loggers import LoggerManager
+from utils.normalization.normalizer import climate_normalizer
+
+
+class ClimateAgent(Agent[ClimateState, WeatherEvent]):
+    def __init__(self, climate: ClimateSystem):
+        self._logger: Logger = LoggerManager.get_logger(Loggers.CLIMATE_AGENT)
+        self._climate: ClimateSystem = climate
+        self._model: ReinforcementModel = ReinforcementModel()
+
+    def perceive(self) -> Observation:
+        self._logger.info("AGENT PERCEIVING")
+        biome_idx: int = list(BiomeType).index(self._climate.biome_type)
+        season_idx: int = list(Season).index(self._climate.get_current_season())
+        state: ClimateState = self._climate.get_state()
+
+        normalized_temp: float = climate_normalizer.normalize("temperature", state.temperature)
+        normalized_pressure: float = climate_normalizer.normalize("atm_pressure", state.atm_pressure)
+
+        return {
+            "temperature": np.array([normalized_temp], dtype=np.float32),
+            "atm_pressure": np.array([normalized_pressure], dtype=np.float32),
+            "biome_type": biome_idx,
+            "season": season_idx
+        }
+
+    def decide(self, observation: Observation) -> WeatherEvent:
+        self._logger.info(f"AGENT DECIDING. Observation: {observation}")
+        weather_event_idx: int = self._model.predict(observation)
+        return WeatherEvent(list(WeatherEvent)[weather_event_idx])
+
+    def act(self, action: WeatherEvent) -> None:
+        self._logger.info(f"AGENT ACTING. Action: {action}")
+        self._climate.update(action)
+

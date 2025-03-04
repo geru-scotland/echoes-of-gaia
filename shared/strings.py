@@ -38,3 +38,4 @@ class Loggers(EnumBaseStr):
     TIME = "time"
     INFLUXDB = "influxdb"
     REINFORCEMENT = "reinforcement"
+    CLIMATE_AGENT = "climate_agent"
