@@ -65,3 +65,7 @@ MetricsData = Dict[str, Any]
 ClimateData = Dict[str, Any]
 PositionData = Tuple[int, int]
 CallbackType = Optional[Callable[[Optional[Path]], None]]
+
+
+# Agents
+Observation = Dict[str, Any]

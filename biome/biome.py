@@ -19,8 +19,12 @@ from typing import Dict, Any
 
 import simpy
 
+from biome.agents.base import Agent
+from biome.agents.climate_agent import ClimateAgent
 from biome.components.biome.climate import Climate
 from biome.environment import Environment
+from biome.systems.climate.state import ClimateState
+from biome.systems.climate.system import ClimateSystem
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.managers.entity_manager import EntityManager
 from biome.systems.managers.worldmap_manager import WorldMapManager
@@ -28,7 +32,8 @@ from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
-from shared.types import EntityList
+from shared.enums import Timers, Agents, AgentType, Season, WeatherEvent
+from shared.types import EntityList, Observation
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.systems.telemetry.datapoint import Datapoint
 
@@ -47,10 +52,33 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
             self._entity_manager: EntityManager = EntityManager(self._map_manager.get_world_map())
             self._entity_collector: EntityDataCollector = EntityDataCollector(entity_manager=self._entity_manager)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
+            self._agents: Dict[AgentType, Agent] = self._initialize_agents()
 
             self._logger.info("Biome is ready!")
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
+
+    def _initialize_agents(self) -> Dict[AgentType, Agent]:
+        agents: Dict[AgentType, Agent] = {}
+
+        climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
+        climate_agent: ClimateAgent = ClimateAgent(climate)
+
+        agents.update({AgentType.CLIMATE_AGENT: climate_agent})
+        self._env.process(self._run_climate_agent(Timers.Agents.CLIMATE_UPDATE))
+        return agents
+
+    def _run_climate_agent(self, delay: int):
+        yield self._env.timeout(delay)
+        while True:
+            try:
+                agent = self._agents.get(AgentType.CLIMATE_AGENT)
+                observation: Observation = agent.perceive()
+                action: WeatherEvent = agent.decide(observation)
+                agent.act(action)
+            except Exception as e:
+                self._logger.exception(f"An exception ocurred running climate agent: {e}")
+            yield self._env.timeout(delay)
 
     def update(self, delay: int):
         yield self._env.timeout(delay)

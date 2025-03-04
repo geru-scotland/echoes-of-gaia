@@ -20,6 +20,7 @@ from abc import ABC
 from dataclasses import dataclass
 
 from config.settings import Config
+from shared.enums import BiomeType
 from shared.types import TileMap, EntityDefinitions
 from simulation.core.systems.telemetry.manager import InfluxDBManager
 
@@ -30,6 +31,7 @@ class ContextData(ABC):
 
 @dataclass
 class BiomeContextData(ContextData):
+    biome_type: BiomeType
     tile_map: TileMap
     config: Config
     flora_definitions: EntityDefinitions

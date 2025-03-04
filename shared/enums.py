@@ -74,6 +74,7 @@ class FaunaType(EnumBaseStr):
 class Timers:
     class Agents(EnumBaseInt):
         EVOLVE = 500
+        CLIMATE_UPDATE = 2
 
     class Entity(EnumBaseInt):
         GROWTH = 25
@@ -88,6 +89,7 @@ class Timers:
 
     class Simulation(EnumBaseInt):
         MONTH = 30
+
 
 class Habitats:
     class Relations(EnumBaseStr):
@@ -134,6 +136,10 @@ class Season(EnumBaseStr):
     AUTUMN = "autumn"
     WINTER = "winter"
 
+class AgentType(EnumBaseStr):
+    CLIMATE_AGENT = "climate_agent"
+
+
 class Agents:
-    class Reinforcement(EnumBaseStr):
+    class Reinforcement(EnumBaseInt):
         NAIVE_CLIMATE = 0

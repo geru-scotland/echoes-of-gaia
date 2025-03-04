@@ -96,7 +96,8 @@ class BiomeBuilder(Builder):
             fauna: EntityDefinitions = config.get("fauna", {})
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
-            self._context = BiomeContextData(tile_map=map_configurator.get_tile_map(),
+            self._context = BiomeContextData(biome_type=config.get("type"),
+                                             tile_map=map_configurator.get_tile_map(),
                                              config=config, logger_name=Loggers.BIOME,
                                              flora_definitions=flora, fauna_definitions=fauna)
         except Exception as e:

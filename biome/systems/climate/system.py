@@ -46,7 +46,7 @@ class ClimateSystem:
 
     def _load_environmental_data(self):
         self._base_environmental_factors = BiomeStore.biomes.get(self._biome_type, {}).get("environmental_factors", {})
-        self._weather_event_deltas = BiomeStore.biomes.get("weather_event_deltas", {})
+        self._weather_event_deltas = BiomeStore.weather_event_deltas
         self._seasonal_deltas = BiomeStore.biomes.get(self._biome_type, {}).get("seasonal_deltas", {})
 
     def _initialize_state(self) -> ClimateState:
@@ -80,6 +80,7 @@ class ClimateSystem:
 
     def _handle_weather_event(self, weather_event: WeatherEvent):
         # Por ahora solo cambio de temperatura, ya veremos en un futuro.
+        # TODO: Incluir ruido, variabilidad aquí
         if weather_event:
             self._state.temperature += self._weather_event_deltas[weather_event]
 
