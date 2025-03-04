@@ -20,6 +20,7 @@ import numpy as np
 from research.training.reinforcement.train_agent import ReinforcementLearningAgent
 from shared.enums import Agents, BiomeType, Season, WeatherEvent
 from shared.stores.biome_store import BiomeStore
+from utils.normalization.normalizer import climate_normalizer
 
 BiomeStore.load_ecosystem_data()
 
@@ -34,66 +35,75 @@ def test_prediction():
 
     agent.load_model()
 
-
-    test_observations = [
+    test_observations_raw = [
         {
-            "temperature": np.array([0.65], dtype=np.float32),
-            "atm_pressure": np.array([0.50], dtype=np.float32),
+            "temperature": 22.0,
+            "atm_pressure": 1000.0,
             "biome_type": 0,
             "season": 0
         },
         {
-            "temperature": np.array([0.95], dtype=np.float32),
-            "atm_pressure": np.array([0.30], dtype=np.float32),
+            "temperature": 42.0,
+            "atm_pressure": 980.0,
             "biome_type": 1,
             "season": 1
         },
         {
-            "temperature": np.array([0.10], dtype=np.float32),
-            "atm_pressure": np.array([0.70], dtype=np.float32),
+            "temperature": -14.0,
+            "atm_pressure": 1020.0,
             "biome_type": 2,
             "season": 3
         },
         {
-            "temperature": np.array([0.50], dtype=np.float32),
-            "atm_pressure": np.array([0.40], dtype=np.float32),
+            "temperature": 10.0,
+            "atm_pressure": 990.0,
             "biome_type": 3,
             "season": 2
         },
         {
-            "temperature": np.array([0.40], dtype=np.float32),
-            "atm_pressure": np.array([0.20], dtype=np.float32),
+            "temperature": 5.0,
+            "atm_pressure": 970.0,
             "biome_type": 1,
             "season": 3
         },
         {
-            "temperature": np.array([0.80], dtype=np.float32),
-            "atm_pressure": np.array([0.60], dtype=np.float32),
+            "temperature": 34.0,
+            "atm_pressure": 1010.0,
             "biome_type": 0,
             "season": 1
         },
         {
-            "temperature": np.array([0.50], dtype=np.float32),
-            "atm_pressure": np.array([0.90], dtype=np.float32),
+            "temperature": 10.0,
+            "atm_pressure": 1040.0,
             "biome_type": 2,
             "season": 1
         },
         {
-            "temperature": np.array([0.30], dtype=np.float32),
-            "atm_pressure": np.array([0.80], dtype=np.float32),
+            "temperature": 0.0,
+            "atm_pressure": 1030.0,
             "biome_type": 0,
             "season": 3
         }
     ]
 
-    def denormalize_temp(norm_temp):
-        return norm_temp * 80 - 30
+    test_observations = []
+    for obs in test_observations_raw:
+        normalized_obs = {
+            "temperature": np.array([climate_normalizer.normalize('temperature', obs["temperature"])],
+                                    dtype=np.float32),
+            "atm_pressure": np.array([climate_normalizer.normalize('atm_pressure', obs["atm_pressure"])], dtype=np.float32),
+            "biome_type": obs["biome_type"],
+            "season": obs["season"]
+        }
+        test_observations.append(normalized_obs)
+
 
     for i, obs in enumerate(test_observations):
         print(f"\nObservación {i + 1}:")
-        real_temp = denormalize_temp(obs['temperature'][0])
+        real_temp = climate_normalizer.denormalize("temperature", obs['temperature'][0])
+        real_atm_pressure = climate_normalizer.denormalize("atm_pressure", obs['atm_pressure'][0])
         print(f"  Temperatura: {obs['temperature'][0]:.2f} (normalizada) = {real_temp:.1f}°C")
-        print(f"  Presión: {obs['atm_pressure'][0]:.2f} (normalizada)")
+        print(f"  Presión: {obs['atm_pressure'][0]:.2f} (normalizada) = {real_atm_pressure} hPa")
         print(f"  Bioma: {list(BiomeType)[obs['biome_type']]}")
         print(f"  Estación: {list(Season)[obs['season']]}")
 
