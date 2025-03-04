@@ -28,6 +28,7 @@ from shared.enums import BiomeType, Season, WeatherEvent
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
 from utils.loggers import LoggerManager
+from utils.normalization.normalizer import climate_normalizer
 
 
 class ClimateTrainAdapter(EnvironmentAdapter):
@@ -133,8 +134,8 @@ class ClimateTrainAdapter(EnvironmentAdapter):
     def get_observation(self) -> Dict[str, Any]:
         biome_idx: int = list(BiomeType).index(self._biome_type)
         season_idx: int = list(Season).index(self._climate_system.get_current_season())
-        normalized_temp: float = self.normalize_temperature(self._state.temperature)
-        normalized_pressure: float = self.normalize_pressure(self._state.atm_pressure)
+        normalized_temp: float = climate_normalizer.normalize("temperature", self._state.temperature)
+        normalized_pressure: float = climate_normalizer.normalize("atm_pressure", self._state.atm_pressure)
         return {
             "temperature": np.array([normalized_temp], dtype=np.float32),
             "atm_pressure": np.array([normalized_pressure], dtype=np.float32),
