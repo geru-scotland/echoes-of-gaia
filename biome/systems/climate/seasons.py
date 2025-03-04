@@ -37,7 +37,7 @@ class SeasonSystem:
         try:
             current_season_idx: int = self._seasons.index(self._current_season)
             self._current_season = self._seasons[(current_season_idx + 1) % len(self._seasons)]
-            self._logger.debug(f"Current season: {self._current_season}")
+            self._logger.info(f"Current season: {self._current_season}")
             # Por ahora, simplemente incremento en 90 por cada season, ya pondré duración
             # determinada por season, no hace falta acotar en el año al ser ticks
             self._next_season_day += 90

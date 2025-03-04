@@ -33,6 +33,7 @@ from utils.loggers import LoggerManager
 class ClimateTrainAdapter(EnvironmentAdapter):
     def __init__(self, biome_type: BiomeType):
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
+        self._biome_type: BiomeType = biome_type
         self._climate_system: ClimateSystem = ClimateSystem(biome_type, initial_season=Season.SPRING)
         self._state: ClimateState = self._climate_system.get_state()
         # TODO: Nota, los targets, tienen que conseguirlos el modelo. PERO, dentro de los targets
@@ -76,14 +77,13 @@ class ClimateTrainAdapter(EnvironmentAdapter):
     def _update_biological_factors(self):
         pass
 
-    def progress_climate(self, weather_event: WeatherEvent):
+    def progress_climate(self, weather_event_idx: int):
         # Desde el entorno la llamo
         # apply weather effects, update temporal factors (seasons)
         # natural processes (enfriamiento, evaporación, calentamiento global (cambio climático))
 
         # Con el weather event, yo sé qué cómo modificar la temperatura (prepara un dict)
-
-        print(f"PROGRESS CLIMATE CALLED {weather_event}")
+        weather_event: WeatherEvent = WeatherEvent(list(WeatherEvent)[weather_event_idx])
         self._update_biological_factors()
         self._climate_system.update(weather_event)
 
@@ -103,7 +103,7 @@ class ClimateTrainAdapter(EnvironmentAdapter):
             Utilizo decaimiento exponencial negativo. Ahora tomo temperatura
             solo como target, más tarde ya tomaré humidy y precipitation
             """
-            targets: Dict[str, int | float] = self._season_targets[self._climate_system.get_current_season()]
+            targets: Dict[str, int|float] = self._season_targets[self._climate_system.get_current_season()]
             temperature_diff: float = abs(self._state.temperature - targets["temperature"])
             scale_factor: float = 0.1
             # Función exponencial negativa: me da 1.0 cuando la diferencia es 0,
@@ -112,17 +112,39 @@ class ClimateTrainAdapter(EnvironmentAdapter):
             base_reward: float = 10.0
             return base_reward * proximity__score
 
+        def extreme_condition_penalty() -> float:
+            too_hot: float = 46.0
+            too_cold: float = -27.0
+
+            if self._state.temperature > too_hot:
+                return -5.0 * (self._state.temperature - too_hot) / 10.0
+            elif self._state.temperature < too_cold:
+                return -5.0 * (too_cold - self._state.temperature) / 10.0
+            return 0.0
+
         def climate_appropiateness() -> float:
             pass
 
         def smooth_transition() -> float:
             pass
 
-        return 0.4*seasonal_climate_fidelity() + 0.3*climate_appropiateness() + 0.2*smooth_transition()
+        return seasonal_climate_fidelity() + extreme_condition_penalty()
 
     def get_observation(self) -> Dict[str, Any]:
+        biome_idx: int = list(BiomeType).index(self._biome_type)
         season_idx: int = list(Season).index(self._climate_system.get_current_season())
+        normalized_temp: float = self.normalize_temperature(self._state.temperature)
+        normalized_pressure: float = self.normalize_pressure(self._state.atm_pressure)
         return {
-            "temperature": np.array([self._state.temperature], dtype=np.float32),
+            "temperature": np.array([normalized_temp], dtype=np.float32),
+            "atm_pressure": np.array([normalized_pressure], dtype=np.float32),
+            "biome_type": biome_idx,
             "season": season_idx
         }
+
+    def normalize_temperature(self, temp: float) -> float:
+        """ TODO: Pasar los valores extremos a config, sin falta"""
+        return (temp - (-30)) / (50 - (-30))
+
+    def normalize_pressure(self, pressure: float) -> float:
+        return (pressure - 300) / (1200 - 300)
