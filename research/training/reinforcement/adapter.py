@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 class EnvironmentAdapter(ABC):
 
     @abstractmethod
-    def compute_reward(self):
+    def compute_reward(self, action):
         raise NotImplementedError
 
     @abstractmethod

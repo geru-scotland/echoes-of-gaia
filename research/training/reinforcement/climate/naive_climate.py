@@ -35,16 +35,15 @@ class NaiveClimateEnvironment(gym.Env):
         self.action_space: Discrete = gym.spaces.Discrete(len(WeatherEvent))
 
         self.observation_space = gym.spaces.Dict({
-           "temperature": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
+            "temperature": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
+            "humidity": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "atm_pressure": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "biome_type": gym.spaces.Discrete(len(BiomeType)),
             "season": gym.spaces.Discrete(len(Season))
         })
 
-        print(self.observation_space)
-
         self._current_step: int = 0
-        self._max_episode_steps: int = 100
+        self._max_episode_steps: int = 200
 
         self._climate_adapter: ClimateTrainAdapter = ClimateTrainAdapter(BiomeType.SAVANNA)
 
@@ -71,7 +70,7 @@ class NaiveClimateEnvironment(gym.Env):
         truncated = self._current_step >= self._max_episode_steps
 
         observation: ObsType = self._climate_adapter.get_observation()
-        reward: float = self._climate_adapter.compute_reward()
+        reward: float = self._climate_adapter.compute_reward(action)
 
         self._climate_adapter.progress_climate(action)
         return observation, reward, terminated, truncated, {}

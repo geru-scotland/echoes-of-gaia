@@ -22,6 +22,7 @@ from stable_baselines3 import PPO
 
 from shared.strings import Loggers
 from utils.loggers import LoggerManager
+from utils.normalization.normalizer import climate_normalizer
 from utils.paths import get_model_path
 
 
@@ -56,11 +57,14 @@ class ReinforcementModel:
             action, _states = self._model.predict(observation, deterministic=True)
 
             temp_normalized = observation["temperature"][0]
-            temp_real = temp_normalized * 80 - 30
+            temp_real = climate_normalizer.denormalize("temperature", temp_normalized)
+            humidity_normalized = observation["humidity"][0]
+            humidity_real = climate_normalizer.denormalize("humidity",  humidity_normalized)
 
             weather_event_name = list(WeatherEvent)[action] if action < len(WeatherEvent) else "UNKNOWN"
 
             self._logger.info(f"Real temperature: {temp_real:.1f}°C")
+            self._logger.info(f"Real humidity: {humidity_real:.1f}°C")
             self._logger.info(f"Predicted action: {action} (Weather Event: {weather_event_name})")
             return action
         except Exception as e:

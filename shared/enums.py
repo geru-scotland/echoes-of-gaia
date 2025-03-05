@@ -22,6 +22,7 @@ class BiomeType(EnumBaseStr):
     DESERT = "desert"
     TAIGA = "taiga"
     SAVANNA = "savanna"
+    TUNDRA = "tundra"
 
 # Maps
 class TerrainType(EnumBaseInt):
@@ -121,14 +122,20 @@ class CaptureType(EnumBaseStr):
     METRICS_ONLY = "metrics_only"
 
 class WeatherEvent(EnumBaseStr):
+    EXTREME_HEAT = "extreme_heat"
+    HEATWAVE = "heatwave"
+    HOT = "hot"
+    SUNNY = "sunny"
     CLEAR = "clear"
+    PARTLY_CLOUDY = "partly_cloudy"
     CLOUDY = "cloudy"
+    DRIZZLE = "drizzle"
     RAIN = "rain"
     HEAVY_RAIN = "heavy_rain"
     STORM = "storm"
-    SNOW =  "snow"
-    HEATWAVE = "heatwave"
-    DROUGHT =  "drought"
+    SNOW = "snow"
+    BLIZZARD = "blizzard"
+
 
 class Season(EnumBaseStr):
     SPRING = "spring"
