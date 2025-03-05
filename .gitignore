@@ -96,3 +96,4 @@ temp/
 __pycache__/
 
 simulation/simulation_records/
+tensorboard_logs/
