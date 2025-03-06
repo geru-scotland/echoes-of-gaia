@@ -55,10 +55,15 @@
     "humidity": {"min": 14.0, "max": 14.5},
     "precipitation": {"min": 44.5, "max": 45.0}
   },
-  "light_snow": {
-    "temperature": {"min": -4.5, "max": -4.0},
-    "humidity": {"min": -1.0, "max": -0.5},
-    "precipitation": {"min": 3.5, "max": 4.0}
+  "light_sprinkle": {
+    "temperature": { "min": -0.5, "max": 0.0 },
+    "humidity": { "min": 2.0, "max": 2.5 },
+    "precipitation": { "min": 3.5, "max": 4.0 }
+  },
+  "rain_shower": {
+    "temperature": { "min": -1.0, "max": -0.5 },
+    "humidity": { "min": 5.0, "max": 5.5 },
+    "precipitation": { "min": 4.0, "max": 4.5 }
   },
   "snow": {
     "temperature": {"min": -6.0, "max": -5.5},

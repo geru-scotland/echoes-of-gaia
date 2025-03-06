@@ -122,7 +122,7 @@ class ClimateTrainAdapter(EnvironmentAdapter):
 
         if not precip_in_range:
             distance = min(abs(current_precip - precip_min), abs(current_precip - precip_max))
-            precip_penalty = 1.0 * (1.0 / (1.0 + np.exp(-0.3 * distance)) - 0.5)
+            precip_penalty = 1.5 * (1.0 / (1.0 + np.exp(-0.3 * distance)) - 0.5)
             total_distance_penalty += precip_penalty
 
         # Hago clamp, que a rangos muy altos se puede ir de madre y le cuesta recuperarse

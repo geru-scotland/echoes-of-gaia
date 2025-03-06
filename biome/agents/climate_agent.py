@@ -42,6 +42,8 @@ class ClimateAgent(Agent[ClimateState, WeatherEvent]):
         self._logger.info("AGENT PERCEIVING")
         biome_idx: int = list(BiomeType).index(self._climate.biome_type)
         season_idx: int = list(Season).index(self._climate.get_current_season())
+        # TODO: implementar get_state_with_modifiers() cuando llegue el momento
+        # para aplicar al clima modificadores
         state: ClimateState = self._climate.get_state()
 
         normalized_temp: float = climate_normalizer.normalize("temperature", state.temperature)
