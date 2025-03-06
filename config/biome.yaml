@@ -1,9 +1,10 @@
 biome:
+  climate-model: "climate_model_v1.1"
   map:
     size:
       - 60 # width
       - 60 # height
-  type: "tropical"
+  type: "taiga"
   flora:
     - type: "oak_tree"
       spawns: 150

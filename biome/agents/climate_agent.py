@@ -33,15 +33,17 @@ from utils.normalization.normalizer import climate_normalizer
 
 
 class ClimateAgent(Agent[ClimateState, WeatherEvent]):
-    def __init__(self, climate: ClimateSystem):
+    def __init__(self, climate: ClimateSystem, climate_model: str):
         self._logger: Logger = LoggerManager.get_logger(Loggers.CLIMATE_AGENT)
         self._climate: ClimateSystem = climate
-        self._model: ReinforcementModel = ReinforcementModel()
+        self._model: ReinforcementModel = ReinforcementModel(climate_model)
 
     def perceive(self) -> Observation:
         self._logger.info("AGENT PERCEIVING")
         biome_idx: int = list(BiomeType).index(self._climate.biome_type)
         season_idx: int = list(Season).index(self._climate.get_current_season())
+        # TODO: implementar get_state_with_modifiers() cuando llegue el momento
+        # para aplicar al clima modificadores
         state: ClimateState = self._climate.get_state()
 
         normalized_temp: float = climate_normalizer.normalize("temperature", state.temperature)

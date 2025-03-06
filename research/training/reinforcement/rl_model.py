@@ -27,13 +27,14 @@ from utils.paths import get_model_path
 
 
 class ReinforcementModel:
-    def __init__(self):
+    def __init__(self, model_name: str = "climate_model_final"):
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
+        self._model_name: str = model_name
         self._model = None
 
-    def _load_model(self, model_name: str = "climate_model_final") -> None:
+    def _load_model(self) -> None:
         try:
-            model_path = get_model_path(model_name)
+            model_path = get_model_path(self._model_name)
             self._logger.info(f"Loading Reinforcement model from {model_path}...")
             self._model = PPO.load(model_path, env=self._model)
             self._logger.info(f"Model loaded!")

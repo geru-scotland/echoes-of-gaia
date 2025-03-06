@@ -90,15 +90,16 @@ class BiomeBuilder(Builder):
         self._logger.info("[Biome Builder] Building biome...")
         # Logs, settings, maps, init events
         try:
-            logger = self._settings.get_logger()
             config: Config = self._settings.config.get("biome")
             flora: EntityDefinitions = config.get("flora", {})
             fauna: EntityDefinitions = config.get("fauna", {})
+            climate_model: str = config.get("climate-model", {})
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
             self._context = BiomeContextData(biome_type=config.get("type"),
                                              tile_map=map_configurator.get_tile_map(),
                                              config=config, logger_name=Loggers.BIOME,
-                                             flora_definitions=flora, fauna_definitions=fauna)
+                                             flora_definitions=flora, fauna_definitions=fauna,
+                                             climate_model=climate_model)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Biome: {e}")

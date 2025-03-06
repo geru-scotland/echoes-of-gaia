@@ -63,7 +63,7 @@ class ReinforcementLearningAgent:
                 tensorboard_log="./tensorboard_logs/"
             )
 
-            total_timesteps = 500000
+            total_timesteps = 1000000
             sb3_model.learn(
                 total_timesteps=total_timesteps
             )

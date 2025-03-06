@@ -36,6 +36,7 @@ class BiomeContextData(ContextData):
     config: Config
     flora_definitions: EntityDefinitions
     fauna_definitions: EntityDefinitions
+    climate_model: str
 
 @dataclass
 class SimulationContextData(ContextData):

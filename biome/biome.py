@@ -62,7 +62,7 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
         agents: Dict[AgentType, Agent] = {}
 
         climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
-        climate_agent: ClimateAgent = ClimateAgent(climate)
+        climate_agent: ClimateAgent = ClimateAgent(climate, self._context.climate_model)
 
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_climate_agent(Timers.Agents.CLIMATE_UPDATE))
