@@ -1,4 +1,5 @@
 biome:
+  climate-model: "climate_model_v1"
   map:
     size:
       - 60 # width

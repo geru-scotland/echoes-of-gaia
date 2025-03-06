@@ -33,10 +33,10 @@ from utils.normalization.normalizer import climate_normalizer
 
 
 class ClimateAgent(Agent[ClimateState, WeatherEvent]):
-    def __init__(self, climate: ClimateSystem):
+    def __init__(self, climate: ClimateSystem, climate_model: str):
         self._logger: Logger = LoggerManager.get_logger(Loggers.CLIMATE_AGENT)
         self._climate: ClimateSystem = climate
-        self._model: ReinforcementModel = ReinforcementModel()
+        self._model: ReinforcementModel = ReinforcementModel(climate_model)
 
     def perceive(self) -> Observation:
         self._logger.info("AGENT PERCEIVING")
