@@ -19,6 +19,8 @@ import random
 from logging import Logger
 from typing import Dict, Any
 
+import numpy as np
+
 from biome.systems.climate.seasons import SeasonSystem
 from biome.systems.climate.state import ClimateState
 from shared.enums import BiomeType, Season, WeatherEvent
@@ -37,7 +39,7 @@ class ClimateSystem:
 
         self._initial_state: Dict[str, Any] = {}
         self._base_environmental_factors: Dict[str, Any] = {}
-        self._weather_event_deltas: Dict[WeatherEvent, float] = {}
+        self._weather_event_effects: Dict[WeatherEvent, Dict[Any]] = {}
         self._seasonal_info:  Dict[Season, Dict[str, int | float]] = {}
         self._load_environmental_data()
 
@@ -49,7 +51,7 @@ class ClimateSystem:
 
     def _load_environmental_data(self):
         self._base_environmental_factors = BiomeStore.biomes.get(self._biome_type, {}).get("environmental_factors", {})
-        self._weather_event_deltas = BiomeStore.weather_event_deltas
+        self._weather_event_effects = BiomeStore.weather_event_effects
         self._seasonal_info = BiomeStore.biomes.get(self._biome_type, {}).get("seasonal_info", {})
 
     def _initialize_state(self) -> ClimateState:
@@ -60,10 +62,13 @@ class ClimateSystem:
                     self._base_environmental_factors.get("temperature", {}).get("max", 15)
                 ),
                 "humidity": random.randint(
-                    self._base_environmental_factors.get("humidity", {}).get("min", 15),
-                    self._base_environmental_factors.get("humidity", {}).get("max", 15)
+                    self._base_environmental_factors.get("humidity", {}).get("min", 20),
+                    self._base_environmental_factors.get("humidity", {}).get("max", 20)
                 ),
-                "precipitation": self._base_environmental_factors.get("precipitation", 15),
+                "precipitation": random.randint(
+                    self._base_environmental_factors.get("precipitation", {}).get("min", 0),
+                    self._base_environmental_factors.get("precipitation", {}).get("max", 0)
+                ),
                 "biomass_density": self._base_environmental_factors.get("biomass_density", 15),
                 "fauna_density": self._base_environmental_factors.get("fauna_density", 15),
                 "co2_level": self._base_environmental_factors.get("co2_level", 15),
@@ -84,7 +89,6 @@ class ClimateSystem:
         # aislado, calculo los factores en el adapter.
         self._season_system.update(self._handle_new_season)
         self._handle_weather_event(weather_event)
-        self._recalculate_humidity()  # Recalcular humedad después de cambios
 
 
     def _handle_new_season(self, season: Season) -> None:
@@ -101,46 +105,49 @@ class ClimateSystem:
     def _handle_weather_event(self, weather_event: WeatherEvent):
         # Por ahora solo cambio de temperatura, ya veremos en un futuro.
         # TODO: Incluir ruido, variabilidad aquí
-        noise = random.gauss(0, 0.5)
-        delta_temp = self._weather_event_deltas[weather_event] + noise
+        self._logger.debug(f"Handling weather event: {weather_event}")
+        self._logger.debug(f"State previously: {self._state}")
 
-        new_temp = self._state.temperature + delta_temp
+        min_effect_temp, max_effect_temp = self._weather_event_effects[weather_event]["temperature"].values()
+        min_effect_hum, max_effect_hum = self._weather_event_effects[weather_event]["humidity"].values()
+        min_effect_prec, max_effect_prec = self._weather_event_effects[weather_event]["precipitation"].values()
+
+        mod_temperature: float = round(random.uniform(min_effect_temp, max_effect_temp), 1)
+        mod_precipitation: float = round(random.uniform(min_effect_prec, max_effect_prec), 1)
+        mod_humidity: float = round(random.uniform(min_effect_hum, max_effect_hum), 1)
+
+        self._logger.debug(f"Generated values - Temperature: {mod_temperature}")
+        self._logger.debug(f"Generated values - Precipitation: {mod_precipitation}")
+        self._logger.debug(f"Generated values - Humidity: {mod_humidity}")
 
         # TODO: tomar de ranges.py
         PHYSICAL_MIN_TEMP = CLIMATE_RANGES["temperature"][0]
         PHYSICAL_MAX_TEMP = CLIMATE_RANGES["temperature"][1]
-        self._state.temperature = max(PHYSICAL_MIN_TEMP, min(new_temp, PHYSICAL_MAX_TEMP))
+        self._logger.debug(
+            f"Temperature - PHYSICAL_MIN: {PHYSICAL_MIN_TEMP}, PHYSICAL_MAX: {PHYSICAL_MAX_TEMP}, "
+            f"MOD: {mod_temperature}, CURRENT_STATE: {self._state.temperature}"
+        )
+        self._state.temperature = round(max(PHYSICAL_MIN_TEMP,
+                                      min(self._state.temperature + mod_temperature, PHYSICAL_MAX_TEMP)), 1)
 
         PHYSICAL_MIN_HUM = CLIMATE_RANGES["humidity"][0]
         PHYSICAL_MAX_HUM = CLIMATE_RANGES["humidity"][1]
-        self._state.humidity = max(PHYSICAL_MIN_HUM, min(self._state.humidity, PHYSICAL_MAX_HUM))
+        self._logger.debug(
+            f"Humidity - PHYSICAL_MIN: {PHYSICAL_MIN_HUM}, PHYSICAL_MAX: {PHYSICAL_MAX_HUM}, "
+            f"MOD: {mod_humidity}, CURRENT_STATE: {self._state.humidity}"
+        )
+        self._state.humidity = round(max(PHYSICAL_MIN_HUM, min(self._state.humidity + mod_humidity, PHYSICAL_MAX_HUM)), 1)
 
-    def _recalculate_humidity(self) -> None:
-        try:
-            base_humidity = self._initial_state.get("humidity", 50)
-            current_temp = self._state.temperature
-            base_temp = self._initial_state.get("temperature", 20)
-            current_pressure = self._state.atm_pressure
-            base_pressure = self._initial_state.get("atm_pressure", 1013)
+        PHYSICAL_MIN_PREC = CLIMATE_RANGES["precipitation"][0]
+        PHYSICAL_MAX_PREC = CLIMATE_RANGES["precipitation"][1]
+        self._logger.debug(
+            f"Precipitation - PHYSICAL_MIN: {PHYSICAL_MIN_PREC}, PHYSICAL_MAX: {PHYSICAL_MAX_PREC}, "
+            f"MOD: {mod_precipitation}, CURRENT_STATE: {self._state.precipitation}"
+        )
+        self._state.precipitation = round(max(PHYSICAL_MIN_PREC,
+                                        min(self._state.precipitation + mod_precipitation, PHYSICAL_MAX_PREC)), 1)
 
-            temp_influence = -0.8  # Hago que la humedad disminuye cuando la temperatura aumenta
-            pressure_influence = 0.3  # y humedad aumenta ligeramente con la presión
-
-            temp_effect = temp_influence * (current_temp - base_temp)
-            pressure_effect = pressure_influence * ((current_pressure - base_pressure) / 10)
-
-            noise = random.uniform(-3, 3)
-
-            new_humidity = base_humidity + temp_effect + pressure_effect + noise
-            # TODO: Coge esto de ranges.py
-            new_humidity = max(0, min(100, new_humidity))
-
-            self._state.humidity = new_humidity
-            self._logger.debug(
-                f"Humidity recalculated: {new_humidity:.2f}% (base: {base_humidity}, temp effect: {temp_effect:.2f}, pressure effect: {pressure_effect:.2f})")
-
-        except Exception as e:
-            self._logger.exception(f"Error recalculating humidity: {e}")
+        self._logger.debug(f"State AFTER: {self._state}")
 
     def get_state(self) -> ClimateState:
         return self._state
@@ -164,7 +171,7 @@ class ClimateSystem:
 
     @property
     def weather_event_deltas(self) -> Dict[WeatherEvent, float]:
-        return self._weather_event_deltas
+        return self._weather_event_effects
 
     @property
     def seasonal_info(self) -> Dict[Season, Dict[str, int|float]]:

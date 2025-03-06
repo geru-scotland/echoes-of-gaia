@@ -122,19 +122,22 @@ class CaptureType(EnumBaseStr):
     METRICS_ONLY = "metrics_only"
 
 class WeatherEvent(EnumBaseStr):
-    EXTREME_HEAT = "extreme_heat"
-    HEATWAVE = "heatwave"
-    HOT = "hot"
-    SUNNY = "sunny"
     CLEAR = "clear"
+    SUNNY = "sunny"
     PARTLY_CLOUDY = "partly_cloudy"
     CLOUDY = "cloudy"
+    FOG = "fog"
     DRIZZLE = "drizzle"
     RAIN = "rain"
     HEAVY_RAIN = "heavy_rain"
-    STORM = "storm"
+    THUNDERSTORM = "thunderstorm"
+    LIGHT_SNOW = "light_snow"
     SNOW = "snow"
     BLIZZARD = "blizzard"
+    HEATWAVE = "heatwave"
+    DROUGHT = "drought"
+    WINDY = "windy"
+
 
 
 class Season(EnumBaseStr):

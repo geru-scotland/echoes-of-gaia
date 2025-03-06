@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import traceback
 from logging import Logger
 from typing import Type, Optional, Dict, Any
 
@@ -57,11 +58,12 @@ class ReinforcementLearningAgent:
                 batch_size=64,
                 n_epochs=10,
                 gamma=0.99,
+                ent_coef= 0.02, # Coef entropia, este valor incentiva expl, pero mantiene aleatoriedad.
                 verbose=1,
                 tensorboard_log="./tensorboard_logs/"
             )
 
-            total_timesteps = 100000
+            total_timesteps = 500000
             sb3_model.learn(
                 total_timesteps=total_timesteps
             )
@@ -72,5 +74,6 @@ class ReinforcementLearningAgent:
             self._logger.info(f"Training completed after {total_timesteps} timesteps!")
 
         except Exception as e:
-            self._logger.exception(f"Error during training: {e}")
+            self._logger.exception(f"Error during training: {e}", exc_info=True)
+            traceback.print_exc()
 

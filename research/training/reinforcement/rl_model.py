@@ -60,11 +60,14 @@ class ReinforcementModel:
             temp_real = climate_normalizer.denormalize("temperature", temp_normalized)
             humidity_normalized = observation["humidity"][0]
             humidity_real = climate_normalizer.denormalize("humidity",  humidity_normalized)
+            precipitation_normlaized= observation["precipitation"][0]
+            precipitation_real = climate_normalizer.denormalize("precipitation", precipitation_normlaized)
 
             weather_event_name = list(WeatherEvent)[action] if action < len(WeatherEvent) else "UNKNOWN"
 
             self._logger.info(f"Real temperature: {temp_real:.1f}°C")
             self._logger.info(f"Real humidity: {humidity_real:.1f}°C")
+            self._logger.info(f"Real precipitation: {precipitation_real:.1f}°C")
             self._logger.info(f"Predicted action: {action} (Weather Event: {weather_event_name})")
             return action
         except Exception as e:

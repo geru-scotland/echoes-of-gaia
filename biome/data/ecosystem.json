@@ -9,31 +9,91 @@
       "SNOW"
   ],
 
-
-"weather_event_deltas": {
-  "extreme_heat": 6,
-  "heatwave": 5,
-  "hot": 3,
-  "sunny": 1.5,
-  "clear": 0,
-  "partly_cloudy": -1,
-  "cloudy": -1.5,
-  "drizzle": -2,
-  "rain": -2.5,
-  "heavy_rain": -3,
-  "storm": -4,
-  "snow": -5,
-  "blizzard": -6
+"weather_event_effects": {
+  "clear": {
+    "temperature": {"min": 2.0, "max": 2.5},
+    "humidity": {"min": -3.5, "max": -3.0},
+    "precipitation": {"min": 0, "max": 0}
+  },
+  "sunny": {
+    "temperature": {"min": 4.0, "max": 4.5},
+    "humidity": {"min": -6.0, "max": -5.5},
+    "precipitation": {"min": -1.0, "max": -0.5}
+  },
+  "partly_cloudy": {
+    "temperature": {"min": 1.0, "max": 1.5},
+    "humidity": {"min": 0.0, "max": 0.5},
+    "precipitation": {"min": 0, "max": 0}
+  },
+  "cloudy": {
+    "temperature": {"min": -1.5, "max": -1.0},
+    "humidity": {"min": 3.5, "max": 4.0},
+    "precipitation": {"min": 1.0, "max": 1.5}
+  },
+  "fog": {
+    "temperature": {"min": -2.0, "max": -1.5},
+    "humidity": {"min": 11.5, "max": 12.0},
+    "precipitation": {"min": 0.5, "max": 1.0}
+  },
+  "drizzle": {
+    "temperature": {"min": -2.0, "max": -1.5},
+    "humidity": {"min": 7.5, "max": 8.0},
+    "precipitation": {"min": 5.0, "max": 5.5}
+  },
+  "rain": {
+    "temperature": {"min": -3.0, "max": -2.5},
+    "humidity": {"min": 11.5, "max": 12.0},
+    "precipitation": {"min": 12.5, "max": 13.0}
+  },
+  "heavy_rain": {
+    "temperature": {"min": -4.5, "max": -4.0},
+    "humidity": {"min": 16.0, "max": 16.5},
+    "precipitation": {"min": 35.0, "max": 35.5}
+  },
+  "thunderstorm": {
+    "temperature": {"min": -3.5, "max": -3.0},
+    "humidity": {"min": 14.0, "max": 14.5},
+    "precipitation": {"min": 44.5, "max": 45.0}
+  },
+  "light_snow": {
+    "temperature": {"min": -4.5, "max": -4.0},
+    "humidity": {"min": -1.0, "max": -0.5},
+    "precipitation": {"min": 3.5, "max": 4.0}
+  },
+  "snow": {
+    "temperature": {"min": -6.0, "max": -5.5},
+    "humidity": {"min": -2.5, "max": -2.0},
+    "precipitation": {"min": 10.0, "max": 10.5}
+  },
+  "blizzard": {
+    "temperature": {"min": -9.5, "max": -9.0},
+    "humidity": {"min": -5.5, "max": -5.0},
+    "precipitation": {"min": 25.0, "max": 25.5}
+  },
+  "heatwave": {
+    "temperature": {"min": 8.0, "max": 8.5},
+    "humidity": {"min": -11.5, "max": -11.0},
+    "precipitation": {"min": -20.0, "max": -19.5}
+  },
+  "drought": {
+    "temperature": {"min": 5.5, "max": 6.0},
+    "humidity": {"min": -15.0, "max": -14.5},
+    "precipitation": {"min": -25.0, "max": -24.5}
+  },
+  "windy": {
+    "temperature": {"min": -1.0, "max": -0.5},
+    "humidity": {"min": -5.5, "max": -5.0},
+    "precipitation": {"min": -4, "max": -4.5}
+  }
 },
 
-
-  "biomes": {
+"biomes": {
     "tropical": {
       "weights": [10, 10, 19, 5, 55, 30, 5],
       "environmental_factors": {
         "temperature": {"min": 23, "max": 31},
         "humidity": {"min": 70, "max": 90},
-        "precipitation": 3000,
+        "precipitation": {"min": 200, "max": 350},
         "biomass_density": 90,
         "fauna_density": 90,
         "co2_level": 400,
@@ -49,7 +109,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 24, "max": 29},
-            "humidity": {"min": 75, "max": 90}
+            "humidity": {"min": 75, "max": 90},
+            "precipitation": {"min": 250, "max": 450}
           }
         },
         "summer": {
@@ -61,7 +122,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 26, "max": 33},
-            "humidity": {"min":67, "max": 85}
+            "humidity": {"min":67, "max": 85},
+            "precipitation": {"min": 150, "max": 350}
           }
         },
         "autumn": {
@@ -73,7 +135,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 25, "max": 30},
-            "humidity": {"min": 70, "max": 87}
+            "humidity": {"min": 70, "max": 87},
+            "precipitation": {"min": 200, "max": 400}
           }
         },
         "winter": {
@@ -85,7 +148,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 23, "max": 29},
-            "humidity": {"min": 68, "max": 80}
+            "humidity": {"min": 68, "max": 80},
+            "precipitation": {"min": 100, "max": 300}
           }
         }
       }
@@ -94,8 +158,8 @@
       "weights": [0, 5, 5, 10, 80, 10, 0],
       "environmental_factors": {
         "temperature": {"min": 27, "max": 45},
-        "humidity": {"min": 5, "max": 30},
-        "precipitation": 50,
+        "humidity": {"min": 2, "max": 10},
+        "precipitation": {"min": 0, "max": 0},
         "biomass_density": 10,
         "fauna_density": 15,
         "co2_level": 380,
@@ -111,7 +175,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 34, "max": 41},
-            "humidity": {"min": 10, "max": 30}
+            "humidity": {"min": 10, "max": 30},
+            "precipitation": {"min": 0, "max": 20}
           }
         },
         "summer": {
@@ -122,8 +187,9 @@
             "atm_pressure": 5
           },
           "comfort_range": {
-            "temperature": {"min": 39, "max": 46},
-            "humidity": {"min": 2, "max": 15}
+            "temperature": {"min": 39, "max": 50},
+            "humidity": {"min": 2, "max": 15},
+            "precipitation": {"min": 0, "max": 5}
           }
         },
         "autumn": {
@@ -135,7 +201,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 26, "max": 34},
-            "humidity": {"min": 18, "max": 33}
+            "humidity": {"min": 18, "max": 33},
+            "precipitation": {"min": 0, "max": 25}
           }
         },
         "winter": {
@@ -147,7 +214,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 25, "max": 33},
-            "humidity": {"min": 17, "max": 27}
+            "humidity": {"min": 17, "max": 27},
+            "precipitation": {"min": 0, "max": 15}
           }
         }
       }
@@ -157,7 +225,7 @@
       "environmental_factors": {
         "temperature": {"min": -20, "max": 12},
         "humidity": {"min": 40, "max": 75},
-        "precipitation": 500,
+        "precipitation": {"min": 25, "max": 60},
         "biomass_density": 50,
         "fauna_density": 40,
         "co2_level": 390,
@@ -172,8 +240,9 @@
             "atm_pressure": -5
           },
           "comfort_range": {
-            "temperature": {"min": -10, "max": 15},
-            "humidity": {"min": 60, "max": 80}
+            "temperature": {"min": -10, "max": 10},
+            "humidity": {"min": 60, "max": 80},
+            "precipitation": {"min": 30, "max": 80}
           }
         },
         "summer": {
@@ -184,8 +253,9 @@
             "atm_pressure": 0
           },
           "comfort_range": {
-            "temperature": {"min": 10, "max": 25},
-            "humidity": {"min": 50, "max": 65}
+            "temperature": {"min": 5, "max": 20},
+            "humidity": {"min": 50, "max": 65},
+            "precipitation": {"min": 40, "max": 90}
           }
         },
         "autumn": {
@@ -197,7 +267,8 @@
           },
           "comfort_range": {
             "temperature": {"min": -10, "max": 10},
-            "humidity": {"min": 65, "max": 85}
+            "humidity": {"min": 65, "max": 85},
+            "precipitation": {"min": 35, "max": 75}
           }
         },
         "winter": {
@@ -209,7 +280,8 @@
           },
           "comfort_range": {
             "temperature": {"min": -45, "max": -10},
-            "humidity": {"min": 30, "max": 50}
+            "humidity": {"min": 20, "max": 40},
+            "precipitation": {"min": 10, "max": 40}
           }
         }
       }
@@ -219,7 +291,7 @@
       "environmental_factors": {
         "temperature": {"min": 25, "max": 35},
         "humidity": {"min": 25, "max": 70},
-        "precipitation": 1000,
+        "precipitation": {"min": 50, "max": 150},
         "biomass_density": 60,
         "fauna_density": 75,
         "co2_level": 395,
@@ -235,7 +307,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 28, "max": 34},
-            "humidity": {"min": 50, "max": 70}
+            "humidity": {"min": 50, "max": 70},
+            "precipitation": {"min": 80, "max": 200}
           }
         },
         "summer": {
@@ -247,7 +320,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 31, "max": 40},
-            "humidity": {"min": 25, "max": 45}
+            "humidity": {"min": 25, "max": 45},
+            "precipitation": {"min": 0, "max": 30}
           }
         },
         "autumn": {
@@ -259,7 +333,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 27, "max": 35},
-            "humidity": {"min": 30, "max": 45}
+            "humidity": {"min": 30, "max": 45},
+            "precipitation": {"min": 20, "max": 60}
           }
         },
         "winter": {
@@ -271,7 +346,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 25, "max": 34},
-            "humidity": {"min": 50, "max": 70}
+            "humidity": {"min": 50, "max": 70},
+            "precipitation": {"min": 100, "max": 250}
           }
         }
       }
@@ -281,7 +357,7 @@
       "environmental_factors": {
         "temperature": {"min": -23, "max": 12},
         "humidity": {"min": 30, "max": 50},
-        "precipitation": 300,
+        "precipitation": {"min": 15, "max": 45},
         "biomass_density": 20,
         "fauna_density": 25,
         "co2_level": 385,
@@ -297,7 +373,8 @@
           },
           "comfort_range": {
             "temperature": {"min": -4, "max": 8},
-            "humidity": {"min": 45, "max": 65}
+            "humidity": {"min": 45, "max": 65},
+            "precipitation": {"min": 20, "max": 50}
           }
         },
         "summer": {
@@ -309,7 +386,8 @@
           },
           "comfort_range": {
             "temperature": {"min": 2, "max": 15},
-            "humidity": {"min": 30, "max": 50}
+            "humidity": {"min": 30, "max": 50},
+            "precipitation": {"min": 30, "max": 70}
           }
         },
         "autumn": {
@@ -321,7 +399,8 @@
           },
           "comfort_range": {
             "temperature": {"min": -14, "max": -2},
-            "humidity": {"min": 30, "max": 45}
+            "humidity": {"min": 30, "max": 45},
+            "precipitation": {"min": 15, "max": 40}
           }
         },
         "winter": {
@@ -332,8 +411,9 @@
             "atm_pressure": 5
           },
           "comfort_range": {
-            "temperature": {"min": -26, "max": -10},
-            "humidity": {"min": 20, "max": 45}
+            "temperature": {"min": -30, "max": -10},
+            "humidity": {"min": 20, "max": 45},
+            "precipitation": {"min": 5, "max": 25}
           }
         }
       }

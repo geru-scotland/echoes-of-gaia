@@ -77,45 +77,86 @@ class ClimateTrainAdapter(EnvironmentAdapter):
         comfort_range = self._climate_system.get_seasonal_comfort_range()
         current_temp = self._state.temperature
         current_humidity = self._state.humidity
+        current_precip = self._state.precipitation
 
-        # Nueva sintaxis que no conocia, desempaquetar en ordel de campos
-        # del json con values
         temp_min, temp_max = comfort_range["temperature"].values()
         humidity_min, humidity_max = comfort_range["humidity"].values()
+        precip_min, precip_max = comfort_range["precipitation"].values()
 
         temp_in_range = temp_min <= current_temp <= temp_max
         humidity_in_range = humidity_min <= current_humidity <= humidity_max
+        precip_in_range = precip_min <= current_precip <= precip_max
+
         self._logger.info(
             f"Current Temperature: {current_temp}, Min: {temp_min}, Max: {temp_max}, In Range: {temp_in_range}")
         self._logger.info(
             f"Current Humidity: {current_humidity}, Min: {humidity_min}, Max: {humidity_max}, In Range: {humidity_in_range}")
-        self._logger.info(f"ACTION WAS: {action}")
+        self._logger.info(
+            f"Current Precipitation: {current_precip}, Min: {precip_min}, Max: {precip_max}, In Range: {precip_in_range}")
+        self._logger.info(f"BIOME TYPE: {self._biome_type} ACTION WAS: {action}")
 
         base_reward = 0.0
-        if temp_in_range:
-            base_reward += 8.0
-        if humidity_in_range:
-            base_reward += 4.0
 
+        if temp_in_range:
+            base_reward += 6.0
+        if humidity_in_range:
+            base_reward += 3.0
+        if precip_in_range:
+            base_reward += 5.0
+
+        max_distance_penalty = 10.0
+        total_distance_penalty = 0.0
+
+        # Tras mucho cacharrear, que funciones exponenciales con decaimiento,
+        # factores para escalar por unidad de distancia...
+        # La mejor ha sido esta; función sigmoidea, me suaviza muy bien penalizaciones grandes
         if not temp_in_range:
             distance = min(abs(current_temp - temp_min), abs(current_temp - temp_max))
-            base_reward -= distance * 0.25
+            temp_penalty = 2.0 * (1.0 / (1.0 + np.exp(-0.25 * distance)) - 0.5)
+            total_distance_penalty += temp_penalty
 
         if not humidity_in_range:
             distance = min(abs(current_humidity - humidity_min), abs(current_humidity - humidity_max))
-            base_reward -= distance * 0.2
+            humidity_penalty = 1.5 * (1.0 / (1.0 + np.exp(-0.15 * distance)) - 0.5)
+            total_distance_penalty += humidity_penalty
+
+        if not precip_in_range:
+            distance = min(abs(current_precip - precip_min), abs(current_precip - precip_max))
+            precip_penalty = 1.0 * (1.0 / (1.0 + np.exp(-0.3 * distance)) - 0.5)
+            total_distance_penalty += precip_penalty
+
+        # Hago clamp, que a rangos muy altos se puede ir de madre y le cuesta recuperarse
+        # al modelo
+        total_distance_penalty = min(total_distance_penalty, max_distance_penalty)
+        base_reward -= total_distance_penalty
 
         extreme_penalty = 0.0
-        if current_temp > 45 or current_temp < -25:
-            extreme_penalty -= 5.0
 
-        if current_humidity > 95 or current_humidity < 5:
-            extreme_penalty -= 5.0
+        if current_temp > 50:
+            # Penalización suave, pero crece con valores extremos
+            extreme_penalty -= min(3.0, (current_temp - 45) * 0.3)
+        elif current_temp < -25:
+            extreme_penalty -= min(3.0, (abs(current_temp) - 25) * 0.3)
 
+        if current_humidity > 99:
+            extreme_penalty -= min(2.0, (current_humidity - 95) * 0.4)
+        elif current_humidity < 0:
+            extreme_penalty -= min(2.0, (5 - current_humidity) * 0.4)
+
+        # Quiero penalizar especialmente estos casos, si no crece mucho la precipitación
+        # el modelo explota los eventos que la incrementan por factores pasivos.
+        if current_precip > 100 + precip_max:
+            extreme_penalty -= min(4.0, (current_precip - (100 + precip_max)) * 0.02)
+        # Recompensa total
         total_reward = base_reward + extreme_penalty
+
+        # Clamp aquí también, para que no se vayan de madre las penalizaciones
+        min_reward = -15.0
+        total_reward = max(total_reward, min_reward)
 
         self._logger.info(
             f"Rewards - Base: {base_reward:.2f}, "
+            f"Distance penalty: {total_distance_penalty:.2f}, "
             f"Extreme penalty: {extreme_penalty:.2f}, "
             f"Total: {total_reward:.2f}"
         )
@@ -127,11 +168,12 @@ class ClimateTrainAdapter(EnvironmentAdapter):
         season_idx: int = list(Season).index(self._climate_system.get_current_season())
         normalized_temp: float = climate_normalizer.normalize("temperature", self._state.temperature)
         normalized_humidity: float = climate_normalizer.normalize("humidity", self._state.humidity)
-        normalized_pressure: float = climate_normalizer.normalize("atm_pressure", self._state.atm_pressure)
+        normalized_precipitation: float = climate_normalizer.normalize("precipitation", self._state.precipitation)
+
         return {
             "temperature": np.array([normalized_temp], dtype=np.float32),
             "humidity": np.array([normalized_humidity], dtype=np.float32),
-            "atm_pressure": np.array([normalized_pressure], dtype=np.float32),
+            "precipitation": np.array([normalized_precipitation], dtype=np.float32),
             "biome_type": biome_idx,
             "season": season_idx
         }

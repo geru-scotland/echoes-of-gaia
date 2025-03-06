@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+from logging import Logger
 
 import gymnasium as gym
 import numpy as np
@@ -25,6 +26,8 @@ from gymnasium.utils import seeding
 from research.training.registry import EnvironmentRegistry
 from shared.enums import Agents, BiomeType, WeatherEvent, Season
 from research.training.reinforcement.climate.climate_adapter import ClimateTrainAdapter
+from shared.strings import Loggers
+from utils.loggers import LoggerManager
 
 
 @EnvironmentRegistry.register(Agents.Reinforcement.NAIVE_CLIMATE)
@@ -37,14 +40,14 @@ class NaiveClimateEnvironment(gym.Env):
         self.observation_space = gym.spaces.Dict({
             "temperature": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "humidity": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
-            "atm_pressure": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
+            "precipitation": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "biome_type": gym.spaces.Discrete(len(BiomeType)),
             "season": gym.spaces.Discrete(len(Season))
         })
 
         self._current_step: int = 0
-        self._max_episode_steps: int = 200
-
+        self._max_episode_steps: int = 720
+        self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self._climate_adapter: ClimateTrainAdapter = ClimateTrainAdapter(BiomeType.SAVANNA)
 
 
@@ -53,12 +56,13 @@ class NaiveClimateEnvironment(gym.Env):
        self._current_step = 0
 
        random_biome = self.np_random.choice(list(BiomeType))
+       self._logger.debug(f"NEW BIOMA: {random_biome}")
        self._climate_adapter = ClimateTrainAdapter(random_biome)
-       print(random_biome)
+       self._logger.debug(f"Initial Data: {self._climate_adapter._state}")
        return self._climate_adapter.get_observation(), {}
 
     def step(self, action):
-        # TODO: Tensorboard
+        # TODO: Tensorboar5d
         # NORMALIZAR VALORES, IMPORTANTE
         # hay que hacer conversión de action a weatherevent, no sé qué me devuelve el modelo,
         # asumo que idx de acción
@@ -72,7 +76,6 @@ class NaiveClimateEnvironment(gym.Env):
         observation: ObsType = self._climate_adapter.get_observation()
         reward: float = self._climate_adapter.compute_reward(action)
 
-        self._climate_adapter.progress_climate(action)
         return observation, reward, terminated, truncated, {}
 
     def render(self):
