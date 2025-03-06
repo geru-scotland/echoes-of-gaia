@@ -20,9 +20,9 @@ from typing import Dict, Tuple, Union
 Number = Union[int, float]
 
 CLIMATE_RANGES: Dict[str, Tuple[Number, Number]] = {
-    "temperature": (-30.0, 50.0),        # °C
-    "humidity": (0.0, 100.0),            # %
-    "precipitation": (0.0, 5000.0),      # mm/año
+    "temperature": (-30.0, 51.0),        # °C
+    "humidity": (2.0, 100.0),            # %
+    "precipitation": (0.0, 1000.0),      # mm/año
     "atm_pressure": (950.0, 1050.0),         # hPa
     "wind_speed": (0.0, 100.0),          # km/h
     "co2_level": (200.0, 1000.0),        # ppm

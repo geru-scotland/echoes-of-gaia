@@ -45,11 +45,13 @@ class ClimateAgent(Agent[ClimateState, WeatherEvent]):
         state: ClimateState = self._climate.get_state()
 
         normalized_temp: float = climate_normalizer.normalize("temperature", state.temperature)
-        normalized_pressure: float = climate_normalizer.normalize("atm_pressure", state.atm_pressure)
+        normalized_humidity: float = climate_normalizer.normalize("humidity", state.humidity)
+        normalized_precipitation: float = climate_normalizer.normalize("precipitation", state.precipitation)
 
         return {
             "temperature": np.array([normalized_temp], dtype=np.float32),
-            "atm_pressure": np.array([normalized_pressure], dtype=np.float32),
+            "humidity": np.array([normalized_humidity], dtype=np.float32),
+            "precipitation": np.array([normalized_precipitation], dtype=np.float32),
             "biome_type": biome_idx,
             "season": season_idx
         }

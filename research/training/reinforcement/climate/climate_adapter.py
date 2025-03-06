@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import copy
 import math
 from logging import Logger
 from typing import List, Dict, Any
@@ -42,38 +43,12 @@ class ClimateTrainAdapter(EnvironmentAdapter):
         # al entrar en la season - primero de manera abrupta, y quizá en un futuro, de manera gradual
         # Pero la presión atmosférica NO es un target para el modelo realmente.
         self._base_environmental_factors: Dict[str, int | float] = self._climate_system.base_environmental_factors
-        self._season_targets: Dict[Season, Dict[str, int|float]] = self._precompute_seasonal_targets()
         self._initial_season: bool = True
+        self._previous_temp = self._state.temperature
+        self._previous_humidity = self._state.humidity
         # Extras, los que quiera simular que no vayan a estar en el system por defecto
         self._fauna: int = 2342432
         self._flora: int = 2342
-
-    def _precompute_seasonal_targets(self) -> Dict[Season, Dict[str, int|float]]:
-        try:
-            deltas: Dict[Season, Dict[str, int|float]] = self._climate_system.seasonal_deltas
-            targets: Dict[Season, Dict[str, int|float]] = {}
-
-            for season, environmental_factors in deltas.items():
-                season_targets: Dict[str, int|float] = {}
-                for env_factor, value in environmental_factors.items():
-                   season_targets[env_factor] = self._base_environmental_factors[env_factor] + value
-                targets[season] = season_targets
-
-            return targets
-        except Exception as e:
-            self._logger.exception(f"There was an exception when trying to precompute seasonal targets: {e}")
-
-
-
-    def get_season_target(self, season: Season):
-        # OJO, para la primera season, la inicial, el target seran los base values
-        # para el resto si, los detales.
-
-        if self._initial_season:
-            self._initial_season = False
-            return self._base_environmental_factors
-
-        return self._season_targets.get(season, {})
 
     def _update_biological_factors(self):
         pass
@@ -98,54 +73,107 @@ class ClimateTrainAdapter(EnvironmentAdapter):
     def compute_simulated_co2(self):
         pass
 
-    def compute_reward(self) -> float:
-        def seasonal_climate_fidelity() -> float:
-            """
-            Utilizo decaimiento exponencial negativo. Ahora tomo temperatura
-            solo como target, más tarde ya tomaré humidy y precipitation
-            """
-            targets: Dict[str, int|float] = self._season_targets[self._climate_system.get_current_season()]
-            temperature_diff: float = abs(self._state.temperature - targets["temperature"])
-            scale_factor: float = 0.1
-            # Función exponencial negativa: me da 1.0 cuando la diferencia es 0,
-            # y tiende a 0 conforme aumenta la diferencia
-            proximity__score: float = math.exp(-scale_factor * temperature_diff)
-            base_reward: float = 10.0
-            return base_reward * proximity__score
+    def compute_reward(self, action) -> float:
+        comfort_range = self._climate_system.get_seasonal_comfort_range()
+        current_temp = self._state.temperature
+        current_humidity = self._state.humidity
+        current_precip = self._state.precipitation
 
-        def extreme_condition_penalty() -> float:
-            too_hot: float = 46.0
-            too_cold: float = -27.0
+        temp_min, temp_max = comfort_range["temperature"].values()
+        humidity_min, humidity_max = comfort_range["humidity"].values()
+        precip_min, precip_max = comfort_range["precipitation"].values()
 
-            if self._state.temperature > too_hot:
-                return -5.0 * (self._state.temperature - too_hot) / 10.0
-            elif self._state.temperature < too_cold:
-                return -5.0 * (too_cold - self._state.temperature) / 10.0
-            return 0.0
+        temp_in_range = temp_min <= current_temp <= temp_max
+        humidity_in_range = humidity_min <= current_humidity <= humidity_max
+        precip_in_range = precip_min <= current_precip <= precip_max
 
-        def climate_appropiateness() -> float:
-            pass
+        self._logger.info(
+            f"Current Temperature: {current_temp}, Min: {temp_min}, Max: {temp_max}, In Range: {temp_in_range}")
+        self._logger.info(
+            f"Current Humidity: {current_humidity}, Min: {humidity_min}, Max: {humidity_max}, In Range: {humidity_in_range}")
+        self._logger.info(
+            f"Current Precipitation: {current_precip}, Min: {precip_min}, Max: {precip_max}, In Range: {precip_in_range}")
+        self._logger.info(f"BIOME TYPE: {self._biome_type} ACTION WAS: {action}")
 
-        def smooth_transition() -> float:
-            pass
+        base_reward = 0.0
 
-        return seasonal_climate_fidelity() + extreme_condition_penalty()
+        if temp_in_range:
+            base_reward += 6.0
+        if humidity_in_range:
+            base_reward += 3.0
+        if precip_in_range:
+            base_reward += 5.0
+
+        max_distance_penalty = 10.0
+        total_distance_penalty = 0.0
+
+        # Tras mucho cacharrear, que funciones exponenciales con decaimiento,
+        # factores para escalar por unidad de distancia...
+        # La mejor ha sido esta; función sigmoidea, me suaviza muy bien penalizaciones grandes
+        if not temp_in_range:
+            distance = min(abs(current_temp - temp_min), abs(current_temp - temp_max))
+            temp_penalty = 2.0 * (1.0 / (1.0 + np.exp(-0.25 * distance)) - 0.5)
+            total_distance_penalty += temp_penalty
+
+        if not humidity_in_range:
+            distance = min(abs(current_humidity - humidity_min), abs(current_humidity - humidity_max))
+            humidity_penalty = 1.5 * (1.0 / (1.0 + np.exp(-0.15 * distance)) - 0.5)
+            total_distance_penalty += humidity_penalty
+
+        if not precip_in_range:
+            distance = min(abs(current_precip - precip_min), abs(current_precip - precip_max))
+            precip_penalty = 1.0 * (1.0 / (1.0 + np.exp(-0.3 * distance)) - 0.5)
+            total_distance_penalty += precip_penalty
+
+        # Hago clamp, que a rangos muy altos se puede ir de madre y le cuesta recuperarse
+        # al modelo
+        total_distance_penalty = min(total_distance_penalty, max_distance_penalty)
+        base_reward -= total_distance_penalty
+
+        extreme_penalty = 0.0
+
+        if current_temp > 50:
+            # Penalización suave, pero crece con valores extremos
+            extreme_penalty -= min(3.0, (current_temp - 45) * 0.3)
+        elif current_temp < -25:
+            extreme_penalty -= min(3.0, (abs(current_temp) - 25) * 0.3)
+
+        if current_humidity > 99:
+            extreme_penalty -= min(2.0, (current_humidity - 95) * 0.4)
+        elif current_humidity < 0:
+            extreme_penalty -= min(2.0, (5 - current_humidity) * 0.4)
+
+        # Quiero penalizar especialmente estos casos, si no crece mucho la precipitación
+        # el modelo explota los eventos que la incrementan por factores pasivos.
+        if current_precip > 100 + precip_max:
+            extreme_penalty -= min(4.0, (current_precip - (100 + precip_max)) * 0.02)
+        # Recompensa total
+        total_reward = base_reward + extreme_penalty
+
+        # Clamp aquí también, para que no se vayan de madre las penalizaciones
+        min_reward = -15.0
+        total_reward = max(total_reward, min_reward)
+
+        self._logger.info(
+            f"Rewards - Base: {base_reward:.2f}, "
+            f"Distance penalty: {total_distance_penalty:.2f}, "
+            f"Extreme penalty: {extreme_penalty:.2f}, "
+            f"Total: {total_reward:.2f}"
+        )
+
+        return total_reward
 
     def get_observation(self) -> Dict[str, Any]:
         biome_idx: int = list(BiomeType).index(self._biome_type)
         season_idx: int = list(Season).index(self._climate_system.get_current_season())
         normalized_temp: float = climate_normalizer.normalize("temperature", self._state.temperature)
-        normalized_pressure: float = climate_normalizer.normalize("atm_pressure", self._state.atm_pressure)
+        normalized_humidity: float = climate_normalizer.normalize("humidity", self._state.humidity)
+        normalized_precipitation: float = climate_normalizer.normalize("precipitation", self._state.precipitation)
+
         return {
             "temperature": np.array([normalized_temp], dtype=np.float32),
-            "atm_pressure": np.array([normalized_pressure], dtype=np.float32),
+            "humidity": np.array([normalized_humidity], dtype=np.float32),
+            "precipitation": np.array([normalized_precipitation], dtype=np.float32),
             "biome_type": biome_idx,
             "season": season_idx
         }
-
-    def normalize_temperature(self, temp: float) -> float:
-        """ TODO: Pasar los valores extremos a config, sin falta"""
-        return (temp - (-30)) / (50 - (-30))
-
-    def normalize_pressure(self, pressure: float) -> float:
-        return (pressure - 300) / (1200 - 300)
