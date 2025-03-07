@@ -16,6 +16,8 @@
 ##########################################################################
 """
 import pytest
+pytestmark = pytest.mark.skip(reason="Skipping test_simulation.py to avoid stable_baselines3 dependency")
+
 from unittest.mock import patch, MagicMock
 
 from biome.api.biome_api import BiomeAPI
@@ -30,7 +32,6 @@ import simpy
 from utils.loggers import LoggerManager
 
 
-pytestmark = pytest.mark.skip(reason="Skipping test_simulation.py to avoid stable_baselines3 dependency")
 
 @pytest.fixture
 def settings():
