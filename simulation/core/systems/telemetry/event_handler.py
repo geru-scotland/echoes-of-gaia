@@ -16,7 +16,7 @@
 # =============================================================================
 """
 from simulation.core.systems.events.event_bus import SimulationEventBus
-from simulation.core.systems.events.handler import EventHandler
+from shared.events.handler import EventHandler
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from simulation.core.systems.telemetry.influxdb import InfluxDB
 

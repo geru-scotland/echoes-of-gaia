@@ -25,20 +25,23 @@ from biome.environment import Environment
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
 from biome.systems.data.providers import BiomeDataProvider
-from biome.systems.managers.entity_manager import EntityManager
+from biome.systems.events.event_bus import BiomeEventBus
+from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
 from shared.enums.enums import Agents, AgentType, Season, WeatherEvent
+from shared.enums.events import BiomeEvent
+from shared.events.handler import EventHandler
 from shared.timers import Timers
 from shared.types import EntityList, Observation
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.systems.telemetry.datapoint import Datapoint
 
 
-class Biome(Environment, StateHandler, BiomeDataProvider):
+class Biome(Environment, StateHandler, BiomeDataProvider, EventHandler):
 
     def __init__(self, context: BiomeContextData, env: simpy.Environment):
         super().__init__(context, env)
@@ -47,8 +50,8 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions)
-            self._entity_manager: EntityManager = EntityManager(self._map_manager.get_world_map())
-            self._entity_collector: EntityDataCollector = EntityDataCollector(entity_manager=self._entity_manager)
+            self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
+            self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
             self._agents: Dict[AgentType, Agent] = self._initialize_agents()
 
@@ -80,6 +83,10 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
             except Exception as e:
                 self._logger.exception(f"An exception ocurred running climate agent: {e}")
 
+    def _register_events(self):
+        BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
+        BiomeEventBus.register(BiomeEvent.REMOVE_ENTITY, self._map_manager.remove_entity)
+
     def update(self, delay: int):
         yield self._env.timeout(delay)
         while True:
@@ -89,8 +96,8 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
     def resolve_pending_components(self):
         self._logger.info("Resolving pending components...")
 
-    def get_entity_manager(self) -> EntityManager:
-        return self._entity_manager
+    def get_entity_provider(self) -> EntityProvider:
+        return self._entity_provider
 
     def get_world_map(self) -> WorldMap:
         return self._map_manager.get_world_map()

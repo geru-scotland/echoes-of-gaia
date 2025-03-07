@@ -33,7 +33,7 @@ class Fauna(Entity):
         self._fauna_type = fauna_type
         self._logger.debug(f"FAUNA CREATED: {fauna_type}")
         self._habitats: HabitatList = habitats
-         
+
     def _register_events(self):
         pass
 

@@ -7,7 +7,7 @@ biome:
   type: "taiga"
   flora:
     - species: "oak_tree"
-      spawns: 150
+      spawns: 300
       components:
         - GrowthComponent:
             growth_rate: 0.3
@@ -16,7 +16,7 @@ biome:
             nutritional_decay_rate: 0.1
 
     - species: "bramble"
-      spawns: 150
+      spawns: 5
       components:
         - DefenseComponent:
         - NutritionalValueComponent:
@@ -24,7 +24,7 @@ biome:
             toxicity: 99
 
     - species: "mushroom"
-      spawns: 100
+      spawns: 350
 
   fauna:
     - species: "deer"

@@ -21,7 +21,7 @@ from typing import Dict, Any
 from shared.enums.strings import Loggers
 from shared.types import TileMap
 from simulation.core.systems.events.event_bus import SimulationEventBus
-from simulation.core.systems.events.handler import EventHandler
+from shared.events.handler import EventHandler
 from simulation.render.components import MapComponent
 from simulation.render.engine import RenderEngine
 from utils.loggers import LoggerManager

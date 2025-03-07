@@ -23,13 +23,13 @@ from simpy import Environment as simpyEnv
 
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
-from biome.systems.events.event_dispatcher import EventNotifier
+from biome.systems.events.event_notifier import EventNotifier
 from biome.systems.state.handler import StateHandler
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
 from shared.enums.strings import Loggers
 from shared.types import ComponentDict, HabitatList
-from simulation.core.systems.events.handler import EventHandler
+from shared.events.handler import EventHandler
 from biome.components.base.component import EntityComponent
 from utils.loggers import LoggerManager
 

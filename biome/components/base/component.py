@@ -17,11 +17,11 @@
 """
 from logging import Logger
 from abc import abstractmethod, ABC
-from typing import Optional, Callable, Any
+from typing import Optional
 
 from simpy import Environment as simpyEnv
 
-from biome.systems.events.event_dispatcher import EventNotifier
+from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager

@@ -19,6 +19,8 @@ from typing import Optional
 
 from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
+from biome.services.climate_service import ClimateService
+from biome.systems.climate.state import ClimateState
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
 from shared.timers import Timers
@@ -51,6 +53,7 @@ class VitalComponent(EntityComponent):
     def _update_health(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
+            climate_state: ClimateState = ClimateService.query_state()
             if self._health > 0:
                 self._health -= self._health_decay_rate
                 if self._health <= 0:

@@ -48,10 +48,7 @@ class EntityState(EnumBaseStr):
     WEAK = "weak"
     DYING = "dying"
 
-class BiomeEvent(EnumBaseStr):
-    CLIMATE_CHANGE = "climate_change"
-    SEASON_CHANGE = "season_change"
-    DISASTER = "disaster"
+
 
 class EntityType(EnumBaseStr):
     FLORA = "flora"

@@ -20,3 +20,11 @@ from shared.enums.base import EnumBaseStr
 
 class ComponentEvent(EnumBaseStr):
     UPDATE_STATE = "on_component_update"
+
+class BiomeEvent(EnumBaseStr):
+    CREATE_ENTITY = "create_entity"
+    REMOVE_ENTITY = "remove_entity"
+
+    CLIMATE_CHANGE = "climate_change"
+    SEASON_CHANGE = "season_change"
+    DISASTER = "disaster"

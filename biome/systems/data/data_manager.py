@@ -67,7 +67,7 @@ class BiomeDataManager:
             config = self._create_snapshot_config(snapshot_config)
 
             self._snapshot_system = BiomeSnapshotSystem(
-                entity_manager=self._data_provider.get_entity_manager(),
+                entity_manager=self._data_provider.get_entity_provider(),
                 world_map=self._data_provider.get_world_map(),
                 entity_collector=self._data_provider.get_entity_collector(),
                 score_analyzer=self._data_provider.get_score_analyzer(),

@@ -15,13 +15,12 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Any
 
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums.enums import EntityType, FloraSpecies
+from shared.enums.enums import FloraSpecies
 from shared.types import HabitatList
 
 
