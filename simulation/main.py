@@ -31,7 +31,7 @@ sys.excepthook = global_exception_handler
 settings: Settings = Settings()
 LoggerManager.initialize(settings.log_level)
 # TODO: Pasar a config esto
-HEADLESS: bool = True
+HEADLESS: bool = False
 
 simulation = SimulationAPI(settings)
 

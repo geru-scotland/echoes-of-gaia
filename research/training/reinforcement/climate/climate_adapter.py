@@ -115,6 +115,8 @@ class ClimateTrainAdapter(EnvironmentAdapter):
             temp_penalty = 2.0 * (1.0 / (1.0 + np.exp(-0.25 * distance)) - 0.5)
             total_distance_penalty += temp_penalty
 
+        # TODO: has tocado factor de pendiente/escalado de la sigmoidea, deja el mismo para todos
+        #  y toca solo el factor exterior
         if not humidity_in_range:
             distance = min(abs(current_humidity - humidity_min), abs(current_humidity - humidity_max))
             humidity_penalty = 1.5 * (1.0 / (1.0 + np.exp(-0.15 * distance)) - 0.5)

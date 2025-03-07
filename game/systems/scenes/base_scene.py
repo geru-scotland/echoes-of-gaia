@@ -17,8 +17,11 @@
 """
 import os.path
 from abc import abstractmethod
+from logging import Logger
 
+from shared.strings import Loggers
 from utils.dependecy_injector import dependency_injector
+from utils.loggers import LoggerManager
 from utils.paths import ASSETS_DIR
 
 
@@ -35,7 +38,7 @@ class Scene:
         self.settings = dependency_injector.get("scene_settings")
         self._scene_data = self.settings.load_scene_data(self._scene_name)
         self._screen_width, self._screen_height = self.settings.screen_width, self.settings.screen_height
-        self._logger = self.settings.get_logger("scene")
+        self._logger: Logger = LoggerManager.get_logger(Loggers.SCENE)
 
         self._load_assets()
         self._build_scene()

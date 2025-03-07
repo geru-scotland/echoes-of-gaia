@@ -6,9 +6,9 @@ tiles:
   tiles_y: 25
   assets:
     tilesheets:
-       map: "simulation/render/assets/overworld-tileset-perlin.png"
+       map: "render/assets/overworld-tileset-perlin.png"
        tilesize: 16
   configs:
-    terrain_files: "simulation/render/tiles/terrain_tiles.yaml"
+    terrain_files: "render/tiles/terrain_tiles.yaml"
 
 
