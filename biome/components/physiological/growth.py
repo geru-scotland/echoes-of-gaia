@@ -21,6 +21,7 @@ from simpy import Environment as simpyEnv
 
 from biome.components.base.component import EntityComponent
 from shared.enums.enums import ComponentType
+from shared.enums.events import ComponentEvent
 from shared.timers import Timers
 
 
@@ -44,6 +45,6 @@ class GrowthComponent(EntityComponent):
                 self._size += self._growth_rate
                 if self._size >= self._max_size * (self._growth_stage + 1) / self._total_stages:
                     self._growth_stage += 1
-                    self._notify_update(GrowthComponent, growth_stage=self._growth_stage)
-                self._notify_update(GrowthComponent, size=self._size)
+                    self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent, growth_stage=self._growth_stage)
+                self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent, size=self._size)
             yield self._env.timeout(timer)

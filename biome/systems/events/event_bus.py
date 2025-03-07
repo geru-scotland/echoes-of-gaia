@@ -14,26 +14,11 @@
 #    Repo:   https://github.com/geru-scotland/echoes-of-gaia                   #
 #                                                                              #
 # =============================================================================
-
 """
 from typing import Dict, List, Any
 
+from shared.events.event_bus import EventBus
 
-class EventBus:
-    _listeners: Dict[str, List[Any]] = {}
 
-    @classmethod
-    def clear(cls):
-        cls._listeners.clear()
-
-    @classmethod
-    def register(cls, event_name: str, callback: Any):
-        if event_name not in cls._listeners:
-            cls._listeners[event_name] = []
-        cls._listeners[event_name].append(callback)
-
-    @classmethod
-    def trigger(cls, event_name, *args, **kwargs):
-        for callback in cls._listeners.get(event_name, []):
-            callback(*args, **kwargs)
-
+class BiomeEventBus(EventBus):
+    _listeners: Dict[str, List[Any]]

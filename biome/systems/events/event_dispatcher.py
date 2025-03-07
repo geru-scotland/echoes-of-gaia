@@ -14,26 +14,23 @@
 #    Repo:   https://github.com/geru-scotland/echoes-of-gaia                   #
 #                                                                              #
 # =============================================================================
-
 """
-from typing import Dict, List, Any
+from typing import Dict, List, Callable
 
 
-class EventBus:
-    _listeners: Dict[str, List[Any]] = {}
+class EventNotifier:
+    def __init__(self):
+        self._listeners: Dict[str, Callable] = {}
 
-    @classmethod
-    def clear(cls):
-        cls._listeners.clear()
+    def clear(self):
+        self._listeners.clear()
 
-    @classmethod
-    def register(cls, event_name: str, callback: Any):
-        if event_name not in cls._listeners:
-            cls._listeners[event_name] = []
-        cls._listeners[event_name].append(callback)
+    def register(self, event_name: str, callback: Callable):
+        if event_name not in self._listeners:
+            self._listeners[event_name] = callback
 
-    @classmethod
-    def trigger(cls, event_name, *args, **kwargs):
-        for callback in cls._listeners.get(event_name, []):
+    def notify(self, event_name: str, *args, **kwargs):
+        callback: Callable = self._listeners.get(event_name, None)
+
+        if callback is not None:
             callback(*args, **kwargs)
-

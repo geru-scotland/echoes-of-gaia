@@ -21,6 +21,7 @@ from typing import Optional, Callable, Any
 
 from simpy import Environment as simpyEnv
 
+from biome.systems.events.event_dispatcher import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
@@ -59,14 +60,10 @@ class BiomeComponent(Component):
 class EntityComponent(Component):
     def __init__(self, type: ComponentType, env: simpyEnv):
         super().__init__(type, env)
-        self._update_callback: Optional[Callable] = None
+        self._event_notifier: Optional[EventNotifier] = None
 
-    def set_update_callback(self, callback: Callable):
-        self._update_callback = callback
-
-    def _notify_update(self, component_class, **kwargs: Any):
-        if self._update_callback:
-            self._update_callback(component_class, **kwargs)
+    def set_event_notifier(self, event_notifier: EventNotifier):
+        self._event_notifier = event_notifier
 
     def get_state(self):
         pass

@@ -32,6 +32,9 @@ class Flora(Entity):
         self._logger.debug(f"Flora entity initialized: {flora_type}")
         self._flora_type: FloraSpecies = flora_type
 
+    def _register_events(self):
+        pass
+
     def compute_state(self):
         pass
 

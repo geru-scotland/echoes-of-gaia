@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+import traceback
 from logging import Logger
 from typing import List
 
@@ -244,7 +245,8 @@ class WorldMapManager:
             self._entity_index_map: EntityIndexMap = self._spawn_system.get_entity_index_map()
             self._world_map = WorldMap(tile_map=tile_map, entity_registry=self._entity_registry, entity_index_map=self._entity_index_map)
         except Exception as e:
-            self._logger.exception(f"There was an en exception spawning entities: {e}")
+            tb = traceback.format_exc()
+            self._logger.error("There was an exception spawning entities: %s", tb)
 
     def get_world_map(self):
         return self._world_map

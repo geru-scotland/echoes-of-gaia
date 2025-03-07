@@ -23,8 +23,10 @@ from simpy import Environment as simpyEnv
 
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
+from biome.systems.events.event_dispatcher import EventNotifier
 from biome.systems.state.handler import StateHandler
 from shared.enums.enums import ComponentType
+from shared.enums.events import ComponentEvent
 from shared.enums.strings import Loggers
 from shared.types import ComponentDict, HabitatList
 from simulation.core.systems.events.handler import EventHandler
@@ -35,6 +37,7 @@ from utils.loggers import LoggerManager
 class Entity(EventHandler, StateHandler, ABC):
 
     def __init__(self, id: int, env: simpyEnv, descriptor: EntityDescriptor, habitats: HabitatList):
+        self._event_notifier: EventNotifier = EventNotifier()
         super().__init__()
         self._id: int = id
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
@@ -45,11 +48,11 @@ class Entity(EventHandler, StateHandler, ABC):
         self._state: EntityState = EntityState()
 
     def _register_events(self):
-        pass
+        self._event_notifier.register(ComponentEvent.UPDATE_STATE, self.handle_component_update)
 
     def add_component(self, component: EntityComponent):
         self._components[component.type] = component
-        component.set_update_callback(self.handle_component_update)
+        component.set_event_notifier(self._event_notifier)
 
     def get_component(self, type: ComponentType):
         return self._components.get(type, None)
@@ -71,7 +74,7 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def handle_component_update(self, component_class: Type, **kwargs: Any):
         if kwargs:
-            self._logger.debug(f"Updating entity: {self._descriptor.species} ({self._descriptor.entity_type}),"
+            self._logger.debug(f"[Sim tick: {self._env.now}] Updating entity: {self._descriptor.species} ({self._descriptor.entity_type}),"
                                f" [component: {component_class.__name__}]: {kwargs}")
             for key, value in kwargs.items():
                 self._state.update(key, value)

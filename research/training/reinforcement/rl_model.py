@@ -57,6 +57,8 @@ class ReinforcementModel:
 
             action, _states = self._model.predict(observation, deterministic=True)
 
+            # TODO: IMPORTANTE. Quitar esto de aquí, era para development
+            # Si quieres hacer debug del clima, en el mismo ClimateSystem al hacer predict
             temp_normalized = observation["temperature"][0]
             temp_real = climate_normalizer.denormalize("temperature", temp_normalized)
             humidity_normalized = observation["humidity"][0]

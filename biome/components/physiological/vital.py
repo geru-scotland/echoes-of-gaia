@@ -20,6 +20,7 @@ from typing import Optional
 from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
 from shared.enums.enums import ComponentType
+from shared.enums.events import ComponentEvent
 from shared.timers import Timers
 
 
@@ -44,7 +45,7 @@ class VitalComponent(EntityComponent):
             # TODO: el decay rate ha de ser escalado con _age
             # pensar bien en formulación / valores.
             self._age += self._aging_rate
-            self._notify_update(VitalComponent, age=self._age)
+            self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, age=self._age)
             yield self._env.timeout(timer)
 
     def _update_health(self, timer: Optional[int] = None):
@@ -55,8 +56,8 @@ class VitalComponent(EntityComponent):
                 if self._health <= 0:
                     self._health = 0
                     self._alive = False
-                    self._notify_update(VitalComponent, alive=self._alive)
-                self._notify_update(VitalComponent, health=self._health)
+                    self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, alive=self._alive)
+                self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._health)
             yield self._env.timeout(timer)
 
     # TODO: Métodos con soporte para recibir daño/heals

@@ -39,8 +39,8 @@ class RenderEventHandler(EventHandler):
         SimulationEventBus.register("simulation_finished", self.on_simulation_finished)
 
     def on_biome_loaded(self, tile_map: TileMap):
-        self._logger.debug("[Render] Biome Loaded! Now biome image should be projected")
-        self._logger.debug(f"Render title: {self._settings.title}")
+        self._logger.info("[Render] Biome Loaded! Now biome image should be projected")
+        self._logger.info(f"Render title: {self._settings.title}")
         try:
             if self._engine.is_initialized():
                 tile_config: Dict[str, Any] = self._settings.config.get("tiles", {})
