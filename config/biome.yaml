@@ -6,7 +6,7 @@ biome:
       - 60 # height
   type: "taiga"
   flora:
-    - type: "oak_tree"
+    - species: "oak_tree"
       spawns: 150
       components:
         - GrowthComponent:
@@ -15,7 +15,7 @@ biome:
             nutritive_value: 0.4
             nutritional_decay_rate: 0.1
 
-    - type: "bramble"
+    - species: "bramble"
       spawns: 150
       components:
         - DefenseComponent:
@@ -23,21 +23,21 @@ biome:
             nutritive_value: 0.9
             toxicity: 99
 
-    - type: "mushroom"
+    - species: "mushroom"
       spawns: 100
 
   fauna:
-    - type: "deer"
+    - species: "deer"
       spawns: 110
       components:
         - NutritionalValueComponent:
         - GrowthComponent:
         - VitalComponent:
-    - type: "boar"
+    - species: "boar"
       spawns: 50
       components:
         - NutritionalValueComponent:
-    - type: "fox"
+    - species: "fox"
       spawns: 40
       components:
         - NutritionalValueComponent:

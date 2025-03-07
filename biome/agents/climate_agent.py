@@ -32,14 +32,14 @@ from utils.loggers import LoggerManager
 from utils.normalization.normalizer import climate_normalizer
 
 
-class ClimateAgent(Agent[ClimateState, WeatherEvent]):
+class ClimateAgentAI(Agent[ClimateState, WeatherEvent]):
     def __init__(self, climate: ClimateSystem, climate_model: str):
         self._logger: Logger = LoggerManager.get_logger(Loggers.CLIMATE_AGENT)
         self._climate: ClimateSystem = climate
         self._model: ReinforcementModel = ReinforcementModel(climate_model)
 
     def perceive(self) -> Observation:
-        self._logger.info("AGENT PERCEIVING")
+        self._logger.debug("AGENT PERCEIVING")
         biome_idx: int = list(BiomeType).index(self._climate.biome_type)
         season_idx: int = list(Season).index(self._climate.get_current_season())
         # TODO: implementar get_state_with_modifiers() cuando llegue el momento
@@ -59,11 +59,11 @@ class ClimateAgent(Agent[ClimateState, WeatherEvent]):
         }
 
     def decide(self, observation: Observation) -> WeatherEvent:
-        self._logger.info(f"AGENT DECIDING. Observation: {observation}")
+        self._logger.debug(f"AGENT DECIDING. Observation: {observation}")
         weather_event_idx: int = self._model.predict(observation)
         return WeatherEvent(list(WeatherEvent)[weather_event_idx])
 
     def act(self, action: WeatherEvent) -> None:
-        self._logger.info(f"AGENT ACTING. Action: {action}")
+        self._logger.debug(f"AGENT ACTING. Action: {action}")
         self._climate.update(action)
 

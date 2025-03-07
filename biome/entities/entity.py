@@ -71,7 +71,7 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def handle_component_update(self, component_class: Type, **kwargs: Any):
         if kwargs:
-            self._logger.debug(f"Updating entity: {self._descriptor.specific_type} ({self._descriptor.entity_type}),"
+            self._logger.debug(f"Updating entity: {self._descriptor.species} ({self._descriptor.entity_type}),"
                                f" [component: {component_class.__name__}]: {kwargs}")
             for key, value in kwargs.items():
                 self._state.update(key, value)
@@ -92,8 +92,8 @@ class Entity(EventHandler, StateHandler, ABC):
     def get_type(self):
         return self._descriptor.entity_type
 
-    def get_specific_type(self):
-        return self._descriptor.specific_type
+    def get_species(self):
+        return self._descriptor.species
 
     @property
     def type(self):

@@ -66,10 +66,10 @@ class ReinforcementModel:
 
             weather_event_name = list(WeatherEvent)[action] if action < len(WeatherEvent) else "UNKNOWN"
 
-            self._logger.info(f"Real temperature: {temp_real:.1f}°C")
-            self._logger.info(f"Real humidity: {humidity_real:.1f}°C")
-            self._logger.info(f"Real precipitation: {precipitation_real:.1f}°C")
-            self._logger.info(f"Predicted action: {action} (Weather Event: {weather_event_name})")
+            self._logger.debug(f"Real temperature: {temp_real:.1f}°C")
+            self._logger.debug(f"Real humidity: {humidity_real:.1f}°C")
+            self._logger.debug(f"Real precipitation: {precipitation_real:.1f}°C")
+            self._logger.debug(f"Predicted action: {action} (Weather Event: {weather_event_name})")
             return action
         except Exception as e:
             self._logger.exception(f"There was an error during the prediction: {e}")

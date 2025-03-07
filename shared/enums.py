@@ -62,20 +62,20 @@ class EntityIndex(EnumBaseInt):
     FLORA = 1
     FAUNA = 2
 
-class FloraType(EnumBaseStr):
+class FloraSpecies(EnumBaseStr):
     OAK_TREE = "oak_tree"
     BRAMBLE = "bramble"
     MUSHROOM = "mushroom"
 
-class FaunaType(EnumBaseStr):
+class FaunaSpecies(EnumBaseStr):
     DEER = "deer"
     BOAR = "boar"
     FOX = "fox"
 
 class Timers:
     class Agents(EnumBaseInt):
-        EVOLVE = 500
-        CLIMATE_UPDATE = 2
+        EVOLUTIONARY_CYCLE = 500
+        CLIMATE_UPDATE = 2 # 2 ticks = 1 día
 
     class Entity(EnumBaseInt):
         GROWTH = 25

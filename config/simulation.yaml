@@ -6,7 +6,7 @@ simulation:
 
   data:
     snapshots:
-      enabled: true
+      enabled: False
       period_type: "CUSTOM"
       custom_period: 60
       storage_directory: "simulation_records"

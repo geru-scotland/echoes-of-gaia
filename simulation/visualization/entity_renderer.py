@@ -27,14 +27,14 @@ class EntityInfo:
     def __init__(self, entity_data: EntityData, position: Tuple[int, int], color: Color):
         self.id = entity_data["id"]
         self.type = entity_data["type"]
-        self.specific_type = entity_data["specific_type"]
+        self.species = entity_data["species"]
         self.position = position
         self.color = color
         self.state_fields = entity_data["state_fields"]
         self.habitats = entity_data["habitats"]
 
     def __str__(self) -> str:
-        return f"Entity {self.id}: {self.specific_type} at {self.position}"
+        return f"Entity {self.id}: {self.species} at {self.position}"
 
 
 class EntityRenderer:

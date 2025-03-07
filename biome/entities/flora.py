@@ -21,16 +21,16 @@ from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums import EntityType, FloraType
+from shared.enums import EntityType, FloraSpecies
 from shared.types import HabitatList
 
 
 class Flora(Entity):
-    def __init__(self, id: int, env: simpyEnv, flora_type: FloraType, habitats: HabitatList):
+    def __init__(self, id: int, env: simpyEnv, flora_type: FloraSpecies, habitats: HabitatList):
         descriptor: EntityDescriptor = EntityDescriptor.create_flora(flora_type)
         super().__init__(id, env, descriptor, habitats)
         self._logger.debug(f"Flora entity initialized: {flora_type}")
-        self._flora_type: FloraType = flora_type
+        self._flora_type: FloraSpecies = flora_type
 
     def compute_state(self):
         pass

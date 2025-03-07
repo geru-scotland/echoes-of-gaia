@@ -20,8 +20,7 @@ from typing import Dict, Any
 import simpy
 
 from biome.agents.base import Agent
-from biome.agents.climate_agent import ClimateAgent
-from biome.components.biome.climate import Climate
+from biome.agents.climate_agent import ClimateAgentAI
 from biome.environment import Environment
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
@@ -43,8 +42,6 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
     def __init__(self, context: BiomeContextData, env: simpy.Environment):
         super().__init__(context, env)
         try:
-            # Del contexto, habrá que pasar datos de clima de los config
-            self.add_component(Climate(self._env))
             self._logger.info(self._context.config.get("type"))
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
@@ -62,7 +59,7 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
         agents: Dict[AgentType, Agent] = {}
 
         climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
-        climate_agent: ClimateAgent = ClimateAgent(climate, self._context.climate_model)
+        climate_agent: ClimateAgentAI = ClimateAgentAI(climate, self._context.climate_model)
 
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_climate_agent(Timers.Agents.CLIMATE_UPDATE))
@@ -76,9 +73,11 @@ class Biome(Environment, StateHandler, BiomeDataProvider):
                 observation: Observation = agent.perceive()
                 action: WeatherEvent = agent.decide(observation)
                 agent.act(action)
+                # TODO: delay basado en el weatherevent quizá?
+                # echarle una pensada - si drought que persista por X días
+                yield self._env.timeout(delay)
             except Exception as e:
                 self._logger.exception(f"An exception ocurred running climate agent: {e}")
-            yield self._env.timeout(delay)
 
     def update(self, delay: int):
         yield self._env.timeout(delay)

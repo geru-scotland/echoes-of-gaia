@@ -98,7 +98,7 @@ class SnapshotCollector:
             entity_data = {
                 "id": entity.get_id(),
                 "type": entity.get_type(),
-                "specific_type": str(entity.get_specific_type()),
+                "species": str(entity.get_species()),
                 "habitats": [str(h) for h in entity.get_habitats()],
                 "state_fields": entity.get_state_fields(),
                 "components": self._collect_entity_components(entity),

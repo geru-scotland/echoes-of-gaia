@@ -30,7 +30,7 @@ from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
 from biome.entities.flora import Flora
 from biome.systems.maps.worldmap import WorldMap
-from shared.enums import FloraType, FaunaType, Habitats, TerrainType
+from shared.enums import FloraSpecies, FaunaSpecies, Habitats, TerrainType
 from shared.stores.biome_store import BiomeStore
 from shared.strings import Loggers
 from shared.types import TileMap, EntityList, HabitatCache, BiomeStoreData, EntityDefinitions, EntityRegistry, \
@@ -52,7 +52,7 @@ class WorldMapManager:
             self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
 
         @log_execution_time(context="Entities created")
-        def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_type_enum,
+        def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_species_enum,
                              biome_store) -> EntityRegistry:
             if not spawns:
                 return {}
@@ -63,7 +63,7 @@ class WorldMapManager:
 
             for spawn in spawns:
                 try:
-                    entity_type = entity_type_enum(str(spawn.get("type")).lower())
+                    entity_type = entity_species_enum(str(spawn.get("species")).lower())
                     habitats: HabitatList = biome_store.get(entity_type, {}).get("habitat", {})
                     amount = spawn.get("spawns")
 
@@ -142,7 +142,7 @@ class WorldMapManager:
                     self._logger.debug(f"Random position selected: {selected_position}")
 
             if selected_position is None:
-                self._logger.warning(f"No valid position found for entity {entity.get_type()} ({entity.get_specific_type()})(id: {entity.get_id()})!")
+                self._logger.warning(f"No valid position found for entity {entity.get_type()} ({entity.get_species()})(id: {entity.get_id()})!")
                 return
 
             # Quizá, para evitar este bucle, pasar a mapa de habitats directamente
@@ -218,8 +218,8 @@ class WorldMapManager:
             pass
 
         def spawn(self,flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
-            self._flora_registry = self._create_entities(flora_spawns, Flora, FloraType, BiomeStore.flora)
-            self._fauna_registry = self._create_entities(fauna_spawns, Fauna, FaunaType, BiomeStore.fauna)
+            self._flora_registry = self._create_entities(flora_spawns, Flora, FloraSpecies, BiomeStore.flora)
+            self._fauna_registry = self._create_entities(fauna_spawns, Fauna, FaunaSpecies, BiomeStore.fauna)
 
         def get_entity_registry(self) -> EntityRegistry:
             return {**self._flora_registry, **self._fauna_registry}

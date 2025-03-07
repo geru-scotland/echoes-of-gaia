@@ -52,18 +52,18 @@ class SimulationEngine:
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._datapoints: bool = self._context.config.get("datapoints", False)
 
-            if self._datapoints:
-                self._context.influxdb.start()
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
             self._biome_api = BiomeAPI(biome_context, self._env)
 
-            self._data_manager = BiomeDataManager(
-                env=self._env,
-                config=self._context.config
-            )
+            if self._datapoints:
+                self._context.influxdb.start()
+                self._data_manager = BiomeDataManager(
+                    env=self._env,
+                    config=self._context.config
+                )
 
-            self._data_manager.configure(self._biome_api.biome)
+                self._data_manager.configure(self._biome_api.biome)
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)
 

@@ -170,7 +170,7 @@ class ClimateSystem:
         return self._base_environmental_factors
 
     @property
-    def weather_event_deltas(self) -> Dict[WeatherEvent, float]:
+    def weather_event_effects(self) -> Dict[WeatherEvent, dict]:
         return self._weather_event_effects
 
     @property
