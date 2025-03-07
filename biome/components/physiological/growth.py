@@ -15,34 +15,34 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Optional, Callable
+from typing import Optional
 
 from simpy import Environment as simpyEnv
 
-from biome.components.component import EntityComponent
+from biome.components.base.component import EntityComponent
 from shared.enums import ComponentType, Timers
 
 
-class NutritionalValueComponent(EntityComponent):
-    def __init__(self, env: simpyEnv, nutritive_value: float, nutritional_decay_rate: float,
-                 toxicity: float):
-        super().__init__(ComponentType.NUTRITIONAL, env)
-        # Por ahora, ha de ser exacto y coincidir con atributos
-        # en biome/data/ecosystem.json... TODO: Cambiar esto
-        self._nutritive_value = round(nutritive_value, 2)
-        self._nutritional_decay_rate = round(nutritional_decay_rate, 2)
-        self._toxicity = round(toxicity, 2)
-        self._logger.debug(f"NV: {self._nutritive_value}, decay rate : {self._nutritional_decay_rate}"
-                             f" toxicity: {self._toxicity}")
-        self._env.process(self._update(Timers.Entity.NUTRITIONAL_VALUE_DECAY))
+class GrowthComponent(EntityComponent):
+    def __init__(self, env: simpyEnv, growth_stage: int = 0, stages: int = 3,
+                 growth_rate: float = 0.05, size: float = 1.0, max_size: float = 5.0):
+        super().__init__(ComponentType.GROWTH, env)
+        self._growth_stage: int = growth_stage
+        self._total_stages: int = stages
+        self._growth_rate: float = round(growth_rate, 2)
+        self._size: float = round(size, 2)
+        self._max_size: float = round(max_size, 2)
+        self._logger.debug(f"Stage: {self._growth_stage}/{self._total_stages}, "
+                           f"Size: {self._size}/{self._max_size}, Growth rate: {self._growth_rate}")
+        self._env.process(self._update_growth(Timers.Entity.GROWTH))
 
-
-    def _update(self, timer: Optional[int] = None):
+    def _update_growth(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._notify_update(NutritionalValueComponent, toxicity=self._toxicity)
-            self._toxicity += 0.01
+            if self._growth_stage < self._total_stages and self._size < self._max_size:
+                self._size += self._growth_rate
+                if self._size >= self._max_size * (self._growth_stage + 1) / self._total_stages:
+                    self._growth_stage += 1
+                    self._notify_update(GrowthComponent, growth_stage=self._growth_stage)
+                self._notify_update(GrowthComponent, size=self._size)
             yield self._env.timeout(timer)
-
-    def get_state(self):
-        pass

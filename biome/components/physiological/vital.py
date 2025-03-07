@@ -18,7 +18,7 @@
 from typing import Optional
 
 from simpy import Environment as simpyEnv
-from biome.components.component import EntityComponent
+from biome.components.base.component import EntityComponent
 from shared.enums import ComponentType, Timers
 
 

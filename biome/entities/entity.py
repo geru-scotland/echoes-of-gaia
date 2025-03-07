@@ -17,18 +17,18 @@
 """
 from logging import Logger
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Dict, Type
+from typing import Any, Dict, Type
 
 from simpy import Environment as simpyEnv
 
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
 from biome.systems.state.handler import StateHandler
-from shared.enums import ComponentType, EntityType, Habitats
+from shared.enums import ComponentType
 from shared.strings import Loggers
 from shared.types import ComponentDict, HabitatList
 from simulation.core.systems.events.handler import EventHandler
-from biome.components.component import EntityComponent
+from biome.components.base.component import EntityComponent
 from utils.loggers import LoggerManager
 
 

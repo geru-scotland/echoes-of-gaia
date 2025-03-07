@@ -21,6 +21,7 @@ from typing import Dict, Any
 
 import numpy as np
 
+from biome.services.climate_service import ClimateService
 from biome.systems.climate.seasons import SeasonSystem
 from biome.systems.climate.state import ClimateState
 from shared.enums import BiomeType, Season, WeatherEvent
@@ -44,6 +45,8 @@ class ClimateSystem:
         self._load_environmental_data()
 
         self._state: ClimateState = self._initialize_state()
+        ClimateService.init_service(self._state)
+
         self._season_system: SeasonSystem = SeasonSystem(initial_season)
 
         for i in range(360):
@@ -147,6 +150,8 @@ class ClimateSystem:
         self._state.precipitation = round(max(PHYSICAL_MIN_PREC,
                                         min(self._state.precipitation + mod_precipitation, PHYSICAL_MAX_PREC)), 1)
 
+        # TODO: Establecer umbrales para temperatura, hum y prec, y
+        # triggear aquí para los que se hayan subscrito
         self._logger.debug(f"State AFTER: {self._state}")
 
     def get_state(self) -> ClimateState:

@@ -30,7 +30,7 @@ from shared.strings import Strings, Loggers
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
-from simulation.core.systems.events.dispatcher import EventDispatcher
+from simulation.core.systems.events.event_bus import GlobalEventBus
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from simulation.core.systems.time.time import SimulationTime
 from utils.loggers import LoggerManager
@@ -67,7 +67,7 @@ class SimulationEngine:
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)
 
-            EventDispatcher.trigger("biome_loaded", biome_context.tile_map)
+            GlobalEventBus.trigger("biome_loaded", biome_context.tile_map)
         except Exception as e:
             self._logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
             self._logger.exception(f"[Simulation Engine] There was an error bootstraping: {e}")
@@ -92,7 +92,7 @@ class SimulationEngine:
                     datapoint_id, simulated_timestamp
                 )
                 if biome_datapoint:
-                    EventDispatcher.trigger("on_biome_data_collected", biome_datapoint)
+                     GlobalEventBus.trigger("on_biome_data_collected", biome_datapoint)
 
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)
@@ -107,8 +107,8 @@ class SimulationEngine:
         if self._datapoints:
             self._context.influxdb.close()
 
-        if self._data_manager:
-            self._data_manager.shutdown()
+            if self._data_manager:
+                self._data_manager.shutdown()
 
         self._time.log_time(self._env.now)
 

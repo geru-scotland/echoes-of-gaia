@@ -15,9 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+from biome.systems.climate.state import ClimateState
 
-class ClimateDataCollector:
-    def __init__(self):
-        pass
 
-    # metricas
+class ClimateService:
+    state: ClimateState
+
+    @classmethod
+    def init_service(cls, state_ref: ClimateState):
+        cls.state = state_ref
+
+    @classmethod
+    def query_state(cls) -> ClimateState:
+        return cls.state

@@ -15,7 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
-from simulation.core.systems.events.dispatcher import EventDispatcher
+from simulation.core.systems.events.event_bus import GlobalEventBus
 from simulation.core.systems.events.handler import EventHandler
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from simulation.core.systems.telemetry.influxdb import InfluxDB
@@ -27,7 +27,7 @@ class InfluxEventHandler(EventHandler):
        super().__init__()
 
    def _register_events(self):
-       EventDispatcher.register("on_biome_data_collected", self._influxdb.write_data_point)
+       GlobalEventBus.register("on_biome_data_collected", self._influxdb.write_data_point)
 
    def on_data_collected(self, datapoint: Datapoint):
        self._influxdb.write_data_point(datapoint)
