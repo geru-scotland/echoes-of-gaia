@@ -56,7 +56,7 @@ class EntityRenderer:
                         position = (int(transform["x"]), int(transform["y"]))
 
                         entity_type = entity_data["type"]
-                        specific_type = entity_data["specific_type"]
+                        specific_type = entity_data["species"]
 
                         color = self._entity_colors.get(
                             specific_type,
