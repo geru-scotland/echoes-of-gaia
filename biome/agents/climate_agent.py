@@ -18,15 +18,13 @@
 from logging import Logger
 
 import numpy as np
-from stable_baselines3 import PPO
-from stable_baselines3.common.base_class import SelfBaseAlgorithm
 
 from biome.agents.base import Agent
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
 from research.training.reinforcement.rl_model import ReinforcementModel
-from shared.enums import WeatherEvent, BiomeType, Season
-from shared.strings import Loggers
+from shared.enums.enums import WeatherEvent, BiomeType, Season
+from shared.enums.strings import Loggers
 from shared.types import Observation
 from utils.loggers import LoggerManager
 from utils.normalization.normalizer import climate_normalizer

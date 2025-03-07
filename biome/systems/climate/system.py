@@ -19,14 +19,12 @@ import random
 from logging import Logger
 from typing import Dict, Any
 
-import numpy as np
-
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.seasons import SeasonSystem
 from biome.systems.climate.state import ClimateState
-from shared.enums import BiomeType, Season, WeatherEvent
+from shared.enums.enums import BiomeType, Season, WeatherEvent
 from shared.stores.biome_store import BiomeStore
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 from utils.normalization.ranges import CLIMATE_RANGES
 

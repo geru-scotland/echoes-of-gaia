@@ -22,7 +22,7 @@ from typing import Dict, Any, List
 import numpy as np
 
 from biome.systems.managers.entity_manager import EntityManager
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import EntityList
 from utils.loggers import LoggerManager
 

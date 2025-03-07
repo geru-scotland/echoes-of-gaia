@@ -19,7 +19,7 @@ from typing import Tuple
 
 from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
-from shared.enums import ComponentType
+from shared.enums.enums import ComponentType
 
 
 class TransformComponent(EntityComponent):

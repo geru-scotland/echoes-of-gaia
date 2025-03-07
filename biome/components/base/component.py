@@ -21,8 +21,8 @@ from typing import Optional, Callable, Any
 
 from simpy import Environment as simpyEnv
 
-from shared.enums import ComponentType
-from shared.strings import Loggers
+from shared.enums.enums import ComponentType
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
 

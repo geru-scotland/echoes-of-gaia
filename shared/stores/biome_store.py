@@ -21,7 +21,7 @@ from typing import Dict, Any
 
 import numpy as np
 
-from shared.enums import TerrainType
+from shared.enums.enums import TerrainType
 from shared.types import TerrainList, BiomeStoreData
 from utils.paths import BIOME_DATA_DIR
 

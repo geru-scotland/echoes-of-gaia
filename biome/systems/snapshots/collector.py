@@ -27,8 +27,8 @@ from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.snapshots.data import SnapshotData
-from shared.enums import TerrainType, ComponentType
-from shared.strings import Loggers
+from shared.enums.enums import TerrainType
+from shared.enums.strings import Loggers
 from shared.types import TerrainData, EntityData, ComponentData
 from simulation.core.systems.time.time import SimulationTimeInfo
 from utils.loggers import LoggerManager

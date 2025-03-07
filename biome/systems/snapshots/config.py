@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Set, Optional
 
-from shared.enums import CapturePeriod, CaptureFormat, CaptureType
+from shared.enums.enums import CapturePeriod, CaptureFormat, CaptureType
 from utils.paths import SIMULATION_DIR
 
 

@@ -15,12 +15,11 @@
 #                                                                        #
 ##########################################################################
 """
-import sys
 from logging import getLogger, Logger
 from typing import Optional, Type
 
 from config.settings import Settings
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from simulation.core.engine import SimulationEngine
 
 

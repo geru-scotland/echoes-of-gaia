@@ -18,7 +18,7 @@
 import numpy as np
 
 from research.training.reinforcement.train_agent import ReinforcementLearningAgent
-from shared.enums import Agents, BiomeType, Season, WeatherEvent
+from shared.enums.enums import Agents, BiomeType, Season, WeatherEvent
 from shared.stores.biome_store import BiomeStore
 from utils.normalization.normalizer import climate_normalizer
 

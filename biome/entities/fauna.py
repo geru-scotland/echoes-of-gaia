@@ -21,7 +21,7 @@ from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums import FaunaSpecies
+from shared.enums.enums import FaunaSpecies
 from shared.types import HabitatList
 
 

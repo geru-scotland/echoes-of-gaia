@@ -24,8 +24,8 @@ from simpy import Environment as simpyEnv
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
 from biome.systems.state.handler import StateHandler
-from shared.enums import ComponentType
-from shared.strings import Loggers
+from shared.enums.enums import ComponentType
+from shared.enums.strings import Loggers
 from shared.types import ComponentDict, HabitatList
 from simulation.core.systems.events.handler import EventHandler
 from biome.components.base.component import EntityComponent

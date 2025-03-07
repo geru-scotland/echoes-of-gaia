@@ -26,7 +26,7 @@ from unittest.mock import patch, MagicMock
 
 from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
-from shared.strings import Strings, Loggers
+from shared.enums.strings import Strings, Loggers
 from simulation.api.simulation_api import SimulationAPI
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
 from simulation.core.engine import SimulationEngine

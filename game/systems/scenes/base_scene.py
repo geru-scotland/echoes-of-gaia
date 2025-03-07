@@ -15,14 +15,12 @@
 #                                                                        #
 ##########################################################################
 """
-import os.path
 from abc import abstractmethod
 from logging import Logger
 
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.dependecy_injector import dependency_injector
 from utils.loggers import LoggerManager
-from utils.paths import ASSETS_DIR
 
 
 class Scene:

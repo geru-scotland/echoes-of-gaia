@@ -18,10 +18,9 @@
 from logging import Logger
 from typing import Dict, Any
 
-from biome.systems.maps.procedural_maps import MapGenData
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import TileMap
-from simulation.core.systems.events.event_bus import GlobalEventBus
+from simulation.core.systems.events.event_bus import SimulationEventBus
 from simulation.core.systems.events.handler import EventHandler
 from simulation.render.components import MapComponent
 from simulation.render.engine import RenderEngine
@@ -36,8 +35,8 @@ class RenderEventHandler(EventHandler):
         self._logger: Logger = LoggerManager.get_logger(Loggers.RENDER)
 
     def _register_events(self):
-        GlobalEventBus.register("biome_loaded", self.on_biome_loaded)
-        GlobalEventBus.register("simulation_finished", self.on_simulation_finished)
+        SimulationEventBus.register("biome_loaded", self.on_biome_loaded)
+        SimulationEventBus.register("simulation_finished", self.on_simulation_finished)
 
     def on_biome_loaded(self, tile_map: TileMap):
         self._logger.debug("[Render] Biome Loaded! Now biome image should be projected")

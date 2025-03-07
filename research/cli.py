@@ -19,14 +19,11 @@ import os
 import sys
 import argparse
 from enum import Enum, auto
-from threading import Thread
-from typing import Dict, List, Callable, Optional, TypedDict, Any, Tuple, Union
+from typing import Dict, Callable, Optional, TypedDict
 import subprocess
 
 from config.settings import Settings
-from shared.strings import Loggers
-from simulation.api.simulation_api import SimulationAPI
-from simulation.render.manager import RenderManager
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager, LogColors
 
 

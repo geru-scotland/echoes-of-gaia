@@ -23,9 +23,9 @@ from pygame import Surface
 import pygame
 import yaml
 
-from shared.enums import TerrainType
+from shared.enums.enums import TerrainType
 from shared.stores.biome_store import BiomeStore
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import TileMappings, TerrainSpritesMapping, TerrainList
 from utils.loggers import LoggerManager
 

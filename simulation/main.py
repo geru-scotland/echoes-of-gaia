@@ -20,7 +20,7 @@ from logging import Logger
 from threading import Thread
 
 from config.settings import Settings
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from simulation.api.simulation_api import SimulationAPI
 from simulation.render.manager import RenderManager
 from utils.loggers import LoggerManager

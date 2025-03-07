@@ -20,7 +20,7 @@ from typing import Optional, Dict, Any
 
 from stable_baselines3 import PPO
 
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 from utils.normalization.normalizer import climate_normalizer
 from utils.paths import get_model_path
@@ -42,7 +42,7 @@ class ReinforcementModel:
             self._logger.exception(f"Error loading model: {e}")
 
     def predict(self, observation: Optional[Dict[str, Any]] = None) -> int:
-        from shared.enums import WeatherEvent
+        from shared.enums.enums import WeatherEvent
 
         if  self._model is None:
             self._load_model()

@@ -15,12 +15,12 @@
 #                                                                              #
 # =============================================================================
 """
-from shared.base import EnumBaseInt
-
+from shared.enums.base import EnumBaseInt
 
 class Timers:
     class Agents(EnumBaseInt):
-        EVOLVE = 500
+        EVOLUTIONARY_CYCLE = 500
+        CLIMATE_UPDATE = 2 # 2 ticks = 1 día
 
     class Entity(EnumBaseInt):
         GROWTH = 25
@@ -33,4 +33,5 @@ class Timers:
         CLIMATE = 50
         TEMPERATURE = 10
 
-
+    class Simulation(EnumBaseInt):
+        MONTH = 30

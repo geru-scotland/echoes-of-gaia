@@ -22,7 +22,7 @@ import numpy as np
 from numpy import ndarray
 from pygame import Surface
 
-from shared.enums import TerrainType, Habitats
+from shared.enums.enums import TerrainType, Habitats
 
 if TYPE_CHECKING:
     pass

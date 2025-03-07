@@ -20,7 +20,8 @@ from typing import Optional
 from simpy import Environment as simpyEnv
 
 from biome.components.base.component import EntityComponent
-from shared.enums import ComponentType, Timers
+from shared.enums.enums import ComponentType
+from shared.timers import Timers
 
 
 class NutritionalValueComponent(EntityComponent):

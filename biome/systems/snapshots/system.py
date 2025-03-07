@@ -25,7 +25,7 @@ from biome.systems.snapshots.collector import SnapshotCollector
 from biome.systems.snapshots.config import SnapshotConfig
 from biome.systems.snapshots.data import SnapshotData
 from biome.systems.snapshots.storage import SnapshotStorage
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import CallbackType
 from utils.loggers import LoggerManager
 

@@ -19,7 +19,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict
 
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
 

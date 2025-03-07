@@ -15,7 +15,6 @@
 #                                                                        #
 ##########################################################################
 """
-import random
 from logging import Logger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -25,10 +24,10 @@ import numpy as np
 from numpy import ndarray
 from perlin_noise import PerlinNoise
 
-from shared.enums import TerrainType
-from shared.constants import MAP_DEFAULT_SIZE
+from shared.enums.enums import TerrainType
+from shared.enums.constants import MAP_DEFAULT_SIZE
 from shared.stores.biome_store import BiomeStore
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import TileMap, NoiseMap, TerrainList
 from exceptions.custom import MapGenerationError
 from utils.loggers import LoggerManager

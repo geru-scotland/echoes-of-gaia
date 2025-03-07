@@ -31,7 +31,8 @@ from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
-from shared.enums import Timers, Agents, AgentType, Season, WeatherEvent
+from shared.enums.enums import Agents, AgentType, Season, WeatherEvent
+from shared.timers import Timers
 from shared.types import EntityList, Observation
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.systems.telemetry.datapoint import Datapoint

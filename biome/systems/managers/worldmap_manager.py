@@ -30,9 +30,9 @@ from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
 from biome.entities.flora import Flora
 from biome.systems.maps.worldmap import WorldMap
-from shared.enums import FloraSpecies, FaunaSpecies, Habitats, TerrainType
+from shared.enums.enums import FloraSpecies, FaunaSpecies, Habitats, TerrainType
 from shared.stores.biome_store import BiomeStore
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import TileMap, EntityList, HabitatCache, BiomeStoreData, EntityDefinitions, EntityRegistry, \
     TerrainMap, EntityIndexMap, HabitatList
 from utils.loggers import LoggerManager

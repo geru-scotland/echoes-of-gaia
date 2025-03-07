@@ -25,10 +25,10 @@ import numpy as np
 from config.settings import BiomeSettings, Config
 from biome.systems.maps.procedural_maps import MapGenerator, MapGenData, PerlinNoiseGenerator
 from exceptions.custom import MapGenerationError
-from shared.constants import MAP_DEFAULT_SIZE
-from shared.enums import BiomeType
+from shared.enums.constants import MAP_DEFAULT_SIZE
+from shared.enums.enums import BiomeType
 from shared.stores.biome_store import BiomeStore
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import EntityDefinitions, TileMap
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy

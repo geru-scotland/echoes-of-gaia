@@ -18,7 +18,7 @@
 from typing import Dict, List, Any
 
 
-class GlobalEventBus:
+class SimulationEventBus:
     _listeners: Dict[str, List[Any]] = {}
 
     @classmethod

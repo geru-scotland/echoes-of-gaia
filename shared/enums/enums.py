@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from shared.base import EnumBaseStr, EnumBaseInt
+from shared.enums.base import EnumBaseStr, EnumBaseInt
 
 class BiomeType(EnumBaseStr):
     TROPICAL = "tropical"
@@ -72,24 +72,7 @@ class FaunaSpecies(EnumBaseStr):
     BOAR = "boar"
     FOX = "fox"
 
-class Timers:
-    class Agents(EnumBaseInt):
-        EVOLUTIONARY_CYCLE = 500
-        CLIMATE_UPDATE = 2 # 2 ticks = 1 día
 
-    class Entity(EnumBaseInt):
-        GROWTH = 25
-        NUTRITIONAL_VALUE_DECAY = 5
-        ENERGY = 3
-        AGING = 30
-        HEALTH_DECAY = 5
-
-    class Biome(EnumBaseInt):
-        CLIMATE = 50
-        TEMPERATURE = 10
-
-    class Simulation(EnumBaseInt):
-        MONTH = 30
 
 
 class Habitats:

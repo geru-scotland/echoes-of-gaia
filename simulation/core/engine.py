@@ -25,12 +25,12 @@ import simpy
 from biome.api.biome_api import BiomeAPI
 from biome.systems.data.data_manager import BiomeDataManager
 from config.settings import Settings
-from shared.enums import Timers
-from shared.strings import Strings, Loggers
+from shared.timers import Timers
+from shared.enums.strings import Strings, Loggers
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
-from simulation.core.systems.events.event_bus import GlobalEventBus
+from simulation.core.systems.events.event_bus import SimulationEventBus
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from simulation.core.systems.time.time import SimulationTime
 from utils.loggers import LoggerManager
@@ -67,7 +67,7 @@ class SimulationEngine:
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)
 
-            GlobalEventBus.trigger("biome_loaded", biome_context.tile_map)
+            SimulationEventBus.trigger("biome_loaded", biome_context.tile_map)
         except Exception as e:
             self._logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
             self._logger.exception(f"[Simulation Engine] There was an error bootstraping: {e}")
@@ -92,7 +92,7 @@ class SimulationEngine:
                     datapoint_id, simulated_timestamp
                 )
                 if biome_datapoint:
-                     GlobalEventBus.trigger("on_biome_data_collected", biome_datapoint)
+                     SimulationEventBus.trigger("on_biome_data_collected", biome_datapoint)
 
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)

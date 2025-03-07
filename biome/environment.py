@@ -22,7 +22,7 @@ from typing import TypeVar, Generic
 from simpy import Environment as simpyEnv
 
 from biome.components.base.component import Component
-from shared.enums import ComponentType
+from shared.enums.enums import ComponentType
 from shared.types import EntityList, ComponentDict
 from simulation.core.bootstrap.context.context_data import ContextData
 from utils.loggers import LoggerManager
