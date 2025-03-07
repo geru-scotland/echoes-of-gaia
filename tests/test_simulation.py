@@ -16,7 +16,11 @@
 ##########################################################################
 """
 import pytest
-pytestmark = pytest.mark.skip(reason="Skipping test_simulation.py to avoid stable_baselines3 dependency")
+import importlib.util
+
+if importlib.util.find_spec("stable_baselines3") is None:
+    pytest.skip("Skipping test_simulation.py because stable_baselines3 is not installed", allow_module_level=True)
+
 
 from unittest.mock import patch, MagicMock
 
