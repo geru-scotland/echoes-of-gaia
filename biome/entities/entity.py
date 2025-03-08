@@ -25,7 +25,7 @@ from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
 from biome.systems.events.event_notifier import EventNotifier
 from biome.systems.state.handler import StateHandler
-from shared.enums.enums import ComponentType
+from shared.enums.enums import ComponentType, EntityType
 from shared.enums.events import ComponentEvent
 from shared.enums.strings import Loggers
 from shared.types import ComponentDict, HabitatList
@@ -51,6 +51,7 @@ class Entity(EventHandler, StateHandler, ABC):
         self._event_notifier.register(ComponentEvent.UPDATE_STATE, self.handle_component_update)
 
     def add_component(self, component: EntityComponent):
+        self._logger.warning(f"Adding component to {self._descriptor.species}: {component.type}")
         self._components[component.type] = component
         component.set_event_notifier(self._event_notifier)
 

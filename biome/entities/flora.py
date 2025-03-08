@@ -32,7 +32,7 @@ class Flora(Entity):
         self._flora_type: FloraSpecies = flora_type
 
     def _register_events(self):
-        pass
+        super()._register_events() 
 
     def compute_state(self):
         pass

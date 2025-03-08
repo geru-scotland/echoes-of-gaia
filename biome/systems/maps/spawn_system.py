@@ -41,6 +41,7 @@ class SpawnSystem:
     def __init__(self, env: simpyEnv, tile_map: TileMap):
         self._flora_registry: EntityRegistry = {}
         self._fauna_registry: EntityRegistry = {}
+        self._main_registry: EntityRegistry = {}
         self._entity_index_map: EntityIndexMap = np.full(tile_map.shape, -1, dtype=int)
         self._id_generator = itertools.count(0)
         self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
@@ -61,7 +62,7 @@ class SpawnSystem:
             kernel_neighbour: ndarray = np.array([[1, 1, 1],
                                                      [1, 0, 1],
                                                      [1, 1, 1]])
-            
+
             # expando en +1 todos los lados, para que no tenga que ser justo la casilla adyacente
             kernel_expanded = np.pad(kernel_neighbour, pad_width=1, mode='constant', constant_values=1)
             for habitat, rules in habitat_data.items():
@@ -256,6 +257,8 @@ class SpawnSystem:
             elif entity_class == Fauna:
                 self._fauna_registry[entity.get_id()] = entity
 
+            self._main_registry[entity.get_id()] = entity
+
             return entity
 
         return None
@@ -263,9 +266,10 @@ class SpawnSystem:
     def spawn(self, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
         self._flora_registry = self._create_entities(flora_spawns, Flora, FloraSpecies, BiomeStore.flora)
         self._fauna_registry = self._create_entities(fauna_spawns, Fauna, FaunaSpecies, BiomeStore.fauna)
+        self._main_registry = {**self._flora_registry, **self._fauna_registry}
 
     def get_entity_registry(self) -> EntityRegistry:
-        return {**self._flora_registry, **self._fauna_registry}
+        return self._main_registry
 
     def get_entity_index_map(self) -> EntityIndexMap:
         return self._entity_index_map

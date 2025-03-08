@@ -35,7 +35,7 @@ class Fauna(Entity):
         self._habitats: HabitatList = habitats
 
     def _register_events(self):
-        pass
+        super()._register_events()
 
     def dump_components(self) -> None:
         pass
