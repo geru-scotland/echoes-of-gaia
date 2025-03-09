@@ -7,38 +7,17 @@ biome:
   type: "taiga"
   flora:
     - species: "oak_tree"
-      spawns: 300
+      spawns: 1
       components:
         - GrowthComponent:
-            growth_rate: 0.3
-        - NutritionalValueComponent:
-            nutritive_value: 0.4
-            nutritional_decay_rate: 0.1
+             lifespan:  1 # En años lo pongo
 
     - species: "bramble"
-      spawns: 5
-      components:
-        - DefenseComponent:
-        - NutritionalValueComponent:
-            nutritive_value: 0.9
-            toxicity: 99
+      spawns: 1
 
     - species: "mushroom"
-      spawns: 350
+      spawns: 1
 
   fauna:
     - species: "deer"
-      spawns: 110
-      components:
-        - NutritionalValueComponent:
-        - GrowthComponent:
-        - VitalComponent:
-    - species: "boar"
-      spawns: 50
-      components:
-        - NutritionalValueComponent:
-    - species: "fox"
-      spawns: 40
-      components:
-        - NutritionalValueComponent:
-        - GrowthComponent:
+      spawns: 1

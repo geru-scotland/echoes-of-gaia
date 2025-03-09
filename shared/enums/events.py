@@ -20,11 +20,21 @@ from shared.enums.base import EnumBaseStr
 
 class ComponentEvent(EnumBaseStr):
     UPDATE_STATE = "on_component_update"
+    STAGE_CHANGE = "on_stage_change"
+    SIZE_CHANGE = "on_size_change"
+    MODIFIER_CHANGE = "on_modifier_change"
+    STRESS_CHANGE = "on_stress_change"
+    CLIMATE_RESPONSE = "on_climate_response"
+    FLORA_CONSUMED = "on_flora_consumed"
+    DORMANCY_CHANGE = "on_dormancy_change"
+    ENTITY_DEATH = "entity_death"
+    COLD_WEATHER = "cold_weather"
 
 class BiomeEvent(EnumBaseStr):
     CREATE_ENTITY = "create_entity"
     REMOVE_ENTITY = "remove_entity"
 
     CLIMATE_CHANGE = "climate_change"
+    WEATHER_CHANGE = "on_weather_change"
     SEASON_CHANGE = "season_change"
     DISASTER = "disaster"

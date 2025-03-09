@@ -100,7 +100,7 @@ class SimulationEngine:
     @log_execution_time(context="Simulation executed in")
     def run(self):
         self._logger.info("Running simulation...")
-        self._env.process(self._montly_update(Timers.Simulation.MONTH))
+        self._env.process(self._montly_update(Timers.Calendar.MONTH))
         self._time.log_time(self._env.now)
         self._env.run(until=self._eras * self._events_per_era)
 

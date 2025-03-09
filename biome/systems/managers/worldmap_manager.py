@@ -41,7 +41,7 @@ class WorldMapManager:
 
         try:
             self._spawn_system = SpawnSystem(env, tile_map)
-            self._spawn_system.spawn(flora_definitions, fauna_definitions)
+            self._spawn_system.initial_spawns(flora_definitions, fauna_definitions)
             # quitar habitatds de worldmap, no compete al mapa tener las especificaciones
             # quizá, como mucho, habitat cache
             self._entity_registry: EntityRegistry = self._spawn_system.get_entity_registry()
@@ -54,7 +54,8 @@ class WorldMapManager:
     def add_entity(self, entity: Entity):
         pass
 
-    def remove_entity(self, entity: Entity):
+    def remove_entity(self, entity_species: str):
+        # TODO: entity_species está str com placeholder, definir bien esto en enums.
         pass
 
     def get_world_map(self):

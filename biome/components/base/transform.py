@@ -19,14 +19,18 @@ from typing import Tuple
 
 from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
+from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 
 
 class TransformComponent(EntityComponent):
-    def __init__(self, env: simpyEnv = None, x: int = -1, y: int = -1):
-        super().__init__(ComponentType.TRANSFORM, env)
+    def __init__(self, env: simpyEnv = None, event_notifier: EventNotifier = None, x: int = -1, y: int = -1):
+        super().__init__(env, ComponentType.TRANSFORM, event_notifier)
         self.x = x
         self.y = y
+
+    def _register_events(self):
+        pass
 
     def get_position(self) -> Tuple[int, int]:
         return self.x, self.y

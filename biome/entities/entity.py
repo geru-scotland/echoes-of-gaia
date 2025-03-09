@@ -17,16 +17,19 @@
 """
 from logging import Logger
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Type
+from typing import Any, Dict, Type, Optional
 
 from simpy import Environment as simpyEnv
 
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
+from biome.services.climate_service import ClimateService
+from biome.systems.climate.system import ClimateSystem
+from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.events.event_notifier import EventNotifier
 from biome.systems.state.handler import StateHandler
 from shared.enums.enums import ComponentType, EntityType
-from shared.enums.events import ComponentEvent
+from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.enums.strings import Loggers
 from shared.types import ComponentDict, HabitatList
 from shared.events.handler import EventHandler
@@ -50,10 +53,18 @@ class Entity(EventHandler, StateHandler, ABC):
     def _register_events(self):
         self._event_notifier.register(ComponentEvent.UPDATE_STATE, self.handle_component_update)
 
+        # BiomeEventBus ahora
+        BiomeEventBus.register(BiomeEvent.WEATHER_CHANGE, self._handle_weather_change)
+
+    def _handle_weather_change(self):
+        state: Optional[ClimateSystem] = ClimateService.query_state()
+        if state:
+            if state.temperature < 5:
+                self._event_notifier.notify(ComponentEvent.COLD_WEATHER, temperature=state.temperature)
+
     def add_component(self, component: EntityComponent):
         self._logger.warning(f"Adding component to {self._descriptor.species}: {component.type}")
         self._components[component.type] = component
-        component.set_event_notifier(self._event_notifier)
 
     def get_component(self, type: ComponentType):
         return self._components.get(type, None)
@@ -75,7 +86,7 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def handle_component_update(self, component_class: Type, **kwargs: Any):
         if kwargs:
-            self._logger.debug(f"[Sim tick: {self._env.now}] Updating entity: {self._descriptor.species} ({self._descriptor.entity_type}),"
+            self._logger.debug(f"[Sim tick: {self._env.now} (called in: {kwargs.get("tick")})] Updating entity: {self._descriptor.species} (id: {self._id}) ({self._descriptor.entity_type}),"
                                f" [component: {component_class.__name__}]: {kwargs}")
             for key, value in kwargs.items():
                 self._state.update(key, value)
@@ -102,6 +113,10 @@ class Entity(EventHandler, StateHandler, ABC):
     @property
     def type(self):
         return self.get_type()
+
+    @property
+    def event_notifier(self):
+        return self._event_notifier
 
     def update(self):
         pass

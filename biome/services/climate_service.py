@@ -15,16 +15,18 @@
 #                                                                              #
 # =============================================================================
 """
+from typing import Optional
+
 from biome.systems.climate.state import ClimateState
 
 
 class ClimateService:
-    state: ClimateState
+    state: Optional[ClimateState] = None
 
     @classmethod
     def init_service(cls, state_ref: ClimateState):
         cls.state = state_ref
 
     @classmethod
-    def query_state(cls) -> ClimateState:
-        return cls.state
+    def query_state(cls) -> Optional[ClimateState]:
+        return cls.state if cls.state else None

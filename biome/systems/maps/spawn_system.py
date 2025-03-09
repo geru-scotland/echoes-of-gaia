@@ -214,8 +214,8 @@ class SpawnSystem:
         entity.set_position(selected_position[0], selected_position[1])
         return True
 
-    def create_entity(self, entity_class, entity_species_enum, species_name: str,
-                      custom_components: List[Dict] = None, biome_store=None) -> Optional[Entity]:
+    def spawn(self, entity_class, entity_species_enum, species_name: str,
+              custom_components: List[Dict] = None, biome_store=None) -> Optional[Entity]:
         if biome_store is None:
             if entity_class == Flora:
                 biome_store = BiomeStore.flora
@@ -263,7 +263,7 @@ class SpawnSystem:
 
         return None
 
-    def spawn(self, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
+    def initial_spawns(self, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
         self._flora_registry = self._create_entities(flora_spawns, Flora, FloraSpecies, BiomeStore.flora)
         self._fauna_registry = self._create_entities(fauna_spawns, Fauna, FaunaSpecies, BiomeStore.fauna)
         self._main_registry = {**self._flora_registry, **self._fauna_registry}
