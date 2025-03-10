@@ -4,13 +4,14 @@ biome:
     size:
       - 60 # width
       - 60 # height
-  type: "taiga"
+  type: "tropical"
   flora:
     - species: "oak_tree"
       spawns: 1
+      avg-lifespan: 4 # En años lo pongo
       components:
         - GrowthComponent:
-             lifespan:  1 # En años lo pongo
+        - VitalComponent:
 
     - species: "bramble"
       spawns: 1

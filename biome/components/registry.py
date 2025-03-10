@@ -22,6 +22,7 @@ from biome.components.physiological.vital import VitalComponent
 
 CLASS_REGISTRY = {
     "GrowthComponent": GrowthComponent,
+    "VitalComponent": VitalComponent,
     "TransformComponent": TransformComponent,
 }
 

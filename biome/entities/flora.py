@@ -21,6 +21,7 @@ from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
 from shared.enums.enums import FloraSpecies
+from shared.enums.events import ComponentEvent
 from shared.types import HabitatList
 
 
@@ -32,7 +33,14 @@ class Flora(Entity):
         self._flora_type: FloraSpecies = flora_type
 
     def _register_events(self):
-        super()._register_events() 
+        super()._register_events()
+        self._event_notifier.register(ComponentEvent.DORMANCY_CHANGE, self._handle_dormancy)
+
+    def _handle_dormancy(self, *args, **kwargs):
+        is_dormant: bool = kwargs.get("is_dormant", False)
+        if is_dormant:
+            self._logger.error("WENT DORMANT")
+            print("WENT DORMANT!!")
 
     def compute_state(self):
         pass

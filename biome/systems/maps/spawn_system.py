@@ -16,6 +16,7 @@
 # =============================================================================
 """
 import itertools
+import random
 from logging import Logger
 from typing import List, Dict, Optional
 
@@ -24,6 +25,8 @@ from numpy import ndarray
 from simpy import Environment as simpyEnv
 from scipy.ndimage import convolve
 
+from biome.components.physiological.growth import GrowthComponent
+from biome.components.physiological.vital import VitalComponent
 from biome.components.registry import get_component_class
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
@@ -102,7 +105,7 @@ class SpawnSystem:
             self._logger.error(f"Error precomputing habitat cache: {e}")
 
     def _create_single_entity(self, entity_class, entity_species, habitats: HabitatList,
-                              components: List[Dict]) -> Optional[Entity]:
+                              lifespan: float, components: List[Dict]) -> Optional[Entity]:
         entity_id: int = next(self._id_generator)
         entity: Entity = entity_class(entity_id, self._env, entity_species, habitats)
 
@@ -124,8 +127,12 @@ class SpawnSystem:
 
                 if data:
                     component_class = get_component_class(class_name)
+
+                    if component_class in [GrowthComponent, VitalComponent]:
+                        data.update({"lifespan": lifespan})
+
                     if component_class:
-                        component_instance = component_class(self._env, **data)
+                        component_instance = component_class(self._env, entity.event_notifier, **data)
                         self._logger.debug(
                             f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                         entity.add_component(component_instance)
@@ -150,10 +157,13 @@ class SpawnSystem:
             try:
                 entity_species = entity_species_enum(str(spawn.get("species")).lower())
                 habitats: HabitatList = biome_store.get(entity_species, {}).get("habitat", {})
-                amount = spawn.get("spawns")
+                amount: int  = spawn.get("spawns")
+                lifespan: float = spawn.get("avg-lifespan", random.randint(1, 20))
 
                 if amount < 1 or amount > 350:
                     raise ValueError(f"Invalid spawn amount: {amount}. Must be between 1 and 150.")
+                if lifespan <= 0:
+                    raise ValueError(f"Invalid avg-lifespan amount: {lifespan}. Must be higher than 0")
             except (AttributeError, ValueError) as e:
                 self._logger.exception(f"There was an error loading {entity_class.__name__} spawns: {e}")
                 continue
@@ -173,7 +183,7 @@ class SpawnSystem:
 
             for _ in range(amount):
                 entity = self._create_single_entity(
-                    entity_class, entity_species, habitats, components)
+                    entity_class, entity_species, habitats, lifespan, components)
                 if entity:
                     entity_registry[entity.get_id()] = entity
 

@@ -17,10 +17,10 @@
 """
 from typing import Optional, List
 
-import math
 from simpy import Environment as simpyEnv
 
 from biome.components.base.component import EntityComponent
+from biome.components.biological_patterns import BiologicalGrowthPatterns
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.state import ClimateState
 from biome.systems.events.event_notifier import EventNotifier
@@ -28,20 +28,6 @@ from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.timers import Timers
 
-class BiologicalGrowthPatterns:
-
-    @staticmethod
-    def sigmoid_growth_curve(relative_age: float, curve_steepness: float = 10) -> float:
-        min_bound = 1 / (1 + math.exp(curve_steepness / 2))
-        max_bound = 1 / (1 + math.exp(-curve_steepness / 2))
-
-        raw_growth_value = 1 / (1 + math.exp(-curve_steepness * (relative_age - 0.5)))
-
-        return (raw_growth_value - min_bound) / (max_bound - min_bound)
-
-    @staticmethod
-    def von_bertalanffy_growth(relative_age: float, growth_constant: float = 2.0) -> float:
-        return 1.0 - math.exp(-growth_constant * relative_age)
 
 class GrowthComponent(EntityComponent):
     def __init__(self, env: simpyEnv,
@@ -109,8 +95,8 @@ class GrowthComponent(EntityComponent):
 
                 # Quiero transformar el tiempo lineal, que aumenta constantemente, en un patrón
                 # de crecimiento biológico NO lienal (ya sabes, S)
-                non_lineal_growth_completion_ratio = BiologicalGrowthPatterns.sigmoid_growth_curve(biological_age_ratio_with_mods)
-                self._current_size = self._initial_size + (self._max_size - self._initial_size) * non_lineal_growth_completion_ratio
+                non_linear_growth_completion_ratio = BiologicalGrowthPatterns.sigmoid_growth_curve(biological_age_ratio_with_mods)
+                self._current_size = self._initial_size + (self._max_size - self._initial_size) * non_linear_growth_completion_ratio
 
                 self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
                                             current_size=self._current_size, tick=self._env.now)
@@ -129,10 +115,8 @@ class GrowthComponent(EntityComponent):
 
     def _log_data(self, message: Optional[str]):
         if message:
-            self._logger.debug(message)
-        state: ClimateState = ClimateService.query_state()
-        if state:
-            self._logger.info(f"Temperature: {state.temperature}")
+            self._logger.info(message)
+
         self._logger.info(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
                       f"Size={self._current_size}/{self._max_size}, "
                       f"Efficiency={self._growth_efficiency}")
