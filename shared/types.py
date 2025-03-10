@@ -20,7 +20,6 @@ from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional, Callable
 
 import numpy as np
 from numpy import ndarray
-from pygame import Surface
 
 from shared.enums.enums import TerrainType, Habitats
 
@@ -32,7 +31,7 @@ if TYPE_CHECKING:
 # Coordenadas y mapeoss de terrenos
 Coords = Tuple[int, int]
 TileMappings = Dict[TerrainType, List[Coords]]
-TerrainSpritesMapping = Dict[TerrainType, List[Surface]]
+TerrainSpritesMapping = Dict[TerrainType, List[Any]]
 
 # Listas
 EntityList = List["Entity"]

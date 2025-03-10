@@ -48,6 +48,7 @@ class GrowthComponent(EntityComponent):
         self._current_size: float = round(current_size, 3)
         self._max_size: float = round(max_size, 3)
 
+        self._is_dormant: bool = False
         self._growth_modifier: float = growth_modifier # Este lo cambio SOLO por evolución
         # Y este, es el que modifico por estrés, clima,
         # enfermedades... es cómo de bien convierte recursos
@@ -61,6 +62,7 @@ class GrowthComponent(EntityComponent):
 
     def _register_events(self):
         self._event_notifier.register(ComponentEvent.COLD_WEATHER, self._handle_cold_weather)
+        self._event_notifier.register(ComponentEvent.DORMANCY_TOGGLE, self._handle_dormancy_update)
 
     def _calculate_stage_thresholds(self) -> List[float]:
         return [self._max_size * (i / self._total_stages) for i in range(1, self._total_stages + 1)]
@@ -74,6 +76,9 @@ class GrowthComponent(EntityComponent):
         self._growth_efficiency: float = max(0.0, modifier)
         self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
                                     growth_efficiency=self._growth_efficiency)
+
+    def _handle_dormancy_update(self):
+        self._is_dormant = not self._is_dormant
 
     def _handle_cold_weather(self, *args, **kwargs):
         if self._growth_stage == self._total_stages:
@@ -115,24 +120,8 @@ class GrowthComponent(EntityComponent):
 
     def _log_data(self, message: Optional[str]):
         if message:
-            self._logger.info(message)
+            self._logger.debug(message)
 
-        self._logger.info(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
+        self._logger.debug(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
                       f"Size={self._current_size}/{self._max_size}, "
                       f"Efficiency={self._growth_efficiency}")
-
-    @property
-    def current_size(self) -> float:
-        return self._current_size
-
-    @property
-    def growth_stage(self) -> int:
-        return self._growth_stage
-
-    @property
-    def max_size(self) -> float:
-        return self._max_size
-
-    @property
-    def is_mature(self) -> bool:
-        return self._growth_stage == self._total_stages - 1

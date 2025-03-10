@@ -26,7 +26,8 @@ class ComponentEvent(EnumBaseStr):
     STRESS_CHANGE = "on_stress_change"
     CLIMATE_RESPONSE = "on_climate_response"
     FLORA_CONSUMED = "on_flora_consumed"
-    DORMANCY_CHANGE = "on_dormancy_change"
+    DORMANCY_TOGGLE = "on_dormancy_toggle"
+    DORMANCY_UPDATED = "on_dormancy_updated"
     ENTITY_DEATH = "entity_death"
     COLD_WEATHER = "cold_weather"
 
