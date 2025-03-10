@@ -70,7 +70,7 @@ class VitalComponent(FloraComponent):
     def _update_health(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._logger.error(f"{self.__class__}: is_dormant = {self._is_dormant}")
+
             if not self._is_dormant:
                 completed_lifespan_ratio: float = min(1.0, self._biological_age / self._lifespan_in_days)
                 completed_lifespan_ratio_with_mods: float = completed_lifespan_ratio * self._health_modifier

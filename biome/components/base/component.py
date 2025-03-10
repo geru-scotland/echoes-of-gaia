@@ -96,6 +96,8 @@ class FloraComponent(EntityComponent):
         if active:
             self._dormancy_reasons.add(reason)
         else:
+            if not self._dormancy_reasons:
+                return
             self._dormancy_reasons.discard(reason)
 
         self._event_notifier.notify(ComponentEvent.DORMANCY_REASONS_CHANGED,

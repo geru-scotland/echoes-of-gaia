@@ -85,7 +85,6 @@ class GrowthComponent(FloraComponent):
         while True:
             if self._current_size < self._max_size:
 
-                self._logger.error(f"{self.__class__}: is_dormant = {self._is_dormant}")
                 biological_age_ratio: float = self._env.now / self._lifespan_in_ticks
                 biological_age_ratio_with_mods =  biological_age_ratio * self._growth_modifier * self._growth_efficiency
                 biological_age_ratio_with_mods = min(1.0, biological_age_ratio_with_mods)

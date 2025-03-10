@@ -34,28 +34,30 @@ class Flora(Entity):
         self._logger.debug(f"Flora entity initialized: {flora_type}")
         self._component_dormancy_reasons: Dict[Type, Set[DormancyReason]] = {}
         self._flora_type: FloraSpecies = flora_type
-        self._is_dormant = False
+        self._state.update("is_dormant", False)
 
     def _register_events(self):
         super()._register_events()
         self._event_notifier.register(ComponentEvent.DORMANCY_REASONS_CHANGED, self._handle_dormancy_reasons_changed)
 
     def _handle_dormancy_reasons_changed(self, component: Type, reasons: Set[DormancyReason]) -> None:
+        self._logger.warning(f"Component: {component} Reason: {reasons}")
         self._component_dormancy_reasons[component] = reasons
 
         self._update_dormancy_state()
 
     def _update_dormancy_state(self) -> None:
+        self._logger.warning(self._state)
         any_dormancy_reason = any(
             len(reasons) > 0
             for reasons in self._component_dormancy_reasons.values()
         )
 
-        if any_dormancy_reason != self._is_dormant:
-            self._is_dormant = any_dormancy_reason
+        if any_dormancy_reason != self._state.get("is_dormant"):
+            self._state.update("is_dormant", any_dormancy_reason)
 
             self._event_notifier.notify(ComponentEvent.DORMANCY_UPDATED,
-                                        dormant=self._is_dormant)
+                                        dormant=any_dormancy_reason)
 
     def _handle_toggle_dormancy(self, *args, **kwargs) -> None:
         dormant: bool = kwargs.get("dormant", False)

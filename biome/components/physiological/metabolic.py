@@ -60,7 +60,7 @@ class MetabolicComponent(FloraComponent):
             # aunque bajo minimos - pero así, puede recuperar algo de energia
             # y salir de dormancia, que antes se me quedaba siempre dormidica.
             photosynthesis_factor: float = 1.0 if not self._is_dormant else 0.15
-            self._logger.error(f"{self.__class__}: is_dormant = {self._is_dormant}")
+
             effective_photosynthesis: float = (
                     self._photosynthesis_efficiency *
                     self._light_availability *
@@ -108,16 +108,16 @@ class MetabolicComponent(FloraComponent):
                 )
             self._logger.info(
                 f"[Metabolic Update] [Tick: {self._env.now}] "
-                f"Energy: {self._energy_reserves:.2f}/{self._max_energy_reserves:.2f}, "
-                f"Photosynthesis: Eff={self._photosynthesis_efficiency:.2f}, "
-                f"Light={self._light_availability:.2f}, "
-                f"Temp Mod={self._temperature_modifier:.2f}, "
-                f"Water Mod={self._water_modifier:.2f}, "
-                f"Activity={self._metabolic_activity:.2f}, "
-                f"Effective Photo={effective_photosynthesis:.2f}, "
-                f"Respiration: Rate={self._respiration_rate:.2f}, "
-                f"Effective Resp={effective_respiration:.2f}, "
-                f"Energy Change={energy_change:.2f}, "
+                f"Energy: {self._energy_reserves:.3f}/{self._max_energy_reserves:.3f}, "
+                f"Photosynthesis: Eff={self._photosynthesis_efficiency:.3f}, "
+                f"Light={self._light_availability:.3f}, "
+                f"Temp Mod={self._temperature_modifier:.3f}, "
+                f"Water Mod={self._water_modifier:.3f}, "
+                f"Activity={self._metabolic_activity:.3f}, "
+                f"Effective Photo={effective_photosynthesis:.3f}, "
+                f"Respiration: Rate={self._respiration_rate:.3f}, "
+                f"Effective Resp={effective_respiration:.3f}, "
+                f"Energy Change={energy_change:.3f}, "
                 f"Dormant={self._is_dormant}"
             )
             yield self._env.timeout(timer)
