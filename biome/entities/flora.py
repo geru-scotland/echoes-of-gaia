@@ -31,16 +31,18 @@ class Flora(Entity):
         super().__init__(id, env, descriptor, habitats)
         self._logger.debug(f"Flora entity initialized: {flora_type}")
         self._flora_type: FloraSpecies = flora_type
+        self._is_dormant: bool = False
 
     def _register_events(self):
         super()._register_events()
-        self._event_notifier.register(ComponentEvent.DORMANCY_CHANGE, self._handle_dormancy)
+        self._event_notifier.register(ComponentEvent.DORMANCY_TOGGLE, self._handle_toggle_dormancy)
 
-    def _handle_dormancy(self, *args, **kwargs):
-        is_dormant: bool = kwargs.get("is_dormant", False)
-        if is_dormant:
-            self._logger.error("WENT DORMANT")
-            print("WENT DORMANT!!")
+    def _handle_toggle_dormancy(self, *args, **kwargs) -> None:
+        dormant: bool = kwargs.get("dormant", False)
+        if self._is_dormant != dormant:
+            self._is_dormant = dormant
+            # Sincronizo a todos los componentes.
+            self._event_notifier.notify(ComponentEvent.DORMANCY_UPDATED)
 
     def compute_state(self):
         pass

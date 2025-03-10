@@ -19,7 +19,7 @@ from typing import Optional, List
 
 from simpy import Environment as simpyEnv
 
-from biome.components.base.component import EntityComponent
+from biome.components.base.component import EntityComponent, FloraComponentHandler
 from biome.components.biological_patterns import BiologicalGrowthPatterns
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.state import ClimateState
@@ -29,7 +29,7 @@ from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.timers import Timers
 
 
-class GrowthComponent(EntityComponent):
+class GrowthComponent(EntityComponent, FloraComponentHandler):
     def __init__(self, env: simpyEnv,
                  event_notifier: EventNotifier,
                  lifespan: float = 15.0,
@@ -39,7 +39,8 @@ class GrowthComponent(EntityComponent):
                  max_size: float = 3.0,
                  growth_modifier: float = 1.0,
                  growth_efficiency: float = 0.85):
-        super().__init__(env, ComponentType.GROWTH, event_notifier)
+        EntityComponent.__init__(self, env, ComponentType.GROWTH, event_notifier)
+        FloraComponentHandler.__init__(self, event_notifier)
 
         self._lifespan_in_ticks: float = lifespan * float(Timers.Calendar.YEAR)
         self._growth_stage: int = growth_stage
@@ -60,6 +61,7 @@ class GrowthComponent(EntityComponent):
         self._env.process(self._update_growth(Timers.Compoments.Physiological.GROWTH))
 
     def _register_events(self):
+        FloraComponentHandler.register_events(self)
         self._event_notifier.register(ComponentEvent.COLD_WEATHER, self._handle_cold_weather)
 
     def _calculate_stage_thresholds(self) -> List[float]:
@@ -74,6 +76,7 @@ class GrowthComponent(EntityComponent):
         self._growth_efficiency: float = max(0.0, modifier)
         self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
                                     growth_efficiency=self._growth_efficiency)
+
 
     def _handle_cold_weather(self, *args, **kwargs):
         if self._growth_stage == self._total_stages:
@@ -115,24 +118,8 @@ class GrowthComponent(EntityComponent):
 
     def _log_data(self, message: Optional[str]):
         if message:
-            self._logger.info(message)
+            self._logger.debug(message)
 
-        self._logger.info(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
+        self._logger.debug(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
                       f"Size={self._current_size}/{self._max_size}, "
                       f"Efficiency={self._growth_efficiency}")
-
-    @property
-    def current_size(self) -> float:
-        return self._current_size
-
-    @property
-    def growth_stage(self) -> int:
-        return self._growth_stage
-
-    @property
-    def max_size(self) -> float:
-        return self._max_size
-
-    @property
-    def is_mature(self) -> bool:
-        return self._growth_stage == self._total_stages - 1

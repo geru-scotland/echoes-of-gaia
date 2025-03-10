@@ -23,6 +23,7 @@ from simpy import Environment as simpyEnv
 
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
+from shared.enums.events import ComponentEvent
 from shared.enums.strings import Loggers
 from shared.events.handler import EventHandler
 from utils.loggers import LoggerManager
@@ -74,7 +75,16 @@ class EntityComponent(Component, EventHandler):
     def _update(self, delay: Optional[int] = None):
         pass
 
+class FloraComponentHandler:
+    def __init__(self, event_notifier: EventNotifier):
+        self._event_notifier: EventNotifier = event_notifier
+        self._is_dormant: bool = False
 
+    def register_events(self):
+        self._event_notifier.register(ComponentEvent.DORMANCY_UPDATED, self._handle_dormancy_update)
+
+    def _handle_dormancy_update(self):
+        self._is_dormant = not self._is_dormant
 
 
 

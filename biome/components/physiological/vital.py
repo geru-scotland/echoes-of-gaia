@@ -21,7 +21,7 @@ from typing import Optional, List, Tuple
 import numpy as np
 from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
-from biome.components.base.component import EntityComponent
+from biome.components.base.component import EntityComponent, FloraComponentHandler
 from biome.components.biological_patterns import BiologicalGrowthPatterns
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.state import ClimateState
@@ -31,7 +31,7 @@ from shared.enums.events import ComponentEvent
 from shared.timers import Timers
 
 
-class VitalComponent(EntityComponent):
+class VitalComponent(EntityComponent, FloraComponentHandler):
     def __init__(self, env: simpyEnv,
                  event_notifier: EventNotifier,
                  lifespan: float = 15.0,
@@ -39,18 +39,17 @@ class VitalComponent(EntityComponent):
                  max_vitality: float = 100.0,
                  age: float = 0.0,
                  aging_rate: float = 1.0,
-                 dormancy_threshold: float = 25.0,
-                 is_dormant: bool = False):
-        super().__init__(env, ComponentType.VITAL, event_notifier)
+                 dormancy_threshold: float = 25.0):
+        EntityComponent.__init__(self, env, ComponentType.VITAL, event_notifier)
+        FloraComponentHandler.__init__(self, event_notifier)
 
         self._lifespan_in_days: int = int((lifespan * float(Timers.Calendar.YEAR)) / float(Timers.Calendar.DAY))
         self._vitality: float = round(vitality, 2)
         self._max_vitality: float = round(max_vitality, 2)
         self._age: float = age
         self._aging_rate: float = aging_rate
-        self._biological_age: float = self.age * aging_rate
+        self._biological_age: float = self._age * aging_rate
         self._dormancy_threshold: float = round(dormancy_threshold, 2)
-        self._is_dormant: bool = is_dormant
 
         self._health_modifier: float = 1.0
         self._vitality_history: List[Tuple[float, float]] = []  # (age, vitality)
@@ -61,7 +60,7 @@ class VitalComponent(EntityComponent):
         self._env.process(self._update_health(Timers.Compoments.Physiological.HEALTH_DECAY))
 
     def _register_events(self):
-        pass
+        FloraComponentHandler.register_events(self)
 
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
@@ -82,7 +81,7 @@ class VitalComponent(EntityComponent):
                 non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(completed_lifespan_ratio_with_mods)
 
                 new_health = self._max_vitality * (1.0 - non_linear_aging_progression)
-                self._logger.info(
+                self._logger.debug(
                     f"[DEBUG:Tick={self._env.now}] Health Update | Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_days}, "
                     f"Completed Ratio: {completed_lifespan_ratio:.2f}, Aging Progression: {non_linear_aging_progression:.2f}, "
                     f"Health Modifier: {self._health_modifier} "
@@ -90,24 +89,41 @@ class VitalComponent(EntityComponent):
                 )
 
                 self._vitality = max(0, new_health)
-                self._logger.info(f"VITAL: {self._vitality}")
                 self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
                 age_in_years = self._age / 365.0
                 self._vitality_history.append((age_in_years, self._vitality))
                 # TODO: Gestionar en entity, pensar bien la logíca del bloque general de updates
                 # si entra en dormancy.
-                # if self._vitality <= self._dormancy_threshold and not self._is_dormant:
-                #     self._logger.warning(f"GOING DORMANT, THRESHOLD: {self._dormancy_threshold}")
-                #     self.toggle_dormancy(dormant=True)
+                if self._vitality <= self._dormancy_threshold and not self._is_dormant:
+                     self._event_notifier.notify(ComponentEvent.DORMANCY_TOGGLE, dormant=True)
 
-
+                # TODO: Mejorar umbral, con Gompertz me hace falta
                 if self._vitality <= 0.0018:
                     # TODO: Death. Gestionar en entity
                     self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, VitalComponent)
-                    self.plot_vitality_curve()
                     break
 
             yield self._env.timeout(timer)
+
+    def apply_damage(self, amount: float) -> None:
+        # Hervíboros comiendo, tiemps extremos...etc
+        self._vitality -= amount * self._biological_age
+        self._vitality = max(0.0, self._vitality)
+
+        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
+
+        if self._vitality <= 0:
+            self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, VitalComponent)
+
+    def apply_healing(self, amount: float) -> None:
+        # clima favorable, que aplique heals
+        self._vitality += amount * (1 - self._biological_age)
+        self._vitality = min(self._vitality, self._max_vitality)
+
+        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
+
+    def set_health_modifier(self, modifier: float) -> None:
+        self._health_modifier = max(0.0, modifier)
 
     def plot_vitality_curve(self) -> None:
         if not self._vitality_history:
@@ -157,45 +173,3 @@ class VitalComponent(EntityComponent):
 
         plt.tight_layout()
         plt.show()
-
-    def apply_damage(self, amount: float) -> None:
-        # Hervíboros comiendo, tiemps extremos...etc
-        self._vitality -= amount * self._biological_age
-        self._vitality = max(0.0, self._vitality)
-
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
-
-        if self._vitality <= 0:
-            self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, VitalComponent)
-
-    def apply_healing(self, amount: float) -> None:
-        # clima favorable, que aplique heals
-        self._vitality += amount * (1 - self._biological_age)
-        self._vitality = min(self._vitality, self._max_vitality)
-
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
-
-    def set_health_modifier(self, modifier: float) -> None:
-        self._health_modifier = max(0.0, modifier)
-
-    def toggle_dormancy(self, dormant: bool) -> None:
-        if self._is_dormant != dormant:
-            self._is_dormant = dormant
-            self._event_notifier.notify(ComponentEvent.DORMANCY_CHANGE, VitalComponent,
-                                        is_dormant=dormant)
-
-    @property
-    def health(self) -> float:
-        return self._vitality
-
-    @property
-    def age(self) -> float:
-        return self._age
-
-    @property
-    def is_dormant(self) -> bool:
-        return self._is_dormant
-
-    @property
-    def is_alive(self) -> bool:
-        return self._vitality > 0
