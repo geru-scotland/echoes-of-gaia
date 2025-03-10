@@ -22,20 +22,20 @@ from typing import Dict
 import numpy as np
 
 from biome.entities.entity import Entity
-from biome.systems.managers.entity_manager import EntityManager
+from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.snapshots.data import SnapshotData
-from shared.enums import TerrainType, ComponentType
-from shared.strings import Loggers
+from shared.enums.enums import TerrainType
+from shared.enums.strings import Loggers
 from shared.types import TerrainData, EntityData, ComponentData
 from simulation.core.systems.time.time import SimulationTimeInfo
 from utils.loggers import LoggerManager
 
 
 class SnapshotCollector:
-    def __init__(self, entity_manager: EntityManager, world_map: WorldMap,
+    def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
                  entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._entity_manager = entity_manager
@@ -98,7 +98,7 @@ class SnapshotCollector:
             entity_data = {
                 "id": entity.get_id(),
                 "type": entity.get_type(),
-                "specific_type": str(entity.get_specific_type()),
+                "species": str(entity.get_species()),
                 "habitats": [str(h) for h in entity.get_habitats()],
                 "state_fields": entity.get_state_fields(),
                 "components": self._collect_entity_components(entity),

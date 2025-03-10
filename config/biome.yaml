@@ -4,41 +4,21 @@ biome:
     size:
       - 60 # width
       - 60 # height
-  type: "taiga"
+  type: "tropical"
   flora:
-    - type: "oak_tree"
-      spawns: 150
+    - species: "oak_tree"
+      spawns: 1
+      avg-lifespan: 4 # En años lo pongo
       components:
-        - GrowthComponent:
-            growth_rate: 0.3
-        - NutritionalValueComponent:
-            nutritive_value: 0.4
-            nutritional_decay_rate: 0.1
-
-    - type: "bramble"
-      spawns: 150
-      components:
-        - DefenseComponent:
-        - NutritionalValueComponent:
-            nutritive_value: 0.9
-            toxicity: 99
-
-    - type: "mushroom"
-      spawns: 100
-
-  fauna:
-    - type: "deer"
-      spawns: 110
-      components:
-        - NutritionalValueComponent:
         - GrowthComponent:
         - VitalComponent:
-    - type: "boar"
-      spawns: 50
-      components:
-        - NutritionalValueComponent:
-    - type: "fox"
-      spawns: 40
-      components:
-        - NutritionalValueComponent:
-        - GrowthComponent:
+
+    - species: "bramble"
+      spawns: 1
+
+    - species: "mushroom"
+      spawns: 1
+
+  fauna:
+    - species: "deer"
+      spawns: 1

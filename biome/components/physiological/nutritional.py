@@ -15,12 +15,14 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Optional, Callable
+from typing import Optional
 
 from simpy import Environment as simpyEnv
 
-from biome.components.component import EntityComponent
-from shared.enums import ComponentType, Timers
+from biome.components.base.component import EntityComponent
+from shared.enums.enums import ComponentType
+from shared.enums.events import ComponentEvent
+from shared.timers import Timers
 
 
 class NutritionalValueComponent(EntityComponent):
@@ -40,7 +42,7 @@ class NutritionalValueComponent(EntityComponent):
     def _update(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._notify_update(NutritionalValueComponent, toxicity=self._toxicity)
+            self._event_notifier.notify(ComponentEvent.UPDATE_STATE, NutritionalValueComponent, toxicity=self._toxicity)
             self._toxicity += 0.01
             yield self._env.timeout(timer)
 

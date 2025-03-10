@@ -451,20 +451,19 @@
   "flora": {
       "oak_tree": {
           "components": [
-              "GrowthComponent",
-              "HealthComponent"
+              "GrowthComponent"
           ],
           "habitat": ["forest"]
       },
       "bramble": {
           "components": [
-              "TransformComponent"
+
           ],
           "habitat": ["thicket"]
       },
       "mushroom": {
           "components": [
-              "NutritionalValueComponent"
+
           ],
           "habitat": ["fungal_zone"]
       }
@@ -473,14 +472,13 @@
   "fauna": {
       "deer": {
           "components": [
-              "VitalComponent"
+
           ],
           "habitat": ["thicket"]
       },
       "boar": {
           "components": [
-              "GrowthComponent",
-              "NutritionalValueComponent"
+              "GrowthComponent"
           ],
           "habitat": ["thicket"]
       },
@@ -493,39 +491,96 @@
 
   "components": {
       "fixed_components": {
-          "TransformComponent": {},
-          "VitalComponent": {}
+          "TransformComponent": {}
       },
       "VitalComponent": {
-          "defaults": {
-              "health": 100.0,
-              "max_health": 100.0,
-              "age": 0.0,
-              "aging_rate": 0.01,
-              "health_decay_rate": 0.005
-          }
+        "defaults": {
+          "vitality": 100.0,
+          "max_vitality": 100.0,
+          "age": 0.0,
+          "aging_rate": 1,
+          "dormancy_threshold": 25.0,
+          "is_dormant": false
+        }
       },
       "GrowthComponent": {
-          "defaults": {
-              "growth_rate": 0.1,
-              "growth_stage": 0,
-              "stages": 3,
-              "size": 1.0,
-              "max_size": 10.0
-          }
+        "defaults": {
+          "growth_stage": 0,
+          "total_stages": 4,
+          "current_size": 0.05,
+          "max_size": 3.0,
+          "growth_modifier": 1.0,
+          "growth_efficiency": 1.0
+        }
       },
-      "NutritionalValueComponent": {
-          "defaults": {
-              "nutritive_value": 0.5,
-              "nutritional_decay_rate": 0.5,
-              "toxicity": 0.0
-          }
+      "MetabolicComponent": {
+        "defaults": {
+          "photosynthesis_efficiency": 0.75,
+          "respiration_rate": 0.05,
+          "dormancy_capability": 0.6,
+          "metabolic_activity": 1.0,
+          "energy_reserves": 100.0,
+          "max_energy_reserves": 100.0
+        }
       },
-      "DefenseComponent": {
-          "defaults": {
-              "hardiness": 5,
-              "resistance": 0.2
-          }
+      "NutritionalComponent": {
+        "defaults": {
+          "base_nutritive_value": 0.6,
+          "current_nutritive_value": 0.6,
+          "base_toxicity": 0.05,
+          "current_toxicity": 0.05,
+          "max_toxicity": 0.8,
+          "toxin_production_rate": 0.08,
+          "toxin_decay_rate": 0.03
+        }
+      },
+      "StressResponseComponent": {
+        "defaults": {
+          "current_stress_level": 0.0,
+          "stress_tolerance": 0.45,
+          "recovery_rate": 0.15,
+          "stress_memory": 0.3,
+          "stress_adaptation_rate": 0.02
+        }
+      },
+      "TemperatureAdaptationComponent": {
+        "defaults": {
+          "optimal_temperature": 22.0,
+          "min_viable_temperature": 5.0,
+          "max_viable_temperature": 35.0,
+          "cold_resistance": 0.4,
+          "heat_resistance": 0.5,
+          "temperature_stress_threshold": 8.0
+        }
+      },
+      "WaterAdaptationComponent": {
+        "defaults": {
+          "optimal_humidity": 0.65,
+          "optimal_precipitation": 75.0,
+          "drought_resistance": 0.35,
+          "flood_tolerance": 0.4,
+          "transpiration_efficiency": 0.65,
+          "water_storage_capacity": 50.0,
+          "current_water_storage": 50.0,
+          "water_requirement": 2.0
+        }
+      },
+      "ResourceAbsorptionComponent": {
+        "defaults": {
+          "nutrient_absorption_rate": 0.6,
+          "water_absorption_rate": 0.55,
+          "root_system_efficiency": 0.65,
+          "mineral_storage_capacity": 100.0,
+          "current_mineral_storage": 50.0
+        }
+      },
+      "InteractionComponent": {
+        "defaults": {
+          "herbivore_attraction": 0.5,
+          "herbivore_resistance": 0.3,
+          "competition_strength": 0.45,
+          "allelopathic_potential": 0.2
+        }
       },
       "TransformComponent": {
           "defaults": {

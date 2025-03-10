@@ -20,7 +20,7 @@ from abc import ABC
 from dataclasses import dataclass
 
 from config.settings import Config
-from shared.enums import BiomeType
+from shared.enums.enums import BiomeType
 from shared.types import TileMap, EntityDefinitions
 from simulation.core.systems.telemetry.manager import InfluxDBManager
 

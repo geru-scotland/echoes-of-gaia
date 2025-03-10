@@ -19,7 +19,7 @@ import time
 from functools import wraps
 from typing import Callable, Any
 
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
 logger = LoggerManager.get_logger(Loggers.TIME)

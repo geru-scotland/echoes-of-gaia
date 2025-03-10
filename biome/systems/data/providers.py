@@ -17,7 +17,7 @@
 """
 from abc import ABC, abstractmethod
 
-from biome.systems.managers.entity_manager import EntityManager
+from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
@@ -25,7 +25,7 @@ from biome.systems.metrics.collectors.entity_collector import EntityDataCollecto
 
 class BiomeDataProvider(ABC):
     @abstractmethod
-    def get_entity_manager(self) -> EntityManager:
+    def get_entity_provider(self) -> EntityProvider:
         pass
 
     @abstractmethod

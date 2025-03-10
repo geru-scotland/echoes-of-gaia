@@ -20,7 +20,7 @@ from logging import Logger
 from threading import Thread
 
 from config.settings import Settings
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from simulation.api.simulation_api import SimulationAPI
 from simulation.render.manager import RenderManager
 from utils.loggers import LoggerManager
@@ -31,7 +31,7 @@ sys.excepthook = global_exception_handler
 settings: Settings = Settings()
 LoggerManager.initialize(settings.log_level)
 # TODO: Pasar a config esto
-HEADLESS: bool = False
+HEADLESS: bool = True
 
 simulation = SimulationAPI(settings)
 

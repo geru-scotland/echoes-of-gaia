@@ -269,7 +269,7 @@ class SnapshotViewer:
                 if entity_id is not None:
                     entity_info = self._entity_renderer.get_entity_info(entity_id)
                     if entity_info:
-                        tooltip_text += f" | {entity_info.specific_type}"
+                        tooltip_text += f" | {entity_info.species}"
 
                 font = pygame.font.SysFont(None, self._config["font_size"])
                 text_surface = font.render(tooltip_text, True, (220, 220, 225))

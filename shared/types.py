@@ -22,11 +22,10 @@ import numpy as np
 from numpy import ndarray
 from pygame import Surface
 
-from shared.enums import TerrainType, ComponentType, Habitats
+from shared.enums.enums import TerrainType, Habitats
 
 if TYPE_CHECKING:
-    from biome.entities.entity import Entity
-    from biome.components.component import Component
+    pass
 # Tipos, me acabo de enterar que puedo definir tipos custom en Python,
 # algo parecido al typedef de c++; y soy un poco más feliz:
 

@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from shared.base import EnumBaseStr, EnumBaseInt
+from shared.enums.base import EnumBaseStr, EnumBaseInt
 
 class BiomeType(EnumBaseStr):
     TROPICAL = "tropical"
@@ -37,8 +37,8 @@ class TerrainType(EnumBaseInt):
 class ComponentType(EnumBaseStr):
     TRANSFORM = "transform"
     GROWTH = "growth"
+    METABOLIC = "metabolic"
     NUTRITIONAL = "nutritional"
-    MOVEMENT = "movement"
     STATE = "state"
     VITAL = "vital"
     CLIMATE = "climate"
@@ -48,10 +48,7 @@ class EntityState(EnumBaseStr):
     WEAK = "weak"
     DYING = "dying"
 
-class BiomeEvent(EnumBaseStr):
-    CLIMATE_CHANGE = "climate_change"
-    SEASON_CHANGE = "season_change"
-    DISASTER = "disaster"
+
 
 class EntityType(EnumBaseStr):
     FLORA = "flora"
@@ -62,34 +59,17 @@ class EntityIndex(EnumBaseInt):
     FLORA = 1
     FAUNA = 2
 
-class FloraType(EnumBaseStr):
+class FloraSpecies(EnumBaseStr):
     OAK_TREE = "oak_tree"
     BRAMBLE = "bramble"
     MUSHROOM = "mushroom"
 
-class FaunaType(EnumBaseStr):
+class FaunaSpecies(EnumBaseStr):
     DEER = "deer"
     BOAR = "boar"
     FOX = "fox"
 
-class Timers:
-    class Agents(EnumBaseInt):
-        EVOLVE = 500
-        CLIMATE_UPDATE = 2
 
-    class Entity(EnumBaseInt):
-        GROWTH = 25
-        NUTRITIONAL_VALUE_DECAY = 5
-        ENERGY = 3
-        AGING = 30
-        HEALTH_DECAY = 5
-
-    class Biome(EnumBaseInt):
-        CLIMATE = 50
-        TEMPERATURE = 10
-
-    class Simulation(EnumBaseInt):
-        MONTH = 30
 
 
 class Habitats:

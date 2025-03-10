@@ -17,20 +17,18 @@
 """
 import traceback
 from logging import Logger
-from typing import Type, Optional, Dict, Any
+from typing import Type
 
 import stable_baselines3
 
 # No borrar este import, es necesario para el EnvironmentRegistry.
-import research.training.reinforcement.environments
 
 from stable_baselines3 import PPO
-from stable_baselines3.common.callbacks import CheckpointCallback
 import gymnasium as gym
 
 from research.training.registry import EnvironmentRegistry
-from shared.enums import Agents
-from shared.strings import Loggers
+from shared.enums.enums import Agents
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
 

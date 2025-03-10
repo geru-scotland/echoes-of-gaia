@@ -21,7 +21,7 @@ from enum import Enum
 from logging import Logger
 from typing import Protocol, Dict, Any, List, Tuple, Set, Optional
 
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
 

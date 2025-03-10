@@ -18,11 +18,11 @@
 from typing import Tuple
 
 from biome.systems.maps.worldmap import WorldMap
-from shared.enums import EntityType
+from shared.enums.enums import EntityType
 from shared.types import EntityList
 
 
-class EntityManager:
+class EntityProvider:
     def __init__(self, world_map: WorldMap):
         self.world_map: WorldMap = world_map
 

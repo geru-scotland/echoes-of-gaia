@@ -22,7 +22,7 @@ import queue
 import pygame
 
 from config.settings import RenderSettings
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from simulation.render.components import RenderComponent
 from utils.loggers import LoggerManager
 

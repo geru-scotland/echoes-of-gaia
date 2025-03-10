@@ -17,7 +17,7 @@
 """
 from logging import Logger
 
-from biome.systems.managers.entity_manager import EntityManager
+from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
@@ -25,13 +25,13 @@ from biome.systems.snapshots.collector import SnapshotCollector
 from biome.systems.snapshots.config import SnapshotConfig
 from biome.systems.snapshots.data import SnapshotData
 from biome.systems.snapshots.storage import SnapshotStorage
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import CallbackType
 from utils.loggers import LoggerManager
 
 
 class BiomeSnapshotSystem:
-    def __init__(self, entity_manager: EntityManager, world_map: WorldMap,
+    def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
                  entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
                  config: SnapshotConfig):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)

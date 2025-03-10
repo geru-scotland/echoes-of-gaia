@@ -19,13 +19,14 @@ import random
 from logging import Logger
 from typing import Dict, Any
 
-import numpy as np
-
+from biome.services.climate_service import ClimateService
 from biome.systems.climate.seasons import SeasonSystem
 from biome.systems.climate.state import ClimateState
-from shared.enums import BiomeType, Season, WeatherEvent
+from biome.systems.events.event_bus import BiomeEventBus
+from shared.enums.enums import BiomeType, Season, WeatherEvent
+from shared.enums.events import BiomeEvent
 from shared.stores.biome_store import BiomeStore
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 from utils.normalization.ranges import CLIMATE_RANGES
 
@@ -44,6 +45,8 @@ class ClimateSystem:
         self._load_environmental_data()
 
         self._state: ClimateState = self._initialize_state()
+        ClimateService.init_service(self._state)
+
         self._season_system: SeasonSystem = SeasonSystem(initial_season)
 
         for i in range(360):
@@ -103,11 +106,16 @@ class ClimateSystem:
         self._logger.debug(f"Atmospheric pressure updated: {self._state.atm_pressure} (delta: {season_deltas['atm_pressure']})")
 
     def _handle_weather_event(self, weather_event: WeatherEvent):
-        # Por ahora solo cambio de temperatura, ya veremos en un futuro.
-        # TODO: Incluir ruido, variabilidad aquí
         self._logger.debug(f"Handling weather event: {weather_event}")
         self._logger.debug(f"State previously: {self._state}")
 
+        # TODO: IMPORTANTE. Si el weather event es el mismo que el anterior, reducir en un
+        # 0.8 los cambios y que NO se notifique del weather. Si es diferente, NOTIFICAR.
+        # TODO: Reentrenar el modelo con este cambio.
+        # set_environmental_modifiers del componente metabolico etc. BiomeEventBus y éste que triguee un evento
+        # on_weather_change y que las entidades que necesiten saber MODIFICADORES (light, stress etc)
+        # que se subscriban. Que utilicen BiomeEventBus.register y los handlers que hagan de callbacks
+        # que lo gestionen con el diccionario de componentes.
         min_effect_temp, max_effect_temp = self._weather_event_effects[weather_event]["temperature"].values()
         min_effect_hum, max_effect_hum = self._weather_event_effects[weather_event]["humidity"].values()
         min_effect_prec, max_effect_prec = self._weather_event_effects[weather_event]["precipitation"].values()
@@ -120,7 +128,6 @@ class ClimateSystem:
         self._logger.debug(f"Generated values - Precipitation: {mod_precipitation}")
         self._logger.debug(f"Generated values - Humidity: {mod_humidity}")
 
-        # TODO: tomar de ranges.py
         PHYSICAL_MIN_TEMP = CLIMATE_RANGES["temperature"][0]
         PHYSICAL_MAX_TEMP = CLIMATE_RANGES["temperature"][1]
         self._logger.debug(
@@ -147,6 +154,11 @@ class ClimateSystem:
         self._state.precipitation = round(max(PHYSICAL_MIN_PREC,
                                         min(self._state.precipitation + mod_precipitation, PHYSICAL_MAX_PREC)), 1)
 
+        # TODO: Guardar histórico y actualizar el ClimateState
+        # con averages de temp, hum y prec, para que los componentes puedan acceder
+
+        # triggear aquí para los que se hayan subscrito
+        BiomeEventBus.trigger(BiomeEvent.WEATHER_CHANGE)
         self._logger.debug(f"State AFTER: {self._state}")
 
     def get_state(self) -> ClimateState:
@@ -170,7 +182,7 @@ class ClimateSystem:
         return self._base_environmental_factors
 
     @property
-    def weather_event_deltas(self) -> Dict[WeatherEvent, float]:
+    def weather_event_effects(self) -> Dict[WeatherEvent, dict]:
         return self._weather_event_effects
 
     @property

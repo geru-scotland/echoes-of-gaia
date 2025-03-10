@@ -27,8 +27,8 @@ import numpy as np
 
 from biome.systems.snapshots.config import SnapshotConfig
 from biome.systems.snapshots.data import SnapshotData
-from shared.enums import CaptureFormat
-from shared.strings import Loggers
+from shared.enums.enums import CaptureFormat
+from shared.enums.strings import Loggers
 from shared.types import CallbackType
 from utils.loggers import LoggerManager
 

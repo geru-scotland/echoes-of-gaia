@@ -20,7 +20,7 @@ from typing import Optional, Dict, Any
 
 from stable_baselines3 import PPO
 
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 from utils.normalization.normalizer import climate_normalizer
 from utils.paths import get_model_path
@@ -42,7 +42,7 @@ class ReinforcementModel:
             self._logger.exception(f"Error loading model: {e}")
 
     def predict(self, observation: Optional[Dict[str, Any]] = None) -> int:
-        from shared.enums import WeatherEvent
+        from shared.enums.enums import WeatherEvent
 
         if  self._model is None:
             self._load_model()
@@ -57,6 +57,8 @@ class ReinforcementModel:
 
             action, _states = self._model.predict(observation, deterministic=True)
 
+            # TODO: IMPORTANTE. Quitar esto de aquí, era para development
+            # Si quieres hacer debug del clima, en el mismo ClimateSystem al hacer predict
             temp_normalized = observation["temperature"][0]
             temp_real = climate_normalizer.denormalize("temperature", temp_normalized)
             humidity_normalized = observation["humidity"][0]
@@ -66,10 +68,10 @@ class ReinforcementModel:
 
             weather_event_name = list(WeatherEvent)[action] if action < len(WeatherEvent) else "UNKNOWN"
 
-            self._logger.info(f"Real temperature: {temp_real:.1f}°C")
-            self._logger.info(f"Real humidity: {humidity_real:.1f}°C")
-            self._logger.info(f"Real precipitation: {precipitation_real:.1f}°C")
-            self._logger.info(f"Predicted action: {action} (Weather Event: {weather_event_name})")
+            self._logger.debug(f"Real temperature: {temp_real:.1f}°C")
+            self._logger.debug(f"Real humidity: {humidity_real:.1f}°C")
+            self._logger.debug(f"Real precipitation: {precipitation_real:.1f}°C")
+            self._logger.debug(f"Predicted action: {action} (Weather Event: {weather_event_name})")
             return action
         except Exception as e:
             self._logger.exception(f"There was an error during the prediction: {e}")

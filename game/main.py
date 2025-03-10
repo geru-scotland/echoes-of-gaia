@@ -16,12 +16,11 @@
 ##########################################################################
 """
 import pygame
-import sys
 
 from config.settings import Settings
 from game.scripts.scenes.intro import IntroScene
 from game.systems.scenes.scene_manager import SceneManager
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from utils.dependecy_injector import dependency_injector
 from utils.loggers import LoggerManager
 

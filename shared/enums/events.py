@@ -15,22 +15,26 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Tuple, Callable
-
-from simpy import Environment as simpyEnv
-from biome.components.component import EntityComponent
-from shared.enums import ComponentType
+from shared.enums.base import EnumBaseStr
 
 
-class TransformComponent(EntityComponent):
-    def __init__(self, env: simpyEnv = None, x: int = -1, y: int = -1):
-        super().__init__(ComponentType.TRANSFORM, env)
-        self.x = x
-        self.y = y
+class ComponentEvent(EnumBaseStr):
+    UPDATE_STATE = "on_component_update"
+    STAGE_CHANGE = "on_stage_change"
+    SIZE_CHANGE = "on_size_change"
+    MODIFIER_CHANGE = "on_modifier_change"
+    STRESS_CHANGE = "on_stress_change"
+    CLIMATE_RESPONSE = "on_climate_response"
+    FLORA_CONSUMED = "on_flora_consumed"
+    DORMANCY_CHANGE = "on_dormancy_change"
+    ENTITY_DEATH = "entity_death"
+    COLD_WEATHER = "cold_weather"
 
-    def get_position(self) -> Tuple[int, int]:
-        return self.x, self.y
+class BiomeEvent(EnumBaseStr):
+    CREATE_ENTITY = "create_entity"
+    REMOVE_ENTITY = "remove_entity"
 
-    def set_position(self, x: int, y: int) -> None:
-        self.x = x
-        self.y = y
+    CLIMATE_CHANGE = "climate_change"
+    WEATHER_CHANGE = "on_weather_change"
+    SEASON_CHANGE = "season_change"
+    DISASTER = "disaster"

@@ -15,22 +15,32 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Any
 
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums import EntityType, FloraType
+from shared.enums.enums import FloraSpecies
+from shared.enums.events import ComponentEvent
 from shared.types import HabitatList
 
 
 class Flora(Entity):
-    def __init__(self, id: int, env: simpyEnv, flora_type: FloraType, habitats: HabitatList):
+    def __init__(self, id: int, env: simpyEnv, flora_type: FloraSpecies, habitats: HabitatList):
         descriptor: EntityDescriptor = EntityDescriptor.create_flora(flora_type)
         super().__init__(id, env, descriptor, habitats)
         self._logger.debug(f"Flora entity initialized: {flora_type}")
-        self._flora_type: FloraType = flora_type
+        self._flora_type: FloraSpecies = flora_type
+
+    def _register_events(self):
+        super()._register_events()
+        self._event_notifier.register(ComponentEvent.DORMANCY_CHANGE, self._handle_dormancy)
+
+    def _handle_dormancy(self, *args, **kwargs):
+        is_dormant: bool = kwargs.get("is_dormant", False)
+        if is_dormant:
+            self._logger.error("WENT DORMANT")
+            print("WENT DORMANT!!")
 
     def compute_state(self):
         pass

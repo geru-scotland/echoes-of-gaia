@@ -17,20 +17,23 @@
 """
 from logging import Logger
 from abc import abstractmethod, ABC
-from typing import Optional, Callable, Any
+from typing import Optional
 
 from simpy import Environment as simpyEnv
 
-from shared.enums import ComponentType
-from shared.strings import Loggers
+from biome.systems.events.event_notifier import EventNotifier
+from shared.enums.enums import ComponentType
+from shared.enums.strings import Loggers
+from shared.events.handler import EventHandler
 from utils.loggers import LoggerManager
 
 
 class Component(ABC):
-    def __init__(self, type: ComponentType, env: simpyEnv):
+    def __init__(self, env: simpyEnv, type: ComponentType, event_notifier: EventNotifier):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._type: ComponentType = type
         self._env: simpyEnv = env
+        self._event_notifier: EventNotifier = event_notifier
 
     @abstractmethod
     def get_state(self):
@@ -56,17 +59,14 @@ class BiomeComponent(Component):
         pass
 
 
-class EntityComponent(Component):
-    def __init__(self, type: ComponentType, env: simpyEnv):
-        super().__init__(type, env)
-        self._update_callback: Optional[Callable] = None
+class EntityComponent(Component, EventHandler):
+    def __init__(self, env: simpyEnv, type: ComponentType, event_notifier: EventNotifier):
+        Component.__init__(self, env, type, event_notifier)
+        EventHandler.__init__(self)
 
-    def set_update_callback(self, callback: Callable):
-        self._update_callback = callback
-
-    def _notify_update(self, component_class, **kwargs: Any):
-        if self._update_callback:
-            self._update_callback(component_class, **kwargs)
+    @abstractmethod
+    def _register_events(self):
+       raise NotImplementedError
 
     def get_state(self):
         pass

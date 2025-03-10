@@ -170,7 +170,7 @@ class InfoPanel:
             )
             y = self._render_text_line(
                 self._surface,
-                f"Especie: {self._selected_entity.specific_type}",
+                f"Especie: {self._selected_entity.species}",
                 (x, y)
             )
             y = self._render_text_line(

@@ -57,7 +57,7 @@ class EntityStateFields(TypedDict):
 class EntityData(TypedDict):
     id: int
     type: str
-    specific_type: str
+    species: str
     habitats: List[str]
     state_fields: EntityStateFields
     components: Dict[str, Any]

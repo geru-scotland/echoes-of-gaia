@@ -25,12 +25,12 @@ import simpy
 from biome.api.biome_api import BiomeAPI
 from biome.systems.data.data_manager import BiomeDataManager
 from config.settings import Settings
-from shared.enums import Timers
-from shared.strings import Strings, Loggers
+from shared.timers import Timers
+from shared.enums.strings import Strings, Loggers
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
-from simulation.core.systems.events.dispatcher import EventDispatcher
+from simulation.core.systems.events.event_bus import SimulationEventBus
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from simulation.core.systems.time.time import SimulationTime
 from utils.loggers import LoggerManager
@@ -52,22 +52,22 @@ class SimulationEngine:
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._datapoints: bool = self._context.config.get("datapoints", False)
 
-            if self._datapoints:
-                self._context.influxdb.start()
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
             self._biome_api = BiomeAPI(biome_context, self._env)
 
-            self._data_manager = BiomeDataManager(
-                env=self._env,
-                config=self._context.config
-            )
+            if self._datapoints:
+                self._context.influxdb.start()
+                self._data_manager = BiomeDataManager(
+                    env=self._env,
+                    config=self._context.config
+                )
 
-            self._data_manager.configure(self._biome_api.biome)
+                self._data_manager.configure(self._biome_api.biome)
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)
 
-            EventDispatcher.trigger("biome_loaded", biome_context.tile_map)
+            SimulationEventBus.trigger("biome_loaded", biome_context.tile_map)
         except Exception as e:
             self._logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
             self._logger.exception(f"[Simulation Engine] There was an error bootstraping: {e}")
@@ -92,7 +92,7 @@ class SimulationEngine:
                     datapoint_id, simulated_timestamp
                 )
                 if biome_datapoint:
-                    EventDispatcher.trigger("on_biome_data_collected", biome_datapoint)
+                     SimulationEventBus.trigger("on_biome_data_collected", biome_datapoint)
 
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)
@@ -100,15 +100,15 @@ class SimulationEngine:
     @log_execution_time(context="Simulation executed in")
     def run(self):
         self._logger.info("Running simulation...")
-        self._env.process(self._montly_update(Timers.Simulation.MONTH))
+        self._env.process(self._montly_update(Timers.Calendar.MONTH))
         self._time.log_time(self._env.now)
         self._env.run(until=self._eras * self._events_per_era)
 
         if self._datapoints:
             self._context.influxdb.close()
 
-        if self._data_manager:
-            self._data_manager.shutdown()
+            if self._data_manager:
+                self._data_manager.shutdown()
 
         self._time.log_time(self._env.now)
 

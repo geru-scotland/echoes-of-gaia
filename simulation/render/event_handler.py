@@ -18,11 +18,10 @@
 from logging import Logger
 from typing import Dict, Any
 
-from biome.systems.maps.procedural_maps import MapGenData
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from shared.types import TileMap
-from simulation.core.systems.events.dispatcher import EventDispatcher
-from simulation.core.systems.events.handler import EventHandler
+from simulation.core.systems.events.event_bus import SimulationEventBus
+from shared.events.handler import EventHandler
 from simulation.render.components import MapComponent
 from simulation.render.engine import RenderEngine
 from utils.loggers import LoggerManager
@@ -36,12 +35,12 @@ class RenderEventHandler(EventHandler):
         self._logger: Logger = LoggerManager.get_logger(Loggers.RENDER)
 
     def _register_events(self):
-        EventDispatcher.register("biome_loaded", self.on_biome_loaded)
-        EventDispatcher.register("simulation_finished", self.on_simulation_finished)
+        SimulationEventBus.register("biome_loaded", self.on_biome_loaded)
+        SimulationEventBus.register("simulation_finished", self.on_simulation_finished)
 
     def on_biome_loaded(self, tile_map: TileMap):
-        self._logger.debug("[Render] Biome Loaded! Now biome image should be projected")
-        self._logger.debug(f"Render title: {self._settings.title}")
+        self._logger.info("[Render] Biome Loaded! Now biome image should be projected")
+        self._logger.info(f"Render title: {self._settings.title}")
         try:
             if self._engine.is_initialized():
                 tile_config: Dict[str, Any] = self._settings.config.get("tiles", {})

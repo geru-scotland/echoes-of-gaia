@@ -21,21 +21,21 @@ from typing import Dict, Any, List
 
 import numpy as np
 
-from biome.systems.managers.entity_manager import EntityManager
-from shared.strings import Loggers
+from biome.systems.managers.entity_manager import EntityProvider
+from shared.enums.strings import Loggers
 from shared.types import EntityList
 from utils.loggers import LoggerManager
 
 
 class EntityDataCollector:
 
-    def __init__(self, entity_manager: EntityManager):
+    def __init__(self, entity_provider: EntityProvider):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self.entity_manager: EntityManager = entity_manager
+        self._entity_provider: EntityProvider = entity_provider
 
     def collect_data(self) -> Dict[str, int|float]:
         self._logger.debug("EntityDataCollectar has started collecting data...")
-        flora, fauna = self.entity_manager.get_entities()
+        flora, fauna = self._entity_provider.get_entities()
 
         if not flora and not fauna:
             return self._get_empty_stats()

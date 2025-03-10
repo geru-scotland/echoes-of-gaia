@@ -15,11 +15,10 @@
 #                                                                        #
 ##########################################################################
 """
-import sys
 from typing import Dict, Any
 
 from shared.stores.biome_store import BiomeStore
-from shared.strings import Strings
+from shared.enums.strings import Strings
 from config.settings import Settings
 from simulation.core.bootstrap.builders.biome_builder import BiomeBuilder
 from simulation.core.bootstrap.builders.simulation_builder import SimulationBuilder

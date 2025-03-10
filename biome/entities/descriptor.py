@@ -17,19 +17,19 @@
 """
 from dataclasses import dataclass
 
-from shared.base import EnumBaseStr
-from shared.enums import EntityType, FloraType, FaunaType
+from shared.enums.base import EnumBaseStr
+from shared.enums.enums import EntityType, FloraSpecies, FaunaSpecies
 
 
 @dataclass
 class EntityDescriptor:
     entity_type: EntityType
-    specific_type: EnumBaseStr #flora o fauna
+    species: EnumBaseStr #flora o fauna
 
     @classmethod
-    def create_flora(cls, flora_type: FloraType):
-        return cls(entity_type=EntityType.FLORA, specific_type=flora_type)
+    def create_flora(cls, flora_type: FloraSpecies):
+        return cls(entity_type=EntityType.FLORA,species=flora_type)
 
     @classmethod
-    def create_fauna(cls, fauna_type: FaunaType):
-        return cls(entity_type=EntityType.FAUNA, specific_type=fauna_type)
+    def create_fauna(cls, fauna_type: FaunaSpecies):
+        return cls(entity_type=EntityType.FAUNA, species=fauna_type)

@@ -15,16 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
-import time
 from logging import Logger
 from queue import Queue, Empty
 from threading import Thread
 from typing import Dict, Any
 
 from influxdb_client import InfluxDBClient, Point, WriteApi, WritePrecision
-from influxdb_client.client.write_api import ASYNCHRONOUS, SYNCHRONOUS
+from influxdb_client.client.write_api import ASYNCHRONOUS
 
-from shared.strings import Loggers
+from shared.enums.strings import Loggers
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from utils.loggers import LoggerManager
 

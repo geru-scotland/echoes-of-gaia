@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from shared.base import EnumBaseStr
+from shared.enums.base import EnumBaseStr
 
 
 class Strings(EnumBaseStr):

@@ -19,7 +19,7 @@ from typing import Dict, Callable, Type
 
 from typing_extensions import TypeVar
 
-from shared.enums import Agents
+from shared.enums.enums import Agents
 
 
 T = TypeVar("T")

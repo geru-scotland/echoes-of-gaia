@@ -16,11 +16,11 @@
 ##########################################################################
 """
 import pytest
-from simulation.core.systems.events.dispatcher import EventDispatcher
+from simulation.core.systems.events.event_bus import SimulationEventBus
 
 @pytest.fixture(autouse=True)
 def clear_dispatcher():
-    EventDispatcher.clear()
+    SimulationEventBus.clear()
 
 def test_event_dispatcher():
     x: int = 0
@@ -29,8 +29,8 @@ def test_event_dispatcher():
         nonlocal x
         x = x + n
 
-    EventDispatcher.register("test_add", add)
-    EventDispatcher.trigger("test_add", 14)
+    SimulationEventBus.register("test_add", add)
+    SimulationEventBus.trigger("test_add", 14)
 
     assert x == 14
 
@@ -44,8 +44,8 @@ def test_multiple_listeners():
     def listener2(message: str):
         resultado.append(f"L2: {message}")
 
-    EventDispatcher.register("multi_event", listener1)
-    EventDispatcher.register("multi_event", listener2)
-    EventDispatcher.trigger("multi_event", "Event received")
+    SimulationEventBus.register("multi_event", listener1)
+    SimulationEventBus.register("multi_event", listener2)
+    SimulationEventBus.trigger("multi_event", "Event received")
 
     assert resultado == ["L1: Event received", "L2: Event received"]
