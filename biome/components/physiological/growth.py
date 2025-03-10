@@ -19,7 +19,7 @@ from typing import Optional, List
 
 from simpy import Environment as simpyEnv
 
-from biome.components.base.component import EntityComponent, FloraComponentHandler
+from biome.components.base.component import EntityComponent, FloraComponent
 from biome.components.biological_patterns import BiologicalGrowthPatterns
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.state import ClimateState
@@ -29,19 +29,12 @@ from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.timers import Timers
 
 
-class GrowthComponent(EntityComponent, FloraComponentHandler):
-    def __init__(self, env: simpyEnv,
-                 event_notifier: EventNotifier,
-                 lifespan: float = 15.0,
-                 growth_stage: int = 0,
-                 total_stages: int = 4,
-                 current_size: float = 0.05,
-                 max_size: float = 3.0,
-                 growth_modifier: float = 1.0,
-                 growth_efficiency: float = 0.85):
-        EntityComponent.__init__(self, env, ComponentType.GROWTH, event_notifier)
-        FloraComponentHandler.__init__(self, event_notifier)
+class GrowthComponent(FloraComponent):
+    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 15.0,
+                 growth_stage: int = 0, total_stages: int = 4, current_size: float = 0.05, max_size: float = 3.0,
+                 growth_modifier: float = 1.0, growth_efficiency: float = 0.85):
 
+        super().__init__(env, ComponentType.GROWTH, event_notifier)
         self._lifespan_in_ticks: float = lifespan * float(Timers.Calendar.YEAR)
         self._growth_stage: int = growth_stage
         self._initial_size = current_size
@@ -61,7 +54,7 @@ class GrowthComponent(EntityComponent, FloraComponentHandler):
         self._env.process(self._update_growth(Timers.Compoments.Physiological.GROWTH))
 
     def _register_events(self):
-        FloraComponentHandler.register_events(self)
+        super()._register_events()
         self._event_notifier.register(ComponentEvent.COLD_WEATHER, self._handle_cold_weather)
 
     def _calculate_stage_thresholds(self) -> List[float]:
@@ -92,6 +85,7 @@ class GrowthComponent(EntityComponent, FloraComponentHandler):
         while True:
             if self._current_size < self._max_size:
 
+                self._logger.error(f"{self.__class__}: is_dormant = {self._is_dormant}")
                 biological_age_ratio: float = self._env.now / self._lifespan_in_ticks
                 biological_age_ratio_with_mods =  biological_age_ratio * self._growth_modifier * self._growth_efficiency
                 biological_age_ratio_with_mods = min(1.0, biological_age_ratio_with_mods)

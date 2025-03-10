@@ -15,23 +15,11 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Dict, List, Callable, Any
+from enum import Flag, auto
 
 
-class EventNotifier:
-    def __init__(self):
-        self._listeners: Dict[str, List[Any]] = {}
-
-    def clear(self):
-        self._listeners.clear()
-
-    def register(self, event_name: str, callback: Callable):
-        if event_name not in self._listeners:
-            self._listeners[event_name] = []
-
-        if callback not in self._listeners[event_name]:
-            self._listeners[event_name].append(callback)
-
-    def notify(self, event_name: str, *args, **kwargs):
-        for callback in self._listeners.get(event_name, []):
-            callback(*args, **kwargs)
+class DormancyReason(Flag):
+    NONE = 0
+    LOW_ENERGY = auto()
+    LOW_VITALITY = auto()
+    ENVIRONMENTAL_STRESS = auto()
