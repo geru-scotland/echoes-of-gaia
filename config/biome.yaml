@@ -8,10 +8,11 @@ biome:
   flora:
     - species: "oak_tree"
       spawns: 1
-      avg-lifespan: 4 # En años lo pongo
+      avg-lifespan: 1 # En años lo pongo
       components:
         - GrowthComponent:
         - VitalComponent:
+        - MetabolicComponent:
 
     - species: "bramble"
       spawns: 1
