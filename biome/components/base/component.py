@@ -17,13 +17,14 @@
 """
 from logging import Logger
 from abc import abstractmethod, ABC
-from typing import Optional
+from typing import Optional, Set
 
 from simpy import Environment as simpyEnv
 
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
+from shared.enums.reasons import DormancyReason
 from shared.enums.strings import Loggers
 from shared.events.handler import EventHandler
 from utils.loggers import LoggerManager
@@ -75,16 +76,30 @@ class EntityComponent(Component, EventHandler):
     def _update(self, delay: Optional[int] = None):
         pass
 
-class FloraComponentHandler:
-    def __init__(self, event_notifier: EventNotifier):
+class FloraComponent(EntityComponent):
+
+    def __init__(self, env: simpyEnv, type: ComponentType, event_notifier: EventNotifier):
+        super().__init__(env, type, event_notifier)
         self._event_notifier: EventNotifier = event_notifier
+        self._dormancy_reasons: Set[DormancyReason] = set()
         self._is_dormant: bool = False
 
-    def register_events(self):
+    def _register_events(self):
         self._event_notifier.register(ComponentEvent.DORMANCY_UPDATED, self._handle_dormancy_update)
 
-    def _handle_dormancy_update(self):
-        self._is_dormant = not self._is_dormant
+    def _handle_dormancy_update(self, *args, **kwargs):
+        dormant: bool = kwargs.get("dormant", False)
+        if self._is_dormant != dormant:
+            self._is_dormant = dormant
 
+    def request_dormancy(self, reason: DormancyReason, active: bool) -> None:
+        if active:
+            self._dormancy_reasons.add(reason)
+        else:
+            if not self._dormancy_reasons:
+                return
+            self._dormancy_reasons.discard(reason)
 
-
+        self._event_notifier.notify(ComponentEvent.DORMANCY_REASONS_CHANGED,
+                                    component=self.__class__,
+                                    reasons=self._dormancy_reasons)

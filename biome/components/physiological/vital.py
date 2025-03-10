@@ -21,28 +21,23 @@ from typing import Optional, List, Tuple
 import numpy as np
 from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
-from biome.components.base.component import EntityComponent, FloraComponentHandler
+from biome.components.base.component import EntityComponent, FloraComponent
 from biome.components.biological_patterns import BiologicalGrowthPatterns
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.state import ClimateState
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
+from shared.enums.reasons import DormancyReason
 from shared.timers import Timers
 
 
-class VitalComponent(EntityComponent, FloraComponentHandler):
-    def __init__(self, env: simpyEnv,
-                 event_notifier: EventNotifier,
-                 lifespan: float = 15.0,
-                 vitality: float = 100.0,
-                 max_vitality: float = 100.0,
-                 age: float = 0.0,
-                 aging_rate: float = 1.0,
+class VitalComponent(FloraComponent):
+    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 15.0,
+                 vitality: float = 100.0, max_vitality: float = 100.0, age: float = 0.0, aging_rate: float = 1.0,
                  dormancy_threshold: float = 25.0):
-        EntityComponent.__init__(self, env, ComponentType.VITAL, event_notifier)
-        FloraComponentHandler.__init__(self, event_notifier)
 
+        super().__init__( env, ComponentType.VITAL, event_notifier)
         self._lifespan_in_days: int = int((lifespan * float(Timers.Calendar.YEAR)) / float(Timers.Calendar.DAY))
         self._vitality: float = round(vitality, 2)
         self._max_vitality: float = round(max_vitality, 2)
@@ -60,7 +55,7 @@ class VitalComponent(EntityComponent, FloraComponentHandler):
         self._env.process(self._update_health(Timers.Compoments.Physiological.HEALTH_DECAY))
 
     def _register_events(self):
-        FloraComponentHandler.register_events(self)
+        super()._register_events()
 
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
@@ -75,13 +70,14 @@ class VitalComponent(EntityComponent, FloraComponentHandler):
     def _update_health(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
+
             if not self._is_dormant:
                 completed_lifespan_ratio: float = min(1.0, self._biological_age / self._lifespan_in_days)
                 completed_lifespan_ratio_with_mods: float = completed_lifespan_ratio * self._health_modifier
                 non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(completed_lifespan_ratio_with_mods)
 
                 new_health = self._max_vitality * (1.0 - non_linear_aging_progression)
-                self._logger.debug(
+                self._logger.info(
                     f"[DEBUG:Tick={self._env.now}] Health Update | Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_days}, "
                     f"Completed Ratio: {completed_lifespan_ratio:.2f}, Aging Progression: {non_linear_aging_progression:.2f}, "
                     f"Health Modifier: {self._health_modifier} "
@@ -95,7 +91,9 @@ class VitalComponent(EntityComponent, FloraComponentHandler):
                 # TODO: Gestionar en entity, pensar bien la logíca del bloque general de updates
                 # si entra en dormancy.
                 if self._vitality <= self._dormancy_threshold and not self._is_dormant:
-                     self._event_notifier.notify(ComponentEvent.DORMANCY_TOGGLE, dormant=True)
+                    self.request_dormancy(DormancyReason.LOW_VITALITY, True)
+                elif self._vitality > self._dormancy_threshold and self._is_dormant:
+                    self.request_dormancy(DormancyReason.LOW_VITALITY, False)
 
                 # TODO: Mejorar umbral, con Gompertz me hace falta
                 if self._vitality <= 0.0018:

@@ -17,26 +17,22 @@
 """
 from typing import Optional
 
-from biome.components.base.component import EntityComponent, FloraComponentHandler
+from biome.components.base.component import EntityComponent, FloraComponent
 from simpy import Environment as simpyEnv
 
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
+from shared.enums.reasons import DormancyReason
 from shared.timers import Timers
 
 
-class MetabolicComponent(EntityComponent, FloraComponentHandler):
-    def __init__(self, env: simpyEnv,
-                 event_notifier: EventNotifier,
-                 photosynthesis_efficiency: float = 0.75,
-                 respiration_rate: float = 0.05,
-                 metabolic_activity: float = 1.0,
-                 energy_reserves: float = 100.0,
-                 max_energy_reserves: float = 100.0):
-        EntityComponent.__init__(self, env, ComponentType.METABOLIC, event_notifier)
-        FloraComponentHandler.__init__(self, event_notifier)
+class MetabolicComponent(FloraComponent):
+    def __init__(self, env: simpyEnv, event_notifier: EventNotifier,
+                 photosynthesis_efficiency: float = 0.75, respiration_rate: float = 0.05,
+                 metabolic_activity: float = 1.0, energy_reserves: float = 100.0, max_energy_reserves: float = 100.0):
 
+        super().__init__(env, ComponentType.METABOLIC, event_notifier)
         self._photosynthesis_efficiency: float = round(photosynthesis_efficiency, 2)
         self._respiration_rate: float = round(respiration_rate, 2)
         self._metabolic_activity: float = round(metabolic_activity, 2)
@@ -55,7 +51,7 @@ class MetabolicComponent(EntityComponent, FloraComponentHandler):
         self._env.process(self._update_metabolism(Timers.Compoments.Physiological.METABOLISM))
 
     def _register_events(self):
-        FloraComponentHandler.register_events(self)
+        super()._register_events()
 
     def _update_metabolism(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
@@ -92,13 +88,9 @@ class MetabolicComponent(EntityComponent, FloraComponentHandler):
             energy_threshold: float = self._max_energy_reserves * 0.2
 
             if not self._is_dormant and self._energy_reserves < energy_threshold:
-                self._is_dormant = True
-                self._event_notifier.notify(ComponentEvent.DORMANCY_TOGGLE, MetabolicComponent,
-                                            is_dormant=True)
+                self.request_dormancy(DormancyReason.LOW_ENERGY, True)
             elif self._is_dormant and self._energy_reserves > energy_threshold:
-                self._is_dormant = False
-                self._event_notifier.notify(ComponentEvent.DORMANCY_TOGGLE, MetabolicComponent,
-                                            is_dormant=False)
+                self.request_dormancy(DormancyReason.LOW_ENERGY, False)
 
             base_generation = self._photosynthesis_efficiency
             total_modifiers = (self._light_availability * self._temperature_modifier *
@@ -116,16 +108,16 @@ class MetabolicComponent(EntityComponent, FloraComponentHandler):
                 )
             self._logger.info(
                 f"[Metabolic Update] [Tick: {self._env.now}] "
-                f"Energy: {self._energy_reserves:.2f}/{self._max_energy_reserves:.2f}, "
-                f"Photosynthesis: Eff={self._photosynthesis_efficiency:.2f}, "
-                f"Light={self._light_availability:.2f}, "
-                f"Temp Mod={self._temperature_modifier:.2f}, "
-                f"Water Mod={self._water_modifier:.2f}, "
-                f"Activity={self._metabolic_activity:.2f}, "
-                f"Effective Photo={effective_photosynthesis:.2f}, "
-                f"Respiration: Rate={self._respiration_rate:.2f}, "
-                f"Effective Resp={effective_respiration:.2f}, "
-                f"Energy Change={energy_change:.2f}, "
+                f"Energy: {self._energy_reserves:.3f}/{self._max_energy_reserves:.3f}, "
+                f"Photosynthesis: Eff={self._photosynthesis_efficiency:.3f}, "
+                f"Light={self._light_availability:.3f}, "
+                f"Temp Mod={self._temperature_modifier:.3f}, "
+                f"Water Mod={self._water_modifier:.3f}, "
+                f"Activity={self._metabolic_activity:.3f}, "
+                f"Effective Photo={effective_photosynthesis:.3f}, "
+                f"Respiration: Rate={self._respiration_rate:.3f}, "
+                f"Effective Resp={effective_respiration:.3f}, "
+                f"Energy Change={energy_change:.3f}, "
                 f"Dormant={self._is_dormant}"
             )
             yield self._env.timeout(timer)
