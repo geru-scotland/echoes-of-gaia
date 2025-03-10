@@ -499,7 +499,7 @@
           "max_vitality": 100.0,
           "age": 0.0,
           "aging_rate": 1,
-          "dormancy_threshold": 5.0
+          "dormancy_threshold": 10.0
         }
       },
       "GrowthComponent": {

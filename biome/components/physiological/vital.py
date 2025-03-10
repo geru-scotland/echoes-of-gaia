@@ -21,7 +21,7 @@ from typing import Optional, List, Tuple
 import numpy as np
 from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
-from biome.components.base.component import EntityComponent
+from biome.components.base.component import EntityComponent, FloraComponentHandler
 from biome.components.biological_patterns import BiologicalGrowthPatterns
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.state import ClimateState
@@ -31,7 +31,7 @@ from shared.enums.events import ComponentEvent
 from shared.timers import Timers
 
 
-class VitalComponent(EntityComponent):
+class VitalComponent(EntityComponent, FloraComponentHandler):
     def __init__(self, env: simpyEnv,
                  event_notifier: EventNotifier,
                  lifespan: float = 15.0,
@@ -40,7 +40,8 @@ class VitalComponent(EntityComponent):
                  age: float = 0.0,
                  aging_rate: float = 1.0,
                  dormancy_threshold: float = 25.0):
-        super().__init__(env, ComponentType.VITAL, event_notifier)
+        EntityComponent.__init__(self, env, ComponentType.VITAL, event_notifier)
+        FloraComponentHandler.__init__(self, event_notifier)
 
         self._lifespan_in_days: int = int((lifespan * float(Timers.Calendar.YEAR)) / float(Timers.Calendar.DAY))
         self._vitality: float = round(vitality, 2)
@@ -49,7 +50,6 @@ class VitalComponent(EntityComponent):
         self._aging_rate: float = aging_rate
         self._biological_age: float = self._age * aging_rate
         self._dormancy_threshold: float = round(dormancy_threshold, 2)
-        self._is_dormant: bool = False
 
         self._health_modifier: float = 1.0
         self._vitality_history: List[Tuple[float, float]] = []  # (age, vitality)
@@ -60,7 +60,7 @@ class VitalComponent(EntityComponent):
         self._env.process(self._update_health(Timers.Compoments.Physiological.HEALTH_DECAY))
 
     def _register_events(self):
-        self._event_notifier.register(ComponentEvent.DORMANCY_UPDATED, self._handle_dormancy_update)
+        FloraComponentHandler.register_events(self)
 
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
@@ -105,9 +105,6 @@ class VitalComponent(EntityComponent):
 
             yield self._env.timeout(timer)
 
-    def _handle_dormancy_update(self):
-        self._is_dormant = not self._is_dormant
-         
     def apply_damage(self, amount: float) -> None:
         # Hervíboros comiendo, tiemps extremos...etc
         self._vitality -= amount * self._biological_age

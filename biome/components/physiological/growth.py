@@ -19,7 +19,7 @@ from typing import Optional, List
 
 from simpy import Environment as simpyEnv
 
-from biome.components.base.component import EntityComponent
+from biome.components.base.component import EntityComponent, FloraComponentHandler
 from biome.components.biological_patterns import BiologicalGrowthPatterns
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.state import ClimateState
@@ -29,7 +29,7 @@ from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.timers import Timers
 
 
-class GrowthComponent(EntityComponent):
+class GrowthComponent(EntityComponent, FloraComponentHandler):
     def __init__(self, env: simpyEnv,
                  event_notifier: EventNotifier,
                  lifespan: float = 15.0,
@@ -39,7 +39,8 @@ class GrowthComponent(EntityComponent):
                  max_size: float = 3.0,
                  growth_modifier: float = 1.0,
                  growth_efficiency: float = 0.85):
-        super().__init__(env, ComponentType.GROWTH, event_notifier)
+        EntityComponent.__init__(self, env, ComponentType.GROWTH, event_notifier)
+        FloraComponentHandler.__init__(self, event_notifier)
 
         self._lifespan_in_ticks: float = lifespan * float(Timers.Calendar.YEAR)
         self._growth_stage: int = growth_stage
@@ -48,7 +49,6 @@ class GrowthComponent(EntityComponent):
         self._current_size: float = round(current_size, 3)
         self._max_size: float = round(max_size, 3)
 
-        self._is_dormant: bool = False
         self._growth_modifier: float = growth_modifier # Este lo cambio SOLO por evolución
         # Y este, es el que modifico por estrés, clima,
         # enfermedades... es cómo de bien convierte recursos
@@ -61,8 +61,8 @@ class GrowthComponent(EntityComponent):
         self._env.process(self._update_growth(Timers.Compoments.Physiological.GROWTH))
 
     def _register_events(self):
+        FloraComponentHandler.register_events(self)
         self._event_notifier.register(ComponentEvent.COLD_WEATHER, self._handle_cold_weather)
-        self._event_notifier.register(ComponentEvent.DORMANCY_TOGGLE, self._handle_dormancy_update)
 
     def _calculate_stage_thresholds(self) -> List[float]:
         return [self._max_size * (i / self._total_stages) for i in range(1, self._total_stages + 1)]
@@ -77,8 +77,6 @@ class GrowthComponent(EntityComponent):
         self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
                                     growth_efficiency=self._growth_efficiency)
 
-    def _handle_dormancy_update(self):
-        self._is_dormant = not self._is_dormant
 
     def _handle_cold_weather(self, *args, **kwargs):
         if self._growth_stage == self._total_stages:
