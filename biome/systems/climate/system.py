@@ -25,6 +25,7 @@ from biome.systems.climate.state import ClimateState
 from biome.systems.events.event_bus import BiomeEventBus
 from shared.enums.enums import BiomeType, Season, WeatherEvent
 from shared.enums.events import BiomeEvent
+from shared.enums.thresholds import ClimateThresholds
 from shared.stores.biome_store import BiomeStore
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
@@ -156,9 +157,13 @@ class ClimateSystem:
 
         # TODO: Guardar histórico y actualizar el ClimateState
         # con averages de temp, hum y prec, para que los componentes puedan acceder
+        is_extreme = (self._state.temperature <= ClimateThresholds.Temperature.EXTREME_COLD or
+                      self._state.temperature >= ClimateThresholds.Temperature.EXTREME_HOT)
 
-        # triggear aquí para los que se hayan subscrito
-        BiomeEventBus.trigger(BiomeEvent.WEATHER_CHANGE)
+        if is_extreme:
+            BiomeEventBus.trigger(BiomeEvent.EXTREME_WEATHER,
+                                  temperature=self._state.temperature)
+
         self._logger.debug(f"State AFTER: {self._state}")
 
     def get_state(self) -> ClimateState:

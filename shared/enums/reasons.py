@@ -23,3 +23,25 @@ class DormancyReason(Flag):
     LOW_ENERGY = auto()
     LOW_VITALITY = auto()
     ENVIRONMENTAL_STRESS = auto()
+
+
+class StressReason(Flag):
+    NONE = 0
+
+    WATER_SHORTAGE = auto()
+    LIGHT_DEFICIENCY = auto()
+    TOXICITY = auto()
+    DISEASE = auto()
+    PHYSICAL_DAMAGE = auto()
+
+    GOOD_VITALITY = auto()
+    EXCELLENT_VITALITY = auto()
+    LOW_VITALITY = auto()
+    CRITICAL_VITALITY = auto()
+
+    NUTRIENT_DEFICIENCY = auto()
+    ENERGY_ABUNDANCE = auto()
+    ENERGY_SUFFICIENT = auto()
+
+    TEMPERATURE_EXTREME = auto()
+    TEMPERATURE_OPTIMAL = auto()

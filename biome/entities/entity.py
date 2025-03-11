@@ -54,13 +54,10 @@ class Entity(EventHandler, StateHandler, ABC):
         self._event_notifier.register(ComponentEvent.UPDATE_STATE, self.handle_component_update)
 
         # BiomeEventBus ahora
-        BiomeEventBus.register(BiomeEvent.WEATHER_CHANGE, self._handle_weather_change)
+        BiomeEventBus.register(BiomeEvent.EXTREME_WEATHER, self._handle_extreme_weather)
 
-    def _handle_weather_change(self):
-        state: Optional[ClimateSystem] = ClimateService.query_state()
-        if state:
-            if state.temperature < 5:
-                self._event_notifier.notify(ComponentEvent.COLD_WEATHER, temperature=state.temperature)
+    def _handle_extreme_weather(self, *args, **kwargs):
+        self._event_notifier.notify(ComponentEvent.EXTREME_WEATHER, **kwargs)
 
     def add_component(self, component: EntityComponent):
         self._logger.warning(f"Adding component to {self._descriptor.species}: {component.type}")

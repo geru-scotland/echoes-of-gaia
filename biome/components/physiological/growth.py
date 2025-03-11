@@ -55,7 +55,6 @@ class GrowthComponent(FloraComponent):
 
     def _register_events(self):
         super()._register_events()
-        self._event_notifier.register(ComponentEvent.COLD_WEATHER, self._handle_cold_weather)
 
     def _calculate_stage_thresholds(self) -> List[float]:
         return [self._max_size * (i / self._total_stages) for i in range(1, self._total_stages + 1)]
@@ -69,15 +68,6 @@ class GrowthComponent(FloraComponent):
         self._growth_efficiency: float = max(0.0, modifier)
         self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
                                     growth_efficiency=self._growth_efficiency)
-
-
-    def _handle_cold_weather(self, *args, **kwargs):
-        if self._growth_stage == self._total_stages:
-            return
-        # TODO: Guardar histórico de temperaturas EN EL CLIMATE SYSTEM
-        # No aquí, ni de coña, y que lo agregue al ClimateState
-        state: ClimateState = ClimateService.query_state()
-        # self._update_growth_efficiency(efficiency)
 
 
     def _update_growth(self, timer: Optional[int] = None):
@@ -108,6 +98,14 @@ class GrowthComponent(FloraComponent):
                         break
 
             yield self._env.timeout(timer)
+
+    def _handle_stress_update(self, *args, **kwargs):
+        super()._handle_stress_update(*args, **kwargs)
+
+        normalized_stress = kwargs.get("normalized_stress", 0.0)
+
+        # TODO: pasar todos los factores a config, especificos para estrés, 0.6 etc.
+        self._growth_efficiency = max(0.3, self._growth_efficiency * (1.0 - normalized_stress * 0.6))
 
     def _log_data(self, message: Optional[str]):
         if message:

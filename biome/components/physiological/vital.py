@@ -16,6 +16,7 @@
 # =============================================================================
 """
 import os
+import sys
 from typing import Optional, List, Tuple
 
 import numpy as np
@@ -28,7 +29,8 @@ from biome.systems.climate.state import ClimateState
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
-from shared.enums.reasons import DormancyReason
+from shared.enums.reasons import DormancyReason, StressReason
+from shared.enums.thresholds import VitalThresholds
 from shared.timers import Timers
 
 
@@ -52,7 +54,8 @@ class VitalComponent(FloraComponent):
                            f"Age={self._age}")
 
         self._env.process(self._update_age(Timers.Compoments.Physiological.AGING))
-        self._env.process(self._update_health(Timers.Compoments.Physiological.HEALTH_DECAY))
+        self._env.process(self._update_vitality_stress(Timers.Compoments.Physiological.STRESS_UPDATE))
+        self._env.process(self._update_vitality(Timers.Compoments.Physiological.HEALTH_DECAY))
 
     def _register_events(self):
         super()._register_events()
@@ -67,7 +70,39 @@ class VitalComponent(FloraComponent):
 
             yield self._env.timeout(timer)
 
-    def _update_health(self, timer: Optional[int] = None):
+    def _update_vitality_stress(self, timer: int):
+        yield self._env.timeout(timer)
+
+        while True:
+            vitality_ratio = self._vitality / self._max_vitality
+
+            if vitality_ratio < VitalThresholds.Health.CRITICAL:
+                stress_change = VitalThresholds.StressChange.CRITICAL / 10.0
+                self.modify_stress(stress_change, StressReason.CRITICAL_VITALITY)
+                self._logger.warning(
+                    f"Vitality is CRITICAL ({vitality_ratio:.2f}). Increasing stress by {stress_change:.4f}.")
+
+            elif vitality_ratio < VitalThresholds.Health.LOW:
+                stress_change = VitalThresholds.StressChange.LOW / 10.0
+                self.modify_stress(stress_change, StressReason.LOW_VITALITY)
+                self._logger.warning(
+                    f"Vitality is LOW ({vitality_ratio:.2f}). Increasing stress by {stress_change:.4f}.")
+
+            elif vitality_ratio > VitalThresholds.Health.EXCELLENT:
+                stress_change = VitalThresholds.StressChange.EXCELLENT / 10.0
+                self.modify_stress(stress_change, StressReason.EXCELLENT_VITALITY)
+                self._logger.warning(
+                    f"Vitality is EXCELLENT ({vitality_ratio:.2f}). Reducing stress by {stress_change:.4f}.")
+
+            elif vitality_ratio > VitalThresholds.Health.GOOD:
+                stress_change = VitalThresholds.StressChange.GOOD / 10.0
+                self.modify_stress(stress_change, StressReason.GOOD_VITALITY)
+                self._logger.warning(
+                    f"Vitality is GOOD ({vitality_ratio:.2f}). Reducing stress by {stress_change:.4f}.")
+
+            yield self._env.timeout(timer)
+
+    def _update_vitality(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
 
@@ -78,7 +113,10 @@ class VitalComponent(FloraComponent):
 
                 new_health = self._max_vitality * (1.0 - non_linear_aging_progression)
                 self._logger.info(
-                    f"[DEBUG:Tick={self._env.now}] Health Update | Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_days}, "
+                    f"[Vitality Update | DEBUG:Tick={self._env.now}] "
+                    f"Stress level={self._stress_level:4f}]"
+                    f"Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_days}, "
+                    f"Aging rate: {self._aging_rate} "
                     f"Completed Ratio: {completed_lifespan_ratio:.2f}, Aging Progression: {non_linear_aging_progression:.2f}, "
                     f"Health Modifier: {self._health_modifier} "
                     f"New Health: {new_health:.2f}, Vitality: {self._vitality}"
@@ -88,6 +126,7 @@ class VitalComponent(FloraComponent):
                 self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
                 age_in_years = self._age / 365.0
                 self._vitality_history.append((age_in_years, self._vitality))
+
                 # TODO: Gestionar en entity, pensar bien la logíca del bloque general de updates
                 # si entra en dormancy.
                 if self._vitality <= self._dormancy_threshold and not self._is_dormant:
@@ -102,6 +141,19 @@ class VitalComponent(FloraComponent):
                     break
 
             yield self._env.timeout(timer)
+
+    def _handle_stress_update(self, *args, **kwargs):
+        super()._handle_stress_update(*args, **kwargs)
+
+        normalized_stress: float = kwargs.get("normalized_stress", 0.0)
+
+        if normalized_stress <= 0.3:
+            self._aging_rate = (200 / 9) * normalized_stress ** 3 - 10 * normalized_stress ** 2 + 1
+        else:
+            self._aging_rate = -22.02 * normalized_stress ** 3 + 36.45 * normalized_stress ** 2 - 15.93 * normalized_stress + 2.79
+
+        self._logger.warning(
+            f"normalized: {normalized_stress:.2f} → aging_rate: {self._aging_rate:.2f}")
 
     def apply_damage(self, amount: float) -> None:
         # Hervíboros comiendo, tiemps extremos...etc

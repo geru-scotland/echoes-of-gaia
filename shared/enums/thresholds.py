@@ -15,52 +15,55 @@
 #                                                                              #
 # =============================================================================
 """
-from shared.enums.base import EnumBaseInt
 
-class Timers:
+from shared.enums.base import EnumBaseStr, EnumBaseFloat
 
-    class System(EnumBaseInt):
-        CLIMATE_UPDATE = 2
-        BIOME_STATE_UPDATE = 2
-        SNAPSHOT = 60
-        DATA_COLLECTION = 30
 
-    class Agents(EnumBaseInt):
-        EVOLUTIONARY_CYCLE = 500
-        CLIMATE_UPDATE = 2 # 2 ticks = 1 día
+class VitalThresholds:
+    class Health(EnumBaseFloat):
+        CRITICAL = 0.15
+        LOW = 0.30
+        GOOD = 0.70
+        EXCELLENT = 0.90
 
-    class Evolutionary(EnumBaseInt):
-        MUTATION_CHECK = 60
-        ADAPTATION_UPDATE = 180
-        SELECTION_PRESSURE = 360
-        EVOLUTIONARY_CYCLE = 720
+    class StressChange(EnumBaseFloat):
+        CRITICAL = 1.0
+        LOW = 0.5
+        GOOD = -0.9
+        EXCELLENT = -1.2
 
-    class Calendar(EnumBaseInt):
-        TICK = 1
-        DAY = 2
-        WEEK = 14
-        MONTH = 60
-        SEASON = 180
-        YEAR = 720
 
-    class Compoments:
-        class Physiological(EnumBaseInt):
-            AGING = 2
-            HEALTH_DECAY = 2
-            GROWTH = 2
-            METABOLISM = 2
-            ENERGY_UPDATE = 2
-            TOXIN_PRODUCTION = 2
-            DORMANCY_CHECK = 2
-            STRESS_UPDATE = 2
+class MetabolicThresholds:
+    class Energy(EnumBaseFloat):
+        CRITICAL = 0.15
+        LOW = 0.30
+        SUFFICIENT = 0.50
+        ABUNDANT = 0.80
 
-        class Environmental(EnumBaseInt):
-            CLIMATE_RESPONSE = 2
-            RESOURCE_ABSORPTION = 1
-            STRESS_EVALUATION = 2
-            WATER_BALANCE = 2
+    class StressChange(EnumBaseFloat):
+        CRITICAL = 0.8
+        LOW = 0.6
+        SUFFICIENT = -0.6
+        ABUNDANT = -0.9
 
-        class Ecological(EnumBaseInt):
-            HERBIVORE_INTERACTION = 4
-            COMPETITION = 6
-            ALLELOPATHY = 8
+    class EfficiencyModifier(EnumBaseFloat):
+        MIN_PHOTOSYNTHESIS = 0.4
+        PHOTOSYNTHESIS_REDUCTION = 0.2
+        RESPIRATION_INCREASE = 0.4
+
+
+class ClimateThresholds:
+    class Temperature(EnumBaseFloat):
+        EXTREME_COLD = -10.0
+        COLD = 5.0
+        OPTIMAL_LOW = 15.0
+        OPTIMAL_HIGH = 30.0
+        HOT = 35.0
+        EXTREME_HOT = 40.0
+
+    class StressChange(EnumBaseFloat):
+        EXTREME_COLD = 1.5
+        COLD = 0.8
+        OPTIMAL = -0.1
+        HOT = 0.8
+        EXTREME_HOT = 1.5
