@@ -4,11 +4,11 @@ biome:
     size:
       - 60 # width
       - 60 # height
-  type: "tropical"
+  type: "savanna"
   flora:
     - species: "oak_tree"
       spawns: 1
-      avg-lifespan: 1 # En años lo pongo
+      avg-lifespan: 15 # En años lo pongo
       components:
         - GrowthComponent:
         - VitalComponent:

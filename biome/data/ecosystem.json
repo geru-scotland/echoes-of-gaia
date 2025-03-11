@@ -498,7 +498,7 @@
           "vitality": 100.0,
           "max_vitality": 100.0,
           "age": 0.0,
-          "aging_rate": 1,
+          "aging_rate": 1.0,
           "dormancy_threshold": 10.0
         }
       },
@@ -514,8 +514,8 @@
       },
       "MetabolicComponent": {
         "defaults": {
-          "photosynthesis_efficiency": 0.3,
-          "respiration_rate": 0.4,
+          "photosynthesis_efficiency": 0.6,
+          "respiration_rate": 0.2,
           "metabolic_activity": 1,
           "energy_reserves": 100.0,
           "max_energy_reserves": 100.0
