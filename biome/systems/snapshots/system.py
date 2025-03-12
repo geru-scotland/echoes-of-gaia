@@ -20,6 +20,7 @@ from logging import Logger
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
+from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.snapshots.collector import SnapshotCollector
 from biome.systems.snapshots.config import SnapshotConfig
@@ -32,19 +33,21 @@ from utils.loggers import LoggerManager
 
 class BiomeSnapshotSystem:
     def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
-                 entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
+                 entity_collector: EntityDataCollector, climate_collector: ClimateDataCollector,
+                 score_analyzer: BiomeScoreAnalyzer,
                  config: SnapshotConfig):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._logger.info("Initializing BiomeSnapshotSystem...")
 
-        self._entity_manager = entity_manager
-        self._world_map = world_map
-        self._entity_collector = entity_collector
-        self._score_analyzer = score_analyzer
-        self._config = config
+        self._entity_manager: EntityProvider = entity_manager
+        self._world_map: WorldMap = world_map
+        self._entity_collector: EntityDataCollector = entity_collector
+        self._climate_collector: ClimateDataCollector = climate_collector
+        self._score_analyzer: BiomeScoreAnalyzer = score_analyzer
+        self._config: SnapshotConfig = config
 
         self._collector = SnapshotCollector(
-            entity_manager, world_map, entity_collector, score_analyzer
+            entity_manager, world_map, entity_collector, climate_collector, score_analyzer
         )
         self._storage = SnapshotStorage(self._config)
 

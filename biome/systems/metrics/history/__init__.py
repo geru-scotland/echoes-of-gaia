@@ -15,19 +15,4 @@
 #                                                                              #
 # =============================================================================
 """
-from biome.agents.base import Agent, TAction, TState
-from shared.types import Observation
-
-
-class EvolutionAgentAI(Agent):
-    def __init__(self):
-        pass
-
-    def perceive(self) -> Observation:
-        pass
-
-    def decide(self, observation: TState) -> TAction:
-        pass
-
-    def act(self, action: TAction) -> None:
-        pass
+ 

@@ -69,7 +69,6 @@ class GrowthComponent(FloraComponent):
         self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
                                     growth_efficiency=self._growth_efficiency)
 
-
     def _update_growth(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:

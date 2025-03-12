@@ -129,6 +129,7 @@ class Season(EnumBaseStr):
 
 class AgentType(EnumBaseStr):
     CLIMATE_AGENT = "climate_agent"
+    EVOLUTION_AGENT = "evolution_agent"
 
 
 class Agents:

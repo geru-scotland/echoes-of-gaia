@@ -21,15 +21,18 @@ import simpy
 
 from biome.agents.base import Agent
 from biome.agents.climate_agent import ClimateAgentAI
+from biome.agents.evolution_agent import EvolutionAgentAI
 from biome.environment import Environment
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.events.event_bus import BiomeEventBus
+from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
+from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
 from shared.enums.enums import Agents, AgentType, Season, WeatherEvent
@@ -50,38 +53,52 @@ class Biome(Environment, StateHandler, BiomeDataProvider, EventHandler):
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions)
+            self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
             self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider)
+            self._climate_collector: ClimateDataCollector = ClimateDataCollector(self._climate)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
             self._agents: Dict[AgentType, Agent] = self._initialize_agents()
+            self._initialize_climate_data_management()
 
             self._logger.info("Biome is ready!")
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
 
+    def _initialize_climate_data_management(self) -> None:
+        try:
+            self._climate_data_manager = ClimateDataManager(self._climate)
+            self._climate_data_manager.start(self._env)
+            self._logger.info("Sistema de datos climáticos inicializado")
+        except Exception as e:
+            self._logger.exception(f"Error inicializando el sistema de datos climáticos: {e}")
+
     def _initialize_agents(self) -> Dict[AgentType, Agent]:
         agents: Dict[AgentType, Agent] = {}
 
-        climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
-        climate_agent: ClimateAgentAI = ClimateAgentAI(climate, self._context.climate_model)
-
+        climate_agent: ClimateAgentAI = ClimateAgentAI(self._climate, self._context.climate_model)
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
-        self._env.process(self._run_climate_agent(Timers.Agents.CLIMATE_UPDATE))
+        self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.CLIMATE_UPDATE))
+
+        evolution_agent: EvolutionAgentAI = EvolutionAgentAI()
+        agents.update({AgentType.EVOLUTION_AGENT: evolution_agent})
+        self._env.process(self._run_agent(AgentType.EVOLUTION_AGENT, Timers.Agents.EVOLUTION_CYCLE))
         return agents
 
-    def _run_climate_agent(self, delay: int):
+    def _run_agent(self, agent_type: AgentType, delay: int):
         yield self._env.timeout(delay)
         while True:
             try:
-                agent = self._agents.get(AgentType.CLIMATE_AGENT)
-                observation: Observation = agent.perceive()
-                action: WeatherEvent = agent.decide(observation)
+                # TODO, he qutiado tipado, hacer uno general para el agente
+                agent = self._agents.get(agent_type, None)
+                observation = agent.perceive()
+                action = agent.decide(observation)
                 agent.act(action)
                 # TODO: delay basado en el weatherevent quizá?
                 # echarle una pensada - si drought que persista por X días
                 yield self._env.timeout(delay)
             except Exception as e:
-                self._logger.exception(f"An exception ocurred running climate agent: {e}")
+                self._logger.exception(f"An exception ocurred running  agent: {e}")
 
     def _register_events(self):
         BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
@@ -104,6 +121,9 @@ class Biome(Environment, StateHandler, BiomeDataProvider, EventHandler):
 
     def get_entity_collector(self) -> EntityDataCollector:
         return self._entity_collector
+
+    def get_climate_collector(self) -> ClimateDataCollector:
+        return self._climate_collector
 
     def get_score_analyzer(self) -> BiomeScoreAnalyzer:
         return self._score_analyzer

@@ -16,7 +16,7 @@
 ##########################################################################
 """
 from pathlib import Path
-from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional, Callable
+from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional, Callable, Union
 
 import numpy as np
 from numpy import ndarray
@@ -66,4 +66,4 @@ CallbackType = Optional[Callable[[Optional[Path]], None]]
 
 
 # Agents
-Observation = Dict[str, Any]
+Observation = Union[Dict[str, Any]]

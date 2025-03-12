@@ -17,7 +17,6 @@
 """
 from biome.components.physiological.growth import GrowthComponent
 from biome.components.physiological.metabolic import MetabolicComponent
-from biome.components.physiological.nutritional import NutritionalComponent
 from biome.components.base.transform import TransformComponent
 from biome.components.physiological.vital import VitalComponent
 

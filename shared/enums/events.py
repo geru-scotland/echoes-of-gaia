@@ -41,3 +41,4 @@ class BiomeEvent(EnumBaseStr):
     EXTREME_WEATHER = "on_extreme_weather"
     SEASON_CHANGE = "season_change"
     DISASTER = "disaster"
+    CLIMATE_DATA_COLLECTED = "climate_data_collected"

@@ -131,14 +131,19 @@ class ThreadNameFilter(logging.Filter):
 
         return True
 
-class LoggerManager:
+import logging
 
+class LoggerManager:
     _loggers = {}
     _log_level = logging.INFO
 
     @staticmethod
     def initialize(log_level: str):
-        LoggerManager._log_level = getattr(logging, log_level.upper(), logging.INFO)
+        if log_level.upper() == "OFF":
+            logging.disable(logging.CRITICAL + 1)  # Desactiva completamente los logs
+        else:
+            LoggerManager._log_level = getattr(logging, log_level.upper(), logging.INFO)
+
 
     @staticmethod
     def get_logger(name: str, log_file: str = None):

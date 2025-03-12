@@ -163,8 +163,14 @@ class ClimateSystem:
         if is_extreme:
             BiomeEventBus.trigger(BiomeEvent.EXTREME_WEATHER,
                                   temperature=self._state.temperature)
-
-        self._logger.debug(f"State AFTER: {self._state}")
+        self._logger.debug(
+            f"\n{'=' * 60}\n"
+            f"[CLIMATE] Season: {self._season_system.get_current_season()} | Weather Event: {weather_event}\n"
+            f"│ Temperature: {self._state.temperature:.2f}°C\n"
+            f"│ Humidity: {self._state.humidity:.2f}%\n"
+            f"│ Precipitation: {self._state.precipitation:.2f}mm\n"
+            f"{'=' * 60}"
+        )
 
     def get_state(self) -> ClimateState:
         return self._state
