@@ -26,6 +26,7 @@ from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.events.event_bus import BiomeEventBus
+from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from biome.systems.maps.worldmap import WorldMap
@@ -50,20 +51,29 @@ class Biome(Environment, StateHandler, BiomeDataProvider, EventHandler):
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions)
+            self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
             self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
             self._agents: Dict[AgentType, Agent] = self._initialize_agents()
+            self._initialize_climate_data_management()
 
             self._logger.info("Biome is ready!")
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
 
+    def _initialize_climate_data_management(self) -> None:
+        try:
+            self._climate_data_manager = ClimateDataManager(self._climate)
+            self._climate_data_manager.start(self._env)
+            self._logger.info("Sistema de datos climáticos inicializado")
+        except Exception as e:
+            self._logger.exception(f"Error inicializando el sistema de datos climáticos: {e}")
+
     def _initialize_agents(self) -> Dict[AgentType, Agent]:
         agents: Dict[AgentType, Agent] = {}
 
-        climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
-        climate_agent: ClimateAgentAI = ClimateAgentAI(climate, self._context.climate_model)
+        climate_agent: ClimateAgentAI = ClimateAgentAI(self._climate, self._context.climate_model)
 
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_climate_agent(Timers.Agents.CLIMATE_UPDATE))

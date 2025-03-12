@@ -23,7 +23,7 @@ from typing import Optional, cast, Tuple
 import simpy
 
 from biome.api.biome_api import BiomeAPI
-from biome.systems.data.data_manager import BiomeDataManager
+from biome.systems.managers.biome_data_manager import BiomeDataManager
 from config.settings import Settings
 from shared.timers import Timers
 from shared.enums.strings import Strings, Loggers

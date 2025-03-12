@@ -115,10 +115,6 @@ class MetabolicComponent(FloraComponent):
                                         energy_reserves=self._energy_reserves)
 
             energy_threshold: float = self._max_energy_reserves * 0.2
-
-
-
-
             base_generation = self._photosynthesis_efficiency
             total_modifiers = (self._light_availability * self._temperature_modifier *
                                self._water_modifier * self._metabolic_activity * photosynthesis_factor)
