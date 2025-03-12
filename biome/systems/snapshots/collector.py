@@ -25,23 +25,25 @@ from biome.entities.entity import Entity
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
+from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.snapshots.data import SnapshotData
 from shared.enums.enums import TerrainType
 from shared.enums.strings import Loggers
-from shared.types import TerrainData, EntityData, ComponentData
+from shared.types import TerrainData, EntityData, ComponentData, ClimateData, TerrainMap
 from simulation.core.systems.time.time import SimulationTimeInfo
 from utils.loggers import LoggerManager
 
 
 class SnapshotCollector:
     def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
-                 entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer):
+                 entity_collector: EntityDataCollector, climate_collector: ClimateDataCollector, score_analyzer: BiomeScoreAnalyzer):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self._entity_manager = entity_manager
-        self._world_map = world_map
-        self._entity_collector = entity_collector
-        self._score_analyzer = score_analyzer
+        self._entity_manager: EntityProvider = entity_manager
+        self._entity_collector: EntityDataCollector = entity_collector
+        self._world_map: WorldMap = world_map
+        self._climate_collector: ClimateDataCollector = climate_collector
+        self._score_analyzer: BiomeScoreAnalyzer = score_analyzer
 
     def collect_snapshot_data(self, simulation_time: int) -> SnapshotData:
         snapshot_id = f"{int(time.time())}_{simulation_time}"
@@ -56,13 +58,21 @@ class SnapshotCollector:
         self._collect_metrics_data(snapshot)
 
         # Clima, cuando lo haga
-        # snapshot.set_climate_data(self._collect_climate_data())
+        snapshot.set_climate_data(self._collect_climate_data())
 
         return snapshot
 
+    def _collect_climate_data(self) -> ClimateData:
+        try:
+            climate_data = self._climate_collector.collect_data()
+            return climate_data
+        except Exception as e:
+            self._logger.error(f"Error collecting climate data: {e}")
+            return {"error": str(e)}
+
     def _collect_terrain_data(self) -> TerrainData:
         try:
-            terrain_map = self._world_map._terrain_map
+            terrain_map: TerrainMap = self._world_map.terrain_map
 
             # Serializable, convierto los terrenos a int.
             terrain_int_map = terrain_map.astype(np.int8).tolist()
@@ -112,7 +122,7 @@ class SnapshotCollector:
     def _collect_entity_components(self, entity: Entity) -> Dict[str, ComponentData]:
         components_data = {}
 
-        for component_type, component in entity._components.items():
+        for component_type, component in entity.components.items():
             try:
                 component_attrs = {
                     k: v for k, v in vars(component).items()

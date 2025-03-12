@@ -70,6 +70,7 @@ class BiomeDataManager:
                 entity_manager=self._data_provider.get_entity_provider(),
                 world_map=self._data_provider.get_world_map(),
                 entity_collector=self._data_provider.get_entity_collector(),
+                climate_collector=self._data_provider.get_climate_collector(),
                 score_analyzer=self._data_provider.get_score_analyzer(),
                 config=config
             )

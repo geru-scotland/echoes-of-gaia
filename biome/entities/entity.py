@@ -49,6 +49,7 @@ class Entity(EventHandler, StateHandler, ABC):
         self._components: ComponentDict = {}
         self._habitats: HabitatList = habitats
         self._state: EntityState = EntityState()
+        self._birth_tick: int = self._env.now
 
     def _register_events(self):
         self._event_notifier.register(ComponentEvent.UPDATE_STATE, self.handle_component_update)
@@ -117,3 +118,7 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def update(self):
         pass
+
+    @property
+    def components(self):
+        return self._components

@@ -63,7 +63,7 @@ class VitalComponent(FloraComponent):
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._age =  self._env.now / Timers.Calendar.DAY
+            self._age =  timer / Timers.Calendar.DAY
             self._biological_age = self._age * self._aging_rate
             self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, age=self._age,
                                         biological_age=self._biological_age)

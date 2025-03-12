@@ -37,3 +37,6 @@ class WorldMap:
             entities.append(entity)
         return entities
 
+    @property
+    def terrain_map(self):
+        return self._terrain_map
