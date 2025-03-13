@@ -41,7 +41,7 @@ class Flora(Entity):
         self._event_notifier.register(ComponentEvent.DORMANCY_REASONS_CHANGED, self._handle_dormancy_reasons_changed)
 
     def _handle_dormancy_reasons_changed(self, component: Type, reasons: Set[DormancyReason]) -> None:
-        self._logger.warning(f"Component: {component} Reason: {reasons}")
+        self._logger.debug(f"Component: {component} Reason: {reasons}")
         self._component_dormancy_reasons[component] = reasons
 
         self._update_dormancy_state()

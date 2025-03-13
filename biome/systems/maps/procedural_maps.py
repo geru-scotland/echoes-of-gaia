@@ -124,7 +124,7 @@ class PerlinNoiseGenerator(ProceduralMethod):
         # el autor original, acumulaba en iteración, pero como yo vectorizo con numpy
         # utilizo cumsum
         max_terrain_heights = min_value + np.cumsum(total_range * normalized_weights)
-        max_terrain_heights[int(TerrainType.SNOW)] = max_value
+        max_terrain_heights[-1] = max_value
 
         # Copio shape del noise map y lo inicializo con grass
         self._map.tile_map = np.full_like(self._map.noise_map, TerrainType.GRASS, dtype=object)

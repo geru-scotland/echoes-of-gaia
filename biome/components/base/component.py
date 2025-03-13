@@ -103,7 +103,7 @@ class FloraComponent(EntityComponent):
 
     def _handle_extreme_weather(self, *args, **kwargs):
         temperature = kwargs.get("temperature", 0.0)
-        self._logger.error(f"EXTREME WEATHER HANDLING FROM A COMPONENT: {temperature}")
+        self._logger.debug(f"EXTREME WEATHER HANDLING FROM A COMPONENT: {temperature}")
 
         if temperature <= ClimateThresholds.Temperature.EXTREME_COLD:
             stress_change = ClimateThresholds.StressChange.EXTREME_COLD / 5.0
@@ -138,11 +138,20 @@ class FloraComponent(EntityComponent):
                                     reasons=self._dormancy_reasons)
 
     def modify_stress(self, delta: float, reason: StressReason):
-        self._logger.error(f"TRYING TO MODIFY STRESS LEVEL {delta} - Reason: {reason}")
-        old_stress = self._stress_level
-        self._stress_level = round(max(0.0, min(self._stress_level + delta, self._max_stress)), 4)
+        self._logger.debug(f"[{id(self._host)}|{str(self._host._descriptor.species).upper()} {self.__class__} STRESS DEBUG] Attempting to modify stress level.")
+        self._logger.debug(f"[STRESS DEBUG] - Delta: {delta}")
+        self._logger.debug(f"[STRESS DEBUG] - Reason: {reason}")
+        self._logger.debug(f"[STRESS DEBUG] - Previous Stress Level: {self._stress_level}")
+        self._logger.debug(f"[STRESS DEBUG] - Max Stress Allowed: {self._max_stress}")
 
-        self._logger.error(f"STRESS IN SSTRESS {delta}")
+        old_stress = self._stress_level
+        new_stress = max(0.0, min(self._stress_level + delta, self._max_stress))
+        rounded_stress = round(new_stress, 4)
+
+        self._logger.debug(f"[STRESS DEBUG] - New Calculated Stress (Before Rounding): {new_stress}")
+        self._logger.debug(f"[STRESS DEBUG] - New Stress Level (Rounded): {rounded_stress}")
+
+        self._stress_level = rounded_stress
         if old_stress != self._stress_level:
 
             self._event_notifier.notify(
