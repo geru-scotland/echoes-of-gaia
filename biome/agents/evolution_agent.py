@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import itertools
 from logging import Logger
 from typing import List, Dict, Any
 
@@ -30,11 +31,15 @@ from utils.loggers import LoggerManager
 class EvolutionAgentAI(Agent):
     def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider):
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
-        self._climate_data_manager: ClimateDataManager = climate_data_manager
         self._genetic_model: GeneticAlgorithmModel = GeneticAlgorithmModel()
+        self._evolution_cycle: itertools.count[int] = itertools.count(0)
+        self._climate_data_manager: ClimateDataManager = climate_data_manager
+        self._current_evolution_cycle: int = next(self._evolution_cycle)
+        self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
+
 
     def perceive(self) -> Observation:
-        last_cycle_climate_data: List[Dict[str, Any]] = self._climate_data_manager.get_last_evolution_cycle_data()
+        last_cycle_climate_data: List[Dict[str, Any]] = self._climate_data_manager.get_data(self._current_evolution_cycle)
         self._logger.error(f"PERCEIVING: {last_cycle_climate_data}")
         return {"data": last_cycle_climate_data}
 
@@ -42,4 +47,5 @@ class EvolutionAgentAI(Agent):
         pass
 
     def act(self, action: TAction) -> None:
-        pass
+        self._current_evolution_cycle = next(self._evolution_cycle)
+        self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)

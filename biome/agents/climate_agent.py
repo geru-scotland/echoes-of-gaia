@@ -27,7 +27,7 @@ from shared.enums.enums import WeatherEvent, BiomeType, Season
 from shared.enums.strings import Loggers
 from shared.types import Observation
 from utils.loggers import LoggerManager
-from utils.normalization.normalizer import climate_normalizer
+from shared.normalization.normalizer import climate_normalizer
 
 
 class ClimateAgentAI(Agent[ClimateState, WeatherEvent]):
@@ -42,7 +42,7 @@ class ClimateAgentAI(Agent[ClimateState, WeatherEvent]):
         season_idx: int = list(Season).index(self._climate.get_current_season())
         # TODO: implementar get_state_with_modifiers() cuando llegue el momento
         # para aplicar al clima modificadores
-        state: ClimateState = self._climate.get_state()
+        state: ClimateState = self._climate.get_state_and_record()
 
         normalized_temp: float = climate_normalizer.normalize("temperature", state.temperature)
         normalized_humidity: float = climate_normalizer.normalize("humidity", state.humidity)

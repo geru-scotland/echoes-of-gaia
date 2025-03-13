@@ -41,7 +41,7 @@ class Timers:
             MUTATION_CHECK = 60
             ADAPTATION_UPDATE = 180
             SELECTION_PRESSURE = 360
-            EVOLUTION_CYCLE = 10800
+            EVOLUTION_CYCLE = 2800
 
 
 

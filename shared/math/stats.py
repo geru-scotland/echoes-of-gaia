@@ -16,19 +16,9 @@
 # =============================================================================
 """
 
-from research.training.reinforcement.train_agent import ReinforcementLearningAgent
-from shared.enums.enums import Agents
-from shared.stores.biome_store import BiomeStore
+class StatsProcessor:
 
-BiomeStore.load_ecosystem_data()
-
-
-
-if __name__ == "__main__":
-    # Para entrenar el modelo
-    # BiomeStore.load_ecosystem_data()
-    train_agent = ReinforcementLearningAgent(Agents.Reinforcement.NAIVE_CLIMATE)
-    train_agent.train()
-
-    # train_agent: ReinforcementTrainingAgent = ReinforcementTrainingAgent(Agents.Reinforcement.NAIVE_CLIMATE)
-    # train_agent.train()
+    @staticmethod
+    def exponential_moving_average(current_value: float, previous_ema: float, alpha: float):
+        current_ema: float = alpha * current_value + (1 - alpha) * previous_ema
+        return current_ema

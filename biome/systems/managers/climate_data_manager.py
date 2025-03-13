@@ -34,55 +34,23 @@ class ClimateDataManager:
         self._logger: Logger = LoggerManager.get_logger(Loggers.CLIMATE)
         self._climate_service = climate_service
         self._collector = ClimateDataCollector(climate_service)
-        self._history_service = ClimateHistoryService()
+        self._climate_history = ClimateHistoryService()
         self._env: simpyEnv = env
+        self._evolution_cycle: int = 0
 
-    def start(self) -> None:
-        self._env.process(self._collect_periodically(Timers.Calendar.MONTH))
+    def record_daily_data(self) -> None:
+        self._collect_daily()
 
-    def _collect_periodically(self, timer: int):
-        while True:
-            climate_data = self._collector.collect_data()
-            self._history_service.add_climate_data(climate_data)
+    def set_evolution_cycle(self, evolution_cycle: int):
+        self._evolution_cycle = evolution_cycle
 
-            num_averages: int = 10
-            num_recent: int = 5
+    def _collect_daily(self):
+        climate_data: Dict[str, Any] = self._collector.collect_data()
+        self._climate_history.add_daily_data(climate_data, self._evolution_cycle, self._env.now)
 
-            recent_history = self.get_recent_climate_history(num_recent)
-            climate_averages = self.get_climate_averages(num_averages)
-            latest_climate_data = self.get_latest_climate_data()
-
-            self._logger.debug(
-                f"[Periodic Check: {self._env.now}] New climate data collected: {climate_data}\n"
-                f"  - Latest {num_recent} entries: {recent_history}\n"
-                f"  - Averages ({num_averages}): {climate_averages}\n"
-                f"  - Último dato climático registrado: {latest_climate_data}"
-            )
-
-            BiomeEventBus.trigger(BiomeEvent.CLIMATE_DATA_COLLECTED, climate_data)
-
-            yield self._env.timeout(timer)
-
-    def get_recent_climate_history(self, num_entries: int) -> List[Dict[str, Any]]:
-        return self._history_service.get_history(num_entries)
+    def get_data(self, evolution_cycle: int):
+        self._climate_history.get_data_by_evolution_cycle(evolution_cycle)
 
     def get_climate_averages(self, period: int) -> Dict[str, float]:
-        return self._history_service.get_average_over_period(period)
+        return self._climate_history.get_average_over_period()
 
-    def get_latest_climate_data(self) -> Dict[str, Any]:
-        history = self._history_service.get_history(1)
-        if history:
-            return history[0]
-        return self._collector.collect_data()
-
-    def get_last_evolution_cycle_data(self) -> List[Dict[str, Any]]:
-        try:
-            history = self._history_service.get_history(12 * 15)
-            if history:
-                return history
-            raise
-        except Exception as e:
-            self._logger.exception(f"There as error obtaining last evolution cycle's climate data {e}")
-
-    def shutdown(self) -> None:
-        self._history_service.clear_history()

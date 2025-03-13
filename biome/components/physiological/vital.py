@@ -15,17 +15,13 @@
 #                                                                              #
 # =============================================================================
 """
-import os
-import sys
 from typing import Optional, List, Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
-from biome.components.base.component import EntityComponent, FloraComponent
-from biome.components.biological_patterns import BiologicalGrowthPatterns
-from biome.services.climate_service import ClimateService
-from biome.systems.climate.state import ClimateState
+from biome.components.base.component import FloraComponent
+from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent

@@ -19,6 +19,7 @@ import time
 from logging import Logger
 from typing import Dict, Any
 
+from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
@@ -32,7 +33,7 @@ class ClimateDataCollector:
     def collect_data(self) -> Dict[str, Any]:
         self._logger.debug("Recolectando datos climáticos actuales")
 
-        climate_state = self._climate_service.get_state()
+        climate_state: ClimateState = self._climate_service.get_state()
         if not climate_state:
             return self._get_empty_climate_data()
 
@@ -42,7 +43,6 @@ class ClimateDataCollector:
             "precipitation": climate_state.precipitation,
             "atm_pressure": climate_state.atm_pressure,
             "current_season": str(self._climate_service.get_current_season()),
-            "timestamp": int(time.time())
         }
 
         return climate_data
@@ -54,7 +54,6 @@ class ClimateDataCollector:
             "precipitation": 0.0,
             "atm_pressure": 1013.0,
             "current_season": "unknown",
-            "timestamp": int(time.time())
         }
 
     # metricas. Pongo aquí, para que luego el sistema de snapshots pueda utilizar también

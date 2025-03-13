@@ -22,7 +22,7 @@ from stable_baselines3 import PPO
 
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
-from utils.normalization.normalizer import climate_normalizer
+from shared.normalization.normalizer import climate_normalizer
 from utils.paths import get_model_path
 
 

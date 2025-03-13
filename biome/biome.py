@@ -54,11 +54,13 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions)
             self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
+            self._climate_data_manager = ClimateDataManager(self._env, self._climate)
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
             self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
 
-            self._initialize_climate_data_management()
+            self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
+
             self._agents: Dict[AgentType, Agent] = self._initialize_agents()
 
             EventHandler.__init__(self)
@@ -66,13 +68,6 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
 
-    def _initialize_climate_data_management(self) -> None:
-        try:
-            self._climate_data_manager = ClimateDataManager(self._env, self._climate)
-            self._climate_data_manager.start()
-            self._logger.info("Climate system initialized.")
-        except Exception as e:
-            self._logger.exception(f"Error initialising climate manager: {e}")
 
     def _initialize_agents(self) -> Dict[AgentType, Agent]:
         agents: Dict[AgentType, Agent] = {}
