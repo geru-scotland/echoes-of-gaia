@@ -26,7 +26,7 @@ from research.training.reinforcement.adapter import EnvironmentAdapter
 from shared.enums.enums import BiomeType, Season, WeatherEvent
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
-from utils.normalization.normalizer import climate_normalizer
+from shared.normalization.normalizer import climate_normalizer
 
 
 class ClimateTrainAdapter(EnvironmentAdapter):

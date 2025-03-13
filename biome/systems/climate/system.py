@@ -17,7 +17,7 @@
 """
 import random
 from logging import Logger
-from typing import Dict, Any
+from typing import Dict, Any, Optional, Callable
 
 from biome.services.climate_service import ClimateService
 from biome.systems.climate.seasons import SeasonSystem
@@ -29,7 +29,7 @@ from shared.enums.thresholds import ClimateThresholds
 from shared.stores.biome_store import BiomeStore
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
-from utils.normalization.ranges import CLIMATE_RANGES
+from shared.normalization.normalizer import CLIMATE_RANGES
 
 
 class ClimateSystem:
@@ -47,11 +47,10 @@ class ClimateSystem:
 
         self._state: ClimateState = self._initialize_state()
         ClimateService.init_service(self._state)
-
         self._season_system: SeasonSystem = SeasonSystem(initial_season)
 
-        for i in range(360):
-            self._season_system.update(handle_new_season=self._handle_new_season)
+        self._record_data_callback: Optional[Callable] = None
+
 
     def _load_environmental_data(self):
         self._base_environmental_factors = BiomeStore.biomes.get(self._biome_type, {}).get("environmental_factors", {})
@@ -83,6 +82,8 @@ class ClimateSystem:
         except Exception as e:
             self._logger.exception(f"An exception occured when trying to obtain environmental factors: {e}")
 
+    def configure_record_callback(self, record_data_callback: Callable):
+        self._record_data_callback = record_data_callback
 
     def update(self, weather_event: WeatherEvent = None) -> None:
         # Este método es el que irá con simpy para el Bioma, lo hago público
@@ -172,6 +173,10 @@ class ClimateSystem:
             f"{'=' * 60}"
         )
 
+    def get_state_and_record(self) -> ClimateState:
+        self._record_data_callback()
+        return self._state
+
     def get_state(self) -> ClimateState:
         return self._state
 
@@ -207,3 +212,7 @@ class ClimateSystem:
     @property
     def biome_type(self):
         return self._biome_type
+
+    @property
+    def data_manager(self):
+        return self._record_data_callback

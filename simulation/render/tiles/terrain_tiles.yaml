@@ -1,5 +1,5 @@
 # Ojo, las claves han de coincidir con los enums TerrainType en shared/enums.py
-OCEAN_DEEP:
+WATER_DEEP:
   - [0, 0]
   - [352, 160]
   - [384, 160]
@@ -16,7 +16,7 @@ OCEAN_DEEP:
   - [368, 176]
   - [416, 224]
   - [368, 176]
-OCEAN_MID:
+WATER_MID:
   - [0, 0]
   - [272, 160]
   - [304, 160]
@@ -33,7 +33,7 @@ OCEAN_MID:
   - [320, 176]
   - [336, 176]
   - [288, 176]
-OCEAN_SHALLOW:
+WATER_SHALLOW:
   - [0, 0]
   - [192, 160]
   - [224, 160]
@@ -50,7 +50,7 @@ OCEAN_SHALLOW:
   - [240, 176]
   - [256, 176]
   - [208, 176]
-BEACH:
+SHORE:
   - [0, 0]
   - [352, 0]
   - [192, 0]

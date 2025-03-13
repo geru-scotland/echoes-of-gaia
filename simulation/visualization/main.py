@@ -26,14 +26,16 @@ from utils.loggers import LoggerManager
 from utils.paths import SIMULATION_DIR
 
 TERRAIN_COLORS = {
-    0: (12, 36, 97),      # OCEAN_DEEP: Azul oscuro mate
-    1: (32, 80, 160),     # OCEAN_MID: Azul medio mate
-    2: (65, 132, 190),    # OCEAN_SHALLOW: Azul claro mate
-    3: (222, 209, 175),   # BEACH: Arena mate
-    4: (59, 122, 87),     # GRASS: Verde oscuro mate
-    5: (115, 115, 115),   # MOUNTAIN: Gris piedra mate
-    6: (230, 232, 250)    # SNOW: Blanco grisáceo mate
+    0: (15, 42, 68),    # OCEAN_DEEP
+    1: (40, 84, 116),   # OCEAN_MID
+    2: (72, 123, 153),  # OCEAN_SHALLOW
+    3: (152, 135, 122), # SHORE
+    4: (92, 114, 81),   # GRASS
+    5: (120, 119, 112), # MOUNTAIN
+    6: (225, 227, 222), # SNOW
+    7: (219, 203, 165)  # SAND
 }
+
 
 ENTITY_COLORS = {
     "flora": (67, 124, 23),       # Verde bosque mate

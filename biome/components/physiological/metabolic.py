@@ -129,7 +129,7 @@ class MetabolicComponent(FloraComponent):
                     f"Energy deficit! Photosynthesis={effective_photosynthesis:.2f} <= "
                     f"Respiration={effective_respiration:.2f}"
                 )
-            self._logger.info(
+            self._logger.debug(
                 f"[Metabolic Update | DEBUG:Tick={self._env.now}]"
                 f"Stress level={self._stress_level:4f}]"
                 f"Energy: {self._energy_reserves:.3f}/{self._max_energy_reserves:.3f}, "
@@ -150,7 +150,7 @@ class MetabolicComponent(FloraComponent):
         super()._handle_stress_update(*args, **kwargs)
 
         normalized_stress = kwargs.get("normalized_stress", 0.0)
-        self._logger.error(f"NORMLIZED STRESS {normalized_stress}")
+        self._logger.debug(f"NORMLIZED STRESS {normalized_stress}")
         self._photosynthesis_efficiency = max(0.0, self._base_photosynthesis_efficiency - max(0.05, normalized_stress * 0.8))
         # Quizá problema aquí
         self._respiration_rate = min(1.0, self._base_respiration_rate +  1.0 * normalized_stress)

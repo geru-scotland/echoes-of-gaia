@@ -15,17 +15,13 @@
 #                                                                              #
 # =============================================================================
 """
-import os
-import sys
 from typing import Optional, List, Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
-from biome.components.base.component import EntityComponent, FloraComponent
-from biome.components.biological_patterns import BiologicalGrowthPatterns
-from biome.services.climate_service import ClimateService
-from biome.systems.climate.state import ClimateState
+from biome.components.base.component import FloraComponent
+from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
@@ -35,7 +31,7 @@ from shared.timers import Timers
 
 
 class VitalComponent(FloraComponent):
-    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 15.0,
+    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 5.0,
                  vitality: float = 100.0, max_vitality: float = 100.0, age: float = 0.0, aging_rate: float = 1.0,
                  dormancy_threshold: float = 25.0):
 
@@ -79,25 +75,25 @@ class VitalComponent(FloraComponent):
             if vitality_ratio < VitalThresholds.Health.CRITICAL:
                 stress_change = VitalThresholds.StressChange.CRITICAL / 10.0
                 self.modify_stress(stress_change, StressReason.CRITICAL_VITALITY)
-                self._logger.warning(
+                self._logger.debug(
                     f"Vitality is CRITICAL ({vitality_ratio:.2f}). Increasing stress by {stress_change:.4f}.")
 
             elif vitality_ratio < VitalThresholds.Health.LOW:
                 stress_change = VitalThresholds.StressChange.LOW / 10.0
                 self.modify_stress(stress_change, StressReason.LOW_VITALITY)
-                self._logger.warning(
+                self._logger.debug(
                     f"Vitality is LOW ({vitality_ratio:.2f}). Increasing stress by {stress_change:.4f}.")
 
             elif vitality_ratio > VitalThresholds.Health.EXCELLENT:
                 stress_change = VitalThresholds.StressChange.EXCELLENT / 10.0
                 self.modify_stress(stress_change, StressReason.EXCELLENT_VITALITY)
-                self._logger.warning(
+                self._logger.debug(
                     f"Vitality is EXCELLENT ({vitality_ratio:.2f}). Reducing stress by {stress_change:.4f}.")
 
             elif vitality_ratio > VitalThresholds.Health.GOOD:
                 stress_change = VitalThresholds.StressChange.GOOD / 10.0
                 self.modify_stress(stress_change, StressReason.GOOD_VITALITY)
-                self._logger.warning(
+                self._logger.debug(
                     f"Vitality is GOOD ({vitality_ratio:.2f}). Reducing stress by {stress_change:.4f}.")
 
             yield self._env.timeout(timer)
@@ -112,7 +108,7 @@ class VitalComponent(FloraComponent):
                 non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(completed_lifespan_ratio_with_mods)
 
                 new_health = self._max_vitality * (1.0 - non_linear_aging_progression)
-                self._logger.info(
+                self._logger.debug(
                     f"[Vitality Update | DEBUG:Tick={self._env.now}] "
                     f"Stress level={self._stress_level:4f}]"
                     f"Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_days}, "
@@ -152,7 +148,7 @@ class VitalComponent(FloraComponent):
         else:
             self._aging_rate = -22.02 * normalized_stress ** 3 + 36.45 * normalized_stress ** 2 - 15.93 * normalized_stress + 2.79
 
-        self._logger.warning(
+        self._logger.debug(
             f"normalized: {normalized_stress:.2f} → aging_rate: {self._aging_rate:.2f}")
 
     def apply_damage(self, amount: float) -> None:

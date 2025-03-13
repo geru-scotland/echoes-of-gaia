@@ -1,12 +1,13 @@
 {
   "terrains": [
-      "OCEAN_DEEP",
-      "OCEAN_MID",
-      "OCEAN_SHALLOW",
-      "BEACH",
+      "WATER_DEEP",
+      "WATER_MID",
+      "WATER_SHALLOW",
+      "SHORE",
       "GRASS",
       "MOUNTAIN",
-      "SNOW"
+      "SNOW",
+      "SAND"
   ],
 
 "weather_event_effects": {
@@ -94,7 +95,7 @@
 
 "biomes": {
     "tropical": {
-      "weights": [10, 10, 19, 5, 55, 30, 5],
+      "weights": [11, 12, 13, 11, 50, 20, -1],
       "environmental_factors": {
         "temperature": {"min": 23, "max": 31},
         "humidity": {"min": 70, "max": 90},
@@ -160,7 +161,7 @@
       }
     },
     "desert": {
-      "weights": [0, 5, 5, 10, 80, 10, 0],
+      "weights": [0, 5, 5, 10, 10, 3, 0, 50],
       "environmental_factors": {
         "temperature": {"min": 27, "max": 45},
         "humidity": {"min": 2, "max": 10},
@@ -436,11 +437,11 @@
       },
       "fungal_zone": {
           "IN": ["GRASS", "MOUNTAIN"],
-          "NEARBY": ["SNOW", "OCEAN_SHALLOW"]
+          "NEARBY": ["SNOW", "WATER_SHALLOW"]
       },
       "coastal": {
-          "IN": ["BEACH"],
-          "NEARBY": ["OCEAN_DEEP", "OCEAN_SHALLOW", "OCEAN_MID"]
+          "IN": ["SHORE"],
+          "NEARBY": ["WATER_DEEP", "WATER_SHALLOW", "WATER_MID"]
       },
       "alpine": {
           "IN": ["MOUNTAIN"],
@@ -515,7 +516,7 @@
       "MetabolicComponent": {
         "defaults": {
           "photosynthesis_efficiency": 0.6,
-          "respiration_rate": 0.2,
+          "respiration_rate": 0.3,
           "metabolic_activity": 1,
           "energy_reserves": 100.0,
           "max_energy_reserves": 100.0

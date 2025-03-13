@@ -26,13 +26,14 @@ class BiomeType(EnumBaseStr):
 
 # Maps
 class TerrainType(EnumBaseInt):
-    OCEAN_DEEP = 0
-    OCEAN_MID = 1
-    OCEAN_SHALLOW = 2
-    BEACH = 3
+    WATER_DEEP = 0
+    WATER_MID = 1
+    WATER_SHALLOW = 2
+    SHORE = 3
     GRASS = 4
     MOUNTAIN = 5
     SNOW = 6
+    SAND = 7
 
 class ComponentType(EnumBaseStr):
     TRANSFORM = "transform"

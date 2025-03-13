@@ -44,45 +44,41 @@ from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.systems.telemetry.datapoint import Datapoint
 
 
-class Biome(Environment, StateHandler, BiomeDataProvider, EventHandler):
+class Biome(Environment, BiomeDataProvider, EventHandler):
 
     def __init__(self, context: BiomeContextData, env: simpy.Environment):
-        super().__init__(context, env)
+        Environment.__init__(self, context, env)
         try:
             self._logger.info(self._context.config.get("type"))
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions)
             self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
+            self._climate_data_manager = ClimateDataManager(self._env, self._climate)
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
             self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider)
-            self._climate_collector: ClimateDataCollector = ClimateDataCollector(self._climate)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
-            self._agents: Dict[AgentType, Agent] = self._initialize_agents()
-            self._initialize_climate_data_management()
 
+            self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
+
+            self._agents: Dict[AgentType, Agent] = self._initialize_agents()
+
+            EventHandler.__init__(self)
             self._logger.info("Biome is ready!")
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
 
-    def _initialize_climate_data_management(self) -> None:
-        try:
-            self._climate_data_manager = ClimateDataManager(self._climate)
-            self._climate_data_manager.start(self._env)
-            self._logger.info("Sistema de datos climáticos inicializado")
-        except Exception as e:
-            self._logger.exception(f"Error inicializando el sistema de datos climáticos: {e}")
 
     def _initialize_agents(self) -> Dict[AgentType, Agent]:
         agents: Dict[AgentType, Agent] = {}
 
         climate_agent: ClimateAgentAI = ClimateAgentAI(self._climate, self._context.climate_model)
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
-        self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.CLIMATE_UPDATE))
+        self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.Climate.CLIMATE_UPDATE))
 
-        evolution_agent: EvolutionAgentAI = EvolutionAgentAI()
+        evolution_agent: EvolutionAgentAI = EvolutionAgentAI(self._climate_data_manager, self._entity_provider)
         agents.update({AgentType.EVOLUTION_AGENT: evolution_agent})
-        self._env.process(self._run_agent(AgentType.EVOLUTION_AGENT, Timers.Agents.EVOLUTION_CYCLE))
+        self._env.process(self._run_agent(AgentType.EVOLUTION_AGENT, Timers.Agents.Evolution.EVOLUTION_CYCLE))
         return agents
 
     def _run_agent(self, agent_type: AgentType, delay: int):
@@ -90,7 +86,7 @@ class Biome(Environment, StateHandler, BiomeDataProvider, EventHandler):
         while True:
             try:
                 # TODO, he qutiado tipado, hacer uno general para el agente
-                agent = self._agents.get(agent_type, None)
+                agent: Agent = self._agents.get(agent_type, None)
                 observation = agent.perceive()
                 action = agent.decide(observation)
                 agent.act(action)
