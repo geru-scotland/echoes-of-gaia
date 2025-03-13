@@ -19,22 +19,6 @@ from shared.enums.base import EnumBaseInt
 
 class Timers:
 
-    class System(EnumBaseInt):
-        CLIMATE_UPDATE = 2
-        BIOME_STATE_UPDATE = 2
-        SNAPSHOT = 60
-        DATA_COLLECTION = 30
-
-    class Agents(EnumBaseInt):
-        EVOLUTIONARY_CYCLE = 500
-        CLIMATE_UPDATE = 2 # 2 ticks = 1 día
-
-    class Evolutionary(EnumBaseInt):
-        MUTATION_CHECK = 60
-        ADAPTATION_UPDATE = 180
-        SELECTION_PRESSURE = 360
-        EVOLUTIONARY_CYCLE = 720
-
     class Calendar(EnumBaseInt):
         TICK = 1
         DAY = 2
@@ -42,6 +26,24 @@ class Timers:
         MONTH = 60
         SEASON = 180
         YEAR = 720
+
+    class System(EnumBaseInt):
+        CLIMATE_UPDATE = 2
+        BIOME_STATE_UPDATE = 2
+        SNAPSHOT = 60
+        DATA_COLLECTION = 30
+
+    class Agents:
+        class Climate(EnumBaseInt):
+            CLIMATE_UPDATE = 2
+
+        class Evolution(EnumBaseInt):
+            MUTATION_CHECK = 60
+            ADAPTATION_UPDATE = 180
+            SELECTION_PRESSURE = 360
+            EVOLUTION_CYCLE = 10800
+
+
 
     class Compoments:
         class Physiological(EnumBaseInt):

@@ -23,7 +23,7 @@ from utils.loggers import LoggerManager
 
 
 class ClimateHistoryService:
-    def __init__(self, max_history_size: int = 100):
+    def __init__(self, max_history_size: int = 200):
         self._logger: Logger = LoggerManager.get_logger(Loggers.CLIMATE)
         self._history: List[Dict[str, Any]] = []
         self._max_history_size: int = max_history_size

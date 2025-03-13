@@ -133,6 +133,7 @@ class SpawnSystem:
 
                     if component_class:
                         component_instance = component_class(self._env, entity.event_notifier, **data)
+
                         self._logger.debug(
                             f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
                         entity.add_component(component_instance)
