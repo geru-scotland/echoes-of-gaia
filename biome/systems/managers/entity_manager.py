@@ -24,19 +24,18 @@ from shared.types import EntityList
 
 class EntityProvider:
     def __init__(self, world_map: WorldMap):
-        self.world_map: WorldMap = world_map
+        self._world_map: WorldMap = world_map
+        self._entities: EntityList = self._world_map.get_entities()
 
     def get_entities(self) -> Tuple[EntityList, EntityList]:
-        entities = self.world_map.get_entities()
-        return self.get_flora(entities), self.get_fauna(entities)
+        return self.get_flora(), self.get_fauna()
 
-    def get_entities_by_type(self, entity_type: EntityType,
-                             entities: EntityList) -> EntityList:
-        return [entity for entity in entities if entity.get_type() == entity_type]
+    def get_entities_by_type(self, entity_type: EntityType) -> EntityList:
+        return [entity for entity in self._entities if entity.get_type() == entity_type]
 
-    def get_flora(self, entities: EntityList) -> EntityList:
-        return self.get_entities_by_type(EntityType.FLORA, entities)
+    def get_flora(self) -> EntityList:
+        return self.get_entities_by_type(EntityType.FLORA)
 
-    def get_fauna(self, entities: EntityList) -> EntityList:
-        return self.get_entities_by_type(EntityType.FAUNA, entities)
+    def get_fauna(self) -> EntityList:
+        return self.get_entities_by_type(EntityType.FAUNA)
 
