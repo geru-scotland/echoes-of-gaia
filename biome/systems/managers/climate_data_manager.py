@@ -18,6 +18,7 @@
 from logging import Logger
 from typing import List, Dict, Any
 
+from pandas import DataFrame
 from simpy import Environment as simpyEnv
 
 from biome.systems.events.event_bus import BiomeEventBus
@@ -48,9 +49,6 @@ class ClimateDataManager:
         climate_data: Dict[str, Any] = self._collector.collect_data()
         self._climate_history.add_daily_data(climate_data, self._evolution_cycle, self._env.now)
 
-    def get_data(self, evolution_cycle: int):
-        self._climate_history.get_data_by_evolution_cycle(evolution_cycle)
-
-    def get_climate_averages(self, period: int) -> Dict[str, float]:
-        return self._climate_history.get_average_over_period()
+    def get_data(self, evolution_cycle: int) -> DataFrame:
+        return self._climate_history.get_data_by_evolution_cycle(evolution_cycle)
 

@@ -40,29 +40,37 @@ class ClimateHistoryService:
             "current_season": pd.Series(dtype="object"),
         })
 
-
     def _compute_monthly_averages(self, evolution_cycle: int) -> DataFrame:
-        if self._climate_data.empty:
-            return pd.DataFrame()
+        try:
 
-        numeric_data: DataFrame = self._climate_data.select_dtypes(include=["number"])
-        filtered_data: DataFrame = numeric_data[numeric_data["evo_cycle"] == evolution_cycle]
-        monthly_means: DataFrame = filtered_data.groupby('month').mean().reset_index()
-        monthly_averages = monthly_means[["evo_cycle", "month", "temperature", "humidity", "precipitation"]]
+            if self._climate_data.empty:
+                return pd.DataFrame()
 
-        return monthly_averages
+            numeric_data: DataFrame = self._climate_data.select_dtypes(include=["number"])
+            filtered_data: DataFrame = numeric_data[numeric_data["evo_cycle"] == evolution_cycle]
+            monthly_means: DataFrame = filtered_data.groupby('month').mean().reset_index()
+            monthly_averages = monthly_means[["evo_cycle", "month", "temperature", "humidity", "precipitation"]]
+
+            return monthly_averages
+        except Exception as e:
+            self._logger.exception(f"There was an exception computing the monthly averages: {e}")
+
 
     def _compute_emas(self, monthly_averages: DataFrame) -> DataFrame:
-        if monthly_averages.empty:
-            return pd.DataFrame()
+        try:
+            if monthly_averages.empty:
+                return pd.DataFrame()
 
-        ema_data: DataFrame = pd.DataFrame(index=monthly_averages.index)
+            ema_data: DataFrame = pd.DataFrame(index=monthly_averages.index)
 
-        for column in ["temperature", "humidity", "precipitation"]:
-            ema_data[f"{column}_ema"] = monthly_averages[column].ewm(span=6).mean()
-            ema_data[f"{column}_avg"] = monthly_averages[column].mean()
+            for column in ["temperature", "humidity", "precipitation"]:
+                ema_data[f"{column}_ema"] = monthly_averages[column].ewm(span=6).mean()
+                ema_data[f"{column}_avg"] = monthly_averages[column].mean()
 
-        return ema_data
+            return ema_data
+        except Exception as e:
+            self._logger.exception(f"There was an exception computing the monthly averages: {e}")
+
 
     def add_daily_data(self, daily_data: Dict[str, Any], evolution_cycle: int, env_tick: int):
         day: int = env_tick // Timers.Calendar.DAY
@@ -83,7 +91,7 @@ class ClimateHistoryService:
 
         self._climate_data = pd.concat([self._climate_data, new_entry], ignore_index=True)
 
-    def get_data_by_evolution_cycle(self, evolution_cycle_int):
+    def get_data_by_evolution_cycle(self, evolution_cycle_int) -> DataFrame:
         monthly_averages: DataFrame = self._compute_monthly_averages(evolution_cycle_int)
         data: DataFrame = self._compute_emas(monthly_averages)
         return data
