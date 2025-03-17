@@ -15,7 +15,8 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Optional, List, Tuple
+import math
+from typing import Optional, List, Tuple, Dict, Any
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -28,6 +29,7 @@ from shared.enums.events import ComponentEvent
 from shared.enums.reasons import DormancyReason, StressReason
 from shared.enums.thresholds import VitalThresholds
 from shared.timers import Timers
+from simulation.core.systems.events.event_bus import SimulationEventBus
 
 
 class VitalComponent(FloraComponent):
@@ -36,7 +38,8 @@ class VitalComponent(FloraComponent):
                  dormancy_threshold: float = 25.0):
 
         super().__init__( env, ComponentType.VITAL, event_notifier)
-        self._lifespan_in_days: int = int((lifespan * float(Timers.Calendar.YEAR)) / float(Timers.Calendar.DAY))
+        self._lifespan_in_ticks: int = int((lifespan * float(Timers.Calendar.YEAR)))
+        self._lifespan: float = lifespan
         self._vitality: float = round(vitality, 2)
         self._max_vitality: float = round(max_vitality, 2)
         self._age: float = age
@@ -46,7 +49,7 @@ class VitalComponent(FloraComponent):
         # TODO: BIRTHTIME como timer
         self._health_modifier: float = 1.0
         self._vitality_history: List[Tuple[float, float]] = []  # (age, vitality)
-        self._start_tick: int = self._env.now
+        self._birth_tick: int = self._env.now
         self._logger.debug(f"Vital component initialized: Health={self._vitality}/{self._max_vitality}, "
                            f"Age={self._age}")
 
@@ -56,11 +59,15 @@ class VitalComponent(FloraComponent):
 
     def _register_events(self):
         super()._register_events()
+        SimulationEventBus.register("simulation_finished", self._handle_simulation_finished)
+
+    def _handle_simulation_finished(self):
+        self.plot_vitality_curve()
 
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._age = (self._env.now - self._start_tick) / Timers.Calendar.DAY
+            self._age += timer
             self._biological_age = self._age * self._aging_rate
             self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, age=self._age,
                                         biological_age=self._biological_age)
@@ -72,30 +79,32 @@ class VitalComponent(FloraComponent):
 
         while True:
             vitality_ratio = self._vitality / self._max_vitality
+            # Factor suavizado - usa raíz cuadrada para una relación menos abrupta
+            lifespan_factor = 1.0 / math.sqrt(max(1.0, self._lifespan))
 
             if vitality_ratio < VitalThresholds.Health.CRITICAL:
-                stress_change = VitalThresholds.StressChange.CRITICAL / 10.0
-                self.modify_stress(stress_change, StressReason.CRITICAL_VITALITY)
+                stress_change = VitalThresholds.StressChange.CRITICAL
+                self.modify_stress(stress_change * lifespan_factor, StressReason.CRITICAL_VITALITY)
                 self._logger.debug(
-                    f"Vitality is CRITICAL ({vitality_ratio:.2f}). Increasing stress by {stress_change:.4f}.")
+                    f"Vitality is CRITICAL ({vitality_ratio:.2f}). Increasing stress by {stress_change:}.")
 
             elif vitality_ratio < VitalThresholds.Health.LOW:
-                stress_change = VitalThresholds.StressChange.LOW / 10.0
-                self.modify_stress(stress_change, StressReason.LOW_VITALITY)
+                stress_change = VitalThresholds.StressChange.LOW
+                self.modify_stress(stress_change * lifespan_factor, StressReason.LOW_VITALITY)
                 self._logger.debug(
-                    f"Vitality is LOW ({vitality_ratio:.2f}). Increasing stress by {stress_change:.4f}.")
+                    f"Vitality is LOW ({vitality_ratio:.2f}). Increasing stress by {stress_change}.")
 
             elif vitality_ratio > VitalThresholds.Health.EXCELLENT:
-                stress_change = VitalThresholds.StressChange.EXCELLENT / 10.0
-                self.modify_stress(stress_change, StressReason.EXCELLENT_VITALITY)
+                stress_change = VitalThresholds.StressChange.EXCELLENT
+                self.modify_stress(stress_change * lifespan_factor, StressReason.EXCELLENT_VITALITY)
                 self._logger.debug(
-                    f"Vitality is EXCELLENT ({vitality_ratio:.2f}). Reducing stress by {stress_change:.4f}.")
+                    f"Vitality is EXCELLENT ({vitality_ratio:.2f}). Reducing stress by {stress_change}.")
 
             elif vitality_ratio > VitalThresholds.Health.GOOD:
-                stress_change = VitalThresholds.StressChange.GOOD / 10.0
-                self.modify_stress(stress_change, StressReason.GOOD_VITALITY)
+                stress_change = VitalThresholds.StressChange.GOOD
+                self.modify_stress(stress_change * lifespan_factor, StressReason.GOOD_VITALITY)
                 self._logger.debug(
-                    f"Vitality is GOOD ({vitality_ratio:.2f}). Reducing stress by {stress_change:.4f}.")
+                    f"Vitality is GOOD ({vitality_ratio:.2f}). Reducing stress by {stress_change}.")
 
             yield self._env.timeout(timer)
 
@@ -104,7 +113,7 @@ class VitalComponent(FloraComponent):
         while True:
 
             if not self._is_dormant:
-                completed_lifespan_ratio: float = min(1.0, self._biological_age / self._lifespan_in_days)
+                completed_lifespan_ratio: float = min(1.0, self._biological_age / self._lifespan_in_ticks)
                 completed_lifespan_ratio_with_mods: float = completed_lifespan_ratio * self._health_modifier
                 non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(completed_lifespan_ratio_with_mods)
 
@@ -112,7 +121,7 @@ class VitalComponent(FloraComponent):
                 self._logger.debug(
                     f"[Vitality Update | DEBUG:Tick={self._env.now}] "
                     f"Stress level={self._stress_level:4f}]"
-                    f"Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_days}, "
+                    f"Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_ticks}, "
                     f"Aging rate: {self._aging_rate} "
                     f"Completed Ratio: {completed_lifespan_ratio:.2f}, Aging Progression: {non_linear_aging_progression:.2f}, "
                     f"Health Modifier: {self._health_modifier} "
@@ -121,15 +130,14 @@ class VitalComponent(FloraComponent):
 
                 self._vitality = max(0, new_health)
                 self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
-                age_in_years = self._age / 365.0
-                self._vitality_history.append((age_in_years, self._vitality))
+                age_in_years = self._age / float(Timers.Calendar.YEAR)
+                self._vitality_history.append((age_in_years, self._vitality))                # TODO: Gestionar en entity, pensar bien la logíca del bloque general de updates
 
-                # TODO: Gestionar en entity, pensar bien la logíca del bloque general de updates
                 # si entra en dormancy.
-                if self._vitality <= self._dormancy_threshold and not self._is_dormant:
-                    self.request_dormancy(DormancyReason.LOW_VITALITY, True)
-                elif self._vitality > self._dormancy_threshold and self._is_dormant:
-                    self.request_dormancy(DormancyReason.LOW_VITALITY, False)
+                # if self._vitality <= self._dormancy_threshold and not self._is_dormant:
+                #     self.request_dormancy(DormancyReason.LOW_VITALITY, True)
+                # elif self._vitality > self._dormancy_threshold and self._is_dormant:
+                #     self.request_dormancy(DormancyReason.LOW_VITALITY, False)
 
                 # TODO: Mejorar umbral, con Gompertz me hace falta
                 if self._vitality <= 0.0018:
@@ -144,10 +152,15 @@ class VitalComponent(FloraComponent):
 
         normalized_stress: float = kwargs.get("normalized_stress", 0.0)
 
-        if normalized_stress <= 0.3:
-            self._aging_rate = (200 / 9) * normalized_stress ** 3 - 10 * normalized_stress ** 2 + 1
+        if normalized_stress <= 0.2:
+            self._aging_rate = (1
+                                - 11.25 * (normalized_stress ** 2)
+                                + 37.5 * (normalized_stress ** 3))
         else:
-            self._aging_rate = -22.02 * normalized_stress ** 3 + 36.45 * normalized_stress ** 2 - 15.93 * normalized_stress + 2.79
+            self._aging_rate = (0.9921875
+                                - 1.5234375 * normalized_stress
+                                + 4.5703125 * (normalized_stress ** 2)
+                                - 2.5390625 * (normalized_stress ** 3))
 
         self._logger.debug(
             f"normalized: {normalized_stress:.2f} → aging_rate: {self._aging_rate:.2f}")
@@ -172,6 +185,17 @@ class VitalComponent(FloraComponent):
     def set_health_modifier(self, modifier: float) -> None:
         self._health_modifier = max(0.0, modifier)
 
+    def get_state(self) -> Dict[str, Any]:
+        return {
+            "birth_tick": self._birth_tick,
+            "age": self._age,
+            "biological_age": self._biological_age,
+            "aging_rate": self._aging_rate,
+            "vitality": self._vitality,
+            "max_vitality": self._max_vitality,
+            "health_modifier": self._health_modifier,
+        }
+
     def plot_vitality_curve(self) -> None:
         if not self._vitality_history:
             self._logger.warning("No hay datos de vitalidad")
@@ -189,8 +213,8 @@ class VitalComponent(FloraComponent):
         if len(ages) > 5:
             max_age = max(ages) * 1.2
             age_range = np.linspace(0, max_age, 1000)
-            biological_age_range = age_range * 365.0 * self._aging_rate
-            completed_lifespan_ratio = np.minimum(1.0, biological_age_range / self._lifespan_in_days)
+            biological_age_range = age_range * float(Timers.Calendar.YEAR) * self._aging_rate
+            completed_lifespan_ratio = np.minimum(1.0, biological_age_range / self._lifespan_in_ticks)
             completed_lifespan_ratio_with_mods = completed_lifespan_ratio * self._health_modifier
             non_linear_aging = np.array([BiologicalGrowthPatterns.gompertz_decay(x)
                                          for x in completed_lifespan_ratio_with_mods])
@@ -199,7 +223,7 @@ class VitalComponent(FloraComponent):
             plt.plot(age_range, theoretical_vitality, '--', color='red', alpha=0.7,
                      label='Curva teórica')
 
-        max_age_years = self._lifespan_in_days / 365.0
+        max_age_years = self._lifespan_in_ticks / 720.0
         plt.axvline(x=max_age_years, color='gray', linestyle=':',
                     label=f'Esperanza de vida ({max_age_years:.1f} años)')
 
@@ -235,4 +259,8 @@ class VitalComponent(FloraComponent):
 
     @property
     def lifespan(self) -> float:
-        return self._lifespan_in_days / (float(Timers.Calendar.YEAR) / float(Timers.Calendar.DAY))
+        return self._lifespan_in_ticks / (float(Timers.Calendar.YEAR) / float(Timers.Calendar.DAY))
+
+    @property
+    def stress_level(self) -> float:
+        return self._stress_level

@@ -21,6 +21,7 @@ from typing import Any, Dict, Type, Optional
 
 from simpy import Environment as simpyEnv
 
+from biome.components.physiological.vital import VitalComponent
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
 from biome.services.climate_service import ClimateService
@@ -97,8 +98,24 @@ class Entity(EventHandler, StateHandler, ABC):
     def get_attribute(self, attribute: str) -> Any:
         return self._state.get(attribute)
 
-    def get_state_fields(self) -> Dict[str, Any]:
-        return self._state.fields
+    def get_state_fields(self) -> Dict[str, Dict[str, Any]]:
+        fields: Dict[str, Any] = {
+            "general": {
+                "Lifespan": self._lifespan,
+                "is_dormant": self._state.get("is_dormant", False)
+            }
+        }
+        vital_component: ComponentType.VITAL = self._components.get(ComponentType.VITAL, None)
+
+        if vital_component is not None:
+            fields["general"].update({"Stress level": vital_component.stress_level})
+
+        for component_type, component in self._components.items():
+            component_name = str(component_type).split('.')[-1].lower()
+            component_fields = component.get_state()
+            if component_fields:
+                fields[component_name] = component_fields
+        return fields
 
     @abstractmethod
     def dump_components(self) -> None:

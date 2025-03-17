@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 from simpy import Environment as simpyEnv
 
@@ -28,6 +28,7 @@ from shared.timers import Timers
 
 
 class GrowthComponent(FloraComponent):
+
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 15.0,
                  growth_stage: int = 0, total_stages: int = 4, current_size: float = 0.05, max_size: float = 3.0,
                  growth_modifier: float = 1.0, growth_efficiency: float = 0.85):
@@ -111,6 +112,14 @@ class GrowthComponent(FloraComponent):
         self._logger.debug(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
                       f"Size={self._current_size}/{self._max_size}, "
                       f"Efficiency={self._growth_efficiency}")
+
+    def get_state(self) -> Dict[str, Any]:
+        return {
+            "growth_stage": self._growth_stage,
+            "current_size": self._current_size,
+            "max_size": self._max_size,
+            "growth_efficiency": self._growth_efficiency
+        }
 
     @property
     def growth_modifier(self) -> float:

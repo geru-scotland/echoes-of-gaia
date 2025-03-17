@@ -24,27 +24,27 @@ class VitalThresholds:
         CRITICAL = 0.15
         LOW = 0.30
         GOOD = 0.60
-        EXCELLENT = 0.90
+        EXCELLENT = 0.80
 
     class StressChange(EnumBaseFloat):
-        CRITICAL = 0.9
-        LOW = 0.3
-        GOOD = -0.4
-        EXCELLENT = -0.9
+        CRITICAL = 0.02
+        LOW = 0.009
+        GOOD = 0.004
+        EXCELLENT = 0.003
 
 
 class MetabolicThresholds:
     class Energy(EnumBaseFloat):
         CRITICAL = 0.15
-        LOW = 0.30
+        LOW = 0.1
         SUFFICIENT = 0.50
         ABUNDANT = 0.80
 
     class StressChange(EnumBaseFloat):
-        CRITICAL = 0.6
-        LOW = 0.4
-        SUFFICIENT = -0.4
-        ABUNDANT = -0.7
+        CRITICAL = 0.015
+        LOW = 0.008
+        SUFFICIENT = 0.005
+        ABUNDANT = 0.003
 
     class EfficiencyModifier(EnumBaseFloat):
         MIN_PHOTOSYNTHESIS = 0.4

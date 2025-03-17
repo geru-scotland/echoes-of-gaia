@@ -24,6 +24,15 @@ from simulation.visualization.entity_renderer import EntityInfo
 from simulation.visualization.types import SnapshotTimeInfo, MetricsData, BiomeScoreData, TerrainTypeInfo, Color
 
 
+def format_time_value(ticks: float, timers) -> str:
+    days = ticks / timers.Calendar.DAY
+    years = int(days / 365)
+    remaining_days = int(days % 365)
+    months = int(remaining_days / 30)
+    days = int(remaining_days % 30)
+
+    return f"{years}a {months}m {days}d"
+
 class InfoPanel:
     def __init__(
             self,
@@ -62,6 +71,29 @@ class InfoPanel:
             "healthy": (100, 160, 50),      # Verde claro mate
             "eden": (50, 160, 80)           # Verde mate
         }
+
+    def _format_field_value(self, field: str, value: Any) -> str:
+        time_related_fields = {
+            "age", "birth_tick", "biological_age", "lifespan_in_ticks", "lifespan"
+        }
+
+        if field in time_related_fields and isinstance(value, (int, float)):
+            from shared.timers import Timers
+            return format_time_value(value, Timers)
+
+        elif isinstance(value, float):
+            return f"{value:.2f}"
+
+        elif isinstance(value, (list, tuple)):
+            return ", ".join(str(item) for item in value)
+        elif isinstance(value, dict):
+            return "{...}"
+
+        elif isinstance(value, bool):
+            return "✓" if value else "✗"
+
+        else:
+            return str(value)
 
     def set_simulation_time(self, simulation_time: SnapshotTimeInfo) -> None:
         self._simulation_time = simulation_time
@@ -158,40 +190,35 @@ class InfoPanel:
 
         if self._selected_entity:
             y = self._render_text_line(self._surface, "ENTIDAD SELECCIONADA", (x, y), font=self._font_title)
-            y = self._render_text_line(
-                self._surface,
-                f"ID: {self._selected_entity.id}",
-                (x, y)
-            )
-            y = self._render_text_line(
-                self._surface,
-                f"Tipo: {self._selected_entity.type}",
-                (x, y)
-            )
-            y = self._render_text_line(
-                self._surface,
-                f"Especie: {self._selected_entity.species}",
-                (x, y)
-            )
-            y = self._render_text_line(
-                self._surface,
-                f"Posición: {self._selected_entity.position}",
-                (x, y)
-            )
+            y = self._render_text_line(self._surface, f"ID: {self._selected_entity.id}", (x, y))
+            y = self._render_text_line(self._surface, f"Tipo: {self._selected_entity.type}", (x, y))
+            y = self._render_text_line(self._surface, f"Especie: {self._selected_entity.species}", (x, y))
+            y = self._render_text_line(self._surface, f"Posición: {self._selected_entity.position}", (x, y))
 
             if self._selected_entity.habitats:
                 habitats_str = ", ".join(self._selected_entity.habitats)
                 y = self._render_text_line(self._surface, f"Hábitats: {habitats_str}", (x, y))
 
-            if self._selected_entity.state_fields:
-                y = self._render_text_line(self._surface, "Estado:", (x, y))
+            fields_by_component = self._selected_entity.state_fields
 
-                for field, value in self._selected_entity.state_fields.items():
-                    if value is not None:
-                        field_name = field.replace('_', ' ').title()
-                        y = self._render_text_line(self._surface, f"  - {field_name}: {value:.2f}", (x, y))
+            for component_name, fields in fields_by_component.items():
+                if not fields:
+                    continue
 
-            y += 10
+                component_title = component_name.replace('_', ' ').title()
+                y = self._render_text_line(self._surface, f"-- {component_title} --", (x, y), font=self._font_bold)
+
+                for field, value in fields.items():
+                    if value is None:
+                        continue
+
+                    field_name = field.replace('_', ' ').title()
+
+                    formatted_value = self._format_field_value(field, value)
+
+                    y = self._render_text_line(self._surface, f"  {field_name}: {formatted_value}", (x, y))
+
+                y += 15
 
         elif self._selected_terrain:
             y = self._render_text_line(self._surface, "TERRENO SELECCIONADO", (x, y), font=self._font_title)
