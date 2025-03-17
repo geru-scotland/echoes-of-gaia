@@ -152,10 +152,15 @@ class VitalComponent(FloraComponent):
 
         normalized_stress: float = kwargs.get("normalized_stress", 0.0)
 
-        if normalized_stress <= 0.3:
-            self._aging_rate = (200 / 9) * normalized_stress ** 3 - 10 * normalized_stress ** 2 + 1
+        if normalized_stress <= 0.2:
+            self._aging_rate = (1
+                                - 11.25 * (normalized_stress ** 2)
+                                + 37.5 * (normalized_stress ** 3))
         else:
-            self._aging_rate = -22.02 * normalized_stress ** 3 + 36.45 * normalized_stress ** 2 - 15.93 * normalized_stress + 2.79
+            self._aging_rate = (0.9921875
+                                - 1.5234375 * normalized_stress
+                                + 4.5703125 * (normalized_stress ** 2)
+                                - 2.5390625 * (normalized_stress ** 3))
 
         self._logger.debug(
             f"normalized: {normalized_stress:.2f} → aging_rate: {self._aging_rate:.2f}")
