@@ -43,9 +43,10 @@ class VitalComponent(FloraComponent):
         self._aging_rate: float = aging_rate
         self._biological_age: float = self._age * aging_rate
         self._dormancy_threshold: float = round(dormancy_threshold, 2)
-
+        # TODO: BIRTHTIME como timer
         self._health_modifier: float = 1.0
         self._vitality_history: List[Tuple[float, float]] = []  # (age, vitality)
+        self._start_tick: int = self._env.now
         self._logger.debug(f"Vital component initialized: Health={self._vitality}/{self._max_vitality}, "
                            f"Age={self._age}")
 
@@ -59,7 +60,7 @@ class VitalComponent(FloraComponent):
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
         while True:
-            self._age =  timer / Timers.Calendar.DAY
+            self._age = (self._env.now - self._start_tick) / Timers.Calendar.DAY
             self._biological_age = self._age * self._aging_rate
             self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, age=self._age,
                                         biological_age=self._biological_age)

@@ -27,9 +27,9 @@ from shared.types import HabitatList
 
 class Fauna(Entity):
 
-    def __init__(self, id: int, env: simpyEnv, fauna_type: FaunaSpecies, habitats: HabitatList):
+    def __init__(self, id: int, env: simpyEnv, fauna_type: FaunaSpecies, habitats: HabitatList, lifespan: float):
         descriptor: EntityDescriptor = EntityDescriptor.create_fauna(fauna_type)
-        super().__init__(id, env, descriptor, habitats)
+        super().__init__(id, env, descriptor, habitats, lifespan)
         self._fauna_type = fauna_type
         self._logger.debug(f"FAUNA CREATED: {fauna_type}")
         self._habitats: HabitatList = habitats

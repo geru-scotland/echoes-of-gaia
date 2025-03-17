@@ -17,6 +17,7 @@
 """
 import traceback
 from logging import Logger
+from typing import List, Dict
 
 from simpy import Environment as simpyEnv
 
@@ -51,8 +52,27 @@ class WorldMapManager:
             tb = traceback.format_exc()
             self._logger.error("There was an exception spawning entities: %s", tb)
 
-    def add_entity(self, entity: Entity):
-        pass
+    def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float, custom_components: List[Dict] = None):
+        try:
+            entity = self._spawn_system.spawn(
+                entity_class=entity_class,
+                entity_species_enum=entity_species_enum,
+                species_name=species_name,
+                lifespan=lifespan,
+                custom_components=custom_components
+            )
+
+            if entity:
+                self._logger.info(f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")
+                return entity
+            else:
+                self._logger.warning(f"Entity coudln't be created {entity_class.__name__}, species: {species_name}")
+                return None
+
+        except Exception as e:
+            tb = traceback.format_exc()
+            self._logger.error(f"Error when creating entity {e}\n{tb}")
+            return None
 
     def remove_entity(self, entity_species: str):
         # TODO: entity_species está str com placeholder, definir bien esto en enums.

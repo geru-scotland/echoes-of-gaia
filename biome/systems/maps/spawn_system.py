@@ -107,7 +107,7 @@ class SpawnSystem:
     def _create_single_entity(self, entity_class, entity_species, habitats: HabitatList,
                               lifespan: float, components: List[Dict]) -> Optional[Entity]:
         entity_id: int = next(self._id_generator)
-        entity: Entity = entity_class(entity_id, self._env, entity_species, habitats)
+        entity: Entity = entity_class(entity_id, self._env, entity_species, habitats, lifespan)
 
         if not components:
             if self._add_to_index_map(entity):

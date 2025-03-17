@@ -39,7 +39,7 @@ from utils.loggers import LoggerManager
 
 class Entity(EventHandler, StateHandler, ABC):
 
-    def __init__(self, id: int, env: simpyEnv, descriptor: EntityDescriptor, habitats: HabitatList):
+    def __init__(self, id: int, env: simpyEnv, descriptor: EntityDescriptor, habitats: HabitatList, lifespan: float):
         self._event_notifier: EventNotifier = EventNotifier()
         super().__init__()
         self._id: int = id
@@ -50,6 +50,7 @@ class Entity(EventHandler, StateHandler, ABC):
         self._habitats: HabitatList = habitats
         self._state: EntityState = EntityState()
         self._birth_tick: int = self._env.now
+        self._lifespan: float = lifespan
 
     def _register_events(self):
         self._event_notifier.register(ComponentEvent.UPDATE_STATE, self.handle_component_update)
@@ -63,6 +64,7 @@ class Entity(EventHandler, StateHandler, ABC):
     def add_component(self, component: EntityComponent):
         self._logger.warning(f"Adding component to {self._descriptor.species}: {component.type}")
         self._components[component.type] = component
+        component.set_host(self)
 
     def get_component(self, type: ComponentType):
         return self._components.get(type, None)
@@ -122,3 +124,7 @@ class Entity(EventHandler, StateHandler, ABC):
     @property
     def components(self):
         return self._components
+
+    @property
+    def lifespan(self):
+        return self._lifespan

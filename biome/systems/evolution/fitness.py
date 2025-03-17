@@ -87,8 +87,31 @@ def compute_fitness(flora_genes, climate_data):
     if flora_genes.base_respiration_rate > 0.1:
         energy_score -= (flora_genes.base_respiration_rate - 0.1) * 10.0
 
-    # Combinar todas las puntuaciones
     fitness = temperature_score + humidity_score + precipitation_score + survival_score + energy_score
+
+    # Por ahora pongo simplemente valores promedio, es para forzar a que no premie
+    # una eficiencia fotosintetica muy baja
+    light_availability = 0.5
+    temperature_modifier = 0.7
+    water_modifier = 0.6
+
+    effective_photosynthesis = (
+            flora_genes.base_photosynthesis_efficiency *
+            light_availability *
+            temperature_modifier *
+            water_modifier *
+            flora_genes.metabolic_activity
+    )
+
+    effective_respiration = flora_genes.base_respiration_rate * flora_genes.metabolic_activity
+
+    if effective_photosynthesis <= effective_respiration:
+        return fitness * 0.1
+
+    energy_ratio = effective_photosynthesis / effective_respiration
+    if energy_ratio > 1.0:
+        energy_bonus = min(5.0, energy_ratio - 1.0) * 2.0
+        fitness += energy_bonus
 
     # TODO: Poner logger especifico, o al menos de agente de evolución
     # print(f"Climate: Temp={avg_temperature:.1f}°C, Humidity={avg_humidity:.1f}%, Precip={avg_precipitation:.1f}mm")
