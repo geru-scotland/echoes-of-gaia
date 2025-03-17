@@ -15,7 +15,8 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Optional
+import math
+from typing import Optional, Dict, Any
 
 from biome.components.base.component import EntityComponent, FloraComponent
 from simpy import Environment as simpyEnv
@@ -29,7 +30,7 @@ from shared.timers import Timers
 
 
 class MetabolicComponent(FloraComponent):
-    def __init__(self, env: simpyEnv, event_notifier: EventNotifier,
+    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  photosynthesis_efficiency: float = 0.75, respiration_rate: float = 0.05,
                  metabolic_activity: float = 1.0, energy_reserves: float = 100.0, max_energy_reserves: float = 100.0):
 
@@ -41,12 +42,12 @@ class MetabolicComponent(FloraComponent):
         self._metabolic_activity: float = round(metabolic_activity, 2)
         self._energy_reserves: float = round(energy_reserves, 2)
         self._max_energy_reserves: float = round(max_energy_reserves, 2)
-
+        self._lifespan: float = lifespan
         # TODO: Para light availability, hace falta más información en el state
         # quizá agregar el weather effect y analizar desde aquí, mediante ClimateService
-        self._light_availability: float = 0.5
+        self._light_availability: float = 0.7
         self._temperature_modifier: float = 1.0
-        self._water_modifier: float = 0.8
+        self._water_modifier: float = 0.7
 
         self._logger.debug(f"Metabolic component initialized: Photosynthesis={self._photosynthesis_efficiency}, "
                            f"Respiration={self._respiration_rate}, Energy={self._energy_reserves}")
@@ -63,22 +64,23 @@ class MetabolicComponent(FloraComponent):
 
         while True:
             energy_ratio = self._energy_reserves / self._max_energy_reserves
-
+            # Factor suavizado - usa raíz cuadrada para una relación menos abrupta
+            lifespan_factor = 1.0 / math.sqrt(max(1.0, self._lifespan))
             if MetabolicThresholds.Energy.CRITICAL > energy_ratio > 0.0:
-                stress_change = MetabolicThresholds.StressChange.CRITICAL / 10.0
-                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
+                stress_change = MetabolicThresholds.StressChange.CRITICAL
+                self.modify_stress(stress_change * lifespan_factor, StressReason.NUTRIENT_DEFICIENCY)
 
             elif energy_ratio < MetabolicThresholds.Energy.LOW:
-                stress_change = MetabolicThresholds.StressChange.LOW / 10.0
-                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
+                stress_change = MetabolicThresholds.StressChange.LOW
+                self.modify_stress(stress_change * lifespan_factor, StressReason.NUTRIENT_DEFICIENCY)
 
             elif energy_ratio > MetabolicThresholds.Energy.ABUNDANT:
-                stress_change = MetabolicThresholds.StressChange.ABUNDANT / 10.0
-                self.modify_stress(stress_change, StressReason.ENERGY_ABUNDANCE)
+                stress_change = MetabolicThresholds.StressChange.ABUNDANT
+                self.modify_stress(stress_change * lifespan_factor, StressReason.ENERGY_ABUNDANCE)
 
             elif energy_ratio > MetabolicThresholds.Energy.SUFFICIENT:
-                stress_change = MetabolicThresholds.StressChange.SUFFICIENT / 10.0
-                self.modify_stress(stress_change, StressReason.ENERGY_SUFFICIENT)
+                stress_change = MetabolicThresholds.StressChange.SUFFICIENT
+                self.modify_stress(stress_change * lifespan_factor, StressReason.ENERGY_SUFFICIENT)
 
             yield self._env.timeout(timer)
 
@@ -175,6 +177,15 @@ class MetabolicComponent(FloraComponent):
                                         energy_reserves=self._energy_reserves)
             return True
         return False
+
+    def get_state(self) -> Dict[str, Any]:
+        return {
+            "energy_reserves": self._energy_reserves,
+            "max_energy_reserves": self._max_energy_reserves,
+            "photosynthesis_efficiency": self._photosynthesis_efficiency,
+            "respiration_rate": self._respiration_rate,
+            "metabolic_activity": self._metabolic_activity,
+        }
 
     @property
     def base_photosynthesis_efficiency(self) -> float:

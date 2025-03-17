@@ -103,7 +103,7 @@ class SimulationEngine:
         self._env.process(self._montly_update(Timers.Calendar.MONTH))
         self._time.log_time(self._env.now)
         self._env.run(until=self._eras * self._events_per_era)
-
+        SimulationEventBus.trigger("simulation_finished")
         if self._datapoints:
             self._context.influxdb.close()
 

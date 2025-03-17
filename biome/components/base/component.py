@@ -17,7 +17,7 @@
 """
 from logging import Logger
 from abc import abstractmethod, ABC
-from typing import Optional, Set
+from typing import Optional, Set, Dict, Any
 
 from simpy import Environment as simpyEnv
 
@@ -39,7 +39,7 @@ class Component(ABC):
         self._event_notifier: EventNotifier = event_notifier
 
     @abstractmethod
-    def get_state(self):
+    def get_state(self) -> Dict[str, Any]:
         raise NotImplementedError
 
     @abstractmethod
@@ -66,13 +66,18 @@ class EntityComponent(Component, EventHandler):
     def __init__(self, env: simpyEnv, type: ComponentType, event_notifier: EventNotifier):
         Component.__init__(self, env, type, event_notifier)
         EventHandler.__init__(self)
+        self._host = None
 
     @abstractmethod
     def _register_events(self):
        raise NotImplementedError
 
-    def get_state(self):
-        pass
+    @abstractmethod
+    def get_state(self) -> Dict[str, Any]:
+        raise NotImplementedError
+
+    def set_host(self, ref):
+        self._host = ref
 
     def _update(self, delay: Optional[int] = None):
         pass
@@ -101,6 +106,7 @@ class FloraComponent(EntityComponent):
         new_stress: float = kwargs.get("stress_level", 0.0)
         self._stress_level = new_stress
 
+    # TODO: Pasar esto a componente de temperatura propio.
     def _handle_extreme_weather(self, *args, **kwargs):
         temperature = kwargs.get("temperature", 0.0)
         self._logger.debug(f"EXTREME WEATHER HANDLING FROM A COMPONENT: {temperature}")
@@ -166,3 +172,7 @@ class FloraComponent(EntityComponent):
             #     self.request_dormancy(DormancyReason.ENVIRONMENTAL_STRESS, True)
             # elif self._stress_level < self._max_stress * 0.7  and DormancyReason.ENVIRONMENTAL_STRESS in self._dormancy_reasons:
             #     self.request_dormancy(DormancyReason.ENVIRONMENTAL_STRESS, False)
+
+    @abstractmethod
+    def get_state(self) -> Dict[str, Any]:
+        raise NotImplementedError

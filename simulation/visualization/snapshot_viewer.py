@@ -40,7 +40,7 @@ class SnapshotViewer:
         self._running = False
         self._paused = True
         self._last_frame_time = 0
-
+        self._selected_entity_id = None
         pygame.init()
 
         self._window_size = config["window_size"]
@@ -110,6 +110,8 @@ class SnapshotViewer:
             self._logger.warning("Intentando cargar un snapshot nulo")
             return
 
+        previously_selected_entity_id = self._selected_entity_id
+
         try:
             if "terrain" not in snapshot:
                 self._logger.error("Error al cargar el snapshot: 'terrain' no encontrado")
@@ -134,10 +136,21 @@ class SnapshotViewer:
             if "biome_score" in snapshot:
                 self._info_panel.set_biome_score(snapshot["biome_score"])
 
-            self._selected_cell = None
-            self._selected_entity = None
-            self._entity_renderer.select_entity(None)
-            self._info_panel.set_selected_entity(None)
+            if previously_selected_entity_id is not None:
+                entity_info = self._entity_renderer.get_entity_info(previously_selected_entity_id)
+                if entity_info:
+                    self._selected_entity = previously_selected_entity_id
+                    self._entity_renderer.select_entity(previously_selected_entity_id)
+
+                    self._info_panel.set_selected_entity(entity_info)
+                    self._info_panel.set_selected_terrain(None)
+                else:
+                    self._selected_entity = None
+                    self._selected_entity_id = None
+                    self._entity_renderer.select_entity(None)
+                    self._info_panel.set_selected_entity(None)
+                    self._info_panel.set_selected_terrain(None)
+
             self._info_panel.set_selected_terrain(None)
 
             self._logger.info(f"Snapshot {snapshot['snapshot_id']} cargado correctamente")
@@ -179,6 +192,7 @@ class SnapshotViewer:
 
             if entity_id is not None:
                 self._selected_entity = entity_id
+                self._selected_entity_id = entity_id
                 self._entity_renderer.select_entity(entity_id)
                 entity_info = self._entity_renderer.get_entity_info(entity_id)
                 self._info_panel.set_selected_entity(entity_info)

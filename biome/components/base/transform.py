@@ -15,7 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
 from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
@@ -38,3 +38,8 @@ class TransformComponent(EntityComponent):
     def set_position(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
+
+    def get_state(self) -> Dict[str, Any]:
+        return {
+            "position": (self.x, self.y)
+        }

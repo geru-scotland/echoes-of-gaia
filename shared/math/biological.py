@@ -30,7 +30,7 @@ class BiologicalGrowthPatterns:
         return (raw_growth_value - min_bound) / (max_bound - min_bound)
 
     @staticmethod
-    def gompertz_decay(life_proportion: float, decay_onset: float = 0.01, decay_steepness: float = 7.0) -> float:
+    def gompertz_decay(life_proportion: float, decay_onset: float = 0.005, decay_steepness: float = 7.0) -> float:
         life_proportion = max(0, min(1, life_proportion))
 
         vitality_loss = 1.0 - math.exp(-decay_onset * math.exp(decay_steepness * life_proportion))

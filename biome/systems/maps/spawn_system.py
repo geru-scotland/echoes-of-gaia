@@ -26,6 +26,7 @@ from simpy import Environment as simpyEnv
 from scipy.ndimage import convolve
 
 from biome.components.physiological.growth import GrowthComponent
+from biome.components.physiological.metabolic import MetabolicComponent
 from biome.components.physiological.vital import VitalComponent
 from biome.components.registry import get_component_class
 from biome.entities.entity import Entity
@@ -128,7 +129,7 @@ class SpawnSystem:
                 if data:
                     component_class = get_component_class(class_name)
 
-                    if component_class in [GrowthComponent, VitalComponent]:
+                    if component_class in [GrowthComponent, VitalComponent, MetabolicComponent]:
                         data.update({"lifespan": lifespan})
 
                     if component_class:
