@@ -4,10 +4,10 @@ biome:
     size:
       - 60 # width
       - 60 # height
-  type: "tundra"
+  type: "tropical"
   flora:
     - species: "oak_tree"
-      spawns: 4
+      spawns: 11
       avg-lifespan: 6 # En años lo pongo
       components:
         - GrowthComponent:
@@ -16,11 +16,11 @@ biome:
 
     - species: "bramble"
       avg-lifespan: 5 # En años lo pongo
-      spawns: 3
+      spawns: 13
 
     - species: "mushroom"
       avg-lifespan: 5 # En años lo pongo
-      spawns: 7
+      spawns: 17
 
   fauna:
     - species: "deer"

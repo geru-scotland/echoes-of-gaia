@@ -39,3 +39,20 @@ class FloraGenes:
         # self.toxicity = 0.0
 
 
+    def __str__(self):
+        fields = {
+            "growth_modifier": self.growth_modifier,
+            "growth_efficiency": self.growth_efficiency,
+            "max_size": self.max_size,
+            "max_vitality": self.max_vitality,
+            "aging_rate": self.aging_rate,
+            "health_modifier": self.health_modifier,
+            "base_photosynthesis_efficiency": self.base_photosynthesis_efficiency,
+            "base_respiration_rate": self.base_respiration_rate,
+            "lifespan": self.lifespan,
+            "metabolic_activity": self.metabolic_activity,
+            "max_energy_reserves": self.max_energy_reserves,
+            "cold_resistance": self.cold_resistance,
+            "heat_resistance": self.heat_resistance,
+        }
+        return ", ".join(f"{key}={value}" for key, value in fields.items())
