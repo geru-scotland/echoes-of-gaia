@@ -175,3 +175,19 @@ class MetabolicComponent(FloraComponent):
                                         energy_reserves=self._energy_reserves)
             return True
         return False
+
+    @property
+    def base_photosynthesis_efficiency(self) -> float:
+        return self._base_photosynthesis_efficiency
+
+    @property
+    def base_respiration_rate(self) -> float:
+        return self._base_respiration_rate
+
+    @property
+    def metabolic_activity(self) -> float:
+        return self._metabolic_activity
+
+    @property
+    def max_energy_reserves(self) -> float:
+        return self._max_energy_reserves

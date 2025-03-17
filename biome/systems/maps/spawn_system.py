@@ -225,7 +225,7 @@ class SpawnSystem:
         entity.set_position(selected_position[0], selected_position[1])
         return True
 
-    def spawn(self, entity_class, entity_species_enum, species_name: str,
+    def spawn(self, entity_class, entity_species_enum, species_name: str, lifespan: float = 20.0,
               custom_components: List[Dict] = None, biome_store=None) -> Optional[Entity]:
         if biome_store is None:
             if entity_class == Flora:
@@ -260,7 +260,7 @@ class SpawnSystem:
                 ]
                 components.append(fixed_components)
 
-        entity = self._create_single_entity(entity_class, entity_species, habitats, components)
+        entity = self._create_single_entity(entity_class, entity_species, habitats, lifespan, components)
 
         if entity:
             if entity_class == Flora:

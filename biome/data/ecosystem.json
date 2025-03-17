@@ -500,6 +500,7 @@
           "max_vitality": 100.0,
           "age": 0.0,
           "aging_rate": 1.0,
+          "health_modifier": 1.0,
           "dormancy_threshold": 10.0
         }
       },

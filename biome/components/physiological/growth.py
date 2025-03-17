@@ -111,3 +111,19 @@ class GrowthComponent(FloraComponent):
         self._logger.debug(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
                       f"Size={self._current_size}/{self._max_size}, "
                       f"Efficiency={self._growth_efficiency}")
+
+    @property
+    def growth_modifier(self) -> float:
+        return self._growth_modifier
+
+    @property
+    def growth_efficiency(self) -> float:
+        return self._growth_efficiency
+
+    @property
+    def max_size(self) -> float:
+        return self._max_size
+
+    @property
+    def lifespan(self) -> float:
+        return self._lifespan_in_ticks / float(Timers.Calendar.YEAR)

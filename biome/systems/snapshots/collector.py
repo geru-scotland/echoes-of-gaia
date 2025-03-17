@@ -37,7 +37,8 @@ from utils.loggers import LoggerManager
 
 class SnapshotCollector:
     def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
-                 entity_collector: EntityDataCollector, climate_collector: ClimateDataCollector, score_analyzer: BiomeScoreAnalyzer):
+                 entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
+                 climate_collector: ClimateDataCollector = None):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._entity_manager: EntityProvider = entity_manager
         self._entity_collector: EntityDataCollector = entity_collector
@@ -58,7 +59,7 @@ class SnapshotCollector:
         self._collect_metrics_data(snapshot)
 
         # Clima, cuando lo haga
-        snapshot.set_climate_data(self._collect_climate_data())
+        # snapshot.set_climate_data(self._collect_climate_data())
 
         return snapshot
 
@@ -91,6 +92,7 @@ class SnapshotCollector:
             self._logger.error(f"Error collecting terrain data: {e}")
             return {"error": str(e)}
 
+
     def _collect_entities_data(self, snapshot: SnapshotData) -> None:
         try:
             flora, fauna = self._entity_manager.get_entities()
@@ -121,7 +123,6 @@ class SnapshotCollector:
 
     def _collect_entity_components(self, entity: Entity) -> Dict[str, ComponentData]:
         components_data = {}
-
         for component_type, component in entity.components.items():
             try:
                 component_attrs = {

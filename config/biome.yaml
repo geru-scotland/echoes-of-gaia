@@ -2,12 +2,12 @@ biome:
   climate-model: "climate_model_v1.1"
   map:
     size:
-      - 75 # width
-      - 75 # height
-  type: "tropical"
+      - 60 # width
+      - 60 # height
+  type: "tundra"
   flora:
     - species: "oak_tree"
-      spawns: 1
+      spawns: 4
       avg-lifespan: 6 # En años lo pongo
       components:
         - GrowthComponent:
@@ -16,11 +16,11 @@ biome:
 
     - species: "bramble"
       avg-lifespan: 5 # En años lo pongo
-      spawns: 1
+      spawns: 3
 
     - species: "mushroom"
       avg-lifespan: 5 # En años lo pongo
-      spawns: 1
+      spawns: 7
 
   fauna:
     - species: "deer"
