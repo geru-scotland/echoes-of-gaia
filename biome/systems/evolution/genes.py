@@ -15,29 +15,27 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Tuple
 
-from biome.systems.maps.worldmap import WorldMap
-from shared.enums.enums import EntityType
-from shared.types import EntityList
+class FloraGenes:
+    def __init__(self):
+        self.growth_modifier = 0.0
+        self.growth_efficiency = 0.0
+        self.max_size = 0.0
 
+        self.max_vitality = 0.0
+        self.aging_rate = 0.0
+        self.health_modifier = 0.0
 
-class EntityProvider:
-    def __init__(self, world_map: WorldMap):
-        self._world_map: WorldMap = world_map
-        self._entities: EntityList = self._world_map.get_entities()
+        self.base_photosynthesis_efficiency = 0.0
+        self.base_respiration_rate = 0.0
+        self.lifespan = 0.0
+        self.metabolic_activity = 0.0
+        self.max_energy_reserves = 0.0
+        # OJO, inicializo a 1 porque aún no tengo gestión:
+        self.cold_resistance = 1.0
+        self.heat_resistance = 1.0
+        # Dejo las siguientes para más adelante:
+        # self.drought_resistance = 0.0
+        # self.toxicity = 0.0
 
-    def get_entities(self) -> Tuple[EntityList, EntityList]:
-        self._entities = self._world_map.get_entities()
-        return self.get_flora(), self.get_fauna()
-
-    def get_entities_by_type(self, entity_type: EntityType) -> EntityList:
-        self._entities = self._world_map.get_entities()
-        return [entity for entity in self._entities if entity.get_type() == entity_type]
-
-    def get_flora(self) -> EntityList:
-        return self.get_entities_by_type(EntityType.FLORA)
-
-    def get_fauna(self) -> EntityList:
-        return self.get_entities_by_type(EntityType.FAUNA)
 

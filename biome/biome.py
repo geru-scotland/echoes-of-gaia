@@ -15,6 +15,8 @@
 #                                                                        #
 ##########################################################################
 """
+import sys
+import traceback
 from typing import Dict, Any
 
 import simpy
@@ -94,7 +96,9 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 # echarle una pensada - si drought que persista por X días
                 yield self._env.timeout(delay)
             except Exception as e:
-                self._logger.exception(f"An exception ocurred running  agent: {e}")
+                tb = traceback.format_exc()
+                self._logger.exception(f"An exception ocurred running  agent: {e}. Traceback: {tb}")
+                sys.exit(1)
 
     def _register_events(self):
         BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
@@ -119,7 +123,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         return self._entity_collector
 
     def get_climate_collector(self) -> ClimateDataCollector:
-        return self._climate_collector
+        return None
 
     def get_score_analyzer(self) -> BiomeScoreAnalyzer:
         return self._score_analyzer

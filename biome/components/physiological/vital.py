@@ -31,7 +31,7 @@ from shared.timers import Timers
 
 
 class VitalComponent(FloraComponent):
-    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 5.0,
+    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 5.0, health_modifier: float = 1.0,
                  vitality: float = 100.0, max_vitality: float = 100.0, age: float = 0.0, aging_rate: float = 1.0,
                  dormancy_threshold: float = 25.0):
 
@@ -219,3 +219,19 @@ class VitalComponent(FloraComponent):
 
         plt.tight_layout()
         plt.show()
+
+    @property
+    def max_vitality(self) -> float:
+        return self._max_vitality
+
+    @property
+    def aging_rate(self) -> float:
+        return self._aging_rate
+
+    @property
+    def health_modifier(self) -> float:
+        return self._health_modifier
+
+    @property
+    def lifespan(self) -> float:
+        return self._lifespan_in_days / (float(Timers.Calendar.YEAR) / float(Timers.Calendar.DAY))

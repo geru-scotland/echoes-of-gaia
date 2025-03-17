@@ -33,9 +33,8 @@ from utils.loggers import LoggerManager
 
 class BiomeSnapshotSystem:
     def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
-                 entity_collector: EntityDataCollector, climate_collector: ClimateDataCollector,
-                 score_analyzer: BiomeScoreAnalyzer,
-                 config: SnapshotConfig):
+                 entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
+                 config: SnapshotConfig, climate_collector: ClimateDataCollector = None):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._logger.info("Initializing BiomeSnapshotSystem...")
 
@@ -47,7 +46,7 @@ class BiomeSnapshotSystem:
         self._config: SnapshotConfig = config
 
         self._collector = SnapshotCollector(
-            entity_manager, world_map, entity_collector, climate_collector, score_analyzer
+            entity_manager, world_map, entity_collector, score_analyzer
         )
         self._storage = SnapshotStorage(self._config)
 
