@@ -20,6 +20,7 @@ import random
 import numpy as np
 from deap import base, creator, tools, algorithms
 
+from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
 from biome.components.physiological.metabolic import MetabolicComponent
 from biome.components.physiological.vital import VitalComponent
@@ -44,7 +45,7 @@ class GeneticAlgorithmModel:
         self.toolbox.register("attr_float", random.random)
 
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
-                              self.toolbox.attr_float, n=12)
+                              self.toolbox.attr_float, n=14)
 
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
@@ -65,8 +66,9 @@ class GeneticAlgorithmModel:
             "lifespan": (1.0, 1000.0),  # en años
             "metabolic_activity": (0.2, 1.0),
             "max_energy_reserves": (50.0, 150.0),
-            "cold_resistance": (0.1, 3.0),
-            "heat_resistance": (0.1, 3.0)
+            "cold_resistance": (0.0, 1.0),
+            "heat_resistance": (0.0, 1.0),
+            "optimal_temperature": (-30, 50)
         }
 
         for attr, (min_val, max_val) in valid_ranges.items():
@@ -77,7 +79,7 @@ class GeneticAlgorithmModel:
 
         return genes
 
-    def evolve_population(self, current_flora, climate_data, generation_count=10):
+    def evolve_population(self, current_flora, climate_data, generation_count=20):
         population = []
         for flora in current_flora:
             current_genes: FloraGenes = self.extract_genes_from_entity(flora)
@@ -128,6 +130,11 @@ class GeneticAlgorithmModel:
         genes.metabolic_activity = 0.1 + (clamped_individual[9] * 0.9)  # 0.1-1.0
         genes.max_energy_reserves = 50.0 + (clamped_individual[10] * 100.0)  # 50-150
 
+        genes.cold_resistance = clamped_individual[11]  #  0-1
+        genes.heat_resistance = clamped_individual[12]  #  0-1
+
+        genes.optimal_temperature = -30 + (clamped_individual[13] * 80.0)  # -30 a 50
+
         return genes
 
     def _flora_genes_to_individual(self, flora_genes):
@@ -144,7 +151,13 @@ class GeneticAlgorithmModel:
             (validated_genes.base_respiration_rate - 0.01) / 0.99,  # De 0.01-1.0 a 0-1
             (validated_genes.lifespan - 1.0) / 999.0,  # De 1-1000 a 0-1
             (validated_genes.metabolic_activity - 0.1) / 0.9,  # De 0.1-1.0 a 0-1
-            (validated_genes.max_energy_reserves - 50.0) / 100.0  # De 50-150 a 0-1
+            (validated_genes.max_energy_reserves - 50.0) / 100.0,  # De 50-150 a 0-1
+
+            validated_genes.cold_resistance,
+            validated_genes.heat_resistance,
+
+            (validated_genes.optimal_temperature + 30.0) / 80.0  # De -30-50 a [0,1]
+
         ])
 
     def extract_genes_from_entity(self, flora_entity: Flora):
@@ -169,5 +182,11 @@ class GeneticAlgorithmModel:
             genes.base_respiration_rate = metabolic_component.base_respiration_rate
             genes.metabolic_activity = metabolic_component.metabolic_activity
             genes.max_energy_reserves = metabolic_component.max_energy_reserves
+
+        weather_adaptation_component: WeatherAdaptationComponent = flora_entity.get_component(ComponentType.WEATHER_ADAPTATION)
+        if weather_adaptation_component:
+            genes.cold_resistance = weather_adaptation_component.cold_resistance
+            genes.heat_resistance = weather_adaptation_component.heat_resistance
+            genes.optimal_temperature = weather_adaptation_component.optimal_temperature
 
         return genes

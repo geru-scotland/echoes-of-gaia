@@ -31,9 +31,10 @@ class FloraGenes:
         self.lifespan = 0.0
         self.metabolic_activity = 0.0
         self.max_energy_reserves = 0.0
-        # OJO, inicializo a 1 porque aún no tengo gestión:
-        self.cold_resistance = 1.0
-        self.heat_resistance = 1.0
+
+        self.cold_resistance = 0.0
+        self.heat_resistance = 0.0
+        self.optimal_temperature = 0.0
         # Dejo las siguientes para más adelante:
         # self.drought_resistance = 0.0
         # self.toxicity = 0.0

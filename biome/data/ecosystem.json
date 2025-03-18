@@ -545,9 +545,9 @@
       },
       "WeatherAdaptationComponent": {
         "defaults": {
-          "optimal_temperature": 1.0,
+          "optimal_temperature": 24.0,
           "cold_resistance": 0.0,
-          "heat_resistance": 1.0
+          "heat_resistance": 0.5
         }
       },
       "WaterAdaptationComponent": {

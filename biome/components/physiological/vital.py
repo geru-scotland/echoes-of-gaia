@@ -56,12 +56,13 @@ class VitalComponent(FloraComponent):
         self._env.process(self._update_vitality_stress(Timers.Compoments.Physiological.STRESS_UPDATE))
         self._env.process(self._update_vitality(Timers.Compoments.Physiological.HEALTH_DECAY))
 
-    def _register_events(self):
+    def _register_events(self) -> None:
         super()._register_events()
         SimulationEventBus.register("simulation_finished", self._handle_simulation_finished)
 
-    def _handle_simulation_finished(self):
-        self.plot_vitality_curve()
+    def _handle_simulation_finished(self) -> None:
+        # self.plot_vitality_curve()
+        pass
 
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
