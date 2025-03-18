@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
 from biome.components.physiological.metabolic import MetabolicComponent
 from biome.components.base.transform import TransformComponent
@@ -25,6 +26,7 @@ CLASS_REGISTRY = {
     "VitalComponent": VitalComponent,
     "MetabolicComponent": MetabolicComponent,
     "TransformComponent": TransformComponent,
+    "WeatherAdaptationComponent": WeatherAdaptationComponent
 }
 
 def register_component(name: str, cls):

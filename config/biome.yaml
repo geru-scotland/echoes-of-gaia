@@ -8,25 +8,14 @@ biome:
   flora:
     - species: "oak_tree"
       spawns: 11
-      avg-lifespan: 6 # En años lo pongo
+      avg-lifespan: 2 # En años lo pongo
       components:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
+        - WeatherAdaptationComponent:
+            cold_resistance: 1.0
+            optimal_temperature: -8
+            heat_resistance: 0.1
 
-    - species: "bramble"
-      avg-lifespan: 5 # En años lo pongo
-      spawns: 13
 
-    - species: "mushroom"
-      avg-lifespan: 5 # En años lo pongo
-      spawns: 17
-
-  fauna:
-    - species: "deer"
-      avg-lifespan: 8 # En años lo pongo
-      spawns: 1
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - MetabolicComponent:

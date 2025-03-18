@@ -16,6 +16,7 @@
 # =============================================================================
 """
 import math
+import random
 from typing import Optional, Dict, Any
 
 from biome.components.base.component import EntityComponent, FloraComponent
@@ -34,7 +35,7 @@ class MetabolicComponent(FloraComponent):
                  photosynthesis_efficiency: float = 0.75, respiration_rate: float = 0.05,
                  metabolic_activity: float = 1.0, energy_reserves: float = 100.0, max_energy_reserves: float = 100.0):
 
-        super().__init__(env, ComponentType.METABOLIC, event_notifier)
+        super().__init__(env, ComponentType.METABOLIC, event_notifier, lifespan)
         self._base_photosynthesis_efficiency: float = round(photosynthesis_efficiency, 2)
         self._photosynthesis_efficiency: float = self._base_photosynthesis_efficiency
         self._base_respiration_rate: float = round(respiration_rate, 4)
@@ -42,7 +43,6 @@ class MetabolicComponent(FloraComponent):
         self._metabolic_activity: float = round(metabolic_activity, 2)
         self._energy_reserves: float = round(energy_reserves, 2)
         self._max_energy_reserves: float = round(max_energy_reserves, 2)
-        self._lifespan: float = lifespan
         # TODO: Para light availability, hace falta más información en el state
         # quizá agregar el weather effect y analizar desde aquí, mediante ClimateService
         self._light_availability: float = 0.7
@@ -59,28 +59,29 @@ class MetabolicComponent(FloraComponent):
     def _register_events(self):
         super()._register_events()
 
+
     def _update_metabolic_stress(self, timer: int):
         yield self._env.timeout(timer)
 
         while True:
             energy_ratio = self._energy_reserves / self._max_energy_reserves
             # Factor suavizado - usa raíz cuadrada para una relación menos abrupta
-            lifespan_factor = 1.0 / math.sqrt(max(1.0, self._lifespan))
+
             if MetabolicThresholds.Energy.CRITICAL > energy_ratio > 0.0:
                 stress_change = MetabolicThresholds.StressChange.CRITICAL
-                self.modify_stress(stress_change * lifespan_factor, StressReason.NUTRIENT_DEFICIENCY)
+                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
 
             elif energy_ratio < MetabolicThresholds.Energy.LOW:
                 stress_change = MetabolicThresholds.StressChange.LOW
-                self.modify_stress(stress_change * lifespan_factor, StressReason.NUTRIENT_DEFICIENCY)
+                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
 
             elif energy_ratio > MetabolicThresholds.Energy.ABUNDANT:
                 stress_change = MetabolicThresholds.StressChange.ABUNDANT
-                self.modify_stress(stress_change * lifespan_factor, StressReason.ENERGY_ABUNDANCE)
+                self.modify_stress(stress_change, StressReason.ENERGY_ABUNDANCE)
 
             elif energy_ratio > MetabolicThresholds.Energy.SUFFICIENT:
                 stress_change = MetabolicThresholds.StressChange.SUFFICIENT
-                self.modify_stress(stress_change * lifespan_factor, StressReason.ENERGY_SUFFICIENT)
+                self.modify_stress(stress_change, StressReason.ENERGY_SUFFICIENT)
 
             yield self._env.timeout(timer)
 
@@ -155,7 +156,7 @@ class MetabolicComponent(FloraComponent):
         self._logger.debug(f"NORMLIZED STRESS {normalized_stress}")
         self._photosynthesis_efficiency = max(0.0, self._base_photosynthesis_efficiency - max(0.05, normalized_stress * 0.8))
         # Quizá problema aquí
-        self._respiration_rate = min(1.0, self._base_respiration_rate +  1.0 * normalized_stress)
+        self._respiration_rate = min(1.0, self._base_respiration_rate +  0.7 * normalized_stress)
 
     def set_environmental_modifiers(self, light: float = None, temperature: float = None, water: float = None):
         if light is not None:

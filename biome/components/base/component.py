@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+import math
 from logging import Logger
 from abc import abstractmethod, ABC
 from typing import Optional, Set, Dict, Any
@@ -84,18 +85,18 @@ class EntityComponent(Component, EventHandler):
 
 class FloraComponent(EntityComponent):
 
-    def __init__(self, env: simpyEnv, type: ComponentType, event_notifier: EventNotifier):
+    def __init__(self, env: simpyEnv, type: ComponentType, event_notifier: EventNotifier, lifespan: float):
         super().__init__(env, type, event_notifier)
         self._event_notifier: EventNotifier = event_notifier
         self._dormancy_reasons: Set[DormancyReason] = set()
         self._is_dormant: bool = False
         self._stress_level: float =  round(0.0000, 4)
         self._max_stress: float = 100.0
+        self._lifespan: float = lifespan
 
     def _register_events(self):
         self._event_notifier.register(ComponentEvent.DORMANCY_UPDATED, self._handle_dormancy_update)
         self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
-        self._event_notifier.register(ComponentEvent.EXTREME_WEATHER, self._handle_extreme_weather)
 
     def _handle_dormancy_update(self, *args, **kwargs):
         dormant: bool = kwargs.get("dormant", False)
@@ -105,31 +106,6 @@ class FloraComponent(EntityComponent):
     def _handle_stress_update(self, *args, **kwargs):
         new_stress: float = kwargs.get("stress_level", 0.0)
         self._stress_level = new_stress
-
-    # TODO: Pasar esto a componente de temperatura propio.
-    def _handle_extreme_weather(self, *args, **kwargs):
-        temperature = kwargs.get("temperature", 0.0)
-        self._logger.debug(f"EXTREME WEATHER HANDLING FROM A COMPONENT: {temperature}")
-
-        if temperature <= ClimateThresholds.Temperature.EXTREME_COLD:
-            stress_change = ClimateThresholds.StressChange.EXTREME_COLD / 5.0
-            self.modify_stress(stress_change, StressReason.TEMPERATURE_EXTREME)
-
-        elif temperature <= ClimateThresholds.Temperature.COLD:
-            stress_change = ClimateThresholds.StressChange.COLD / 5.0
-            self.modify_stress(stress_change, StressReason.TEMPERATURE_EXTREME)
-
-        elif ClimateThresholds.Temperature.OPTIMAL_LOW <= temperature <= ClimateThresholds.Temperature.OPTIMAL_HIGH:
-            stress_change = ClimateThresholds.StressChange.OPTIMAL / 5.0
-            self.modify_stress(stress_change, StressReason.TEMPERATURE_OPTIMAL)
-
-        elif temperature >= ClimateThresholds.Temperature.EXTREME_HOT:
-            stress_change = ClimateThresholds.StressChange.EXTREME_HOT / 5.0
-            self.modify_stress(stress_change, StressReason.TEMPERATURE_EXTREME)
-
-        elif temperature >= ClimateThresholds.Temperature.HOT:
-            stress_change = ClimateThresholds.StressChange.HOT / 5.0
-            self.modify_stress(stress_change, StressReason.TEMPERATURE_EXTREME)
 
     def request_dormancy(self, reason: DormancyReason, active: bool) -> None:
         if active:
@@ -150,8 +126,10 @@ class FloraComponent(EntityComponent):
         self._logger.debug(f"[STRESS DEBUG] - Previous Stress Level: {self._stress_level}")
         self._logger.debug(f"[STRESS DEBUG] - Max Stress Allowed: {self._max_stress}")
 
+        lifespan_factor = 1.0 / math.sqrt(max(1.0, self._lifespan))
+
         old_stress = self._stress_level
-        new_stress = max(0.0, min(self._stress_level + delta, self._max_stress))
+        new_stress = max(0.0, min(self._stress_level + delta * lifespan_factor, self._max_stress))
         rounded_stress = round(new_stress, 4)
 
         self._logger.debug(f"[STRESS DEBUG] - New Calculated Stress (Before Rounding): {new_stress}")

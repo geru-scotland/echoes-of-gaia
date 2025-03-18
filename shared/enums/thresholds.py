@@ -28,9 +28,9 @@ class VitalThresholds:
 
     class StressChange(EnumBaseFloat):
         CRITICAL = 0.02
-        LOW = 0.009
-        GOOD = 0.004
-        EXCELLENT = 0.003
+        LOW = 0.012
+        GOOD = 0.007
+        EXCELLENT = 0.005
 
 
 class MetabolicThresholds:
@@ -64,6 +64,6 @@ class ClimateThresholds:
     class StressChange(EnumBaseFloat):
         EXTREME_COLD = 1.5
         COLD = 0.8
-        OPTIMAL = -0.1
+        OPTIMAL = -0.01
         HOT = 0.8
         EXTREME_HOT = 1.5

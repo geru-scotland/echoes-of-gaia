@@ -37,9 +37,8 @@ class VitalComponent(FloraComponent):
                  vitality: float = 100.0, max_vitality: float = 100.0, age: float = 0.0, aging_rate: float = 1.0,
                  dormancy_threshold: float = 25.0):
 
-        super().__init__( env, ComponentType.VITAL, event_notifier)
+        super().__init__( env, ComponentType.VITAL, event_notifier, lifespan)
         self._lifespan_in_ticks: int = int((lifespan * float(Timers.Calendar.YEAR)))
-        self._lifespan: float = lifespan
         self._vitality: float = round(vitality, 2)
         self._max_vitality: float = round(max_vitality, 2)
         self._age: float = age
@@ -80,29 +79,28 @@ class VitalComponent(FloraComponent):
         while True:
             vitality_ratio = self._vitality / self._max_vitality
             # Factor suavizado - usa raíz cuadrada para una relación menos abrupta
-            lifespan_factor = 1.0 / math.sqrt(max(1.0, self._lifespan))
 
             if vitality_ratio < VitalThresholds.Health.CRITICAL:
                 stress_change = VitalThresholds.StressChange.CRITICAL
-                self.modify_stress(stress_change * lifespan_factor, StressReason.CRITICAL_VITALITY)
+                self.modify_stress(stress_change, StressReason.CRITICAL_VITALITY)
                 self._logger.debug(
                     f"Vitality is CRITICAL ({vitality_ratio:.2f}). Increasing stress by {stress_change:}.")
 
             elif vitality_ratio < VitalThresholds.Health.LOW:
                 stress_change = VitalThresholds.StressChange.LOW
-                self.modify_stress(stress_change * lifespan_factor, StressReason.LOW_VITALITY)
+                self.modify_stress(stress_change, StressReason.LOW_VITALITY)
                 self._logger.debug(
                     f"Vitality is LOW ({vitality_ratio:.2f}). Increasing stress by {stress_change}.")
 
             elif vitality_ratio > VitalThresholds.Health.EXCELLENT:
                 stress_change = VitalThresholds.StressChange.EXCELLENT
-                self.modify_stress(stress_change * lifespan_factor, StressReason.EXCELLENT_VITALITY)
+                self.modify_stress(stress_change, StressReason.EXCELLENT_VITALITY)
                 self._logger.debug(
                     f"Vitality is EXCELLENT ({vitality_ratio:.2f}). Reducing stress by {stress_change}.")
 
             elif vitality_ratio > VitalThresholds.Health.GOOD:
                 stress_change = VitalThresholds.StressChange.GOOD
-                self.modify_stress(stress_change * lifespan_factor, StressReason.GOOD_VITALITY)
+                self.modify_stress(stress_change, StressReason.GOOD_VITALITY)
                 self._logger.debug(
                     f"Vitality is GOOD ({vitality_ratio:.2f}). Reducing stress by {stress_change}.")
 
