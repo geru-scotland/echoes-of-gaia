@@ -15,6 +15,8 @@
 #                                                                              #
 # =============================================================================
 """
+from typing import List, Dict, Any
+
 
 class FloraGenes:
     def __init__(self):
@@ -57,3 +59,71 @@ class FloraGenes:
             "heat_resistance": self.heat_resistance,
         }
         return ", ".join(f"{key}={value}" for key, value in fields.items())
+
+    def convert_genes_to_components(self) -> List[Dict[str, Any]]:
+        components: List[Dict[str, Any]] = []
+
+        growth_component: Dict[str, Any] = {
+            "GrowthComponent": {
+                "growth_modifier": self.growth_modifier,
+                "growth_efficiency": self.growth_efficiency,
+                "lifespan": self.lifespan,
+                "max_size": self.max_size * 5.0
+            }
+        }
+        components.append(growth_component)
+
+        vital_component: Dict[str, Any] = {
+            "VitalComponent": {
+                "max_vitality": self.max_vitality,
+                "aging_rate": self.aging_rate,
+                "lifespan": self.lifespan,
+                "health_modifier": self.health_modifier,
+            }
+        }
+        components.append(vital_component)
+
+        metabolic_component: Dict[str, Any] = {
+            "MetabolicComponent": {
+                "photosynthesis_efficiency": self.base_photosynthesis_efficiency,
+                "respiration_rate": self.base_respiration_rate,
+                "metabolic_activity": self.metabolic_activity,
+                "max_energy_reserves": self.max_energy_reserves,
+            }
+        }
+        components.append(metabolic_component)
+
+        weather_adaptation_component: Dict[str, Any] = {
+            "WeatherAdaptationComponent": {
+                "cold_resistance": self.cold_resistance,
+                "heat_resistance": self.heat_resistance,
+                "optimal_temperature": self.optimal_temperature,
+            }
+        }
+        components.append(weather_adaptation_component)
+
+        return components
+
+    def validate_genes(self) -> None:
+        valid_ranges = {
+            "growth_modifier": (0.1, 2.0),
+            "growth_efficiency": (0.3, 1.0),
+            "max_size": (0.1, 5.0),
+            "max_vitality": (50.0, 200.0),
+            "aging_rate": (0.1, 2.0),
+            "health_modifier": (0.4, 2.0),
+            "base_photosynthesis_efficiency": (0.4, 1.0),
+            "base_respiration_rate": (0.05, 1.0),
+            "lifespan": (1.0, 1000.0),  # en años
+            "metabolic_activity": (0.2, 1.0),
+            "max_energy_reserves": (50.0, 150.0),
+            "cold_resistance": (0.0, 1.0),
+            "heat_resistance": (0.0, 1.0),
+            "optimal_temperature": (-30, 50)
+        }
+
+        for attr, (min_val, max_val) in valid_ranges.items():
+            if hasattr(self, attr):
+                current_val = getattr(self, attr)
+                valid_val = max(min_val, min(current_val, max_val))
+                setattr(self, attr, valid_val)

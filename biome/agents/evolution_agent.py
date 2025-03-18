@@ -28,7 +28,7 @@ from biome.entities.flora import Flora
 from biome.agents.base import Agent, TAction, TState
 from biome.systems.evolution.fitness import compute_fitness
 from biome.systems.evolution.genes import FloraGenes
-from biome.systems.evolution.genetics import GeneticAlgorithmModel
+from biome.systems.evolution.genetics import GeneticAlgorithmModel, extract_genes_from_entity
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from shared.enums.strings import Loggers
@@ -99,13 +99,13 @@ class EvolutionAgentAI(Agent):
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
 
     def _calculate_entity_fitness(self, entity, climate_data):
-        genes = self._genetic_model.extract_genes_from_entity(entity)
+        genes = extract_genes_from_entity(entity)
 
         return compute_fitness(genes, climate_data)
 
     def _create_evolved_entity(self, species, genes: FloraGenes) -> None:
         try:
-            components = self._convert_genes_to_components(genes)
+            components: List[Dict[str, Any]] = genes.convert_genes_to_components()
 
             BiomeEventBus.trigger(
                 BiomeEvent.CREATE_ENTITY,
@@ -119,46 +119,3 @@ class EvolutionAgentAI(Agent):
         except Exception as e:
             self._logger.exception(f"Error al crear entidad evolucionada de especie {species}: {e}")
 
-    def _convert_genes_to_components(self, genes: FloraGenes):
-        components = []
-
-        growth_component: Dict[str, Any] = {
-            "GrowthComponent": {
-                "growth_modifier": genes.growth_modifier,
-                "growth_efficiency": genes.growth_efficiency,
-                "lifespan": genes.lifespan,
-                "max_size": genes.max_size * 5.0
-            }
-        }
-        components.append(growth_component)
-
-        vital_component: Dict[str, Any] = {
-            "VitalComponent": {
-                "max_vitality": genes.max_vitality,
-                "aging_rate": genes.aging_rate,
-                "lifespan": genes.lifespan,
-                "health_modifier": genes.health_modifier,
-            }
-        }
-        components.append(vital_component)
-
-        metabolic_component: Dict[str, Any] = {
-            "MetabolicComponent": {
-                "photosynthesis_efficiency": genes.base_photosynthesis_efficiency,
-                "respiration_rate": genes.base_respiration_rate,
-                "metabolic_activity": genes.metabolic_activity,
-                "max_energy_reserves": genes.max_energy_reserves,
-            }
-        }
-        components.append(metabolic_component)
-
-        weather_adaptation_component: Dict[str, Any] = {
-            "WeatherAdaptationComponent": {
-                "cold_resistance": genes.cold_resistance,
-                "heat_resistance": genes.heat_resistance,
-                "optimal_temperature": genes.optimal_temperature,
-            }
-        }
-        components.append(weather_adaptation_component)
-
-        return components
