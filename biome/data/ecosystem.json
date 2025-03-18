@@ -517,8 +517,8 @@
       "MetabolicComponent": {
         "defaults": {
           "photosynthesis_efficiency": 0.7,
-          "respiration_rate": 0.2,
-          "metabolic_activity": 0.7,
+          "respiration_rate": 0.35,
+          "metabolic_activity": 0.8,
           "energy_reserves": 100.0,
           "max_energy_reserves": 100.0
         }
@@ -543,14 +543,11 @@
           "stress_adaptation_rate": 0.02
         }
       },
-      "TemperatureAdaptationComponent": {
+      "WeatherAdaptationComponent": {
         "defaults": {
-          "optimal_temperature": 22.0,
-          "min_viable_temperature": 5.0,
-          "max_viable_temperature": 35.0,
-          "cold_resistance": 0.4,
-          "heat_resistance": 0.5,
-          "temperature_stress_threshold": 8.0
+          "optimal_temperature": 24.0,
+          "cold_resistance": 0.0,
+          "heat_resistance": 0.5
         }
       },
       "WaterAdaptationComponent": {

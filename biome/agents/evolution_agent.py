@@ -152,5 +152,13 @@ class EvolutionAgentAI(Agent):
         }
         components.append(metabolic_component)
 
-        # TODO: Falta temperaturas (probabolemente environment compoment)
+        weather_adaptation_component: Dict[str, Any] = {
+            "WeatherAdaptationComponent": {
+                "cold_resistance": genes.cold_resistance,
+                "heat_resistance": genes.heat_resistance,
+                "optimal_temperature": genes.optimal_temperature,
+            }
+        }
+        components.append(weather_adaptation_component)
+
         return components

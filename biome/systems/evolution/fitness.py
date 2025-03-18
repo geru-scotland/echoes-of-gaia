@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import math
 
 
 def compute_fitness(flora_genes, climate_data):
@@ -25,13 +26,20 @@ def compute_fitness(flora_genes, climate_data):
     avg_precipitation = climate_data['precipitation_ema'].iloc[-1]
 
     # 1. Adaptación a temperatura
-    temperature_score: float = 0.0
-    if avg_temperature < 0:  # Frío
-        temperature_score = flora_genes.cold_resistance * 5.0
-    elif avg_temperature > 30:  # Calor
-        temperature_score = flora_genes.heat_resistance * 5.0
-    else:
-        temperature_score = 3.0
+    optimal_temperature = flora_genes.optimal_temperature
+
+    temperature_distance = avg_temperature - optimal_temperature
+
+    # Si resistencia grande, 5.0 se divide entre txiki - sigma grande (distri. grande, muy alta tolerancia a diferencia de º)
+    if temperature_distance < 0:  # Frío
+        sigma_cold = 5.0 / (1.0 - flora_genes.cold_resistance + 1e-6)
+        stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_cold ** 2))
+    else:  # Calor
+        sigma_heat = 5.0 / (1.0 - flora_genes.heat_resistance + 1e-6)
+        stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_heat ** 2))
+
+    temperature_score = 5.0 * stress_factor
+
 
     # 2. Adaptación a humedad
     humidity_score: float = 0.0

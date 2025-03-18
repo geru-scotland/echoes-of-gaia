@@ -43,6 +43,7 @@ class ComponentType(EnumBaseStr):
     STATE = "state"
     VITAL = "vital"
     CLIMATE = "climate"
+    WEATHER_ADAPTATION = "weather_adaptation_component"
 
 class EntityState(EnumBaseStr):
     HEALTHY = "healthy"

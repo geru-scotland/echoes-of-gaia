@@ -31,14 +31,14 @@ class ComponentEvent(EnumBaseStr):
     DORMANCY_UPDATED = "on_dormancy_updated"
     STRESS_UPDATED = "on_stress_updated"
     ENTITY_DEATH = "entity_death"
-    EXTREME_WEATHER = "extreme_weather"
+    WEATHER_UPDATE = "weather_update"
 
 class BiomeEvent(EnumBaseStr):
     CREATE_ENTITY = "create_entity"
     REMOVE_ENTITY = "remove_entity"
 
     CLIMATE_CHANGE = "climate_change"
-    EXTREME_WEATHER = "on_extreme_weather"
+    WEATHER_UPDATE = "on_weather_update"
     SEASON_CHANGE = "season_change"
     DISASTER = "disaster"
     CLIMATE_DATA_COLLECTED = "climate_data_collected"

@@ -158,12 +158,9 @@ class ClimateSystem:
 
         # TODO: Guardar histórico y actualizar el ClimateState
         # con averages de temp, hum y prec, para que los componentes puedan acceder
-        is_extreme = (self._state.temperature <= ClimateThresholds.Temperature.EXTREME_COLD or
-                      self._state.temperature >= ClimateThresholds.Temperature.EXTREME_HOT)
-
-        if is_extreme:
-            BiomeEventBus.trigger(BiomeEvent.EXTREME_WEATHER,
-                                  temperature=self._state.temperature)
+        BiomeEventBus.trigger(BiomeEvent.WEATHER_UPDATE,
+                              temperature=self._state.temperature,
+                              weather_event=weather_event)
         self._logger.debug(
             f"\n{'=' * 60}\n"
             f"[CLIMATE] Season: {self._season_system.get_current_season()} | Weather Event: {weather_event}\n"
