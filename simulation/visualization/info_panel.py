@@ -74,7 +74,8 @@ class InfoPanel:
 
     def _format_field_value(self, field: str, value: Any) -> str:
         time_related_fields = {
-            "age", "birth_tick", "biological_age", "lifespan_in_ticks", "lifespan"
+            "age", "birth_tick", "biological_age", "lifespan_in_ticks", "lifespan",
+            "death_tick"
         }
 
         if field in time_related_fields and isinstance(value, (int, float)):

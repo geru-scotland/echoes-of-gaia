@@ -32,27 +32,37 @@ from biome.systems.evolution.genetics import GeneticAlgorithmModel, extract_gene
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from shared.enums.strings import Loggers
+from shared.timers import Timers
 from shared.types import Observation, EntityList
 from utils.loggers import LoggerManager
 
 
 class EvolutionAgentAI(Agent):
-    def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider):
+    def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider,
+                 species: FloraSpecies, evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE):
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
         self._climate_data_manager: ClimateDataManager = climate_data_manager
         self.entity_provider: EntityProvider = entity_provider
         self._genetic_model: GeneticAlgorithmModel = GeneticAlgorithmModel()
+        self._evolution_cycle_time = evolution_cycle_time
         self._evolution_cycle: itertools.count[int] = itertools.count(0)
         self._current_evolution_cycle: int = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
+        self._species: FloraSpecies = species
+        self._logger.info(f"Initialized Evolution Agent for species: {species}")
 
     def perceive(self) -> Observation:
+        flora_entities: EntityList = self.entity_provider.get_flora()
+        species_entities = [entity for entity in flora_entities if entity.get_species() == self._species]
+
         return {
             "climate_data": self._climate_data_manager.get_data(self._current_evolution_cycle)[-1:],
-            "flora": self.entity_provider.get_flora()
+            "flora": species_entities
         }
 
     def decide(self, observation: Observation) -> TAction:
+       self._logger.info(f"Making evolution decision for species: {self._species}")
+
        self._logger.info(f"Observation: {observation}")
        climate_data = observation["climate_data"]
        flora_entities = observation["flora"]
@@ -93,14 +103,14 @@ class EvolutionAgentAI(Agent):
             pass
 
         for species, genes in action["evolved_genes"]:
-            self._create_evolved_entity(species, genes)
+            if species == self._species:
+                self._create_evolved_entity(species, genes)
 
         self._current_evolution_cycle = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
 
     def _calculate_entity_fitness(self, entity, climate_data):
         genes = extract_genes_from_entity(entity)
-
         return compute_fitness(genes, climate_data)
 
     def _create_evolved_entity(self, species, genes: FloraGenes) -> None:
@@ -119,3 +129,8 @@ class EvolutionAgentAI(Agent):
         except Exception as e:
             self._logger.exception(f"Error al crear entidad evolucionada de especie {species}: {e}")
 
+    def get_species(self) -> FloraSpecies:
+        return self._species
+
+    def get_evolution_cycle_time(self) -> int:
+        return self._evolution_cycle_time

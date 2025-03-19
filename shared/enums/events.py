@@ -30,8 +30,9 @@ class ComponentEvent(EnumBaseStr):
     DORMANCY_REASONS_CHANGED = "on_dormancy_reasons_changed"
     DORMANCY_UPDATED = "on_dormancy_updated"
     STRESS_UPDATED = "on_stress_updated"
-    ENTITY_DEATH = "entity_death"
-    WEATHER_UPDATE = "weather_update"
+    ENTITY_DEATH = "on_entity_death"
+    WEATHER_UPDATE = "on_weather_update"
+    ENERGY_UPDATED = "on_energy_update"
 
 class BiomeEvent(EnumBaseStr):
     CREATE_ENTITY = "create_entity"

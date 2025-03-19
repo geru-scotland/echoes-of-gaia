@@ -37,3 +37,8 @@ class EventBus:
         for callback in cls._listeners.get(event_name, []):
             callback(*args, **kwargs)
 
+    @classmethod
+    def unregister(cls, event_name: str, callback: Any):
+        if event_name in cls._listeners:
+            if callback in cls._listeners[event_name]:
+                cls._listeners[event_name].remove(callback)

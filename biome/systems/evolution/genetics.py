@@ -114,29 +114,51 @@ def deap_genes_to_flora_genes(individual) -> FloraGenes:
 
 
 class GeneticAlgorithmModel:
-    def __init__(self):
-        self._setup_deap()
+    _types_created = False
 
+    def __init__(self):
+        if not GeneticAlgorithmModel._types_created:
+            self._setup_deap()
+            GeneticAlgorithmModel._types_created = True
+
+        self.toolbox = base.Toolbox()
+        self._setup_toolbox()
         self.stats_history = []
 
     def _setup_deap(self):
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
         creator.create("Individual", list, fitness=creator.FitnessMax)
 
-        self.toolbox = base.Toolbox()
-
+    def _setup_toolbox(self):
         self.toolbox.register("attr_float", random.random)
-
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
                               self.toolbox.attr_float, n=14)
-
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
-
         self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
-        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.2, indpb=0.2)
+
+        def mutation_controlled_lifespan(individual, indpb):
+            # Para valores con rango muy amplio, como tengo para lifespan,
+            # un cambio en el valor normalizado es un valor muy grande en el dominio real, asi que
+            # denormalizo, hago la modificación (random, con sigma 0.1 en distr. gauss) y vuelvo a normalizar.
+            for i in range(len(individual)):
+                if random.random() < indpb:
+                    if i == 8:
+                        # El valor normalizado, lo paso al dominio real
+                        # TODO: Quitar esta chapuza
+                        actual_lifespan = 1.0 + individual[i] * 999.0
+                        # Sigma txiki, 0.1, aplico una gaussiana
+                        factor = random.gauss(1.0, 0.1)
+                        new_lifespan = actual_lifespan * factor
+                        new_lifespan = max(1.0, min(1000.0, new_lifespan))
+                        # Normalizo de nuevo
+                        individual[i] = (new_lifespan - 1.0) / 999.0
+                    else:
+                        individual[i] += random.gauss(0, 0.2)
+                        individual[i] = max(0.0, min(1.0, individual[i]))
+            return individual,
+
+        self.toolbox.register("mutate", mutation_controlled_lifespan, indpb=0.2)
         self.toolbox.register("select", tools.selTournament, tournsize=3)
-
-
 
     def evolve_population(self, current_flora, climate_data, generation_count=20):
         population = []

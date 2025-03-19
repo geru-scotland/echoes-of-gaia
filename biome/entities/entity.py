@@ -49,15 +49,43 @@ class Entity(EventHandler, StateHandler, ABC):
         self._env: simpyEnv = env
         self._components: ComponentDict = {}
         self._habitats: HabitatList = habitats
-        self._state: EntityState = EntityState()
         self._birth_tick: int = self._env.now
         self._lifespan: float = lifespan
 
+        self._state: EntityState = EntityState()
+        self._state.update("is_dead", False)
+
     def _register_events(self):
-        self._event_notifier.register(ComponentEvent.UPDATE_STATE, self.handle_component_update)
+        self._event_notifier.register(ComponentEvent.UPDATE_STATE, self._handle_component_update)
+        self._event_notifier.register(ComponentEvent.ENTITY_DEATH, self._handle_death)
 
         # BiomeEventBus ahora
         BiomeEventBus.register(BiomeEvent.WEATHER_UPDATE, self._handle_weather_update)
+
+
+    def _handle_component_update(self, component_class: Type, **kwargs: Any):
+        if kwargs:
+            self._logger.debug(f"[Sim tick: {self._env.now} (called in: {kwargs.get("tick")})] Updating entity: {self._descriptor.species} (id: {self._id}) ({self._descriptor.entity_type}),"
+                               f" [component: {component_class.__name__}]: {kwargs}")
+            for key, value in kwargs.items():
+                self._state.update(key, value)
+
+    def _handle_death(self, *args, **kwargs):
+        self._logger.warning(f"Entity {self._id} ({self._descriptor.species}) has died")
+        self._state.update("is_dead", True)
+
+        BiomeEventBus.unregister(BiomeEvent.WEATHER_UPDATE, self._handle_weather_update)
+
+        for _, component in self._components.items():
+            component.disable_notifier()
+
+        # self._components = {}
+        self.event_notifier.unregister(ComponentEvent.UPDATE_STATE, self._handle_component_update)
+        self.event_notifier.unregister(ComponentEvent.ENTITY_DEATH, self._handle_death)
+
+        self._event_notifier = None
+
+        self._state.update("death_tick", self._env.now)
 
     def _handle_weather_update(self, *args, **kwargs):
         self._event_notifier.notify(ComponentEvent.WEATHER_UPDATE, **kwargs)
@@ -85,13 +113,6 @@ class Entity(EventHandler, StateHandler, ABC):
     def set_position(self, x, y):
         self._components[ComponentType.TRANSFORM].set_position(x, y)
 
-    def handle_component_update(self, component_class: Type, **kwargs: Any):
-        if kwargs:
-            self._logger.debug(f"[Sim tick: {self._env.now} (called in: {kwargs.get("tick")})] Updating entity: {self._descriptor.species} (id: {self._id}) ({self._descriptor.entity_type}),"
-                               f" [component: {component_class.__name__}]: {kwargs}")
-            for key, value in kwargs.items():
-                self._state.update(key, value)
-
     def has_attribute(self, attribute: str) -> bool:
         return attribute in self._state
 
@@ -101,6 +122,8 @@ class Entity(EventHandler, StateHandler, ABC):
     def get_state_fields(self) -> Dict[str, Dict[str, Any]]:
         fields: Dict[str, Any] = {
             "general": {
+                "is_dead": self._state.get("is_dead", False),
+                "death_tick": self._state.get("death_tick", -1),
                 "Lifespan": self._lifespan,
                 "is_dormant": self._state.get("is_dormant", False)
             }

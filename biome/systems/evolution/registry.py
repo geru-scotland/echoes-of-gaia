@@ -15,34 +15,31 @@
 #                                                                              #
 # =============================================================================
 """
-from enum import Flag, auto
+from logging import Logger
+from typing import Any, Dict, Optional, List
+
+from biome.agents.evolution_agent import EvolutionAgentAI
+from shared.enums.enums import FloraSpecies
+from shared.enums.strings import Loggers
+from utils.loggers import LoggerManager
 
 
-class DormancyReason(Flag):
-    NONE = 0
-    LOW_ENERGY = auto()
-    LOW_VITALITY = auto()
-    ENVIRONMENTAL_STRESS = auto()
+class EvolutionAgentRegistry:
+    def __init__(self, climate_data_manager, entity_provider):
+        self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
+        self._climate_data_manager = climate_data_manager
+        self._entity_provider = entity_provider
+        self._agents: Dict[FloraSpecies, EvolutionAgentAI] = {}
+        self._evolution_processes: Dict[FloraSpecies, Any] = {}
 
+    def register_agent(self, species: FloraSpecies, agent: EvolutionAgentAI) -> None:
+        self._agents[species] = agent
 
-class StressReason(Flag):
-    NONE = 0
+    def get_agent(self, species: FloraSpecies) -> Optional[EvolutionAgentAI]:
+        return self._agents.get(species)
 
-    WATER_SHORTAGE = auto()
-    LIGHT_DEFICIENCY = auto()
-    TOXICITY = auto()
-    DISEASE = auto()
-    PHYSICAL_DAMAGE = auto()
+    def register_process(self, species: FloraSpecies, process) -> None:
+        self._evolution_processes[species] = process
 
-    GOOD_VITALITY = auto()
-    EXCELLENT_VITALITY = auto()
-    LOW_VITALITY = auto()
-    CRITICAL_VITALITY = auto()
-
-    NUTRIENT_DEFICIENCY = auto()
-    ENERGY_ABUNDANCE = auto()
-    ENERGY_SUFFICIENT = auto()
-    NO_ENERGY = auto()
-
-    TEMPERATURE_EXTREME = auto()
-    TEMPERATURE_OPTIMAL = auto()
+    def get_all_species(self) -> List[FloraSpecies]:
+        return list(self._agents.keys())

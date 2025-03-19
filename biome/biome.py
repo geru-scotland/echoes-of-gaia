@@ -29,6 +29,7 @@ from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.events.event_bus import BiomeEventBus
+from biome.systems.evolution.registry import EvolutionAgentRegistry
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
@@ -37,11 +38,11 @@ from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, Biom
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
-from shared.enums.enums import Agents, AgentType, Season, WeatherEvent
+from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies
 from shared.enums.events import BiomeEvent
 from shared.events.handler import EventHandler
 from shared.timers import Timers
-from shared.types import EntityList, Observation
+from shared.types import EntityList, Observation, EntityDefinitions
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 from simulation.core.systems.telemetry.datapoint import Datapoint
 
@@ -78,10 +79,58 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.Climate.CLIMATE_UPDATE))
 
-        evolution_agent: EvolutionAgentAI = EvolutionAgentAI(self._climate_data_manager, self._entity_provider)
-        agents.update({AgentType.EVOLUTION_AGENT: evolution_agent})
-        self._env.process(self._run_agent(AgentType.EVOLUTION_AGENT, Timers.Agents.Evolution.EVOLUTION_CYCLE))
+        self._evolution_registry: EvolutionAgentRegistry = EvolutionAgentRegistry(self._climate_data_manager, self._entity_provider)
+
+        flora_definitions: EntityDefinitions = self._context.flora_definitions
+
+        for flora_def in flora_definitions:
+            species_name = flora_def.get("species", "").lower()
+            try:
+                species = FloraSpecies(species_name)
+
+                # Ahora calculo el tiempo del ciclo evolutivo basado en el ciclo de vida
+                # en lugar de como estaba antes (en timers tengo, default)
+                lifespan = flora_def.get("avg-lifespan", 5.0)
+
+                evolution_cycle_time = int(lifespan * float(Timers.Calendar.YEAR) * 0.6)  
+
+                evolution_agent = EvolutionAgentAI(
+                    self._climate_data_manager,
+                    self._entity_provider,
+                    species,
+                    evolution_cycle_time
+                )
+
+                self._evolution_registry.register_agent(species, evolution_agent)
+
+                process = self._env.process(self._run_evolution_agent(species, evolution_cycle_time))
+                self._evolution_registry.register_process(species, process)
+
+                self._logger.info(f"Created evolution agent for {species} with cycle: {evolution_cycle_time}")
+            except ValueError as e:
+                self._logger.warning(f"Invalid species name: {species_name}. Error: {e}")
+
         return agents
+
+    def _run_evolution_agent(self, species: FloraSpecies, delay: int):
+        yield self._env.timeout(delay)
+
+        while True:
+            try:
+                agent = self._evolution_registry.get_agent(species)
+                if agent:
+                    self._logger.error(f"Running evolution cycle for {species}, delay: {delay}")
+                    observation = agent.perceive()
+                    action = agent.decide(observation)
+                    agent.act(action)
+                else:
+                    self._logger.warning(f"Agent for species {species} not found!")
+
+                yield self._env.timeout(delay)
+            except Exception as e:
+                tb = traceback.format_exc()
+                self._logger.exception(f"Error executing evolution for {species}: {e}. Traceback: {tb}")
+                yield self._env.timeout(delay)
 
     def _run_agent(self, agent_type: AgentType, delay: int):
         yield self._env.timeout(delay)
@@ -89,7 +138,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             try:
                 # TODO, he qutiado tipado, hacer uno general para el agente
                 agent: Agent = self._agents.get(agent_type, None)
-                observation = agent.perceive()
+                observation: Observation = agent.perceive()
                 action = agent.decide(observation)
                 agent.act(action)
                 # TODO: delay basado en el weatherevent quizá?
@@ -103,15 +152,6 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
     def _register_events(self):
         BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
         BiomeEventBus.register(BiomeEvent.REMOVE_ENTITY, self._map_manager.remove_entity)
-
-    def update(self, delay: int):
-        yield self._env.timeout(delay)
-        while True:
-            self._logger.info(f"BIOMA UPDATE!... t={self._env.now}")
-            yield self._env.timeout(25)
-
-    def resolve_pending_components(self):
-        self._logger.info("Resolving pending components...")
 
     def get_entity_provider(self) -> EntityProvider:
         return self._entity_provider
