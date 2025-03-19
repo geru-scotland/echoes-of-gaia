@@ -70,7 +70,7 @@ class GrowthComponent(FloraComponent):
 
     def _update_growth(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
-        while True:
+        while self._host_alive:
             if self._current_size < self._max_size:
 
                 biological_age_ratio: float = self._env.now / self._lifespan_in_ticks

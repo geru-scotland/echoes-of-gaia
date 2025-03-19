@@ -516,10 +516,9 @@
       },
       "MetabolicComponent": {
         "defaults": {
-          "photosynthesis_efficiency": 0.7,
-          "respiration_rate": 0.35,
-          "metabolic_activity": 0.8,
-          "energy_reserves": 100.0,
+          "photosynthesis_efficiency": 0.8,
+          "respiration_rate": 0.2,
+          "metabolic_activity": 1.0,
           "max_energy_reserves": 100.0
         }
       },

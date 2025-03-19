@@ -35,3 +35,9 @@ class EventNotifier:
     def notify(self, event_name: str, *args, **kwargs):
         for callback in self._listeners.get(event_name, []):
             callback(*args, **kwargs)
+
+    def unregister(self, event_name: str, callback: Any):
+        if event_name in self._listeners:
+            if callback in self._listeners[event_name]:
+                self._listeners[event_name].remove(callback)
+                print(f"UNREGISTER SUCCESS: {event_name}")

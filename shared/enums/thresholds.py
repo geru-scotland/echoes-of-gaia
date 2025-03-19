@@ -41,6 +41,7 @@ class MetabolicThresholds:
         ABUNDANT = 0.80
 
     class StressChange(EnumBaseFloat):
+        NO_ENERGY = 0.022
         CRITICAL = 0.015
         LOW = 0.008
         SUFFICIENT = 0.005
@@ -64,6 +65,6 @@ class ClimateThresholds:
     class StressChange(EnumBaseFloat):
         EXTREME_COLD = 1.5
         COLD = 0.8
-        OPTIMAL = -0.01
+        OPTIMAL = 0.01
         HOT = 0.8
         EXTREME_HOT = 1.5

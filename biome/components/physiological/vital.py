@@ -66,7 +66,7 @@ class VitalComponent(FloraComponent):
 
     def _update_age(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
-        while True:
+        while self._host_alive:
             self._age += timer
             self._biological_age = self._age * self._aging_rate
             self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, age=self._age,
@@ -77,7 +77,7 @@ class VitalComponent(FloraComponent):
     def _update_vitality_stress(self, timer: int):
         yield self._env.timeout(timer)
 
-        while True:
+        while self._host_alive:
             vitality_ratio = self._vitality / self._max_vitality
             # Factor suavizado - usa raíz cuadrada para una relación menos abrupta
 
@@ -109,7 +109,7 @@ class VitalComponent(FloraComponent):
 
     def _update_vitality(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
-        while True:
+        while self._host_alive:
 
             if not self._is_dormant:
                 completed_lifespan_ratio: float = min(1.0, self._biological_age / self._lifespan_in_ticks)
@@ -128,7 +128,7 @@ class VitalComponent(FloraComponent):
                 )
 
                 self._vitality = max(0, new_health)
-                self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
+                self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
                 age_in_years = self._age / float(Timers.Calendar.YEAR)
                 self._vitality_history.append((age_in_years, self._vitality))                # TODO: Gestionar en entity, pensar bien la logíca del bloque general de updates
 
@@ -139,8 +139,11 @@ class VitalComponent(FloraComponent):
                 #     self.request_dormancy(DormancyReason.LOW_VITALITY, False)
 
                 # TODO: Mejorar umbral, con Gompertz me hace falta
-                if self._vitality <= 0.0018:
+                # asínt
+                if new_health < 0.01 * self._max_vitality:
                     # TODO: Death. Gestionar en entity
+                    self._vitality = 0
+                    self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
                     self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, VitalComponent)
                     break
 
@@ -169,7 +172,7 @@ class VitalComponent(FloraComponent):
         self._vitality -= amount * self._biological_age
         self._vitality = max(0.0, self._vitality)
 
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
+        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
 
         if self._vitality <= 0:
             self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, VitalComponent)
@@ -179,7 +182,7 @@ class VitalComponent(FloraComponent):
         self._vitality += amount * (1 - self._biological_age)
         self._vitality = min(self._vitality, self._max_vitality)
 
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, health=self._vitality)
+        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
 
     def set_health_modifier(self, modifier: float) -> None:
         self._health_modifier = max(0.0, modifier)

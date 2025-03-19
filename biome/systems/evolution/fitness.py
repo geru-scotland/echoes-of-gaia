@@ -32,10 +32,10 @@ def compute_fitness(flora_genes, climate_data):
 
     # Si resistencia grande, 5.0 se divide entre txiki - sigma grande (distri. grande, muy alta tolerancia a diferencia de º)
     if temperature_distance < 0:  # Frío
-        sigma_cold = 5.0 / (1.0 - flora_genes.cold_resistance + 1e-6)
+        sigma_cold = 15.0 / (1.0 - flora_genes.cold_resistance + 1e-6)
         stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_cold ** 2))
     else:  # Calor
-        sigma_heat = 5.0 / (1.0 - flora_genes.heat_resistance + 1e-6)
+        sigma_heat = 15.0 / (1.0 - flora_genes.heat_resistance + 1e-6)
         stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_heat ** 2))
 
     temperature_score = 5.0 * stress_factor

@@ -60,6 +60,7 @@ class EntityData(TypedDict):
     species: str
     habitats: List[str]
     state_fields: EntityStateFields
+    is_dead: bool
     components: Dict[str, Any]
 
 class BiomeScoreContributorData(TypedDict):

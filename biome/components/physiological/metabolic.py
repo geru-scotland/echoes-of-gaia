@@ -19,7 +19,7 @@ import math
 import random
 from typing import Optional, Dict, Any
 
-from biome.components.base.component import EntityComponent, FloraComponent
+from biome.components.base.component import EnergyBasedFloraComponent
 from simpy import Environment as simpyEnv
 
 from biome.systems.events.event_notifier import EventNotifier
@@ -30,19 +30,17 @@ from shared.enums.thresholds import MetabolicThresholds
 from shared.timers import Timers
 
 
-class MetabolicComponent(FloraComponent):
+class MetabolicComponent(EnergyBasedFloraComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  photosynthesis_efficiency: float = 0.75, respiration_rate: float = 0.05,
-                 metabolic_activity: float = 1.0, energy_reserves: float = 100.0, max_energy_reserves: float = 100.0):
+                 metabolic_activity: float = 1.0, max_energy_reserves: float = 100.0):
 
-        super().__init__(env, ComponentType.METABOLIC, event_notifier, lifespan)
+        super().__init__(env, ComponentType.METABOLIC, event_notifier, lifespan, max_energy_reserves)
         self._base_photosynthesis_efficiency: float = round(photosynthesis_efficiency, 2)
         self._photosynthesis_efficiency: float = self._base_photosynthesis_efficiency
         self._base_respiration_rate: float = round(respiration_rate, 4)
         self._respiration_rate: float = self._base_respiration_rate
         self._metabolic_activity: float = round(metabolic_activity, 2)
-        self._energy_reserves: float = round(energy_reserves, 2)
-        self._max_energy_reserves: float = round(max_energy_reserves, 2)
         # TODO: Para light availability, hace falta más información en el state
         # quizá agregar el weather effect y analizar desde aquí, mediante ClimateService
         self._light_availability: float = 0.7
@@ -59,13 +57,11 @@ class MetabolicComponent(FloraComponent):
     def _register_events(self):
         super()._register_events()
 
-
     def _update_metabolic_stress(self, timer: int):
         yield self._env.timeout(timer)
 
-        while True:
+        while self._host_alive:
             energy_ratio = self._energy_reserves / self._max_energy_reserves
-            # Factor suavizado - usa raíz cuadrada para una relación menos abrupta
 
             if MetabolicThresholds.Energy.CRITICAL > energy_ratio > 0.0:
                 stress_change = MetabolicThresholds.StressChange.CRITICAL
@@ -83,11 +79,15 @@ class MetabolicComponent(FloraComponent):
                 stress_change = MetabolicThresholds.StressChange.SUFFICIENT
                 self.modify_stress(stress_change, StressReason.ENERGY_SUFFICIENT)
 
+            elif math.isclose(energy_ratio, 0.0, abs_tol=1e-9):
+                stress_change = MetabolicThresholds.StressChange.NO_ENERGY
+                self.modify_stress(stress_change, StressReason.NO_ENERGY)
+
             yield self._env.timeout(timer)
 
     def _update_metabolism(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
-        while True:
+        while self._host_alive:
             # Hago que aunque en dormancia, aún haga photositensis y respire
             # aunque bajo minimos - pero así, puede recuperar algo de energia
             # y salir de dormancia, que antes se me quedaba siempre dormidica.
@@ -109,13 +109,9 @@ class MetabolicComponent(FloraComponent):
             # fotosintesis - anabolismo, produce
             # respiración, catabolismo, quema
             energy_change: float = effective_photosynthesis - effective_respiration
-            self._energy_reserves += energy_change
 
-            # Clamp
-            self._energy_reserves = max(0.0, min(self._energy_reserves, self._max_energy_reserves))
+            self.modify_energy(energy_change)
 
-            self._event_notifier.notify(ComponentEvent.UPDATE_STATE, MetabolicComponent,
-                                        energy_reserves=self._energy_reserves)
 
             energy_threshold: float = self._max_energy_reserves * 0.2
             base_generation = self._photosynthesis_efficiency

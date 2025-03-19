@@ -31,6 +31,7 @@ class EntityInfo:
         self.position = position
         self.color = color
         self.state_fields = entity_data["state_fields"]
+        self.is_dead = entity_data["is_dead"]
         self.habitats = entity_data["habitats"]
 
     def __str__(self) -> str:
@@ -88,6 +89,7 @@ class EntityRenderer:
             if entity_type not in entities_by_type:
                 continue
 
+
             for entity_info in entities_by_type[entity_type]:
                 y, x = entity_info.position
 
@@ -132,6 +134,20 @@ class EntityRenderer:
                         radius + 2,
                         2
                     )
+        # Si está muerta, pongo rojo alrededor, por ahora.
+        for entity_id, entity_info in self._entities.items():
+            if entity_info.is_dead:
+                y, x = entity_info.position
+                pixel_x = x * self._cell_size + offset[0] + self._cell_size // 2
+                pixel_y = y * self._cell_size + offset[1] + self._cell_size // 2
+
+                pygame.draw.circle(
+                    surface,
+                    (255, 0, 0),
+                    (pixel_x, pixel_y),
+                    self._cell_size // 2,
+                    2
+                )
 
     def get_entity_at_pos(self, pos: Point, cell_coords: Tuple[int, int]) -> Optional[int]:
         entities_at_cell = []

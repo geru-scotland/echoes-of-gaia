@@ -113,6 +113,7 @@ class SnapshotCollector:
                 "species": str(entity.get_species()),
                 "habitats": [str(h) for h in entity.get_habitats()],
                 "state_fields": entity.get_state_fields(),
+                "is_dead": entity.get_state_fields().get("general", {}).get("is_dead"),
                 "components": self._collect_entity_components(entity),
             }
 
