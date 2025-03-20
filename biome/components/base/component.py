@@ -25,7 +25,7 @@ from simpy import Environment as simpyEnv
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
-from shared.enums.reasons import DormancyReason, StressReason
+from shared.enums.reasons import DormancyReason, StressReason, EnergyGainSource
 from shared.enums.strings import Loggers
 from shared.enums.thresholds import ClimateThresholds
 from shared.events.handler import EventHandler
@@ -177,14 +177,15 @@ class EnergyBasedFloraComponent(FloraComponent):
         new_energy: float = kwargs.get("energy_reserves", 0.0)
         self._energy_reserves = new_energy
 
-    def modify_energy(self, energy_delta: float) -> None:
+    def modify_energy(self, energy_delta: float, source: EnergyGainSource = None) -> None:
         old_energy: float = self._energy_reserves
 
         self._energy_reserves = max(0.0, min(self._energy_reserves + energy_delta, self._max_energy_reserves))
 
         if old_energy != self._energy_reserves:
             self._event_notifier.notify(ComponentEvent.ENERGY_UPDATED,
-                                        energy_reserves=self._energy_reserves)
+                                        energy_reserves=self._energy_reserves,
+                                        source=source)
     @abstractmethod
     def get_state(self) -> Dict[str, Any]:
        raise  NotImplementedError

@@ -33,7 +33,8 @@ from shared.timers import Timers
 class MetabolicComponent(EnergyBasedFloraComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  photosynthesis_efficiency: float = 0.75, respiration_rate: float = 0.05,
-                 metabolic_activity: float = 1.0, max_energy_reserves: float = 100.0):
+                 metabolic_activity: float = 1.0, max_energy_reserves: float = 100.0,
+                 optimal_respiration_ratio: float = 0.2):
 
         super().__init__(env, ComponentType.METABOLIC, event_notifier, lifespan, max_energy_reserves)
         self._base_photosynthesis_efficiency: float = round(photosynthesis_efficiency, 2)
@@ -47,6 +48,7 @@ class MetabolicComponent(EnergyBasedFloraComponent):
         self._temperature_modifier: float = 1.0
         self._water_modifier: float = 0.7
         self._biological_age: Optional[float] = None
+        self._optimal_respiration_ratio: float = optimal_respiration_ratio
 
         self._logger.debug(f"Metabolic component initialized: Photosynthesis={self._photosynthesis_efficiency}, "
                            f"Respiration={self._respiration_rate}, Energy={self._energy_reserves}")
@@ -68,13 +70,13 @@ class MetabolicComponent(EnergyBasedFloraComponent):
         while self._host_alive:
             energy_ratio = self._energy_reserves / self._max_energy_reserves
 
-            if MetabolicThresholds.Energy.CRITICAL > energy_ratio > 0.0:
-                stress_change = MetabolicThresholds.StressChange.CRITICAL
-                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
-
-            elif math.isclose(energy_ratio, 0.0, abs_tol=1e-9):
+            if energy_ratio <= 0.0005:
                 stress_change = MetabolicThresholds.StressChange.NO_ENERGY
                 self.modify_stress(stress_change, StressReason.NO_ENERGY)
+
+            elif MetabolicThresholds.Energy.CRITICAL > energy_ratio > 0.0:
+                stress_change = MetabolicThresholds.StressChange.CRITICAL
+                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
 
             elif energy_ratio < MetabolicThresholds.Energy.LOW:
                 stress_change = MetabolicThresholds.StressChange.LOW
@@ -87,8 +89,6 @@ class MetabolicComponent(EnergyBasedFloraComponent):
             elif energy_ratio > MetabolicThresholds.Energy.SUFFICIENT:
                 stress_change = MetabolicThresholds.StressChange.SUFFICIENT
                 self.modify_stress(stress_change, StressReason.ENERGY_SUFFICIENT)
-
-
 
             yield self._env.timeout(timer)
 
@@ -104,17 +104,19 @@ class MetabolicComponent(EnergyBasedFloraComponent):
                     self._metabolic_activity *
                     (0.15 if self._is_dormant else 1.0)
             )
-
             effective_respiration = (
-                    (self._respiration_rate + 0.05) *
+                    self._respiration_rate *
                     self._metabolic_activity *
                     (0.1 if self._is_dormant else 1.0)
             )
 
-            effective_respiration = min(effective_respiration, 1.0)
+            current_ratio = effective_respiration / max(0.001, effective_photosynthesis)
+            ratio_difference = abs(current_ratio - self._optimal_respiration_ratio)
 
-            variability = random.uniform(0.95, 1.05)
-            base_energy_change = (effective_photosynthesis - effective_respiration) * variability
+            metabolic_efficiency = max(0.1, 1.0 - (ratio_difference / self._optimal_respiration_ratio) * 1.5)
+
+            base_energy_change = (effective_photosynthesis - effective_respiration)
+            base_energy_change *= metabolic_efficiency
 
             entropy_decay = 0.02
 
@@ -149,18 +151,44 @@ class MetabolicComponent(EnergyBasedFloraComponent):
     def _handle_stress_update(self, *args, **kwargs):
         super()._handle_stress_update(*args, **kwargs)
 
-        normalized_stress = kwargs.get("normalized_stress", 0.0)
+        normalized_stress: float = kwargs.get("normalized_stress", 0.0)
+        old_efficiency: float = self._photosynthesis_efficiency
+        new_efficiency = self._base_photosynthesis_efficiency
+
+        if 0.0 <= normalized_stress < 0.4:
+            adaptation_factor = 1.0 + 0.25 * (1.0 - (normalized_stress - 0.25) ** 2 * 16)
+            adapted_efficiency = min(self._base_photosynthesis_efficiency * 1.5,
+                                     self._base_photosynthesis_efficiency * adaptation_factor)
+
+            delta_adaptation = adapted_efficiency - self._base_photosynthesis_efficiency
+            new_efficiency += delta_adaptation
+
 
         stress_impact_photosynthesis = math.exp(-1.5 * normalized_stress)
-        self._photosynthesis_efficiency = max(
+        non_adapted_efficiency = max(
             0.25,
             self._base_photosynthesis_efficiency * stress_impact_photosynthesis
         )
 
+        delta_non_adapted = non_adapted_efficiency - self._base_photosynthesis_efficiency
+
+        new_efficiency += delta_non_adapted
+
+        self._photosynthesis_efficiency = max(
+            0.25,
+            min(self._base_photosynthesis_efficiency * 1.5, new_efficiency)
+        )
+
         stress_impact_respiration = 1 + (1.0 * normalized_stress ** 2)
         self._respiration_rate = min(
-            0.2,  
+            0.2,
             self._base_respiration_rate * stress_impact_respiration
+        )
+
+        self._event_notifier.notify(
+            ComponentEvent.PHOTOSYNTHESIS_UPDATED,
+            old_efficiency=old_efficiency,
+            new_efficiency=self._photosynthesis_efficiency,
         )
 
         self._logger.debug(

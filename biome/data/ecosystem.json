@@ -524,13 +524,10 @@
       },
       "NutritionalComponent": {
         "defaults": {
+          "nutrient_absorption_rate": 0.3,
+          "mycorrhizal_rate": 0.01,
           "base_nutritive_value": 0.6,
-          "current_nutritive_value": 0.6,
-          "base_toxicity": 0.05,
-          "current_toxicity": 0.05,
-          "max_toxicity": 0.8,
-          "toxin_production_rate": 0.08,
-          "toxin_decay_rate": 0.03
+          "base_toxicity": 0.1
         }
       },
       "StressResponseComponent": {

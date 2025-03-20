@@ -46,3 +46,7 @@ class StressReason(Flag):
 
     TEMPERATURE_EXTREME = auto()
     TEMPERATURE_OPTIMAL = auto()
+
+class EnergyGainSource(Flag):
+    SOIL_NUTRIENTS = auto()
+    MYCORRHIZAE = auto()

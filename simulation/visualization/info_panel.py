@@ -40,7 +40,7 @@ class InfoPanel:
             height: int,
             background_color: Color,
             text_color: Color = (220, 220, 225),
-            font_size: int = 30
+            font_size: int = 28
     ):
         self._logger = logging.getLogger("info_panel")
         self._width = width

@@ -28,6 +28,7 @@ from scipy.ndimage import convolve
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
 from biome.components.physiological.metabolic import MetabolicComponent
+from biome.components.physiological.nutritional import NutritionalComponent
 from biome.components.physiological.vital import VitalComponent
 from biome.components.registry import get_component_class
 from biome.entities.entity import Entity
@@ -55,6 +56,8 @@ class SpawnSystem:
         self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
 
     def _precompute_habitat_cache(self, habitat_data: BiomeStoreData) -> HabitatCache:
+        # TODO: Recuerda liberar del tipo de habitat, la posición de cache al borrar una entidad
+        # para todos los habitats donde corresponda, importante para reutilizar.
         self._logger.info("Precomputing habitat cache...")
         try:
             habitat_positions: HabitatCache = {
@@ -130,7 +133,8 @@ class SpawnSystem:
                 if data:
                     component_class = get_component_class(class_name)
 
-                    if component_class in [GrowthComponent, VitalComponent, MetabolicComponent, WeatherAdaptationComponent]:
+                    if component_class in [GrowthComponent, VitalComponent, MetabolicComponent, WeatherAdaptationComponent,
+                                           NutritionalComponent]:
                         data.update({"lifespan": lifespan})
 
                     if component_class:
@@ -145,6 +149,8 @@ class SpawnSystem:
         if self._add_to_index_map(entity):
             return entity
 
+        # TODO: Borrar componentes creados
+        entity.clear_and_unregister()
         return None
 
     @log_execution_time(context="Entities created")

@@ -76,16 +76,7 @@ class Entity(EventHandler, StateHandler, ABC):
         self._logger.warning(f"Entity {self._id} ({self._descriptor.species}) has died")
         self._state.update("is_dead", True)
 
-        BiomeEventBus.unregister(BiomeEvent.WEATHER_UPDATE, self._handle_weather_update)
-
-        for _, component in self._components.items():
-            component.disable_notifier()
-
-        # self._components = {}
-        self.event_notifier.unregister(ComponentEvent.UPDATE_STATE, self._handle_component_update)
-        self.event_notifier.unregister(ComponentEvent.ENTITY_DEATH, self._handle_death)
-
-        self._event_notifier = None
+        self.clear_and_unregister()
 
         self._state.update("death_tick", self._env.now)
 
@@ -154,6 +145,19 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def is_alive(self) -> bool:
         return not self._state.get("is_dead", False)
+
+    def clear_and_unregister(self, clear_components: bool = False) -> None:
+        BiomeEventBus.unregister(BiomeEvent.WEATHER_UPDATE, self._handle_weather_update)
+
+        for _, component in self._components.items():
+            component.disable_notifier()
+
+        self.event_notifier.unregister(ComponentEvent.UPDATE_STATE, self._handle_component_update)
+        self.event_notifier.unregister(ComponentEvent.ENTITY_DEATH, self._handle_death)
+
+        if clear_components:
+            self._components = {}
+        self._event_notifier = None
 
     @property
     def type(self):
