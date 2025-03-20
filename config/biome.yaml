@@ -4,18 +4,19 @@ biome:
     size:
       - 60 # width
       - 60 # height
-  type: "tropical"
+  type: "taiga"
   flora:
     - species: "oak_tree"
-      spawns: 11
-      avg-lifespan: 2 # En años lo pongo
+      spawns: 1
+      avg-lifespan: 30  # En años lo pongo
       components:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
+        - NutritionalComponent:
         - WeatherAdaptationComponent:
-            cold_resistance: 1.0
-            optimal_temperature: -8
-            heat_resistance: 0.1
+            optimal_temperature: 20.0
+            cold_resistance: 0.0
+            heat_resistance: 0.0
 
 

@@ -100,7 +100,7 @@ def compute_fitness(flora_genes, climate_data):
     # Penalización NUEVA: evita respiration_rate demasiado bajo
     MIN_RESPIRATION_THRESHOLD = 0.18
     if flora_genes.base_respiration_rate < MIN_RESPIRATION_THRESHOLD:
-        respiration_penalty = (MIN_RESPIRATION_THRESHOLD - flora_genes.base_respiration_rate) * 50.0
+        respiration_penalty = (MIN_RESPIRATION_THRESHOLD - flora_genes.base_respiration_rate) * 30.0
         fitness -= respiration_penalty
     light_availability = 0.5
     temperature_modifier = 0.7
@@ -127,7 +127,7 @@ def compute_fitness(flora_genes, climate_data):
     photosynthesis = flora_genes.base_photosynthesis_efficiency
     respiration = flora_genes.base_respiration_rate
 
-    max_allowed_ratio = 9.0
+    max_allowed_ratio = 3.0
     ratio = photosynthesis / (respiration + 1e-6)
 
     if ratio > max_allowed_ratio:

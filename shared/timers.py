@@ -57,7 +57,7 @@ class Timers:
 
         class Environmental(EnumBaseInt):
             CLIMATE_RESPONSE = 2
-            RESOURCE_ABSORPTION = 1
+            RESOURCE_ABSORPTION = 2
             STRESS_EVALUATION = 2
             WATER_BALANCE = 2
 
