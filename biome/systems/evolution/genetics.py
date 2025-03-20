@@ -136,31 +136,92 @@ class GeneticAlgorithmModel:
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
 
-        def mutation_controlled_lifespan(individual, indpb):
-            # Para valores con rango muy amplio, como tengo para lifespan,
-            # un cambio en el valor normalizado es un valor muy grande en el dominio real, asi que
-            # denormalizo, hago la modificación (random, con sigma 0.1 en distr. gauss) y vuelvo a normalizar.
-            for i in range(len(individual)):
-                if random.random() < indpb:
-                    if i == 8:
-                        # El valor normalizado, lo paso al dominio real
-                        # TODO: Quitar esta chapuza
-                        actual_lifespan = 1.0 + individual[i] * 999.0
-                        # Sigma txiki, 0.1, aplico una gaussiana
-                        factor = random.gauss(1.0, 0.1)
-                        new_lifespan = actual_lifespan * factor
-                        new_lifespan = max(1.0, min(1000.0, new_lifespan))
-                        # Normalizo de nuevo
-                        individual[i] = (new_lifespan - 1.0) / 999.0
-                    else:
-                        individual[i] += random.gauss(0, 0.2)
-                        individual[i] = max(0.0, min(1.0, individual[i]))
-            return individual,
+        def mutation_controlled(individual, indpb, max_change_percent=0.20, min_absolute_change=0.02):
+            flora_genes = deap_genes_to_flora_genes(individual)
 
-        self.toolbox.register("mutate", mutation_controlled_lifespan, indpb=0.2)
+            original_values = {
+                "growth_modifier": flora_genes.growth_modifier,
+                "growth_efficiency": flora_genes.growth_efficiency,
+                "max_size": flora_genes.max_size,
+                "max_vitality": flora_genes.max_vitality,
+                "aging_rate": flora_genes.aging_rate,
+                "health_modifier": flora_genes.health_modifier,
+                "base_photosynthesis_efficiency": flora_genes.base_photosynthesis_efficiency,
+                "base_respiration_rate": flora_genes.base_respiration_rate,
+                "lifespan": flora_genes.lifespan,
+                "metabolic_activity": flora_genes.metabolic_activity,
+                "max_energy_reserves": flora_genes.max_energy_reserves,
+                "cold_resistance": flora_genes.cold_resistance,
+                "heat_resistance": flora_genes.heat_resistance,
+                "optimal_temperature": flora_genes.optimal_temperature
+            }
+
+            # Quitar esta chapuza de aquí, lo dejo por ahora... pero hay que pasar a shared
+            valid_ranges = {
+                "growth_modifier": (0.1, 2.0),
+                "growth_efficiency": (0.3, 1.0),
+                "max_size": (0.1, 5.0),
+                "max_vitality": (50.0, 200.0),
+                "aging_rate": (0.1, 2.0),
+                "health_modifier": (0.4, 2.0),
+                "base_photosynthesis_efficiency": (0.4, 1.0),
+                "base_respiration_rate": (0.05, 1.0),
+                "lifespan": (1.0, 1000.0),
+                "metabolic_activity": (0.2, 1.0),
+                "max_energy_reserves": (50.0, 150.0),
+                "cold_resistance": (0.0, 1.0),
+                "heat_resistance": (0.0, 1.0),
+                "optimal_temperature": (-30, 50)
+            }
+
+            adaptive_boost_attrs = ["cold_resistance", "heat_resistance"]
+
+            for i, attr in enumerate([
+                "growth_modifier", "growth_efficiency", "max_size", "max_vitality",
+                "aging_rate", "health_modifier", "base_photosynthesis_efficiency",
+                "base_respiration_rate", "lifespan", "metabolic_activity",
+                "max_energy_reserves", "cold_resistance", "heat_resistance",
+                "optimal_temperature"
+            ]):
+                if random.random() < indpb:
+                    original_value = original_values[attr]
+                    min_val, max_val = valid_ranges[attr]
+                    range_size = max_val - min_val
+
+                    apply_boost = False
+                    if attr in adaptive_boost_attrs:
+                        # Si el valor es muy bajo (menos del 10%) y positivo
+                        # aplico el impulso adaptativo
+                        if 0 < original_value < (min_val + range_size * 0.1):
+                            apply_boost = True
+
+                    if apply_boost:
+                        if random.random() < 0.8:  # Más prob de incremento
+                            boost_change = random.uniform(0.05 * range_size, 0.4 * range_size)
+                            new_value = original_value + boost_change
+                        else:
+                            new_value = max(min_val, original_value * 0.9)
+                    else:
+                        change_limit = max(min_absolute_change, original_value * max_change_percent)
+
+                        if range_size > 10 and change_limit > range_size * 0.1:
+                            change_limit = range_size * 0.1
+
+                        change = random.uniform(-change_limit, change_limit)
+                        new_value = original_value + change
+
+                    new_value = max(min_val, min(new_value, max_val))
+
+                    setattr(flora_genes, attr, new_value)
+
+            mutated_individual = flora_genes_to_individual(flora_genes)
+
+            return mutated_individual,
+
+        self.toolbox.register("mutate", mutation_controlled, indpb=0.2)
         self.toolbox.register("select", tools.selTournament, tournsize=3)
 
-    def evolve_population(self, current_flora, climate_data, generation_count=20):
+    def evolve_population(self, current_flora, climate_data, generation_count=20, k_best=5):
         population = []
         for flora in current_flora:
             current_genes: FloraGenes = extract_genes_from_entity(flora)
@@ -186,7 +247,7 @@ class GeneticAlgorithmModel:
                             ngen=generation_count,
                             stats=stats, verbose=True)
 
-        top_individuals = tools.selBest(population, k=5)
+        top_individuals = tools.selBest(population, k=k_best)
 
         evolved_genes = [deap_genes_to_flora_genes(ind) for ind in top_individuals]
 

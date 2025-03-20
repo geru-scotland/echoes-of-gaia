@@ -40,4 +40,3 @@ class EventNotifier:
         if event_name in self._listeners:
             if callback in self._listeners[event_name]:
                 self._listeners[event_name].remove(callback)
-                print(f"UNREGISTER SUCCESS: {event_name}")

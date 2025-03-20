@@ -90,17 +90,19 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
                 # Ahora calculo el tiempo del ciclo evolutivo basado en el ciclo de vida
                 # en lugar de como estaba antes (en timers tengo, default)
-                lifespan = flora_def.get("avg-lifespan", 5.0)
+                lifespan = flora_def.get("avg-lifespan", 5.0) * float(Timers.Calendar.YEAR)
 
-                evolution_cycle_time = int(lifespan * float(Timers.Calendar.YEAR) * 0.6)  
+                # TODO: Hacerlo incremental
+                evolution_cycle_time = int(lifespan * 0.15)
 
                 evolution_agent = EvolutionAgentAI(
                     self._climate_data_manager,
                     self._entity_provider,
                     species,
+                    lifespan,
                     evolution_cycle_time
                 )
-
+                self._logger.error(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
                 self._evolution_registry.register_agent(species, evolution_agent)
 
                 process = self._env.process(self._run_evolution_agent(species, evolution_cycle_time))
@@ -118,15 +120,19 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         while True:
             try:
                 agent = self._evolution_registry.get_agent(species)
+                # TODO: EVOLUTION CYCLE ha de ser incremental, hata un cap del 60% del lifetime
+                # toma aquí el tiempo y vete incrementando progresivamente
                 if agent:
                     self._logger.error(f"Running evolution cycle for {species}, delay: {delay}")
                     observation = agent.perceive()
                     action = agent.decide(observation)
                     agent.act(action)
+                    evolution_cycle_time:  float = agent.get_evolution_cycle_time()
+                    self._logger.error(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
+                    yield self._env.timeout(delay)
                 else:
                     self._logger.warning(f"Agent for species {species} not found!")
 
-                yield self._env.timeout(delay)
             except Exception as e:
                 tb = traceback.format_exc()
                 self._logger.exception(f"Error executing evolution for {species}: {e}. Traceback: {tb}")

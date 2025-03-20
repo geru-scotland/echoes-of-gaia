@@ -516,9 +516,9 @@
       },
       "MetabolicComponent": {
         "defaults": {
-          "photosynthesis_efficiency": 0.8,
-          "respiration_rate": 0.2,
-          "metabolic_activity": 1.0,
+          "photosynthesis_efficiency": 0.7,
+          "respiration_rate": 0.35,
+          "metabolic_activity": 0.8,
           "max_energy_reserves": 100.0
         }
       },
@@ -544,6 +544,7 @@
       },
       "WeatherAdaptationComponent": {
         "defaults": {
+          "base_sigma": 19.0,
           "optimal_temperature": 24.0,
           "cold_resistance": 0.0,
           "heat_resistance": 0.5

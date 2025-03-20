@@ -33,6 +33,7 @@ class ComponentEvent(EnumBaseStr):
     ENTITY_DEATH = "on_entity_death"
     WEATHER_UPDATE = "on_weather_update"
     ENERGY_UPDATED = "on_energy_update"
+    BIOLOGICAL_AGE_UPDATED = "on_biological_age_updated"
 
 class BiomeEvent(EnumBaseStr):
     CREATE_ENTITY = "create_entity"

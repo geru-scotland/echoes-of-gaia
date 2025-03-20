@@ -16,6 +16,7 @@
 # =============================================================================
 """
 import itertools
+import random
 from logging import Logger
 from typing import List, Dict, Any
 
@@ -39,7 +40,7 @@ from utils.loggers import LoggerManager
 
 class EvolutionAgentAI(Agent):
     def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider,
-                 species: FloraSpecies, evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE):
+                 species: FloraSpecies, base_lifespan: float, evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE):
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
         self._climate_data_manager: ClimateDataManager = climate_data_manager
         self.entity_provider: EntityProvider = entity_provider
@@ -49,10 +50,11 @@ class EvolutionAgentAI(Agent):
         self._current_evolution_cycle: int = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
         self._species: FloraSpecies = species
+        self._species_base_lifespan: float = base_lifespan
         self._logger.info(f"Initialized Evolution Agent for species: {species}")
 
     def perceive(self) -> Observation:
-        flora_entities: EntityList = self.entity_provider.get_flora()
+        flora_entities: EntityList = self.entity_provider.get_flora(only_alive=True)
         species_entities = [entity for entity in flora_entities if entity.get_species() == self._species]
 
         return {
@@ -66,7 +68,7 @@ class EvolutionAgentAI(Agent):
        self._logger.info(f"Observation: {observation}")
        climate_data = observation["climate_data"]
        flora_entities = observation["flora"]
-
+       self._logger.error(f"EVOLUTION AGENT GOT: {len(flora_entities)} alive flora entites")
        flora_by_species = {}
        for entity in flora_entities:
            species = entity.get_species()
@@ -86,8 +88,11 @@ class EvolutionAgentAI(Agent):
                if i < len(entities_sorted):
                    entities_to_remove.append(entities_sorted[i].get_id())
 
+           selection_percentage = random.uniform(0.3, 0.7)
+           k_best = max(1, int(len(flora_entities) * selection_percentage))
+
            evolved_genes = self._genetic_model.evolve_population(
-               entities, climate_data, generation_count=5
+               entities, climate_data, generation_count=10, k_best=5
            )
 
            for genes in evolved_genes:
@@ -108,6 +113,7 @@ class EvolutionAgentAI(Agent):
 
         self._current_evolution_cycle = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
+        self._increase_evolution_time_cycle()
 
     def _calculate_entity_fitness(self, entity, climate_data):
         genes = extract_genes_from_entity(entity)
@@ -134,3 +140,7 @@ class EvolutionAgentAI(Agent):
 
     def get_evolution_cycle_time(self) -> int:
         return self._evolution_cycle_time
+
+    def _increase_evolution_time_cycle(self) -> None:
+        if self._evolution_cycle_time < 0.4 * self._species_base_lifespan:
+            self._evolution_cycle_time += self._species_base_lifespan * 0.05

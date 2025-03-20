@@ -97,8 +97,11 @@ def compute_fitness(flora_genes, climate_data):
 
     fitness = temperature_score + humidity_score + precipitation_score + survival_score + energy_score
 
-    # Por ahora pongo simplemente valores promedio, es para forzar a que no premie
-    # una eficiencia fotosintetica muy baja
+    # Penalización NUEVA: evita respiration_rate demasiado bajo
+    MIN_RESPIRATION_THRESHOLD = 0.18
+    if flora_genes.base_respiration_rate < MIN_RESPIRATION_THRESHOLD:
+        respiration_penalty = (MIN_RESPIRATION_THRESHOLD - flora_genes.base_respiration_rate) * 50.0
+        fitness -= respiration_penalty
     light_availability = 0.5
     temperature_modifier = 0.7
     water_modifier = 0.6
@@ -121,10 +124,14 @@ def compute_fitness(flora_genes, climate_data):
         energy_bonus = min(5.0, energy_ratio - 1.0) * 2.0
         fitness += energy_bonus
 
-    # TODO: Poner logger especifico, o al menos de agente de evolución
-    # print(f"Climate: Temp={avg_temperature:.1f}°C, Humidity={avg_humidity:.1f}%, Precip={avg_precipitation:.1f}mm")
-    # print(f"Fitness breakdown: Temp={temperature_score:.1f}, Humidity={humidity_score:.1f}, "
-    #       f"Precip={precipitation_score:.1f}, Survival={survival_score:.1f}, Energy={energy_score:.1f}")
-    # print(f"Total fitness: {fitness:.2f}")
+    photosynthesis = flora_genes.base_photosynthesis_efficiency
+    respiration = flora_genes.base_respiration_rate
+
+    max_allowed_ratio = 9.0
+    ratio = photosynthesis / (respiration + 1e-6)
+
+    if ratio > max_allowed_ratio:
+        extreme_ratio_penalty = (ratio - max_allowed_ratio) * 2.0
+        fitness -= extreme_ratio_penalty
 
     return fitness
