@@ -44,6 +44,7 @@ class WeatherAdaptationComponent(FloraComponent):
         self._optimal_temperature: float = optimal_temperature
 
         self._base_sigma: float = base_sigma
+        self._logger.warning(f"BASE SIGMA {self._base_sigma}")
         self._max_stress_delta = max_stress_delta
 
         self._temperature_exposure_history: list = []
@@ -64,10 +65,10 @@ class WeatherAdaptationComponent(FloraComponent):
 
         if stress_delta > 0.001:
             self.modify_stress(stress_delta, StressReason.TEMPERATURE_EXTREME)
-            self._logger.info(f"Temperature stress delta applied: {stress_delta:.4f} (Temperature: {temperature}°C)")
+            self._logger.debug(f"Temperature stress delta applied: {stress_delta:.4f} (Temperature: {temperature}°C)")
         else:
             self.modify_stress(-ClimateThresholds.StressChange.OPTIMAL, StressReason.TEMPERATURE_OPTIMAL)
-            self._logger.info(f"Optimal temperature relief applied. (Temperature: {temperature}°C)")
+            self._logger.debug(f"Optimal temperature relief applied. (Temperature: {temperature}°C)")
 
     def _calculate_stress_delta(self, temperature: float) -> float:
         deviation = temperature - self._optimal_temperature

@@ -69,6 +69,8 @@ class Entity(EventHandler, StateHandler, ABC):
                                f" [component: {component_class.__name__}]: {kwargs}")
             for key, value in kwargs.items():
                 self._state.update(key, value)
+                if key == "biological_age":
+                    self._event_notifier.notify(ComponentEvent.BIOLOGICAL_AGE_UPDATED, biological_age=value)
 
     def _handle_death(self, *args, **kwargs):
         self._logger.warning(f"Entity {self._id} ({self._descriptor.species}) has died")
@@ -144,11 +146,14 @@ class Entity(EventHandler, StateHandler, ABC):
     def dump_components(self) -> None:
         raise NotImplementedError
 
-    def get_type(self):
+    def get_type(self) -> EntityType:
         return self._descriptor.entity_type
 
     def get_species(self):
         return self._descriptor.species
+
+    def is_alive(self) -> bool:
+        return not self._state.get("is_dead", False)
 
     @property
     def type(self):

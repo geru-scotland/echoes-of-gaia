@@ -114,9 +114,17 @@ class VitalComponent(FloraComponent):
             if not self._is_dormant:
                 completed_lifespan_ratio: float = min(1.0, self._biological_age / self._lifespan_in_ticks)
                 completed_lifespan_ratio_with_mods: float = completed_lifespan_ratio * self._health_modifier
-                non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(completed_lifespan_ratio_with_mods)
+
+                if self._stress_level == self._max_stress:
+                    non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(
+                        completed_lifespan_ratio_with_mods, decay_onset=0.001, decay_steepness=29.0)
+                else:
+                    non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(
+                        completed_lifespan_ratio_with_mods)
 
                 new_health = self._max_vitality * (1.0 - non_linear_aging_progression)
+
+
                 self._logger.debug(
                     f"[Vitality Update | DEBUG:Tick={self._env.now}] "
                     f"Stress level={self._stress_level:4f}]"
@@ -138,9 +146,8 @@ class VitalComponent(FloraComponent):
                 # elif self._vitality > self._dormancy_threshold and self._is_dormant:
                 #     self.request_dormancy(DormancyReason.LOW_VITALITY, False)
 
-                # TODO: Mejorar umbral, con Gompertz me hace falta
-                # asínt
-                if new_health < 0.01 * self._max_vitality:
+                # TODO: Esto es hack del copón, es para evitar
+                if new_health < 0.01 * self._max_vitality or (self._stress_level == self._max_stress and new_health < 0.015 * self._max_vitality):
                     # TODO: Death. Gestionar en entity
                     self._vitality = 0
                     self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
