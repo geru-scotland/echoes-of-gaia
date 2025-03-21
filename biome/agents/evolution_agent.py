@@ -108,13 +108,13 @@ class EvolutionAgentAI(Agent):
         for entity_id in action["entities_to_remove"]:
             pass
 
+        self._current_evolution_cycle = next(self._evolution_cycle)
+        self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
+
         for species, genes in action["evolved_genes"]:
             if species == self._species:
                 self._create_evolved_entity(species, genes)
 
-
-        self._current_evolution_cycle = next(self._evolution_cycle)
-        self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
 
         # Nueva generación spawneada, calculo lifespan medio
         average_lifespan: float = self._compute_current_generation_lifespan()
@@ -133,7 +133,7 @@ class EvolutionAgentAI(Agent):
     def _create_evolved_entity(self, species, genes: FloraGenes) -> None:
         try:
             components: List[Dict[str, Any]] = genes.convert_genes_to_components()
-
+            current_cycle = self._current_evolution_cycle
             BiomeEventBus.trigger(
                 BiomeEvent.CREATE_ENTITY,
                 entity_class=Flora,
@@ -141,6 +141,7 @@ class EvolutionAgentAI(Agent):
                 species_name=str(species),
                 lifespan=genes.lifespan,
                 custom_components=components,
+                evolution_cycle=current_cycle,
             )
 
         except Exception as e:

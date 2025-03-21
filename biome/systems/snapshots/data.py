@@ -43,7 +43,7 @@ class SnapshotData:
         self.terrain_data = data
 
     def set_climate_data(self, data: ClimateData) -> None:
-        self.climate_data = data
+        self.climate_averages = data
 
     def set_metrics_data(self, data: MetricsData) -> None:
         self.metrics_data = data
@@ -51,12 +51,9 @@ class SnapshotData:
     def set_biome_score(self, data: BiomeScoreData) -> None:
         self.biome_score = data
 
-    def set_biome_info(self, biome_type, current_season):
+    def set_biome_info(self, biome_type, current_season) -> None:
         self.biome_type = biome_type
         self.current_season = current_season
-
-    def set_climate_averages(self, averages):
-        self.climate_averages = averages
 
     def add_entity_data(self, entity_id: int, data: EntityData) -> None:
         self.entities_data[entity_id] = data

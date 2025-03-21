@@ -110,9 +110,9 @@ class SpawnSystem:
             self._logger.error(f"Error precomputing habitat cache: {e}")
 
     def _create_single_entity(self, entity_class, entity_species, habitats: HabitatList,
-                              lifespan: float, components: List[Dict]) -> Optional[Entity]:
+                              lifespan: float, components: List[Dict], evolution_cycle: int = 0) -> Optional[Entity]:
         entity_id: int = next(self._id_generator)
-        entity: Entity = entity_class(entity_id, self._env, entity_species, habitats, lifespan)
+        entity: Entity = entity_class(entity_id, self._env, entity_species, habitats, lifespan, evolution_cycle)
 
         if not components:
             if self._add_to_index_map(entity):
@@ -234,7 +234,7 @@ class SpawnSystem:
         return True
 
     def spawn(self, entity_class, entity_species_enum, species_name: str, lifespan: float = 20.0,
-              custom_components: List[Dict] = None, biome_store=None) -> Optional[Entity]:
+              custom_components: List[Dict] = None, biome_store=None, evolution_cycle: int = 0) -> Optional[Entity]:
         if biome_store is None:
             if entity_class == Flora:
                 biome_store = BiomeStore.flora
@@ -268,7 +268,7 @@ class SpawnSystem:
                 ]
                 components.append(fixed_components)
 
-        entity = self._create_single_entity(entity_class, entity_species, habitats, lifespan, components)
+        entity = self._create_single_entity(entity_class, entity_species, habitats, lifespan, components, evolution_cycle)
 
         if entity:
             if entity_class == Flora:

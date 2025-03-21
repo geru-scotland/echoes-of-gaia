@@ -20,6 +20,7 @@ from logging import Logger
 from typing import Dict, Any, List
 
 import numpy as np
+from dotenv.cli import enumerate_env
 
 from biome.systems.managers.entity_manager import EntityProvider
 from shared.enums.strings import Loggers
@@ -35,7 +36,7 @@ class EntityDataCollector:
 
     def collect_data(self) -> Dict[str, int|float]:
         self._logger.debug("EntityDataCollectar has started collecting data...")
-        flora, fauna = self._entity_provider.get_entities()
+        flora, fauna = self._entity_provider.get_entities(only_alive=True)
 
         if not flora and not fauna:
             return self._get_empty_stats()
@@ -60,25 +61,41 @@ class EntityDataCollector:
 
         return attributes
 
-    def _compute_statistics(self, all_attributes: Dict[str, Any]):
-        stats: Dict[str, int|float] = {}
+    def _compute_statistics(self, all_attributes: Dict[str, List[Any]]):
+        stats: Dict[str, int | float] = {}
 
         self._logger.debug("Computing state's statistics...")
-        self._logger.debug(f"All attributes: {all_attributes}")
-        for attribute, values in all_attributes.items():
-            try:
-                numeric_values: np.ndarray = np.array(values, dtype=np.float64)
 
-                # isnan crea nuevo array, con true donde sea nan
-                # invierto esos valores bitwise ~
-                # indexación booleana en numeric_values[], coge solo los true
-                numeric_values = numeric_values[~np.isnan(numeric_values)]
+        if "general" in all_attributes:
+            general_data = all_attributes["general"]
+            if isinstance(general_data, list) and general_data:
+                stress_levels = []
+                for item in general_data:
+                    if isinstance(item, dict) and "stress_level" in item:
+                        stress_levels.append(item["stress_level"])
 
-                if len(numeric_values) > 0:
-                    stats[f"avg_{attribute}"] = float(np.mean(numeric_values))
-            except (TypeError, ValueError):
-                # para que no pete si attr no numérico
-                continue
+                if stress_levels:
+                    stress_values = np.array(stress_levels, dtype=np.float64)
+                    valid_stress = stress_values[~np.isnan(stress_values)]
+                    if len(valid_stress) > 0:
+                        stats["avg_stress_level"] = float(np.mean(valid_stress))
+
+        if "growth" in all_attributes:
+            growth_data = all_attributes["growth"]
+            if isinstance(growth_data, list) and growth_data:
+                sizes = []
+                for item in growth_data:
+                    if isinstance(item, dict) and "current_size" in item:
+                        sizes.append(item["current_size"])
+
+                if sizes:
+                    size_values = np.array(sizes, dtype=np.float64)
+                    valid_sizes = size_values[~np.isnan(size_values)]
+                    if len(valid_sizes) > 0:
+                        stats["avg_size"] = float(np.mean(valid_sizes))
+
+        stats["num_flora"] = len(self._entity_provider.get_flora())
+        stats["num_fauna"] = len(self._entity_provider.get_fauna())
 
         return stats
 

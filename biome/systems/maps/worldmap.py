@@ -31,10 +31,15 @@ class WorldMap:
         # mapeo ids de entidad a referencia objeto
         # y ahora, el entity map no es de index, si no de id
 
-    def get_entities(self) -> EntityList:
+    def get_entities(self, only_alive: bool = False) -> EntityList:
         entities: EntityList = []
         for _, entity in self._entity_registry.items():
-            entities.append(entity)
+            if only_alive:
+                if entity.is_alive():
+                    entities.append(entity)
+            else:
+                entities.append(entity)
+
         return entities
 
     @property
