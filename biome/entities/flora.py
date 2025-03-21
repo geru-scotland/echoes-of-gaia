@@ -28,9 +28,9 @@ from shared.types import HabitatList
 
 
 class Flora(Entity):
-    def __init__(self, id: int, env: simpyEnv, flora_type: FloraSpecies, habitats: HabitatList, lifespan: float):
+    def __init__(self, id: int, env: simpyEnv, flora_type: FloraSpecies, habitats: HabitatList, lifespan: float, evolution_cycle: int = 0):
         descriptor: EntityDescriptor = EntityDescriptor.create_flora(flora_type)
-        super().__init__(id, env, descriptor, habitats, lifespan)
+        super().__init__(id, env, descriptor, habitats, lifespan, evolution_cycle)
         self._logger.debug(f"Flora entity initialized: {flora_type}")
         self._component_dormancy_reasons: Dict[Type, Set[DormancyReason]] = {}
         self._flora_type: FloraSpecies = flora_type

@@ -52,14 +52,15 @@ class WorldMapManager:
             tb = traceback.format_exc()
             self._logger.error("There was an exception spawning entities: %s", tb)
 
-    def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float, custom_components: List[Dict] = None):
+    def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float, custom_components: List[Dict] = None, evolution_cycle: int = 0):
         try:
             entity = self._spawn_system.spawn(
                 entity_class=entity_class,
                 entity_species_enum=entity_species_enum,
                 species_name=species_name,
                 lifespan=lifespan,
-                custom_components=custom_components
+                custom_components=custom_components,
+                evolution_cycle=evolution_cycle
             )
 
             if entity:

@@ -18,6 +18,7 @@
 from logging import Logger
 
 from biome.services.climate_service import ClimateService
+from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
@@ -37,7 +38,7 @@ class BiomeSnapshotSystem:
     def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
                  entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
                  config: SnapshotConfig, climate_collector: ClimateDataCollector = None,
-                 biome_type = None, climate_data_manager = None):
+                 biome_type = None, climate_data_manager: ClimateDataManager = None):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._logger.info("Initializing BiomeSnapshotSystem...")
 
@@ -48,11 +49,10 @@ class BiomeSnapshotSystem:
         self._score_analyzer: BiomeScoreAnalyzer = score_analyzer
         self._config: SnapshotConfig = config
 
-        self._biome_type = biome_type
         self._climate_data_manager = climate_data_manager
 
         self._collector = SnapshotCollector(
-            entity_manager, world_map, entity_collector, score_analyzer
+            biome_type, entity_manager, climate_data_manager, world_map, entity_collector, score_analyzer
         )
         self._storage = SnapshotStorage(self._config)
 
@@ -60,35 +60,6 @@ class BiomeSnapshotSystem:
 
     def collect_snapshot_data(self, simulation_time: int) -> SnapshotData:
         snapshot = self._collector.collect_snapshot_data(simulation_time)
-
-        if self._biome_type:
-            current_season = ClimateService.get_current_season()
-
-            snapshot.set_biome_info(self._biome_type, current_season)
-
-            climate_averages = None
-            if self._climate_data_manager:
-                climate_averages = self._climate_data_manager.get_current_month_averages()
-
-
-            if climate_averages:
-                snapshot.set_climate_averages(climate_averages)
-
-                biome_data = {
-                    "biome_type": self._biome_type,
-                    "current_season": current_season,
-                    "climate_averages": climate_averages
-                }
-
-                if snapshot.metrics_data:
-                    biome_data.update(snapshot.metrics_data)
-
-                climate_contributor = ClimateContributor()
-                climate_contributor.calculate(biome_data)
-
-                if "climate_analysis" in biome_data:
-                    snapshot.climate_analysis = biome_data["climate_analysis"]
-
         return snapshot
 
     def capture_snapshot(self, simulation_time: int, callback: CallbackType = None) -> None:

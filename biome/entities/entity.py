@@ -40,7 +40,8 @@ from utils.loggers import LoggerManager
 
 class Entity(EventHandler, StateHandler, ABC):
 
-    def __init__(self, id: int, env: simpyEnv, descriptor: EntityDescriptor, habitats: HabitatList, lifespan: float):
+    def __init__(self, id: int, env: simpyEnv, descriptor: EntityDescriptor, habitats: HabitatList, lifespan: float,
+                 evolution_cycle: int = 0):
         self._event_notifier: EventNotifier = EventNotifier()
         super().__init__()
         self._id: int = id
@@ -54,6 +55,7 @@ class Entity(EventHandler, StateHandler, ABC):
 
         self._state: EntityState = EntityState()
         self._state.update("is_dead", False)
+        self._state.update("evolution_cycle", evolution_cycle)
 
     def _register_events(self):
         self._event_notifier.register(ComponentEvent.UPDATE_STATE, self._handle_component_update)
@@ -115,6 +117,7 @@ class Entity(EventHandler, StateHandler, ABC):
     def get_state_fields(self) -> Dict[str, Dict[str, Any]]:
         fields: Dict[str, Any] = {
             "general": {
+                "evolution_cycle": self._state.get("evolution_cycle", 0),
                 "is_dead": self._state.get("is_dead", False),
                 "death_tick": self._state.get("death_tick", -1),
                 "Lifespan": self._lifespan,
@@ -124,7 +127,7 @@ class Entity(EventHandler, StateHandler, ABC):
         vital_component: ComponentType.VITAL = self._components.get(ComponentType.VITAL, None)
 
         if vital_component is not None:
-            fields["general"].update({"Stress level": vital_component.stress_level})
+            fields["general"].update({"stress_level": vital_component.stress_level})
 
         for component_type, component in self._components.items():
             component_name = str(component_type).split('.')[-1].lower()

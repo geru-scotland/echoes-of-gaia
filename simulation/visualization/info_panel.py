@@ -86,7 +86,7 @@ class InfoPanel:
             "metabolic": True,
             "nutritional": True,
             "weather_adaptation": True,
-            "transform": True
+            "transform": False
         }
         self._section_buttons = {}
         self._position = (0, 0)
@@ -232,7 +232,6 @@ class InfoPanel:
             for factor, details in analysis_data["factors"].items():
                 factor_name = factor.title()
                 value = details["value"]
-                min_val, max_val = details["optimal_range"]
                 status = details["status"]
 
                 if status == "optimal":
@@ -249,17 +248,13 @@ class InfoPanel:
                 factor_surface = self._font.render(factor_text, True, (180, 200, 220))
                 self._surface.blit(factor_surface, (x + 10, current_y))
 
-                range_text = f"({min_val:.1f}-{max_val:.1f})"
-                range_surface = self._font.render(range_text, True, (150, 170, 190))
+
 
                 status_surface = self._font.render(status_text, True, status_color)
                 status_x = x + width - status_surface.get_width() - 10
                 self._surface.blit(status_surface, (status_x, current_y))
 
-                self._surface.blit(range_surface, (x + 10 + factor_surface.get_width() + 5, current_y))
-
                 current_y += factor_height
-
 
         return current_y + 10
 
@@ -367,6 +362,15 @@ class InfoPanel:
             else:
                 y_left = y_next
 
+        if hasattr(self, '_climate_analysis') and self._climate_analysis:
+            y_next, expanded = self._render_collapsible_section(
+                self._surface, "CLIMATE ANALYSIS", x_left, y_left + 10, "climate_analysis")
+
+            if expanded:
+                y_left = self._render_climate_analysis(
+                    self._surface, self._climate_analysis, x_left + 5, y_next, col_width - 10)
+            else:
+                y_left = y_next
 
         if self._biome_score:
             y_next, expanded = self._render_collapsible_section(
@@ -377,13 +381,14 @@ class InfoPanel:
                 quality_color = self._quality_colors.get(quality, self._text_color)
 
                 contributor_count = len(self._biome_score.get('contributor_scores', {}))
-                section_height = 120 + (contributor_count * 25)
+                section_height = 120 + (contributor_count * 30)
 
                 section_rect = pygame.Rect(x_left, y_next, col_width, section_height)
                 pygame.draw.rect(self._surface, (20, 30, 45), section_rect)
                 pygame.draw.rect(self._surface, (40, 70, 110), section_rect, 1)
 
                 score_value = self._biome_score['score']
+                score_value = min(10.0, score_value)
                 score_percent = score_value / 10.0
 
                 quality_text = quality.upper()
@@ -420,15 +425,17 @@ class InfoPanel:
                 if 'contributor_scores' in self._biome_score:
                     contributor_scores = self._biome_score['contributor_scores']
 
+                    normalized_scores = {k: min(1.0, v) for k, v in contributor_scores.items()}
+
                     max_label_width = 0
-                    for factor in contributor_scores.keys():
+                    for factor in normalized_scores.keys():
                         factor_name = factor.replace('_', ' ').title() + ":"
                         label_surface = self._font.render(factor_name, True, (180, 200, 220))
                         max_label_width = max(max_label_width, label_surface.get_width())
 
                     max_label_width = min(max_label_width, col_width // 2 - 10)
 
-                    for factor, score in contributor_scores.items():
+                    for factor, score in normalized_scores.items():
                         factor_name = factor.replace('_', ' ').title() + ":"
 
                         factor_color = (100, 200, 100)
@@ -484,6 +491,9 @@ class InfoPanel:
 
                 id_font = pygame.font.SysFont(None, self._font_size + 10)
                 id_text = f"ID: {self._selected_entity.id}"
+                if hasattr(self._selected_entity, 'evolution_cycle') and self._selected_entity.evolution_cycle >= 0:
+                    id_text += f" | Generation: {self._selected_entity.evolution_cycle}"
+
                 id_surface = id_font.render(id_text, True, (200, 220, 240) if not is_dead else (240, 180, 180))
                 self._surface.blit(id_surface, (x_right + 15, y_next + 12))
 
@@ -672,15 +682,25 @@ class InfoPanel:
                         max_value = fields["max_vitality"]
                     elif field.lower() == "energy_reserves" and "max_energy_reserves" in fields:
                         max_value = fields["max_energy_reserves"]
+                    elif field.lower() == "toxicity":
+                        max_value = 1.0
 
                     percentage = value / max_value if max_value > 0 else 0
 
-                    if percentage < 0.3:
-                        text_color = (220, 100, 100)
-                    elif percentage > 0.7:
-                        text_color = (100, 220, 100)
+                    if field.lower() in ["stress_level", "toxicity"]:
+                        if percentage < 0.3:
+                            text_color = (100, 220, 100)
+                        elif percentage > 0.7:
+                            text_color = (220, 100, 100)
+                        else:
+                            text_color = (220, 220, 100)
                     else:
-                        text_color = (220, 220, 100)
+                        if percentage < 0.3:
+                            text_color = (220, 100, 100)
+                        elif percentage > 0.7:
+                            text_color = (100, 220, 100)
+                        else:
+                            text_color = (220, 220, 100)  
 
             text_y = current_y + (field_height - self._font.get_height()) // 2
 

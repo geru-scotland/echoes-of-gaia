@@ -33,6 +33,7 @@ class EntityInfo:
         self.state_fields = entity_data["state_fields"]
         self.is_dead = entity_data["is_dead"]
         self.habitats = entity_data["habitats"]
+        self.evolution_cycle = entity_data["evolution_cycle"]
 
     def __str__(self) -> str:
         return f"Entity {self.id}: {self.species} at {self.position}"

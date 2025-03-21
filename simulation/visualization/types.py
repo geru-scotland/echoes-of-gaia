@@ -64,6 +64,7 @@ class EntityData(TypedDict):
     state_fields: EntityStateFields
     is_dead: bool
     components: Dict[str, Any]
+    evolution_cycle: int
 
 class BiomeScoreContributorData(TypedDict):
     population_balance: float
@@ -90,7 +91,7 @@ class SnapshotData(TypedDict):
     biome_type: BiomeType
     current_season: Season
     climate_averages: Dict[str, float]
-    climate_analysys: Any
+    climate_analysis: Any
     creation_timestamp: int
     terrain: TerrainMapData
     entities: Dict[str, EntityData]

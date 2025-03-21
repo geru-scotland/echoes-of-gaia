@@ -27,21 +27,23 @@ class EntityProvider:
         self._world_map: WorldMap = world_map
         self._entities: EntityList = self._world_map.get_entities()
 
-    def get_entities(self) -> Tuple[EntityList, EntityList]:
-        self._entities = self._world_map.get_entities()
-        return self.get_flora(), self.get_fauna()
+    def get_entities(self, only_alive: bool = False) -> Tuple[EntityList, EntityList]:
+        entities: EntityList = self._world_map.get_entities(only_alive)
+        flora: EntityList = self.get_entities_by_type(entities, EntityType.FLORA)
+        fauna: EntityList = self.get_entities_by_type(entities, EntityType.FAUNA)
+        return flora, fauna
 
-    def get_entities_by_type(self, entity_type: EntityType, only_alive: bool = False) -> EntityList:
-        self._entities = self._world_map.get_entities()
-
+    def get_entities_by_type(self, entities: EntityList, entity_type: EntityType, only_alive: bool = False) -> EntityList:
         if only_alive:
-            return [entity for entity in self._entities if entity.get_type() == entity_type and entity.is_alive()]
+            return [entity for entity in entities if entity.get_type() == entity_type and entity.is_alive()]
 
-        return [entity for entity in self._entities if entity.get_type() == entity_type]
+        return [entity for entity in entities if entity.get_type() == entity_type]
 
     def get_flora(self, only_alive: bool = False) -> EntityList:
-        return self.get_entities_by_type(EntityType.FLORA, only_alive)
+        entities: EntityList = self._world_map.get_entities(only_alive)
+        return self.get_entities_by_type(entities, EntityType.FLORA, only_alive)
 
     def get_fauna(self, only_alive: bool = False) -> EntityList:
-        return self.get_entities_by_type(EntityType.FAUNA, only_alive)
+        entities: EntityList = self._world_map.get_entities(only_alive)
+        return self.get_entities_by_type(entities, EntityType.FAUNA, only_alive)
 
