@@ -58,12 +58,13 @@ class SimulationEngine:
 
             if self._datapoints:
                 self._context.influxdb.start()
-                self._data_manager = BiomeDataManager(
-                    env=self._env,
-                    config=self._context.config
-                )
 
-                self._data_manager.configure(self._biome_api.biome)
+            self._data_manager = BiomeDataManager(
+                env=self._env,
+                config=self._context.config
+            )
+
+            self._data_manager.configure(self._biome_api.biome)
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)
 

@@ -32,6 +32,7 @@ from simulation.visualization.types import (
 )
 
 
+
 class SnapshotViewer:
 
     def __init__(self, config: ViewerConfig):
@@ -46,7 +47,9 @@ class SnapshotViewer:
         self._window_size = config["window_size"]
         self._screen = pygame.display.set_mode(self._window_size)
         pygame.display.set_caption(config["title"])
-
+        self._screen.fill(self._config["background_color"])
+        self._render_loading_screen(self._screen)
+        pygame.display.flip()
         self._init_components()
 
         self._loader = SnapshotLoader(Path(config["snapshot_path"]))
@@ -59,10 +62,11 @@ class SnapshotViewer:
 
     def _init_components(self) -> None:
         cell_size = self._config["cell_size"]
-        panel_width = self._config["panel_width"]
+        panel_width = self._config.get("panel_width", 600)
 
         window_width, window_height = self._window_size
         map_area_width = window_width - panel_width
+        navigation_text_pos = (window_width - 320, window_height - 30)
 
         self._map_renderer = MapRenderer(
             cell_size=cell_size,
@@ -79,8 +83,8 @@ class SnapshotViewer:
         self._info_panel = InfoPanel(
             width=panel_width,
             height=window_height - 60,
-            background_color=(30, 30, 30),
-            text_color=(200, 200, 200),
+            background_color=(10, 10, 15),  # Más oscuro
+            text_color=(180, 220, 230),  # Color azulado claro
             font_size=self._config["font_size"]
         )
 
@@ -93,8 +97,8 @@ class SnapshotViewer:
             play_callback=self._toggle_play,
             slider_callback=self._go_to_snapshot,
             total_snapshots=1,
-            text_color=(200, 200, 200),
-            bg_color=(20, 20, 20),
+            text_color=(180, 220, 230),  # Color azulado claro
+            bg_color=(10, 10, 15),  # Más oscuro
             font_size=self._config["font_size"]
         )
 
@@ -105,10 +109,34 @@ class SnapshotViewer:
         self._drag_start = (0, 0)
         self._last_mouse_pos = (0, 0)
 
+    def _render_loading_screen(self, surface: pygame.Surface) -> None:
+        overlay = pygame.Surface(self._window_size, pygame.SRCALPHA)
+        overlay.fill((10, 10, 15, 220))
+
+        font_title = pygame.font.SysFont(None, self._config["font_size"] + 10)
+        text_surface = font_title.render("Loading simulation data...", True, (180, 220, 230))
+        text_rect = text_surface.get_rect(center=(self._window_size[0] // 2, self._window_size[1] // 2 - 10))
+
+
+        border_rect = text_rect.inflate(40, 20)
+        pygame.draw.rect(overlay, (50, 100, 130, 180), border_rect, 1)
+
+        dots = "." * (int(pygame.time.get_ticks() / 500) % 4)
+        font_subtitle = pygame.font.SysFont(None, self._config["font_size"] - 2)
+        dots_surface = font_subtitle.render(f"Please wait{dots}", True, (150, 180, 200))
+        dots_rect = dots_surface.get_rect(centerx=self._window_size[0] // 2,
+                                          top=text_rect.bottom + 15)
+
+        overlay.blit(text_surface, text_rect)
+        overlay.blit(dots_surface, dots_rect)
+
+        surface.blit(overlay, (0, 0))
+
     def _load_snapshot(self, snapshot: Optional[SnapshotData]) -> None:
         if snapshot is None:
             self._logger.warning("Intentando cargar un snapshot nulo")
             return
+
 
         previously_selected_entity_id = self._selected_entity_id
 
@@ -236,7 +264,7 @@ class SnapshotViewer:
                 self._last_frame_time = current_time
 
     def _render(self) -> None:
-        self._screen.fill(self._config["background_color"])
+        self._screen.fill((15, 15, 20))
 
         self._map_renderer.render(self._screen, self._map_offset)
         self._entity_renderer.render(self._screen, self._map_offset)
@@ -250,7 +278,7 @@ class SnapshotViewer:
                 cell_size,
                 cell_size
             )
-            pygame.draw.rect(self._screen, (255, 255, 255), rect, 2)
+            pygame.draw.rect(self._screen, (50, 100, 130), rect, 2)
 
         if self._hover_cell and self._hover_cell != self._selected_cell:
             y, x = self._hover_cell
@@ -267,6 +295,7 @@ class SnapshotViewer:
         window_width, _ = self._window_size
         self._info_panel.render(self._screen, (window_width - panel_width, 0))
         self._navigation.render(self._screen)
+
 
         if self._hover_cell:
             y, x = self._hover_cell
@@ -322,6 +351,11 @@ class SnapshotViewer:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 panel_width = self._config["panel_width"]
                 window_width, window_height = self._window_size
+                panel_position = (window_width - panel_width, 0)
+
+                if event.pos[0] >= window_width - panel_width and event.pos[1] < window_height - 60:
+                    if self._info_panel.handle_event(event, panel_position):
+                        continue
 
                 if event.pos[1] >= window_height - 60:
                     self._navigation.handle_event(event)
