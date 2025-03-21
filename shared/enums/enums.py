@@ -95,6 +95,7 @@ class CapturePeriod(EnumBaseInt):
 class CaptureFormat(EnumBaseStr):
     JSON = "json"
     JSONL = "jsonl"
+    MSGPACK_GZ = "msgpack.gz"
     YAML = "yaml"
 
 class CaptureType(EnumBaseStr):

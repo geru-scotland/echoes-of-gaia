@@ -23,11 +23,13 @@ from deap import base, creator, tools, algorithms
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
 from biome.components.physiological.metabolic import MetabolicComponent
+from biome.components.physiological.nutritional import NutritionalComponent
 from biome.components.physiological.vital import VitalComponent
 from biome.systems.evolution.fitness import compute_fitness
 from biome.systems.evolution.genes import FloraGenes
 from biome.entities.flora import Flora
 from shared.enums.enums import ComponentType
+from shared.evolution.ranges import FLORA_GENE_RANGES
 
 
 def extract_genes_from_entity(flora_entity: Flora) -> FloraGenes:
@@ -60,6 +62,13 @@ def extract_genes_from_entity(flora_entity: Flora) -> FloraGenes:
         genes.heat_resistance = weather_adaptation_component.heat_resistance
         genes.optimal_temperature = weather_adaptation_component.optimal_temperature
 
+    nutritional_component: NutritionalComponent = flora_entity.get_component(ComponentType.NUTRITIONAL)
+    if nutritional_component:
+        genes.nutrient_absorption_rate = nutritional_component.nutrient_absorption_rate
+        genes.mycorrhizal_rate = nutritional_component.mycorrhizal_rate
+        genes.base_nutritive_value = nutritional_component.base_nutritive_value
+        genes.base_toxicity = nutritional_component.base_toxicity
+
     return genes
 
 
@@ -83,8 +92,12 @@ def flora_genes_to_individual(flora_genes):
         flora_genes.cold_resistance,
         flora_genes.heat_resistance,
 
-        (flora_genes.optimal_temperature + 30.0) / 80.0  # De -30-50 a [0,1]
+        (flora_genes.optimal_temperature + 30.0) / 80.0,  # De -30-50 a [0,1]
 
+        (flora_genes.nutrient_absorption_rate - 0.1) / 0.9,  # De 0.1-1.0 a 0-1
+        (flora_genes.mycorrhizal_rate - 0.01) / 0.03,  # De 0.01-0.04 a 0-1
+        (flora_genes.base_nutritive_value - 0.1) / 0.9,  # De 0.1-1.0 a 0-1
+        (flora_genes.base_toxicity - 0.01) / 0.99  # De 0.01-1.0 a 0-1
     ])
 
 
@@ -110,6 +123,11 @@ def deap_genes_to_flora_genes(individual) -> FloraGenes:
 
     genes.optimal_temperature = -30 + (clamped_individual[13] * 80.0)  # -30 a 50
 
+    genes.nutrient_absorption_rate = 0.1 + (clamped_individual[14] * 0.9)  # 0.1-1.0
+    genes.mycorrhizal_rate = 0.01 + (clamped_individual[15] * 0.03)  # 0.01-0.04
+    genes.base_nutritive_value = 0.1 + (clamped_individual[16] * 0.9)  # 0.1-1.0
+    genes.base_toxicity = 0.01 + (clamped_individual[17] * 0.99)  # 0.01-1.0
+
     return genes
 
 
@@ -132,7 +150,7 @@ class GeneticAlgorithmModel:
     def _setup_toolbox(self):
         self.toolbox.register("attr_float", random.random)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
-                              self.toolbox.attr_float, n=14)
+                              self.toolbox.attr_float, n=len(FLORA_GENE_RANGES))
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
         self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
 
@@ -153,25 +171,11 @@ class GeneticAlgorithmModel:
                 "max_energy_reserves": flora_genes.max_energy_reserves,
                 "cold_resistance": flora_genes.cold_resistance,
                 "heat_resistance": flora_genes.heat_resistance,
-                "optimal_temperature": flora_genes.optimal_temperature
-            }
-
-            # Quitar esta chapuza de aquí, lo dejo por ahora... pero hay que pasar a shared
-            valid_ranges = {
-                "growth_modifier": (0.1, 2.0),
-                "growth_efficiency": (0.3, 1.0),
-                "max_size": (0.1, 5.0),
-                "max_vitality": (50.0, 200.0),
-                "aging_rate": (0.1, 2.0),
-                "health_modifier": (0.4, 2.0),
-                "base_photosynthesis_efficiency": (0.4, 1.0),
-                "base_respiration_rate": (0.05, 1.0),
-                "lifespan": (1.0, 1000.0),
-                "metabolic_activity": (0.2, 1.0),
-                "max_energy_reserves": (50.0, 150.0),
-                "cold_resistance": (0.0, 1.0),
-                "heat_resistance": (0.0, 1.0),
-                "optimal_temperature": (-30, 50)
+                "optimal_temperature": flora_genes.optimal_temperature,
+                "nutrient_absorption_rate": flora_genes.nutrient_absorption_rate,
+                "mycorrhizal_rate": flora_genes.mycorrhizal_rate,
+                "base_nutritional_value": flora_genes.base_nutritive_value,
+                "base_toxicity": flora_genes.base_toxicity
             }
 
             adaptive_boost_attrs = ["cold_resistance", "heat_resistance"]
@@ -181,11 +185,12 @@ class GeneticAlgorithmModel:
                 "aging_rate", "health_modifier", "base_photosynthesis_efficiency",
                 "base_respiration_rate", "lifespan", "metabolic_activity",
                 "max_energy_reserves", "cold_resistance", "heat_resistance",
-                "optimal_temperature"
+                "optimal_temperature", "nutrient_absorption_rate", "mycorrhizal_rate",
+                "base_nutritional_value", "base_toxicity"
             ]):
                 if random.random() < indpb:
                     original_value = original_values[attr]
-                    min_val, max_val = valid_ranges[attr]
+                    min_val, max_val = FLORA_GENE_RANGES[attr]
                     range_size = max_val - min_val
 
                     apply_boost = False

@@ -43,8 +43,8 @@ class NutritionalComponent(EnergyBasedFloraComponent):
         self._mycorrhizal_rate: float = mycorrhizal_rate
 
         self._base_nutritive_value: float = base_nutritive_value
-        self._current_nutritive_value: float = base_nutritive_value
         self._base_toxicity: float = base_toxicity
+        self._current_nutritive_value: float = base_nutritive_value
         self._current_toxicity: float = base_toxicity
         self._photosynthesis_efficiency: float = 0.0
 
@@ -161,3 +161,19 @@ class NutritionalComponent(EnergyBasedFloraComponent):
     @property
     def nutritive_value(self) -> float:
         return self._current_nutritive_value
+
+    @property
+    def nutrient_absorption_rate(self) -> float:
+        return self._nutrient_absorption_rate
+
+    @property
+    def mycorrhizal_rate(self) -> float:
+        return self._mycorrhizal_rate
+
+    @property
+    def base_nutritive_value(self) -> float:
+        return self._base_nutritive_value
+
+    @property
+    def base_toxicity(self) -> float:
+        return self._base_toxicity

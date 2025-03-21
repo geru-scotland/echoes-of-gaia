@@ -57,13 +57,15 @@ def find_latest_snapshot(snapshot_dir: str = "simulation_records") -> str:
     if not snapshot_path.exists() or not snapshot_path.is_dir():
         return ""
 
-    snapshot_files = list(snapshot_path.glob("biome_snapshot_*.json"))
+    snapshot_files = list(snapshot_path.glob("biome_snapshot_*.msgpack.gz"))
+
+    if not snapshot_files:
+        snapshot_files = list(snapshot_path.glob("biome_snapshot_*.json"))
 
     if not snapshot_files:
         return ""
 
     snapshot_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
-
     return str(snapshot_files[0])
 
 def parse_args():
@@ -99,7 +101,7 @@ def parse_args():
     parser.add_argument(
         "-p", "--panel-width",
         type=int,
-        default=450,
+        default=600,
         help="Information panel width (default: 450)"
     )
 
@@ -155,8 +157,8 @@ def main():
         "fps": args.fps,
         "font_size": args.font_size,
         "title": "Echoes of Gaia - Snapshot Viewer",
-        "background_color": (28, 28, 32),
-        "grid_color":(45, 45, 50),
+        "background_color": (15, 15, 20),
+        "grid_color": (40, 60, 80),
         "terrain_colors": TERRAIN_COLORS,
         "entity_colors": ENTITY_COLORS,
         "navigation_button_size": (40, 40),

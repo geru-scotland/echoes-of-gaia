@@ -129,7 +129,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                     agent.act(action)
                     evolution_cycle_time:  float = agent.get_evolution_cycle_time()
                     self._logger.error(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
-                    yield self._env.timeout(delay)
+                    yield self._env.timeout(evolution_cycle_time)
                 else:
                     self._logger.warning(f"Agent for species {species} not found!")
 

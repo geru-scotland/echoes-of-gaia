@@ -17,6 +17,8 @@
 """
 from typing import List, Dict, Any
 
+from shared.evolution.ranges import FLORA_GENE_RANGES
+
 
 class FloraGenes:
     def __init__(self):
@@ -37,6 +39,11 @@ class FloraGenes:
         self.cold_resistance = 0.0
         self.heat_resistance = 0.0
         self.optimal_temperature = 0.0
+
+        self.nutrient_absorption_rate = 0.0
+        self.mycorrhizal_rate = 0.0
+        self.base_nutritive_value = 0.0
+        self.base_toxicity = 0.0
         # Dejo las siguientes para más adelante:
         # self.drought_resistance = 0.0
         # self.toxicity = 0.0
@@ -57,6 +64,10 @@ class FloraGenes:
             "max_energy_reserves": self.max_energy_reserves,
             "cold_resistance": self.cold_resistance,
             "heat_resistance": self.heat_resistance,
+            "nutrient_absorption_rate": self.nutrient_absorption_rate,
+            "mycorrhizal_rate": self.mycorrhizal_rate,
+            "base_nutritional_value": self.base_nutritive_value,
+            "base_toxicity": self.base_toxicity
         }
         return ", ".join(f"{key}={value}" for key, value in fields.items())
 
@@ -102,27 +113,21 @@ class FloraGenes:
         }
         components.append(weather_adaptation_component)
 
+        nutritional_component: Dict[str, Any] = {
+            "NutritionalComponent": {
+                "nutrient_absorption_rate": self.nutrient_absorption_rate,
+                "mycorrhizal_rate": self.mycorrhizal_rate,
+                "base_nutritive_value": self.base_nutritive_value,
+                "base_toxicity": self.base_toxicity,
+                "max_energy_reserves": self.max_energy_reserves
+            }
+        }
+        components.append(nutritional_component)
         return components
 
     def validate_genes(self) -> None:
-        valid_ranges = {
-            "growth_modifier": (0.1, 2.0),
-            "growth_efficiency": (0.3, 1.0),
-            "max_size": (0.1, 5.0),
-            "max_vitality": (50.0, 200.0),
-            "aging_rate": (0.1, 2.0),
-            "health_modifier": (0.4, 2.0),
-            "base_photosynthesis_efficiency": (0.4, 1.0),
-            "base_respiration_rate": (0.05, 1.0),
-            "lifespan": (1.0, 1000.0),  # en años
-            "metabolic_activity": (0.2, 1.0),
-            "max_energy_reserves": (50.0, 150.0),
-            "cold_resistance": (0.0, 1.0),
-            "heat_resistance": (0.0, 1.0),
-            "optimal_temperature": (-30, 50)
-        }
 
-        for attr, (min_val, max_val) in valid_ranges.items():
+        for attr, (min_val, max_val) in FLORA_GENE_RANGES.items():
             if hasattr(self, attr):
                 current_val = getattr(self, attr)
                 valid_val = max(min_val, min(current_val, max_val))

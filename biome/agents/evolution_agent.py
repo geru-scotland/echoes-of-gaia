@@ -20,6 +20,7 @@ import random
 from logging import Logger
 from typing import List, Dict, Any
 
+import numpy as np
 from pandas import DataFrame
 
 from biome.systems.events.event_bus import BiomeEventBus
@@ -111,9 +112,19 @@ class EvolutionAgentAI(Agent):
             if species == self._species:
                 self._create_evolved_entity(species, genes)
 
+
         self._current_evolution_cycle = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
-        self._increase_evolution_time_cycle()
+
+        # Nueva generación spawneada, calculo lifespan medio
+        average_lifespan: float = self._compute_current_generation_lifespan()
+        self._increase_evolution_time_cycle(average_lifespan)
+
+    def _compute_current_generation_lifespan(self) -> float:
+        flora_entities: EntityList = self.entity_provider.get_flora(only_alive=True)
+        generation_average_lifespan = np.average(np.array([entity.lifespan for entity in flora_entities if entity.get_species() == self._species]))
+        self._logger.error(f"CURRENT GENERATION AVERAGE LIFESPAN: {generation_average_lifespan}")
+        return float(generation_average_lifespan * Timers.Calendar.YEAR)
 
     def _calculate_entity_fitness(self, entity, climate_data):
         genes = extract_genes_from_entity(entity)
@@ -141,6 +152,8 @@ class EvolutionAgentAI(Agent):
     def get_evolution_cycle_time(self) -> int:
         return self._evolution_cycle_time
 
-    def _increase_evolution_time_cycle(self) -> None:
-        if self._evolution_cycle_time < 0.4 * self._species_base_lifespan:
-            self._evolution_cycle_time += self._species_base_lifespan * 0.05
+    def _increase_evolution_time_cycle(self, average_lifespan: float = None) -> None:
+        lifespan: float = average_lifespan if average_lifespan else self._species_base_lifespan
+        # que sea dinámico, si el lifespan anterior es más que el actual, que lo vuelva a hacer
+        if self._evolution_cycle_time < 0.4 * lifespan:
+            self._evolution_cycle_time += lifespan * random.uniform(0.01, 0.03)

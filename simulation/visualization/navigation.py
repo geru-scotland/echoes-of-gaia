@@ -65,14 +65,14 @@ class Button:
         if not self._enabled:
             bg_color = self._disabled_color
         elif self._hovered:
-            bg_color = self._hover_color
+            bg_color = (60, 120, 160)
         else:
-            bg_color = self._bg_color
+            bg_color = (30, 60, 90)
 
         pygame.draw.rect(surface, bg_color, self._rect)
-        pygame.draw.rect(surface, (100, 100, 100), self._rect, 1)
+        pygame.draw.rect(surface, (50, 100, 130), self._rect, 1)
 
-        text_surface = self._font.render(self._text, True, self._text_color)
+        text_surface = self._font.render(self._text, True, (180, 220, 230))
         text_rect = text_surface.get_rect(center=self._rect.center)
         surface.blit(text_surface, text_rect)
 
@@ -109,7 +109,8 @@ class Navigation:
             total_snapshots: int = 1,
             text_color: Color = (255, 255, 255),
             bg_color: Color = (30, 30, 30),
-            font_size: int = 16
+            font_size: int = 16,
+            text_position: Optional[Point] = None
     ):
         self._logger = logging.getLogger("navigation")
         self._position = position
@@ -125,6 +126,7 @@ class Navigation:
         self._bg_color = bg_color
         self._font_size = font_size
         self._is_playing = False
+        self._text_position = text_position
 
         pygame.font.init()
         self._font = pygame.font.SysFont(None, font_size)
@@ -247,21 +249,25 @@ class Navigation:
         self._handle_slider_drag(rel_mouse_pos)
 
     def render(self, surface: pygame.Surface) -> None:
-        self._surface.fill(self._bg_color)
+        self._surface.fill((10, 10, 15))
 
         self._prev_button.render(self._surface)
         self._play_button.render(self._surface)
         self._next_button.render(self._surface)
 
-        pygame.draw.rect(self._surface, (80, 80, 80), self._slider_rect)
-        pygame.draw.rect(self._surface, (200, 200, 200), self._slider_handle_rect, border_radius=10)
+        pygame.draw.rect(self._surface, (40, 70, 100), self._slider_rect)
+        pygame.draw.rect(self._surface, (80, 160, 200), self._slider_handle_rect, border_radius=10)
 
         text = f"Snapshot: {self._current_snapshot + 1}/{self._total_snapshots}"
-        text_surface = self._font.render(text, True, self._text_color)
+        text_surface = self._font.render(text, True, (180, 220, 230))
         text_rect = text_surface.get_rect(
-            right=self._size[0] - 10,
+            left=self._slider_rect.right + 20,
             centery=self._size[1] // 2
         )
+
+        if text_rect.right > self._size[0] - 10:
+            text_rect.right = self._size[0] - 10
+
         self._surface.blit(text_surface, text_rect)
 
         surface.blit(self._surface, self._position)

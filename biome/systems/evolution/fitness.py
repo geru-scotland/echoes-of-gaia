@@ -17,6 +17,8 @@
 """
 import math
 
+from shared.math.constants import epsilon
+
 
 def compute_fitness(flora_genes, climate_data):
     fitness: float = 0.0
@@ -128,10 +130,33 @@ def compute_fitness(flora_genes, climate_data):
     respiration = flora_genes.base_respiration_rate
 
     max_allowed_ratio = 3.0
-    ratio = photosynthesis / (respiration + 1e-6)
+    ratio = photosynthesis / (respiration + epsilon)
 
     if ratio > max_allowed_ratio:
         extreme_ratio_penalty = (ratio - max_allowed_ratio) * 2.0
         fitness -= extreme_ratio_penalty
+
+    nutrition_score = 0.0
+
+    # La absorción de nutrientes - mucho mejor en condiciones húmedas
+    if avg_humidity > 60:
+        nutrition_score += 3.0 * flora_genes.nutrient_absorption_rate
+
+    # Las micorrizas - he leído que mejores en condiciones secas
+    if avg_precipitation < 50:
+        nutrition_score += 2.5 * flora_genes.mycorrhizal_rate * 10  # Rate es muy txiki, lo multiplico
+
+    # Valor nutritivo alto penalizo (ojo... revisar bien) -  la idea es
+    # supervivencia (atrae herbívoros)
+    # nutrition_score -= 0.5 * flora_genes.base_nutritive_value
+
+    # La toxicidad es defensa (hormésis de nuevo, un poco - gud, mucho - bad), pero perjudicial en exceso
+    if flora_genes.base_toxicity < 0.4:
+        nutrition_score += 1.0 * flora_genes.base_toxicity
+    else:
+        nutrition_score -= (flora_genes.base_toxicity - 0.4) * 2.0
+
+    fitness += nutrition_score
+
 
     return fitness
