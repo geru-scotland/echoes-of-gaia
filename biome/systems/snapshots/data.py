@@ -28,6 +28,11 @@ class SnapshotData:
         self.simulation_time = simulation_time
         self.creation_timestamp = int(time.time())
 
+        self.biome_type = None
+        self.current_season = None
+        self.climate_averages = None
+        self.climate_analysis = None
+
         self.terrain_data: Optional[TerrainData] = None
         self.entities_data: Dict[int, EntityData] = {}
         self.climate_data: Optional[ClimateData] = None
@@ -46,6 +51,13 @@ class SnapshotData:
     def set_biome_score(self, data: BiomeScoreData) -> None:
         self.biome_score = data
 
+    def set_biome_info(self, biome_type, current_season):
+        self.biome_type = biome_type
+        self.current_season = current_season
+
+    def set_climate_averages(self, averages):
+        self.climate_averages = averages
+
     def add_entity_data(self, entity_id: int, data: EntityData) -> None:
         self.entities_data[entity_id] = data
 
@@ -55,6 +67,18 @@ class SnapshotData:
             "simulation_time": self.simulation_time.to_dict(),
             "creation_timestamp": self.creation_timestamp,
         }
+
+        if self.biome_type:
+            result["biome_type"] = str(self.biome_type)
+
+        if self.current_season:
+            result["current_season"] = str(self.current_season)
+
+        if self.climate_averages:
+            result["climate_averages"] = self.climate_averages
+
+        if self.climate_analysis:
+            result["climate_analysis"] = self.climate_analysis
 
         if self.terrain_data:
             result["terrain"] = self.terrain_data

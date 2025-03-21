@@ -63,7 +63,6 @@ class SimulationEngine:
                 env=self._env,
                 config=self._context.config
             )
-
             self._data_manager.configure(self._biome_api.biome)
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)

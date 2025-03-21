@@ -38,7 +38,7 @@ from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, Biom
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
-from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies
+from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies, BiomeType
 from shared.enums.events import BiomeEvent
 from shared.events.handler import EventHandler
 from shared.timers import Timers
@@ -170,6 +170,12 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
     def get_climate_collector(self) -> ClimateDataCollector:
         return None
+
+    def get_biome_type(self) -> BiomeType:
+        return self._context.biome_type
+
+    def get_climate_data_manager(self) -> ClimateDataManager:
+        return self._climate_data_manager
 
     def get_score_analyzer(self) -> BiomeScoreAnalyzer:
         return self._score_analyzer

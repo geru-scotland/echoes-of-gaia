@@ -46,8 +46,8 @@ class ClimateSystem:
         self._load_environmental_data()
 
         self._state: ClimateState = self._initialize_state()
-        ClimateService.init_service(self._state)
         self._season_system: SeasonSystem = SeasonSystem(initial_season)
+        ClimateService.init_service(self._state, self._season_system.get_current_season)
 
         self._record_data_callback: Optional[Callable] = None
 

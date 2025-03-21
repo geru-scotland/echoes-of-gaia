@@ -25,7 +25,7 @@ from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.snapshots.config import SnapshotConfig
 from biome.systems.snapshots.system import BiomeSnapshotSystem
 from config.settings import Config
-from shared.enums.enums import CapturePeriod
+from shared.enums.enums import CapturePeriod, BiomeType
 from shared.enums.strings import Loggers
 from shared.types import CallbackType
 from simulation.core.systems.telemetry.datapoint import Datapoint
@@ -72,7 +72,9 @@ class BiomeDataManager:
                 entity_collector=self._data_provider.get_entity_collector(),
                 climate_collector=self._data_provider.get_climate_collector(),
                 score_analyzer=self._data_provider.get_score_analyzer(),
-                config=config
+                config=config,
+                biome_type=self._data_provider.get_biome_type(),
+                climate_data_manager=self._data_provider.get_climate_data_manager()
             )
 
             capture_period = self._get_capture_period(config)

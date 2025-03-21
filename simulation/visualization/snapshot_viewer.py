@@ -155,8 +155,20 @@ class SnapshotViewer:
             if "entities" in snapshot:
                 self._entity_renderer.set_entities_data(snapshot["entities"])
 
+            if "biome_type" in snapshot:
+                self._info_panel.set_biome_type(snapshot["biome_type"])
+
+            if "current_season" in snapshot:
+                self._info_panel.set_current_season(snapshot["current_season"])
+
+            if "climate_averages" in snapshot:
+                self._info_panel.set_climate_averages(snapshot["climate_averages"])
+
             if "simulation_time" in snapshot:
                 self._info_panel.set_simulation_time(snapshot["simulation_time"])
+
+            if "climate_analysis" in snapshot:
+                self._info_panel.set_climate_analysis(snapshot["climate_analysis"])
 
             if "metrics" in snapshot:
                 self._info_panel.set_metrics(snapshot["metrics"])
@@ -278,7 +290,15 @@ class SnapshotViewer:
                 cell_size,
                 cell_size
             )
-            pygame.draw.rect(self._screen, (50, 100, 130), rect, 2)
+            pygame.draw.rect(self._screen, (80, 140, 180), rect, 2, border_radius=2)
+
+            glow_surface = pygame.Surface((cell_size + 8, cell_size + 8), pygame.SRCALPHA)
+            pygame.draw.rect(glow_surface, (120, 180, 220, 40),
+                             pygame.Rect(4, 4, cell_size, cell_size),
+                             border_radius=3)
+            self._screen.blit(glow_surface,
+                              (x * cell_size + self._map_offset[0] - 4,
+                               y * cell_size + self._map_offset[1] - 4))
 
         if self._hover_cell and self._hover_cell != self._selected_cell:
             y, x = self._hover_cell

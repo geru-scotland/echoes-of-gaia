@@ -52,3 +52,8 @@ class ClimateDataManager:
     def get_data(self, evolution_cycle: int) -> DataFrame:
         return self._climate_history.get_data_by_evolution_cycle(evolution_cycle)
 
+    def get_climate_history_service(self):
+        return self._climate_history
+
+    def get_current_month_averages(self) -> Dict[str, float]:
+        return self._climate_history.get_current_month_averages()

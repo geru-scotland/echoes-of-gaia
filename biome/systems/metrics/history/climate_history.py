@@ -96,4 +96,32 @@ class ClimateHistoryService:
         data: DataFrame = self._compute_emas(monthly_averages)
         return data
 
+    def get_current_month_averages(self) -> Dict[str, float]:
+        if self._climate_data.empty:
+            return {
+                "avg_temperature": 0.0,
+                "avg_humidity": 0.0,
+                "avg_precipitation": 0.0
+            }
 
+        if len(self._climate_data) == 0:
+            return {
+                "avg_temperature": 0.0,
+                "avg_humidity": 0.0,
+                "avg_precipitation": 0.0
+            }
+
+        last_cycle = self._climate_data['evo_cycle'].max()
+        current_data = self._climate_data[self._climate_data['evo_cycle'] == last_cycle]
+
+        last_records = current_data.tail(30)
+
+        avg_temperature = last_records['temperature'].mean()
+        avg_humidity = last_records['humidity'].mean()
+        avg_precipitation = last_records['precipitation'].mean()
+
+        return {
+            "avg_temperature": avg_temperature,
+            "avg_humidity": avg_humidity,
+            "avg_precipitation": avg_precipitation
+        }

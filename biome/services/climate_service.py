@@ -15,18 +15,25 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Optional
+from typing import Optional, Callable
 
 from biome.systems.climate.state import ClimateState
+from shared.enums.enums import Season
 
 
 class ClimateService:
     state: Optional[ClimateState] = None
+    get_season: Optional[Callable]
 
     @classmethod
-    def init_service(cls, state_ref: ClimateState):
+    def init_service(cls, state_ref: ClimateState, get_season_func: Callable):
         cls.state = state_ref
+        cls.get_season = get_season_func
 
     @classmethod
     def query_state(cls) -> Optional[ClimateState]:
         return cls.state if cls.state else None
+
+    @classmethod
+    def get_current_season(cls) -> Season:
+        return cls.get_season()

@@ -16,6 +16,7 @@
 # =============================================================================
 """
 import logging
+import random
 from typing import Dict, List, Tuple, Optional, Set
 
 import pygame
@@ -35,7 +36,7 @@ class MapRenderer:
         self._map_dimensions: Tuple[int, int] = (0, 0)
         self._map_surface: Optional[pygame.Surface] = None
         self._show_grid = show_grid
-
+        self._modern_style =  False
         self._cached_terrain_map: Optional[np.ndarray] = None
 
     def set_map_data(self, terrain_data: TerrainMapData) -> None:
@@ -60,24 +61,26 @@ class MapRenderer:
         if self._terrain_map is None:
             return
 
-        if self._cached_terrain_map is not None and np.array_equal(self._terrain_map, self._cached_terrain_map):
-            return
-
         width = self._terrain_map.shape[1] * self._cell_size
         height = self._terrain_map.shape[0] * self._cell_size
         self._map_surface = pygame.Surface((width, height))
+
+        self._map_surface.fill((15, 15, 20))
 
         for y in range(self._terrain_map.shape[0]):
             for x in range(self._terrain_map.shape[1]):
                 terrain_type = self._terrain_map[y, x]
                 color = self._terrain_colors.get(terrain_type, (150, 150, 150))
+
                 rect = pygame.Rect(
                     x * self._cell_size,
                     y * self._cell_size,
                     self._cell_size,
                     self._cell_size
                 )
-                pygame.draw.rect(self._map_surface, color, rect)
+
+                inner_rect = rect.inflate(-2, -2)
+                pygame.draw.rect(self._map_surface, color, inner_rect, border_radius=2)
 
                 if self._show_grid:
                     pygame.draw.rect(self._map_surface, self._grid_color, rect, 1)
@@ -88,15 +91,30 @@ class MapRenderer:
         if self._map_surface is None:
             return
 
-        map_rect = pygame.Rect(
-            offset[0], offset[1],
-            self._map_surface.get_width(),
-            self._map_surface.get_height()
-        )
-        shadow_rect = map_rect.inflate(8, 8)
-        pygame.draw.rect(surface, (20, 20, 24), shadow_rect)  
+        if self._modern_style:
+            map_rect = pygame.Rect(
+                offset[0], offset[1],
+                self._map_surface.get_width(),
+                self._map_surface.get_height()
+            )
 
-        surface.blit(self._map_surface, offset)
+            shadow_rect = map_rect.inflate(8, 8)
+            pygame.draw.rect(surface, (20, 20, 24), shadow_rect)
+
+            if self._cached_terrain_map is None or not np.array_equal(self._terrain_map, self._cached_terrain_map):
+                self._update_map_surface()
+
+            surface.blit(self._map_surface, offset)
+        else:
+            map_rect = pygame.Rect(
+                offset[0], offset[1],
+                self._map_surface.get_width(),
+                self._map_surface.get_height()
+            )
+            shadow_rect = map_rect.inflate(8, 8)
+            pygame.draw.rect(surface, (20, 20, 24), shadow_rect)
+
+            surface.blit(self._map_surface, offset)
 
     def get_cell_at_pos(self, pos: Point) -> Optional[Tuple[int, int]]:
         if self._terrain_map is None:
