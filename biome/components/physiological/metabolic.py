@@ -123,7 +123,7 @@ class MetabolicComponent(EnergyBasedFloraComponent):
             age_factor = 1.0
             age_decay = 0.0
             if self._biological_age and self._lifespan:
-                relative_age = self._biological_age / (self._lifespan * Timers.Calendar.YEAR)
+                relative_age = self._biological_age / (self._lifespan * float(Timers.Calendar.YEAR))
 
                 age_factor = 1.0 + (relative_age ** 2) * 0.5
 
