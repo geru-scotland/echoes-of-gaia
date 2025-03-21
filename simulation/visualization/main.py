@@ -57,13 +57,15 @@ def find_latest_snapshot(snapshot_dir: str = "simulation_records") -> str:
     if not snapshot_path.exists() or not snapshot_path.is_dir():
         return ""
 
-    snapshot_files = list(snapshot_path.glob("biome_snapshot_*.json"))
+    snapshot_files = list(snapshot_path.glob("biome_snapshot_*.msgpack.gz"))
+
+    if not snapshot_files:
+        snapshot_files = list(snapshot_path.glob("biome_snapshot_*.json"))
 
     if not snapshot_files:
         return ""
 
     snapshot_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
-
     return str(snapshot_files[0])
 
 def parse_args():

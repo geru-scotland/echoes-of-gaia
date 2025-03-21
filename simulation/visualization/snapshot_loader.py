@@ -15,10 +15,13 @@
 #                                                                              #
 # =============================================================================
 """
+import gzip
 import json
 import logging
 from pathlib import Path
 from typing import List, Dict, Optional, Any
+
+import msgpack
 
 from simulation.visualization.types import SnapshotData
 
@@ -56,8 +59,9 @@ class SnapshotLoader:
                     else:
                         self._logger.warning("No terrain file found")
 
-            with open(self._file_path, 'r') as f:
-                self._snapshots = json.load(f)
+            with gzip.open(self._file_path, 'rb') as f:
+                unpacker = msgpack.Unpacker(f, raw=False)
+                self._snapshots = list(unpacker)
 
             self._current_index = 0
             self._logger.info(f"Successfully loaded {len(self._snapshots)} snapshots")
