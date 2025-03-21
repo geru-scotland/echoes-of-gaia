@@ -89,7 +89,6 @@ class EntityRenderer:
             if entity_type not in entities_by_type:
                 continue
 
-
             for entity_info in entities_by_type[entity_type]:
                 y, x = entity_info.position
 
@@ -98,6 +97,11 @@ class EntityRenderer:
 
                 radius = self._cell_size // 3 if entity_info.type == "flora" else self._cell_size // 4
 
+                shadow_radius = radius + 2
+                shadow_surface = pygame.Surface((shadow_radius * 2, shadow_radius * 2), pygame.SRCALPHA)
+                pygame.draw.circle(shadow_surface, (0, 0, 0, 60), (shadow_radius, shadow_radius), shadow_radius)
+                surface.blit(shadow_surface, (pixel_x - shadow_radius, pixel_y - shadow_radius))
+
                 pygame.draw.circle(
                     surface,
                     entity_info.color,
@@ -105,6 +109,7 @@ class EntityRenderer:
                     radius,
                     0
                 )
+
                 border_color = tuple(max(0, c - 30) for c in entity_info.color)
                 pygame.draw.circle(
                     surface,
@@ -113,15 +118,18 @@ class EntityRenderer:
                     radius,
                     1
                 )
+
                 if self._selected_entity == entity_info.id:
                     glow_radius = radius + 4
                     glow_surface = pygame.Surface((glow_radius * 2, glow_radius * 2), pygame.SRCALPHA)
-                    pygame.draw.circle(
-                        glow_surface,
-                        (255, 255, 255, 80),
-                        (glow_radius, glow_radius),
-                        glow_radius
-                    )
+                    for r in range(glow_radius, glow_radius - 4, -1):
+                        alpha = 80 - (glow_radius - r) * 20
+                        pygame.draw.circle(
+                            glow_surface,
+                            (255, 255, 255, alpha),
+                            (glow_radius, glow_radius),
+                            r
+                        )
                     surface.blit(
                         glow_surface,
                         (pixel_x - glow_radius, pixel_y - glow_radius)
@@ -134,7 +142,6 @@ class EntityRenderer:
                         radius + 2,
                         2
                     )
-        # Si está muerta, pongo rojo alrededor, por ahora.
         for entity_id, entity_info in self._entities.items():
             if entity_info.is_dead:
                 y, x = entity_info.position

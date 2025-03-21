@@ -136,9 +136,9 @@ class Navigation:
         self._create_buttons()
 
         self._slider_rect = pygame.Rect(
-            self._button_size[0] * 3 + 20,
+            self._button_size[0] * 3 + 40,
             size[1] // 2 - 5,
-            size[0] - (self._button_size[0] * 3 + 40),
+            size[0] - (self._button_size[0] * 3 + 50),
             10
         )
 
@@ -260,13 +260,15 @@ class Navigation:
 
         text = f"Snapshot: {self._current_snapshot + 1}/{self._total_snapshots}"
         text_surface = self._font.render(text, True, (180, 220, 230))
+
         text_rect = text_surface.get_rect(
-            left=self._slider_rect.right + 20,
+            left=self._slider_rect.right + 80,
             centery=self._size[1] // 2
         )
 
-        if text_rect.right > self._size[0] - 10:
-            text_rect.right = self._size[0] - 10
+        right_margin = self._size[0] - 50
+        if text_rect.right > right_margin:
+            text_rect.right = right_margin
 
         self._surface.blit(text_surface, text_rect)
 

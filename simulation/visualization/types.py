@@ -19,6 +19,8 @@ from typing import Dict, List, Tuple, Optional, Any, Callable, TypedDict, Union
 
 import pygame
 
+from shared.enums.enums import Season, BiomeType
+
 Point = Tuple[int, int]
 Size = Tuple[int, int]
 Rect = pygame.Rect
@@ -67,6 +69,8 @@ class BiomeScoreContributorData(TypedDict):
     population_balance: float
     toxicity: float
     climate: float
+    biodiversity: float
+    ecosystem_health: float
 
 class BiomeScoreData(TypedDict):
     score: float
@@ -83,6 +87,10 @@ class MetricsData(TypedDict):
 class SnapshotData(TypedDict):
     snapshot_id: str
     simulation_time: SnapshotTimeInfo
+    biome_type: BiomeType
+    current_season: Season
+    climate_averages: Dict[str, float]
+    climate_analysys: Any
     creation_timestamp: int
     terrain: TerrainMapData
     entities: Dict[str, EntityData]

@@ -22,6 +22,7 @@ from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
+from shared.enums.enums import BiomeType
 
 
 class BiomeDataProvider(ABC):
@@ -43,4 +44,12 @@ class BiomeDataProvider(ABC):
 
     @abstractmethod
     def get_score_analyzer(self) -> BiomeScoreAnalyzer:
+        pass
+
+    @abstractmethod
+    def get_biome_type(self) -> BiomeType:
+        pass
+
+    @abstractmethod
+    def get_climate_data_manager(self):
         pass
