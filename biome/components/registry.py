@@ -19,7 +19,7 @@ from biome.components.environmental.weather_adaptation import WeatherAdaptationC
 from biome.components.physiological.growth import GrowthComponent
 from biome.components.physiological.metabolic import MetabolicComponent
 from biome.components.base.transform import TransformComponent
-from biome.components.physiological.nutritional import NutritionalComponent
+from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
 
 CLASS_REGISTRY = {
@@ -28,7 +28,7 @@ CLASS_REGISTRY = {
     "MetabolicComponent": MetabolicComponent,
     "TransformComponent": TransformComponent,
     "WeatherAdaptationComponent": WeatherAdaptationComponent,
-    "NutritionalComponent": NutritionalComponent
+    "AutotrophicNutritionComponent": AutotrophicNutritionComponent
 }
 
 def register_component(name: str, cls):

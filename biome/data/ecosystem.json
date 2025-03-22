@@ -522,7 +522,7 @@
           "max_energy_reserves": 100.0
         }
       },
-      "NutritionalComponent": {
+      "AutotrophicNutritionComponent": {
         "defaults": {
           "nutrient_absorption_rate": 0.3,
           "mycorrhizal_rate": 0.01,

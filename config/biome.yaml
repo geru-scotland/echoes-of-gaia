@@ -13,7 +13,7 @@ biome:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
-        - NutritionalComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 20.0
             cold_resistance: 0.0
@@ -26,7 +26,7 @@ biome:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
-        - NutritionalComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 8.0
 
@@ -37,7 +37,7 @@ biome:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
-        - NutritionalComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 18.0
 
@@ -49,7 +49,7 @@ biome:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
-        - NutritionalComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 5.0
 
@@ -60,7 +60,7 @@ biome:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
-        - NutritionalComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 16.0
 
@@ -71,7 +71,7 @@ biome:
         - GrowthComponent:
         - VitalComponent:
         - MetabolicComponent:
-        - NutritionalComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 19.0
 

@@ -32,7 +32,7 @@ from shared.math.constants import epsilon
 from shared.timers import Timers
 
 
-class NutritionalComponent(EntityComponent):
+class AutotrophicNutritionComponent(EntityComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  nutrient_absorption_rate: float = 0.3,
                  mycorrhizal_rate: float = 0.02,
@@ -43,7 +43,7 @@ class NutritionalComponent(EntityComponent):
         self._stress_handler: StressHandler = StressHandler(event_notifier, lifespan)
         self._energy_handler: EnergyHandler = EnergyHandler(event_notifier, max_energy_reserves)
 
-        super().__init__(env, ComponentType.NUTRITIONAL, event_notifier, lifespan)
+        super().__init__(env, ComponentType.AUTOTROPHIC_NUTRITION, event_notifier, lifespan)
 
         self._nutrient_absorption_rate: float = nutrient_absorption_rate
         self._mycorrhizal_rate: float = mycorrhizal_rate
@@ -52,12 +52,12 @@ class NutritionalComponent(EntityComponent):
         self._base_toxicity: float = base_toxicity
         self._current_nutritive_value: float = base_nutritive_value
         self._current_toxicity: float = base_toxicity
-        self._photosynthesis_efficiency: float = 0.0
+        self._photosynthesis_efficiency: float = 0.6
 
         self._stress_ratio: float = self._stress_handler.stress_level / self._stress_handler.max_stress
         self._energy_ratio: float = self._energy_handler.energy_reserves / self._energy_handler.max_energy_reserves
 
-        self._logger.debug(f"NutritionalComponent initialized: Absorption rate={self._nutrient_absorption_rate}, "
+        self._logger.debug(f"AutotrophicNutritionComponent initialized: Absorption rate={self._nutrient_absorption_rate}, "
                            f"Mycorrhizal efficiency={self._mycorrhizal_rate}")
 
         self._env.process(self._update_soil_nutrient_absorption(Timers.Compoments.Environmental.RESOURCE_ABSORPTION))
@@ -121,7 +121,7 @@ class NutritionalComponent(EntityComponent):
 
                     self._event_notifier.notify(
                         ComponentEvent.UPDATE_STATE,
-                        NutritionalComponent,
+                        AutotrophicNutritionComponent,
                         toxicity=self._current_toxicity
                     )
 
@@ -162,7 +162,7 @@ class NutritionalComponent(EntityComponent):
 
         self._event_notifier.notify(
             ComponentEvent.UPDATE_STATE,
-            NutritionalComponent,
+            AutotrophicNutritionComponent,
             toxicity=self._current_toxicity
         )
 

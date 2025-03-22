@@ -114,7 +114,7 @@ class FloraGenes:
         components.append(weather_adaptation_component)
 
         nutritional_component: Dict[str, Any] = {
-            "NutritionalComponent": {
+            "AutotrophicNutritionComponent": {
                 "nutrient_absorption_rate": self.nutrient_absorption_rate,
                 "mycorrhizal_rate": self.mycorrhizal_rate,
                 "base_nutritive_value": self.base_nutritive_value,
