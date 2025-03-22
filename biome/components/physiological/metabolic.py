@@ -67,6 +67,7 @@ class MetabolicComponent(EntityComponent):
     def _register_events(self):
         super()._register_events()
         self._stress_handler.register_events()
+        self._energy_handler.register_events()
         self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
         self._event_notifier.register(ComponentEvent.ENERGY_UPDATED, self._handle_energy_update)
         self._event_notifier.register(ComponentEvent.BIOLOGICAL_AGE_UPDATED, self._handle_biological_age_update)
