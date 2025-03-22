@@ -17,7 +17,7 @@
 """
 import sys
 import traceback
-from typing import Dict, Any
+from typing import Dict, Any, Type
 
 import simpy
 
@@ -38,7 +38,8 @@ from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, Biom
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.state.handler import StateHandler
-from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies, BiomeType
+from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies, BiomeType, FaunaSpecies, \
+    EntityType
 from shared.enums.events import BiomeEvent
 from shared.events.handler import EventHandler
 from shared.timers import Timers
@@ -81,40 +82,52 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
         self._evolution_registry: EvolutionAgentRegistry = EvolutionAgentRegistry(self._climate_data_manager, self._entity_provider)
 
-        flora_definitions: EntityDefinitions = self._context.flora_definitions
+        self._initialize_evolution_agents(
+            EntityType.FLORA,
+            self._context.flora_definitions,
+            FloraSpecies
+        )
 
-        for flora_def in flora_definitions:
-            species_name = flora_def.get("species", "").lower()
+        self._initialize_evolution_agents(
+            EntityType.FAUNA,
+            self._context.fauna_definitions,
+            FaunaSpecies
+        )
+
+        return agents
+
+    def _initialize_evolution_agents(self, entity_type: EntityType, entity_definitions: EntityDefinitions,
+                                     species_enum_class: Type[FloraSpecies | FaunaSpecies]) -> None:
+        type_name = "flora" if entity_type == EntityType.FLORA else "fauna"
+
+        for entity_def in entity_definitions:
             try:
-                species = FloraSpecies(species_name)
+                species_name = entity_def.get("species", "").lower()
+                species = species_enum_class(species_name)
 
-                # Ahora calculo el tiempo del ciclo evolutivo basado en el ciclo de vida
-                # en lugar de como estaba antes (en timers tengo, default)
-                lifespan = flora_def.get("avg-lifespan", 5.0) * float(Timers.Calendar.YEAR)
-
-                # TODO: Hacerlo incremental
+                lifespan = entity_def.get("avg-lifespan", 5.0) * float(Timers.Calendar.YEAR)
                 evolution_cycle_time = int(lifespan * 0.15)
 
                 evolution_agent = EvolutionAgentAI(
                     self._climate_data_manager,
                     self._entity_provider,
+                    entity_type,
                     species,
                     lifespan,
                     evolution_cycle_time
                 )
-                self._logger.error(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
-                self._evolution_registry.register_agent(species, evolution_agent)
 
+                self._evolution_registry.register_agent(species, evolution_agent)
                 process = self._env.process(self._run_evolution_agent(species, evolution_cycle_time))
                 self._evolution_registry.register_process(species, process)
 
-                self._logger.info(f"Created evolution agent for {species} with cycle: {evolution_cycle_time}")
+                self._logger.info(
+                    f"Created evolution agent for {type_name} species {species} with cycle: {evolution_cycle_time}")
+
             except ValueError as e:
-                self._logger.warning(f"Invalid species name: {species_name}. Error: {e}")
+                self._logger.warning(f"Invalid {type_name} species name. Error: {e}")
 
-        return agents
-
-    def _run_evolution_agent(self, species: FloraSpecies, delay: int):
+    def _run_evolution_agent(self, species: FloraSpecies | FaunaSpecies, delay: int):
         yield self._env.timeout(delay)
 
         while True:

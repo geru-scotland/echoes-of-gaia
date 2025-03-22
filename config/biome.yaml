@@ -4,7 +4,7 @@ biome:
     size:
       - 60 # width
       - 60 # height
-  type: "tundra"
+  type: "tropical"
   flora:
     - species: "oak_tree"
       spawns: 1
@@ -50,6 +50,7 @@ biome:
         - VitalComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 5.0
+            cold_resistance: 0.0
 
     - species: "boar"
       spawns: 5

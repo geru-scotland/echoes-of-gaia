@@ -15,12 +15,12 @@
 #                                                                              #
 # =============================================================================
 """
+from biome.systems.evolution.genes.genes import Genes
 from typing import List, Dict, Any
 
 from shared.evolution.ranges import FLORA_GENE_RANGES
 
-
-class FloraGenes:
+class FloraGenes(Genes):
     def __init__(self):
         self.growth_modifier = 0.0
         self.growth_efficiency = 0.0
@@ -32,7 +32,7 @@ class FloraGenes:
 
         self.base_photosynthesis_efficiency = 0.0
         self.base_respiration_rate = 0.0
-        self.lifespan = 0.0
+        self._lifespan = 0.0
         self.metabolic_activity = 0.0
         self.max_energy_reserves = 0.0
 
@@ -48,6 +48,13 @@ class FloraGenes:
         # self.drought_resistance = 0.0
         # self.toxicity = 0.0
 
+    @property
+    def lifespan(self) -> float:
+        return self._lifespan
+
+    @lifespan.setter
+    def lifespan(self, value: float):
+        self._lifespan = value
 
     def __str__(self):
         fields = {
@@ -95,7 +102,7 @@ class FloraGenes:
         components.append(vital_component)
 
         metabolic_component: Dict[str, Any] = {
-            "PhotosyntheticMetabo": {
+            "PhotosyntheticMetabolismComponent": {
                 "photosynthesis_efficiency": self.base_photosynthesis_efficiency,
                 "respiration_rate": self.base_respiration_rate,
                 "metabolic_activity": self.metabolic_activity,
@@ -103,15 +110,6 @@ class FloraGenes:
             }
         }
         components.append(metabolic_component)
-
-        weather_adaptation_component: Dict[str, Any] = {
-            "WeatherAdaptationComponent": {
-                "cold_resistance": self.cold_resistance,
-                "heat_resistance": self.heat_resistance,
-                "optimal_temperature": self.optimal_temperature,
-            }
-        }
-        components.append(weather_adaptation_component)
 
         nutritional_component: Dict[str, Any] = {
             "AutotrophicNutritionComponent": {
@@ -123,6 +121,17 @@ class FloraGenes:
             }
         }
         components.append(nutritional_component)
+
+        weather_adaptation_component: Dict[str, Any] = {
+            "WeatherAdaptationComponent": {
+                "cold_resistance": self.cold_resistance,
+                "heat_resistance": self.heat_resistance,
+                "optimal_temperature": self.optimal_temperature,
+            }
+        }
+        components.append(weather_adaptation_component)
+
+
         return components
 
     def validate_genes(self) -> None:
