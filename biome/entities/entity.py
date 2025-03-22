@@ -86,7 +86,7 @@ class Entity(EventHandler, StateHandler, ABC):
         self._event_notifier.notify(ComponentEvent.WEATHER_UPDATE, **kwargs)
 
     def add_component(self, component: EntityComponent):
-        self._logger.warning(f"Adding component to {self._descriptor.species}: {component.type}")
+        self._logger.debug(f"Adding component to {self._descriptor.species}: {component.type}")
         self._components[component.type] = component
         component.set_host(self)
 

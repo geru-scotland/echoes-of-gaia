@@ -544,7 +544,7 @@
           "base_sigma": 19.0,
           "optimal_temperature": 24.0,
           "cold_resistance": 0.0,
-          "heat_resistance": 0.5
+          "heat_resistance": 0.0
         }
       },
       "WaterAdaptationComponent": {

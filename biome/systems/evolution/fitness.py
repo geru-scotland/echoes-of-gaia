@@ -17,10 +17,55 @@
 """
 import math
 
+from biome.systems.evolution.genes.fauna_genes import FaunaGenes
+from biome.systems.evolution.genes.flora_genes import FloraGenes
+from biome.systems.evolution.genes.genes import Genes
 from shared.math.constants import epsilon
 
+def compute_fitness(genes: Genes, climate_data) -> float:
+    """Calcula el fitness para cualquier tipo de genes."""
+    if isinstance(genes, FloraGenes):
+        return compute_flora_fitness(genes, climate_data)
+    elif isinstance(genes, FaunaGenes):
+        return compute_fauna_fitness(genes, climate_data)
+    else:
+        raise ValueError(f"Unsupported genes type: {type(genes)}")
 
-def compute_fitness(flora_genes, climate_data):
+
+def compute_fauna_fitness(fauna_genes: FaunaGenes, climate_data) -> float:
+    fitness: float = 0.0
+
+    avg_temperature = climate_data['temperature_ema'].iloc[-1]
+    avg_humidity = climate_data['humidity_ema'].iloc[-1]
+    avg_precipitation = climate_data['precipitation_ema'].iloc[-1]
+
+    # 1. Adaptación a temperatura (similar a flora)
+    optimal_temperature = fauna_genes.optimal_temperature
+    temperature_distance = avg_temperature - optimal_temperature
+
+    if temperature_distance < 0:  # Frío
+        sigma_cold = 15.0 / (1.0 - fauna_genes.cold_resistance + 1e-6)
+        stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_cold ** 2))
+    else:  # Calor
+        sigma_heat = 15.0 / (1.0 - fauna_genes.heat_resistance + 1e-6)
+        stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_heat ** 2))
+
+    temperature_score = 5.0 * stress_factor
+
+    # 2. Capacidad de supervivencia, especificos de fauna, ya iré poniendo.
+    # mobility_score = 3.0 * fauna_genes.speed
+    # survival_score = 2.0 * fauna_genes.predator_avoidance
+    # foraging_score = 2.5 * fauna_genes.foraging_efficiency
+
+    # 3. Salud y vitalidad (compartido con flora)
+    health_score = 2.0 * (fauna_genes.max_vitality / 200.0)
+    aging_score = 1.5 * (1.0 - fauna_genes.aging_rate / 2.0)
+
+    fitness = (temperature_score + health_score + aging_score)
+
+    return fitness
+
+def compute_flora_fitness(flora_genes, climate_data):
     fitness: float = 0.0
 
     avg_temperature = climate_data['temperature_ema'].iloc[-1]
@@ -41,7 +86,6 @@ def compute_fitness(flora_genes, climate_data):
         stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_heat ** 2))
 
     temperature_score = 5.0 * stress_factor
-
 
     # 2. Adaptación a humedad
     humidity_score: float = 0.0

@@ -16,10 +16,10 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional, List, Tuple
 
 from biome.agents.evolution_agent import EvolutionAgentAI
-from shared.enums.enums import FloraSpecies
+from shared.enums.enums import FloraSpecies, FaunaSpecies, EntityType
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
@@ -29,17 +29,31 @@ class EvolutionAgentRegistry:
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
         self._climate_data_manager = climate_data_manager
         self._entity_provider = entity_provider
-        self._agents: Dict[FloraSpecies, EvolutionAgentAI] = {}
-        self._evolution_processes: Dict[FloraSpecies, Any] = {}
 
-    def register_agent(self, species: FloraSpecies, agent: EvolutionAgentAI) -> None:
-        self._agents[species] = agent
+        self._flora_agents: Dict[FloraSpecies, EvolutionAgentAI] = {}
+        self._fauna_agents: Dict[FaunaSpecies, EvolutionAgentAI] = {}
 
-    def get_agent(self, species: FloraSpecies) -> Optional[EvolutionAgentAI]:
-        return self._agents.get(species)
+        self._flora_processes: Dict[FloraSpecies, Any] = {}
+        self._fauna_processes: Dict[FaunaSpecies, Any] = {}
 
-    def register_process(self, species: FloraSpecies, process) -> None:
-        self._evolution_processes[species] = process
+    def register_agent(self, species: FloraSpecies | FaunaSpecies, agent: EvolutionAgentAI) -> None:
+        if agent.entity_type == EntityType.FLORA:
+            self._flora_agents[species] = agent
+        else:
+            self._fauna_agents[species] = agent
 
-    def get_all_species(self) -> List[FloraSpecies]:
-        return list(self._agents.keys())
+    def get_agent(self, species: FloraSpecies | FaunaSpecies) -> Optional[EvolutionAgentAI]:
+        if species in self._flora_agents:
+            return self._flora_agents[species]
+        elif species in self._fauna_agents:
+            return self._fauna_agents[species]
+        return None
+
+    def register_process(self, species: FloraSpecies | FaunaSpecies, process) -> None:
+        if species in self._flora_agents:
+            self._flora_processes[species] = process
+        elif species in self._fauna_agents:
+            self._fauna_processes[species] = process
+
+    def get_all_species(self) -> Tuple[List[FloraSpecies], List[FaunaSpecies]]:
+        return list(self._flora_agents.keys()), list(self._fauna_agents.keys())
