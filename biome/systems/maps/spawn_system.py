@@ -27,7 +27,7 @@ from scipy.ndimage import convolve
 
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
-from biome.components.physiological.metabolic import MetabolicComponent
+from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
 from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
 from biome.components.registry import get_component_class
@@ -133,7 +133,7 @@ class SpawnSystem:
                 if data:
                     component_class = get_component_class(class_name)
 
-                    if component_class in [GrowthComponent, VitalComponent, MetabolicComponent, WeatherAdaptationComponent,
+                    if component_class in [GrowthComponent, VitalComponent, PhotosyntheticMetabolismComponent, WeatherAdaptationComponent,
                                            AutotrophicNutritionComponent]:
                         data.update({"lifespan": lifespan})
 

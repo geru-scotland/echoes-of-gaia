@@ -38,7 +38,7 @@ class TerrainType(EnumBaseInt):
 class ComponentType(EnumBaseStr):
     TRANSFORM = "transform"
     GROWTH = "growth"
-    METABOLIC = "metabolic"
+    PHOTOSYNTHETIC_METABOLISM = "photosynthetic_metabolism"
     AUTOTROPHIC_NUTRITION = "autotrophic_nutrition"
     STATE = "state"
     VITAL = "vital"

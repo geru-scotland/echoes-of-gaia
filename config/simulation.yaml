@@ -2,7 +2,7 @@ simulation:
   datapoints: true
   eras:
     amount: 10
-    events-per-era: 100
+    events-per-era: 1000
 
   data:
     snapshots:

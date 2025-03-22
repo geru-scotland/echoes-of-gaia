@@ -17,7 +17,7 @@
 """
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
-from biome.components.physiological.metabolic import MetabolicComponent
+from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
 from biome.components.base.transform import TransformComponent
 from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
@@ -25,7 +25,7 @@ from biome.components.physiological.vital import VitalComponent
 CLASS_REGISTRY = {
     "GrowthComponent": GrowthComponent,
     "VitalComponent": VitalComponent,
-    "MetabolicComponent": MetabolicComponent,
+    "PhotosyntheticMetabolismComponent": PhotosyntheticMetabolismComponent,
     "TransformComponent": TransformComponent,
     "WeatherAdaptationComponent": WeatherAdaptationComponent,
     "AutotrophicNutritionComponent": AutotrophicNutritionComponent

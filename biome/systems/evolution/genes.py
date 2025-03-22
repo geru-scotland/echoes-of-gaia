@@ -95,7 +95,7 @@ class FloraGenes:
         components.append(vital_component)
 
         metabolic_component: Dict[str, Any] = {
-            "MetabolicComponent": {
+            "PhotosyntheticMetabo": {
                 "photosynthesis_efficiency": self.base_photosynthesis_efficiency,
                 "respiration_rate": self.base_respiration_rate,
                 "metabolic_activity": self.metabolic_activity,

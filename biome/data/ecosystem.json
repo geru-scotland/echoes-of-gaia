@@ -514,7 +514,7 @@
           "growth_efficiency": 1.0
         }
       },
-      "MetabolicComponent": {
+      "PhotosyntheticMetabolismComponent": {
         "defaults": {
           "photosynthesis_efficiency": 0.7,
           "respiration_rate": 0.35,
