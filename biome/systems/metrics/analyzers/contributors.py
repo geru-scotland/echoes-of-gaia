@@ -238,33 +238,25 @@ class EcosystemHealthContributor(BaseScoreContributor):
         super().__init__("ecosystem_health", weight)
 
     def calculate(self, biome_data: Dict[str, Any]) -> float:
-        health_score = 0.5
-
+        health_score = 0.0
         factors_count = 0
-
         if "avg_stress_level" in biome_data:
-            stress_level = biome_data["avg_stress_level"]
+            stress_level = min(100.0, biome_data["avg_stress_level"])
             stress_factor = 1.0 - (stress_level / 100.0)
-            health_score += stress_factor
-            factors_count += 1
+            health_score += stress_factor * 1.5
+            factors_count += 1.5
+            self._logger.debug(f"Stress factor: {stress_factor:.2f} from level: {stress_level:.2f}")
 
         if "avg_size" in biome_data:
             size = biome_data["avg_size"]
-            size_factor = min(1.0, size / 2.0) if size <= 3.0 else max(0.0, 1.0 - (size - 3.0) / 3.0)
+            size_factor = min(1.0, size / 2.0) if size <= 2.0 else max(0.0, 1.0 - (size - 2.0) / 3.0)
             health_score += size_factor
             factors_count += 1
+            self._logger.debug(f"Size factor: {size_factor:.2f} from size: {size:.2f}")
 
-        if "num_flora" in biome_data and "num_fauna" in biome_data:
-            flora = biome_data["num_flora"]
-            fauna = biome_data["num_fauna"]
-
-            if flora + fauna > 0:
-                flora_ratio = flora / (flora + fauna)
-                balance_factor = 1.0 - min(1.0, abs(flora_ratio - 0.6) * 2.5)
-                health_score += balance_factor
-                factors_count += 1
 
         if factors_count > 0:
             health_score /= factors_count
 
+        health_score = min(1.0, health_score)
         return health_score

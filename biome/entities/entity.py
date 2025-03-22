@@ -155,8 +155,9 @@ class Entity(EventHandler, StateHandler, ABC):
         for _, component in self._components.items():
             component.disable_notifier()
 
-        self.event_notifier.unregister(ComponentEvent.UPDATE_STATE, self._handle_component_update)
-        self.event_notifier.unregister(ComponentEvent.ENTITY_DEATH, self._handle_death)
+        self._event_notifier.clear()
+        # self.event_notifier.unregister(ComponentEvent.UPDATE_STATE, self._handle_component_update)
+        # self.event_notifier.unregister(ComponentEvent.ENTITY_DEATH, self._handle_death)
 
         if clear_components:
             self._components = {}
