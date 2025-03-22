@@ -21,7 +21,8 @@ from typing import Dict, Any, Optional
 
 from simpy import Environment as simpyEnv
 
-from biome.components.base.component import EnergyBasedFloraComponent
+from biome.components.base.component import EntityComponent
+from biome.components.handlers.energy_handler import EnergyHandler
 from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
@@ -31,7 +32,7 @@ from shared.math.constants import epsilon
 from shared.timers import Timers
 
 
-class NutritionalComponent(EnergyBasedFloraComponent):
+class NutritionalComponent(EntityComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  nutrient_absorption_rate: float = 0.3,
                  mycorrhizal_rate: float = 0.02,
@@ -39,8 +40,10 @@ class NutritionalComponent(EnergyBasedFloraComponent):
                  base_toxicity: float = 0.1,
                  max_energy_reserves: float = 100.0):
 
-        self._stress_handler: StressHandler = StressHandler(event_notifier)
-        super().__init__(env, ComponentType.NUTRITIONAL, event_notifier, lifespan, max_energy_reserves)
+        self._stress_handler: StressHandler = StressHandler(event_notifier, lifespan)
+        self._energy_handler: EnergyHandler = EnergyHandler(event_notifier, max_energy_reserves)
+
+        super().__init__(env, ComponentType.NUTRITIONAL, event_notifier, lifespan)
 
         self._nutrient_absorption_rate: float = nutrient_absorption_rate
         self._mycorrhizal_rate: float = mycorrhizal_rate
@@ -52,6 +55,7 @@ class NutritionalComponent(EnergyBasedFloraComponent):
         self._photosynthesis_efficiency: float = 0.0
 
         self._stress_factor: float = self._stress_handler.stress_level / self._stress_handler.max_stress
+        self._energy_factor: float = self._energy_handler.energy_reserves / self._energy_handler.max_energy_reserves
 
         self._logger.debug(f"NutritionalComponent initialized: Absorption rate={self._nutrient_absorption_rate}, "
                            f"Mycorrhizal efficiency={self._mycorrhizal_rate}")
@@ -63,10 +67,15 @@ class NutritionalComponent(EnergyBasedFloraComponent):
         super()._register_events()
         self._stress_handler.register_events()
         self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
+        self._event_notifier.register(ComponentEvent.ENERGY_UPDATED, self._handle_energy_update)
         self._event_notifier.register(ComponentEvent.PHOTOSYNTHESIS_UPDATED, self._handle_photosynthesis_update)
 
     def _handle_stress_update(self, *args, **kwargs) -> None:
         self._stress_factor = kwargs.get("normalized_stress", 0.0)
+
+    def _handle_energy_update(self, *args, **kwargs) -> None:
+        energy_reserves: float = kwargs.get("energy_reserves", 0.0)
+        self._energy_factor = energy_reserves / self._energy_handler.max_energy_reserves
 
     def _update_soil_nutrient_absorption(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
@@ -84,9 +93,9 @@ class NutritionalComponent(EnergyBasedFloraComponent):
                 base_rate = self._nutrient_absorption_rate * 0.01
 
                 absorption_rate = base_rate * self._stress_factor * (toxicity_factor * 0.7 + epsilon) * variability
-                energy_gain = absorption_rate * self._max_energy_reserves
+                energy_gain = absorption_rate * self._energy_handler.max_energy_reserves
 
-                self.modify_energy(energy_gain, source=EnergyGainSource.SOIL_NUTRIENTS)
+                self._energy_handler.modify_energy(energy_gain, source=EnergyGainSource.SOIL_NUTRIENTS)
 
                 self._logger.debug(
                     f"[Soil nutrients] Absorbed +{energy_gain:.2f} energy "
@@ -120,13 +129,11 @@ class NutritionalComponent(EnergyBasedFloraComponent):
 
         while self._host_alive:
             if not self._is_dormant:
-                energy_ratio = self._energy_reserves / self._max_energy_reserves
-
                 # Hago que las micorrizas sean más efectivas cuando la planta tiene menos energía
-                mycorrhizal_bonus = self._mycorrhizal_rate * (1.0 - energy_ratio)
+                mycorrhizal_bonus = self._mycorrhizal_rate * (1.0 - self._energy_factor)
 
-                self._logger.debug(f"[Mycorrhizal activity] Generated +{mycorrhizal_bonus:.5f} energy (ratio: {energy_ratio})")
-                self.modify_energy(mycorrhizal_bonus, source=EnergyGainSource.MYCORRHIZAE)
+                self._logger.debug(f"[Mycorrhizal activity] Generated +{mycorrhizal_bonus:.5f} energy (ratio: {self._energy_factor})")
+                self._energy_handler.modify_energy(mycorrhizal_bonus, source=EnergyGainSource.MYCORRHIZAE)
 
             yield self._env.timeout(timer)
 

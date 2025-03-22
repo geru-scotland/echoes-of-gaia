@@ -34,6 +34,7 @@ class GrowthComponent(EntityComponent):
                  growth_modifier: float = 1.0, growth_efficiency: float = 0.85):
 
         super().__init__(env, ComponentType.GROWTH, event_notifier, lifespan)
+
         self._lifespan_in_ticks: float = lifespan * float(Timers.Calendar.YEAR)
         self._growth_stage: int = growth_stage
         self._initial_size = current_size

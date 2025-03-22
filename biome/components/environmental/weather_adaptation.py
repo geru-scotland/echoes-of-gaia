@@ -38,7 +38,8 @@ class WeatherAdaptationComponent(EntityComponent):
                  base_sigma: float = 15.0,
                  max_stress_delta: float = 0.2):
 
-        self._stress_handler: StressHandler = StressHandler(event_notifier)
+        self._stress_handler: StressHandler = StressHandler(event_notifier, lifespan)
+
         super().__init__(env, ComponentType.WEATHER_ADAPTATION, event_notifier, lifespan)
 
         self._cold_resistance: float = cold_resistance

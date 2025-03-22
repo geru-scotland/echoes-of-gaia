@@ -38,7 +38,8 @@ class VitalComponent(EntityComponent):
                  vitality: float = 100.0, max_vitality: float = 100.0, age: float = 0.0, aging_rate: float = 1.0,
                  dormancy_threshold: float = 25.0):
 
-        self._stress_handler: StressHandler = StressHandler(event_notifier)
+        self._stress_handler: StressHandler = StressHandler(event_notifier, lifespan)
+
         super().__init__(env, ComponentType.VITAL, event_notifier, lifespan)
 
         self._lifespan_in_ticks: int = int((lifespan * float(Timers.Calendar.YEAR)))

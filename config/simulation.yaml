@@ -1,12 +1,12 @@
 simulation:
-  datapoints: false
+  datapoints: true
   eras:
     amount: 10
-    events-per-era: 100
+    events-per-era: 1000
 
   data:
     snapshots:
-      enabled: false
+      enabled: true
       period_type: "CUSTOM"
       custom_period: 60
       storage_directory: "simulation_records"
