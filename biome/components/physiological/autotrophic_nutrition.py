@@ -32,7 +32,7 @@ from shared.math.constants import epsilon
 from shared.timers import Timers
 
 
-class NutritionalComponent(EntityComponent):
+class AutotrophicNutritionComponent(EntityComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  nutrient_absorption_rate: float = 0.3,
                  mycorrhizal_rate: float = 0.02,
@@ -43,7 +43,7 @@ class NutritionalComponent(EntityComponent):
         self._stress_handler: StressHandler = StressHandler(event_notifier, lifespan)
         self._energy_handler: EnergyHandler = EnergyHandler(event_notifier, max_energy_reserves)
 
-        super().__init__(env, ComponentType.NUTRITIONAL, event_notifier, lifespan)
+        super().__init__(env, ComponentType.AUTOTROPHIC_NUTRITION, event_notifier, lifespan)
 
         self._nutrient_absorption_rate: float = nutrient_absorption_rate
         self._mycorrhizal_rate: float = mycorrhizal_rate
@@ -52,12 +52,12 @@ class NutritionalComponent(EntityComponent):
         self._base_toxicity: float = base_toxicity
         self._current_nutritive_value: float = base_nutritive_value
         self._current_toxicity: float = base_toxicity
-        self._photosynthesis_efficiency: float = 0.0
+        self._photosynthesis_efficiency: float = 0.6
 
-        self._stress_factor: float = self._stress_handler.stress_level / self._stress_handler.max_stress
-        self._energy_factor: float = self._energy_handler.energy_reserves / self._energy_handler.max_energy_reserves
+        self._stress_ratio: float = self._stress_handler.stress_level / self._stress_handler.max_stress
+        self._energy_ratio: float = self._energy_handler.energy_reserves / self._energy_handler.max_energy_reserves
 
-        self._logger.debug(f"NutritionalComponent initialized: Absorption rate={self._nutrient_absorption_rate}, "
+        self._logger.debug(f"AutotrophicNutritionComponent initialized: Absorption rate={self._nutrient_absorption_rate}, "
                            f"Mycorrhizal efficiency={self._mycorrhizal_rate}")
 
         self._env.process(self._update_soil_nutrient_absorption(Timers.Compoments.Environmental.RESOURCE_ABSORPTION))
@@ -66,16 +66,17 @@ class NutritionalComponent(EntityComponent):
     def _register_events(self):
         super()._register_events()
         self._stress_handler.register_events()
+        self._energy_handler.register_events()
         self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
         self._event_notifier.register(ComponentEvent.ENERGY_UPDATED, self._handle_energy_update)
         self._event_notifier.register(ComponentEvent.PHOTOSYNTHESIS_UPDATED, self._handle_photosynthesis_update)
 
     def _handle_stress_update(self, *args, **kwargs) -> None:
-        self._stress_factor = kwargs.get("normalized_stress", 0.0)
+        self._stress_ratio = kwargs.get("normalized_stress", 0.0)
 
     def _handle_energy_update(self, *args, **kwargs) -> None:
         energy_reserves: float = kwargs.get("energy_reserves", 0.0)
-        self._energy_factor = energy_reserves / self._energy_handler.max_energy_reserves
+        self._energy_ratio = energy_reserves / self._energy_handler.max_energy_reserves
 
     def _update_soil_nutrient_absorption(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
@@ -86,30 +87,32 @@ class NutritionalComponent(EntityComponent):
                 if self._photosynthesis_efficiency == 0.0:
                     continue
 
+                stress_factor: float = 1 - self._stress_ratio
+
                 # Por ahora, como factores que afectan la absorción:
                 toxicity_factor = 1.0 - self._current_toxicity
 
                 variability = random.uniform(0.9, 1.1)
                 base_rate = self._nutrient_absorption_rate * 0.01
 
-                absorption_rate = base_rate * self._stress_factor * (toxicity_factor * 0.7 + epsilon) * variability
+                absorption_rate = base_rate * stress_factor * (toxicity_factor * 0.7 + epsilon) * variability
                 energy_gain = absorption_rate * self._energy_handler.max_energy_reserves
 
                 self._energy_handler.modify_energy(energy_gain, source=EnergyGainSource.SOIL_NUTRIENTS)
 
                 self._logger.debug(
                     f"[Soil nutrients] Absorbed +{energy_gain:.2f} energy "
-                    f"(Factors: stress={self._stress_factor:.2f}, toxicity={toxicity_factor:.2f})"
+                    f"(Factors: stress={stress_factor:.2f}, toxicity={toxicity_factor:.2f})"
                 )
 
                 if random.random() < 0.15:
 
                     toxicity_direction = random.random()
 
-                    if toxicity_direction < (0.3 + 0.4 * self._stress_factor):
-                        toxicity_change = random.uniform(0.005, 0.015) * (1.0 + self._stress_factor)
+                    if toxicity_direction < (0.3 + 0.4 * self._stress_ratio):
+                        toxicity_change = random.uniform(0.005, 0.015) * (1.0 + self._stress_ratio)
                     else:
-                        toxicity_change = -random.uniform(0.003, 0.008) * (1.0 - self._stress_factor * 0.5)
+                        toxicity_change = -random.uniform(0.003, 0.008) * (1.0 - self._stress_ratio)
 
                     self._current_toxicity = max(
                         self._base_toxicity,
@@ -118,7 +121,7 @@ class NutritionalComponent(EntityComponent):
 
                     self._event_notifier.notify(
                         ComponentEvent.UPDATE_STATE,
-                        NutritionalComponent,
+                        AutotrophicNutritionComponent,
                         toxicity=self._current_toxicity
                     )
 
@@ -129,10 +132,12 @@ class NutritionalComponent(EntityComponent):
 
         while self._host_alive:
             if not self._is_dormant:
-                # Hago que las micorrizas sean más efectivas cuando la planta tiene menos energía
-                mycorrhizal_bonus = self._mycorrhizal_rate * (1.0 - self._energy_factor)
 
-                self._logger.debug(f"[Mycorrhizal activity] Generated +{mycorrhizal_bonus:.5f} energy (ratio: {self._energy_factor})")
+                energy_factor: float = 1 - self._energy_ratio
+                # Hago que las micorrizas sean más efectivas cuando la planta tiene menos energía
+                mycorrhizal_bonus = self._mycorrhizal_rate * energy_factor
+
+                self._logger.debug(f"[Mycorrhizal activity] Generated +{mycorrhizal_bonus:.5f} energy (ratio: {energy_factor})")
                 self._energy_handler.modify_energy(mycorrhizal_bonus, source=EnergyGainSource.MYCORRHIZAE)
 
             yield self._env.timeout(timer)
@@ -157,7 +162,7 @@ class NutritionalComponent(EntityComponent):
 
         self._event_notifier.notify(
             ComponentEvent.UPDATE_STATE,
-            NutritionalComponent,
+            AutotrophicNutritionComponent,
             toxicity=self._current_toxicity
         )
 

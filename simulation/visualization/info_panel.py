@@ -53,7 +53,7 @@ class InfoPanel:
         self._font = pygame.font.SysFont(None, font_size)
         self._font_bold = pygame.font.SysFont(None, font_size)
         self._font_bold.set_bold(True)
-        self._font_title = pygame.font.SysFont(None, font_size + 6)
+        self._font_title = pygame.font.SysFont(None, font_size + 5)
         self._font_title.set_bold(True)
 
         self._surface = pygame.Surface((width, height))

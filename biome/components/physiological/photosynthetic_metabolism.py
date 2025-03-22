@@ -32,7 +32,7 @@ from shared.enums.thresholds import MetabolicThresholds
 from shared.timers import Timers
 
 
-class MetabolicComponent(EntityComponent):
+class PhotosyntheticMetabolismComponent(EntityComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  photosynthesis_efficiency: float = 0.75, respiration_rate: float = 0.05,
                  metabolic_activity: float = 1.0, max_energy_reserves: float = 100.0,
@@ -41,7 +41,7 @@ class MetabolicComponent(EntityComponent):
         self._stress_handler: StressHandler = StressHandler(event_notifier, lifespan)
         self._energy_handler: EnergyHandler = EnergyHandler(event_notifier, max_energy_reserves)
 
-        super().__init__(env, ComponentType.METABOLIC, event_notifier, lifespan)
+        super().__init__(env, ComponentType.PHOTOSYNTHETIC_METABOLISM, event_notifier, lifespan)
 
         self._base_photosynthesis_efficiency: float = round(photosynthesis_efficiency, 2)
         self._photosynthesis_efficiency: float = self._base_photosynthesis_efficiency
@@ -67,6 +67,7 @@ class MetabolicComponent(EntityComponent):
     def _register_events(self):
         super()._register_events()
         self._stress_handler.register_events()
+        self._energy_handler.register_events()
         self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
         self._event_notifier.register(ComponentEvent.ENERGY_UPDATED, self._handle_energy_update)
         self._event_notifier.register(ComponentEvent.BIOLOGICAL_AGE_UPDATED, self._handle_biological_age_update)
@@ -222,7 +223,7 @@ class MetabolicComponent(EntityComponent):
     def consume_energy(self, amount: float) -> bool:
         if amount <= self._energy_handler.energy_reserves:
             new_energy: float = self._energy_handler.energy_reserves - amount
-            self._event_notifier.notify(ComponentEvent.UPDATE_STATE, MetabolicComponent,
+            self._event_notifier.notify(ComponentEvent.UPDATE_STATE, PhotosyntheticMetabolismComponent,
                                         energy_reserves=new_energy)
             return True
         return False

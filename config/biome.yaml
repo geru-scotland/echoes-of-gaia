@@ -4,7 +4,7 @@ biome:
     size:
       - 60 # width
       - 60 # height
-  type: "tropical"
+  type: "tundra"
   flora:
     - species: "oak_tree"
       spawns: 1
@@ -12,8 +12,8 @@ biome:
       components:
         - GrowthComponent:
         - VitalComponent:
-        - MetabolicComponent:
-        - NutritionalComponent:
+        - PhotosyntheticMetabolismComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 20.0
             cold_resistance: 0.0
@@ -25,8 +25,8 @@ biome:
       components:
         - GrowthComponent:
         - VitalComponent:
-        - MetabolicComponent:
-        - NutritionalComponent:
+        - PhotosyntheticMetabolismComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 8.0
 
@@ -36,8 +36,8 @@ biome:
       components:
         - GrowthComponent:
         - VitalComponent:
-        - MetabolicComponent:
-        - NutritionalComponent:
+        - PhotosyntheticMetabolismComponent:
+        - AutotrophicNutritionComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 18.0
 
@@ -48,8 +48,6 @@ biome:
       components:
         - GrowthComponent:
         - VitalComponent:
-        - MetabolicComponent:
-        - NutritionalComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 5.0
 
@@ -59,8 +57,6 @@ biome:
       components:
         - GrowthComponent:
         - VitalComponent:
-        - MetabolicComponent:
-        - NutritionalComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 16.0
 
@@ -70,8 +66,6 @@ biome:
       components:
         - GrowthComponent:
         - VitalComponent:
-        - MetabolicComponent:
-        - NutritionalComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 19.0
 

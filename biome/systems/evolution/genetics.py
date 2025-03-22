@@ -22,8 +22,8 @@ from deap import base, creator, tools, algorithms
 
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
-from biome.components.physiological.metabolic import MetabolicComponent
-from biome.components.physiological.nutritional import NutritionalComponent
+from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
+from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
 from biome.systems.evolution.fitness import compute_fitness
 from biome.systems.evolution.genes import FloraGenes
@@ -49,7 +49,7 @@ def extract_genes_from_entity(flora_entity: Flora) -> FloraGenes:
         genes.aging_rate = vital_component.aging_rate
         genes.health_modifier = vital_component.health_modifier
 
-    metabolic_component: MetabolicComponent = flora_entity.get_component(ComponentType.METABOLIC)
+    metabolic_component: PhotosyntheticMetabolismComponent = flora_entity.get_component(ComponentType.PHOTOSYNTHETIC_METABOLISM)
     if metabolic_component:
         genes.base_photosynthesis_efficiency = metabolic_component.base_photosynthesis_efficiency
         genes.base_respiration_rate = metabolic_component.base_respiration_rate
@@ -62,7 +62,7 @@ def extract_genes_from_entity(flora_entity: Flora) -> FloraGenes:
         genes.heat_resistance = weather_adaptation_component.heat_resistance
         genes.optimal_temperature = weather_adaptation_component.optimal_temperature
 
-    nutritional_component: NutritionalComponent = flora_entity.get_component(ComponentType.NUTRITIONAL)
+    nutritional_component: AutotrophicNutritionComponent = flora_entity.get_component(ComponentType.AUTOTROPHIC_NUTRITION)
     if nutritional_component:
         genes.nutrient_absorption_rate = nutritional_component.nutrient_absorption_rate
         genes.mycorrhizal_rate = nutritional_component.mycorrhizal_rate

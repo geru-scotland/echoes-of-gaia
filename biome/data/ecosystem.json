@@ -514,7 +514,7 @@
           "growth_efficiency": 1.0
         }
       },
-      "MetabolicComponent": {
+      "PhotosyntheticMetabolismComponent": {
         "defaults": {
           "photosynthesis_efficiency": 0.7,
           "respiration_rate": 0.35,
@@ -522,11 +522,11 @@
           "max_energy_reserves": 100.0
         }
       },
-      "NutritionalComponent": {
+      "AutotrophicNutritionComponent": {
         "defaults": {
-          "nutrient_absorption_rate": 0.9,
-          "mycorrhizal_rate": 0.51,
-          "base_nutritive_value": 0.9,
+          "nutrient_absorption_rate": 0.3,
+          "mycorrhizal_rate": 0.01,
+          "base_nutritive_value": 0.6,
           "base_toxicity": 0.1
         }
       },
