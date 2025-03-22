@@ -22,6 +22,7 @@ from typing import Dict, Any, Optional
 from simpy import Environment as simpyEnv
 
 from biome.components.base.component import EnergyBasedFloraComponent
+from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
@@ -37,6 +38,8 @@ class NutritionalComponent(EnergyBasedFloraComponent):
                  base_nutritive_value: float = 0.6,
                  base_toxicity: float = 0.1,
                  max_energy_reserves: float = 100.0):
+
+        self._stress_handler: StressHandler = StressHandler(event_notifier)
         super().__init__(env, ComponentType.NUTRITIONAL, event_notifier, lifespan, max_energy_reserves)
 
         self._nutrient_absorption_rate: float = nutrient_absorption_rate
@@ -48,6 +51,8 @@ class NutritionalComponent(EnergyBasedFloraComponent):
         self._current_toxicity: float = base_toxicity
         self._photosynthesis_efficiency: float = 0.0
 
+        self._stress_factor: float = self._stress_handler.stress_level / self._stress_handler.max_stress
+
         self._logger.debug(f"NutritionalComponent initialized: Absorption rate={self._nutrient_absorption_rate}, "
                            f"Mycorrhizal efficiency={self._mycorrhizal_rate}")
 
@@ -56,7 +61,12 @@ class NutritionalComponent(EnergyBasedFloraComponent):
 
     def _register_events(self):
         super()._register_events()
+        self._stress_handler.register_events()
+        self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
         self._event_notifier.register(ComponentEvent.PHOTOSYNTHESIS_UPDATED, self._handle_photosynthesis_update)
+
+    def _handle_stress_update(self, *args, **kwargs) -> None:
+        self._stress_factor = kwargs.get("normalized_stress", 0.0)
 
     def _update_soil_nutrient_absorption(self, timer: Optional[int] = None):
         yield self._env.timeout(timer)
@@ -68,31 +78,29 @@ class NutritionalComponent(EnergyBasedFloraComponent):
                     continue
 
                 # Por ahora, como factores que afectan la absorción:
-                stress_factor = 1.0 - min(1.0, self._stress_level / 100.0)
                 toxicity_factor = 1.0 - self._current_toxicity
 
                 variability = random.uniform(0.9, 1.1)
                 base_rate = self._nutrient_absorption_rate * 0.01
 
-                absorption_rate = base_rate * stress_factor * (toxicity_factor * 0.7 + epsilon) * variability
+                absorption_rate = base_rate * self._stress_factor * (toxicity_factor * 0.7 + epsilon) * variability
                 energy_gain = absorption_rate * self._max_energy_reserves
 
                 self.modify_energy(energy_gain, source=EnergyGainSource.SOIL_NUTRIENTS)
 
                 self._logger.debug(
                     f"[Soil nutrients] Absorbed +{energy_gain:.2f} energy "
-                    f"(Factors: stress={stress_factor:.2f}, toxicity={toxicity_factor:.2f})"
+                    f"(Factors: stress={self._stress_factor:.2f}, toxicity={toxicity_factor:.2f})"
                 )
 
                 if random.random() < 0.15:
 
-                    stress_influence = self._stress_level / 100.0
                     toxicity_direction = random.random()
 
-                    if toxicity_direction < (0.3 + 0.4 * stress_influence):
-                        toxicity_change = random.uniform(0.005, 0.015) * (1.0 + stress_influence)
+                    if toxicity_direction < (0.3 + 0.4 * self._stress_factor):
+                        toxicity_change = random.uniform(0.005, 0.015) * (1.0 + self._stress_factor)
                     else:
-                        toxicity_change = -random.uniform(0.003, 0.008) * (1.0 - stress_influence * 0.5)
+                        toxicity_change = -random.uniform(0.003, 0.008) * (1.0 - self._stress_factor * 0.5)
 
                     self._current_toxicity = max(
                         self._base_toxicity,

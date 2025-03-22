@@ -20,7 +20,8 @@ from typing import Dict, Any
 
 from simpy import Environment as simpyEnv
 
-from biome.components.base.component import FloraComponent
+from biome.components.base.component import EntityComponent
+from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType, WeatherEvent
 from shared.enums.events import ComponentEvent
@@ -29,13 +30,15 @@ from shared.enums.thresholds import ClimateThresholds
 from shared.timers import Timers
 
 
-class WeatherAdaptationComponent(FloraComponent):
+class WeatherAdaptationComponent(EntityComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
                  cold_resistance: float = 1.0,
                  heat_resistance: float = 1.0,
                  optimal_temperature: float = 22.0,
                  base_sigma: float = 15.0,
                  max_stress_delta: float = 0.2):
+
+        self._stress_handler: StressHandler = StressHandler(event_notifier)
         super().__init__(env, ComponentType.WEATHER_ADAPTATION, event_notifier, lifespan)
 
         self._cold_resistance: float = cold_resistance
@@ -55,6 +58,7 @@ class WeatherAdaptationComponent(FloraComponent):
 
     def _register_events(self):
         super()._register_events()
+        self._stress_handler.register_events()
         self._event_notifier.register(ComponentEvent.WEATHER_UPDATE, self._handle_weather_update)
 
     def _handle_weather_update(self, *args, **kwargs):
@@ -64,10 +68,10 @@ class WeatherAdaptationComponent(FloraComponent):
         stress_delta = self._calculate_stress_delta(temperature)
 
         if stress_delta > 0.001:
-            self.modify_stress(stress_delta, StressReason.TEMPERATURE_EXTREME)
+            self._stress_handler.modify_stress(stress_delta, StressReason.TEMPERATURE_EXTREME)
             self._logger.debug(f"Temperature stress delta applied: {stress_delta:.4f} (Temperature: {temperature}°C)")
         else:
-            self.modify_stress(-ClimateThresholds.StressChange.OPTIMAL, StressReason.TEMPERATURE_OPTIMAL)
+            self._stress_handler.modify_stress(-ClimateThresholds.StressChange.OPTIMAL, StressReason.TEMPERATURE_OPTIMAL)
             self._logger.debug(f"Optimal temperature relief applied. (Temperature: {temperature}°C)")
 
     def _calculate_stress_delta(self, temperature: float) -> float:

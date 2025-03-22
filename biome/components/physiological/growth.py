@@ -19,7 +19,7 @@ from typing import Optional, List, Dict, Any
 
 from simpy import Environment as simpyEnv
 
-from biome.components.base.component import FloraComponent
+from biome.components.base.component import EntityComponent
 from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
@@ -27,7 +27,7 @@ from shared.enums.events import ComponentEvent
 from shared.timers import Timers
 
 
-class GrowthComponent(FloraComponent):
+class GrowthComponent(EntityComponent):
 
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 15.0,
                  growth_stage: int = 0, total_stages: int = 4, current_size: float = 0.05, max_size: float = 3.0,

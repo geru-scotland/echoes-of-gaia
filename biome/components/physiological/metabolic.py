@@ -22,6 +22,7 @@ from typing import Optional, Dict, Any
 from biome.components.base.component import EnergyBasedFloraComponent
 from simpy import Environment as simpyEnv
 
+from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
@@ -36,7 +37,9 @@ class MetabolicComponent(EnergyBasedFloraComponent):
                  metabolic_activity: float = 1.0, max_energy_reserves: float = 100.0,
                  optimal_respiration_ratio: float = 0.2):
 
+        self._stress_handler: StressHandler = StressHandler(event_notifier)
         super().__init__(env, ComponentType.METABOLIC, event_notifier, lifespan, max_energy_reserves)
+
         self._base_photosynthesis_efficiency: float = round(photosynthesis_efficiency, 2)
         self._photosynthesis_efficiency: float = self._base_photosynthesis_efficiency
         self._base_respiration_rate: float = round(respiration_rate, 4)
@@ -50,15 +53,17 @@ class MetabolicComponent(EnergyBasedFloraComponent):
         self._biological_age: Optional[float] = None
         self._optimal_respiration_ratio: float = optimal_respiration_ratio
 
+
         self._logger.debug(f"Metabolic component initialized: Photosynthesis={self._photosynthesis_efficiency}, "
                            f"Respiration={self._respiration_rate}, Energy={self._energy_reserves}")
-
 
         self._env.process(self._update_metabolic_stress(Timers.Compoments.Physiological.STRESS_UPDATE))
         self._env.process(self._update_metabolism(Timers.Compoments.Physiological.METABOLISM))
 
     def _register_events(self):
         super()._register_events()
+        self._stress_handler.register_events()
+        self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
         self._event_notifier.register(ComponentEvent.BIOLOGICAL_AGE_UPDATED, self._handle_biological_age_update)
 
     def _handle_biological_age_update(self, *args, **kwargs):
@@ -72,23 +77,23 @@ class MetabolicComponent(EnergyBasedFloraComponent):
 
             if energy_ratio <= 0.0005:
                 stress_change = MetabolicThresholds.StressChange.NO_ENERGY
-                self.modify_stress(stress_change, StressReason.NO_ENERGY)
+                self._stress_handler.modify_stress(stress_change, StressReason.NO_ENERGY)
 
             elif MetabolicThresholds.Energy.CRITICAL > energy_ratio > 0.0:
                 stress_change = MetabolicThresholds.StressChange.CRITICAL
-                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
+                self._stress_handler.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
 
             elif energy_ratio < MetabolicThresholds.Energy.LOW:
                 stress_change = MetabolicThresholds.StressChange.LOW
-                self.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
+                self._stress_handler.modify_stress(stress_change, StressReason.NUTRIENT_DEFICIENCY)
 
             elif energy_ratio > MetabolicThresholds.Energy.ABUNDANT:
                 stress_change = MetabolicThresholds.StressChange.ABUNDANT
-                self.modify_stress(stress_change, StressReason.ENERGY_ABUNDANCE)
+                self._stress_handler.modify_stress(stress_change, StressReason.ENERGY_ABUNDANCE)
 
             elif energy_ratio > MetabolicThresholds.Energy.SUFFICIENT:
                 stress_change = MetabolicThresholds.StressChange.SUFFICIENT
-                self.modify_stress(stress_change, StressReason.ENERGY_SUFFICIENT)
+                self._stress_handler.modify_stress(stress_change, StressReason.ENERGY_SUFFICIENT)
 
             yield self._env.timeout(timer)
 
@@ -135,7 +140,7 @@ class MetabolicComponent(EnergyBasedFloraComponent):
 
             self._logger.debug(
                 f"[Metabolic Update | DEBUG:Tick={self._env.now}]"
-                f"Stress level={self._stress_level:4f}]"
+                f"Stress level={self._stress_handler.stress_level:4f}]"
                 f"Energy: {self._energy_reserves:.3f}/{self._max_energy_reserves:.3f}, "
                 f"Photosynthesis: Eff={self._photosynthesis_efficiency:.3f}, "
                 f"Light={self._light_availability:.3f}, "
@@ -149,7 +154,6 @@ class MetabolicComponent(EnergyBasedFloraComponent):
             yield self._env.timeout(timer)
 
     def _handle_stress_update(self, *args, **kwargs):
-        super()._handle_stress_update(*args, **kwargs)
 
         normalized_stress: float = kwargs.get("normalized_stress", 0.0)
         old_efficiency: float = self._photosynthesis_efficiency
