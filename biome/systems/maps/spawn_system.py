@@ -20,10 +20,7 @@ import random
 from logging import Logger
 from typing import List, Dict, Optional
 
-import numpy as np
-from numpy import ndarray
 from simpy import Environment as simpyEnv
-from scipy.ndimage import convolve
 
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
@@ -34,80 +31,24 @@ from biome.components.registry import get_component_class
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
 from biome.entities.flora import Flora
-from shared.enums.enums import Habitats, TerrainType, FloraSpecies, FaunaSpecies
+from biome.systems.maps.map_allocator import MapAllocator
+from shared.enums.enums import FloraSpecies, FaunaSpecies
 from shared.enums.strings import Loggers
 from shared.stores.biome_store import BiomeStore
-from shared.types import TileMap, EntityRegistry, EntityIndexMap, HabitatCache, EntityDefinitions, HabitatList, \
-    BiomeStoreData
+from shared.types import EntityRegistry, EntityDefinitions, HabitatList
 from utils.loggers import LoggerManager
 from utils.middleware import log_execution_time
 
 
 class SpawnSystem:
-    def __init__(self, env: simpyEnv, tile_map: TileMap):
+    def __init__(self, env: simpyEnv, map_allocator: MapAllocator):
         self._flora_registry: EntityRegistry = {}
         self._fauna_registry: EntityRegistry = {}
         self._main_registry: EntityRegistry = {}
-        self._entity_index_map: EntityIndexMap = np.full(tile_map.shape, -1, dtype=int)
         self._id_generator = itertools.count(0)
         self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
         self._env: simpyEnv = env
-        self._tile_map: TileMap = tile_map
-        self._habitat_cache: HabitatCache = self._precompute_habitat_cache(BiomeStore.habitats)
-
-    def _precompute_habitat_cache(self, habitat_data: BiomeStoreData) -> HabitatCache:
-        # TODO: Recuerda liberar del tipo de habitat, la posición de cache al borrar una entidad
-        # para todos los habitats donde corresponda, importante para reutilizar.
-        self._logger.info("Precomputing habitat cache...")
-        try:
-            habitat_positions: HabitatCache = {
-                Habitats.Type(habitat): np.array([[0, 0]], dtype=np.int8) for habitat, _ in habitat_data.items()
-            }
-            # es np, pero con terraintype, para optimizar convierto a int8
-            terrain_map: ndarray = self._tile_map.astype(np.int8)
-
-            # para convolución una celda, cuenta sus vecinas y no así misma
-            kernel_neighbour: ndarray = np.array([[1, 1, 1],
-                                                     [1, 0, 1],
-                                                     [1, 1, 1]])
-
-            # expando en +1 todos los lados, para que no tenga que ser justo la casilla adyacente
-            kernel_expanded = np.pad(kernel_neighbour, pad_width=1, mode='constant', constant_values=1)
-            for habitat, rules in habitat_data.items():
-                in_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
-                                                    for terrain in rules.get(Habitats.Relations.IN, {})],
-                                                   dtype=np.int8)
-                nearby_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
-                                                        for terrain in rules.get(Habitats.Relations.NEARBY, {})],
-                                                       dtype=np.int8)
-                in_mask: ndarray = np.isin(terrain_map, in_terrains).astype(np.int8)
-                nearby_mask: ndarray = np.isin(terrain_map, nearby_terrains).astype(np.int8)
-                valid_positions: ndarray = np.empty((0, 2), dtype=np.int8)
-
-                if nearby_mask.any():
-                    nearby_convolved: ndarray = convolve(nearby_mask.astype(np.int8), kernel_expanded,
-                                                         mode="constant", cval=0)
-                    # Mecaguen la leche, qué dolor de cabeza me ha dado esto.
-                    # Si una celda tiene 2 nearby, 1 & 2 dará 0. Necesito
-                    # que la máscara proporcione valor true, 1, para todo aquello
-                    # que sea mayor que 1... Lo hago con broadcasting y convierto a 0/1 int8
-                    nearby_presence = (nearby_convolved > 0).astype(np.int8)
-                    habitat_mask: ndarray = in_mask & nearby_presence
-                    valid_positions = np.argwhere(habitat_mask)
-                    self._logger.debug(f"Habitat {habitat}. \n {terrain_map}")
-                    self._logger.debug(f"Habitat mask: \n {habitat_mask}")
-                    self._logger.debug(f"Convolved map: \n {nearby_convolved}")
-                    self._logger.debug(f"IN mask: \n {in_mask}")
-                    self._logger.debug(f"Valid positions for  {habitat}: \n {valid_positions}")
-                elif in_mask.any():
-                    valid_positions = np.argwhere(in_mask)
-
-                habitat_positions[Habitats.Type(habitat)] = np.array(valid_positions)
-
-            return habitat_positions
-
-        except Exception as e:
-            self._logger.error(f"Error precomputing habitat cache: {e}")
+        self._map_allocator: MapAllocator = map_allocator
 
     def _create_single_entity(self, entity_class, entity_species, habitats: HabitatList,
                               lifespan: float, components: List[Dict], evolution_cycle: int = 0) -> Optional[Entity]:
@@ -115,7 +56,7 @@ class SpawnSystem:
         entity: Entity = entity_class(entity_id, self._env, entity_species, habitats, lifespan, evolution_cycle)
 
         if not components:
-            if self._add_to_index_map(entity):
+            if self._request_allocation(entity):
                 return entity
             return None
 
@@ -124,6 +65,14 @@ class SpawnSystem:
             # de la entidad, biomestore. importante, es TAMBIÉN.
             for class_name, attribute_dict in component.items():
                 defaults = BiomeStore.components.get(class_name, {}).get("defaults", {}).copy()
+
+                for key, value in defaults.items():
+                    if isinstance(value, (int, float)):
+                        # Variación del 10%
+                        if value != 1.0 or value != 0.0:
+                            variation = random.uniform(0.9, 1.1)
+                            defaults[key] = value * variation
+
                 # Primera vez con esta sintaxis
                 # desempaqueto defaults, y luego, los atributos del value del dict
                 # esos atributos, van a sobreescribir, asi que es un merge
@@ -146,7 +95,7 @@ class SpawnSystem:
                     else:
                         self._logger.debug(f"Class not found: {class_name}")
 
-        if self._add_to_index_map(entity):
+        if self._request_allocation(entity):
             return entity
 
         # TODO: Borrar componentes creados
@@ -198,39 +147,18 @@ class SpawnSystem:
 
         return entity_registry
 
-    def _add_to_index_map(self, entity: Entity) -> bool:
+    def _request_allocation(self, entity: Entity) -> bool:
         self._logger.debug(
-            f"Adding {entity.get_type()} to index map: {entity.get_id()} , habitats: {entity.get_habitats()}")
+            f"Adding {entity.get_type()} to index map: {entity.get_id()}, habitats: {entity.get_habitats()}")
 
-        selected_position = None
+        position = self._map_allocator.allocate_position(entity.get_id(), entity.get_habitats())
 
-        for habitat in entity.get_habitats():
-            habitat_positions: ndarray = self._habitat_cache.get(habitat, np.array([]))
-
-            if habitat_positions.shape[0] == 0:
-                self._logger.warning(f"Habitat: {habitat} doesn't have available tiles! Can't spawn here.")
-                continue
-
-            if selected_position is None:
-                random_index = np.random.randint(0, habitat_positions.shape[0])
-                selected_position = habitat_positions[random_index]
-                self._logger.debug(f"Random position selected: {selected_position}")
-
-        if selected_position is None:
+        if position is None:
             self._logger.warning(
-                f"No valid position found for entity {entity.get_type()} ({entity.get_species()})(id: {entity.get_id()})!")
+                f"Failed to allocate position for entity {entity.get_type()} ({entity.get_species()})(id: {entity.get_id()})!")
             return False
 
-        # Quizá, para evitar este bucle, pasar a mapa de habitats directamente
-        # que a cada celda se le asigne un habitat y listo, el resto de habitats
-        # que no la tengan disponible al estar rellena
-        for habitat, _ in self._habitat_cache.items():
-            habitat_positions: ndarray = self._habitat_cache.get(habitat, np.array([]))
-            self._habitat_cache[habitat] = np.array(
-                [pos for pos in habitat_positions if not np.array_equal(pos, selected_position)])
-
-        self._entity_index_map[selected_position[0], selected_position[1]] = entity.get_id()
-        entity.set_position(selected_position[0], selected_position[1])
+        entity.set_position(position[0], position[1])
         return True
 
     def spawn(self, entity_class, entity_species_enum, species_name: str, lifespan: float = 20.0,
@@ -290,5 +218,10 @@ class SpawnSystem:
     def get_entity_registry(self) -> EntityRegistry:
         return self._main_registry
 
-    def get_entity_index_map(self) -> EntityIndexMap:
-        return self._entity_index_map
+    @property
+    def flora_registry(self) -> EntityRegistry:
+        return self._flora_registry
+
+    @property
+    def fauna_registry(self) -> EntityRegistry:
+        return self._fauna_registry

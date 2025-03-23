@@ -40,6 +40,7 @@ class ComponentEvent(EnumBaseStr):
 class BiomeEvent(EnumBaseStr):
     CREATE_ENTITY = "create_entity"
     REMOVE_ENTITY = "remove_entity"
+    ENTITY_DEATH = "entity_death"
 
     CLIMATE_CHANGE = "climate_change"
     WEATHER_UPDATE = "on_weather_update"

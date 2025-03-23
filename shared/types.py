@@ -48,7 +48,7 @@ EntityLayer = List[EntityList]
 TerrainMap = np.ndarray
 EntityIndexMap = np.ndarray
 EntityRegistry = Dict[int, "Entity"]
-
+Position = Tuple[int, int]
 BiomeStoreData = Dict[str, Any]
 HabitatCache = Dict[Habitats.Type, ndarray]
 

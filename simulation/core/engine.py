@@ -52,9 +52,10 @@ class SimulationEngine:
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._datapoints: bool = self._context.config.get("datapoints", False)
 
+            clean_dead_entities: bool = self._context.config.get("cleanup", {}).get("remove_dead_entities", False)
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
-            self._biome_api = BiomeAPI(biome_context, self._env)
+            self._biome_api = BiomeAPI(biome_context, self._env, clean_dead_entities)
 
             if self._datapoints:
                 self._context.influxdb.start()

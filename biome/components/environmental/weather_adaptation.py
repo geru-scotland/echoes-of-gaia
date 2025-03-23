@@ -48,12 +48,12 @@ class WeatherAdaptationComponent(EntityComponent):
         self._optimal_temperature: float = optimal_temperature
 
         self._base_sigma: float = base_sigma
-        self._logger.warning(f"BASE SIGMA {self._base_sigma}")
+        self._logger.debug(f"BASE SIGMA {self._base_sigma}")
         self._max_stress_delta = max_stress_delta
 
         self._temperature_exposure_history: list = []
 
-        self._logger.warning(f"TemperatureAdaptationComponent initialized: Cold resistance={self._cold_resistance}, "
+        self._logger.debug(f"TemperatureAdaptationComponent initialized: Cold resistance={self._cold_resistance}, "
                            f"Heat resistance={self._heat_resistance}"
                            f"Optimal temperature={self._optimal_temperature}")
 

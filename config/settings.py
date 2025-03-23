@@ -127,6 +127,7 @@ class SimulationSettings(DefaultSettings):
         super().__init__(config_file)
         self._influxdb_config: Dict[str, Any] = self._load_influxdb_config()
 
+
     def _load_influxdb_config(self):
         try:
             return {

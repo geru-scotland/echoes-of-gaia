@@ -228,7 +228,7 @@ class GeneticAlgorithmModel:
 
         self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
 
-        def mutation_controlled(individual, indpb, entity_type=None, max_change_percent=0.20, min_absolute_change=0.02):
+        def mutation_controlled(individual, indpb, entity_type=None, max_change_percent=0.10, min_absolute_change=0.02):
             if entity_type is None:
                 entity_type = (EntityType.FLORA
                                if len(individual) == len(FLORA_GENE_RANGES)
@@ -298,7 +298,7 @@ class GeneticAlgorithmModel:
             return mutated_individual,
 
         self.toolbox.register("mutate", mutation_controlled, indpb=0.2)
-        self.toolbox.register("select", tools.selTournament, tournsize=3)
+        self.toolbox.register("select", tools.selTournament, tournsize=2) # lo he cambiado de 3 a 2 para ver si la convergencia es más lenta
 
     def evolve_population(self, entities: EntityList, climate_data: ClimateData, generation_count=20, k_best=5):
         if not entities:
@@ -336,7 +336,7 @@ class GeneticAlgorithmModel:
         stats.register("max", np.max)
 
         algorithms.eaSimple(population, self.toolbox,
-                            cxpb=0.5, mutpb=0.2,
+                            cxpb=0.3, mutpb=0.3,
                             ngen=generation_count,
                             stats=stats, verbose=True)
 

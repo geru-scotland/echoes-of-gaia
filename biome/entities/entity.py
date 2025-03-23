@@ -78,7 +78,7 @@ class Entity(EventHandler, StateHandler, ABC):
         self._logger.warning(f"Entity {self._id} ({self._descriptor.species}) has died")
         self._state.update("is_dead", True)
 
-        self.clear_and_unregister()
+        BiomeEventBus.trigger(BiomeEvent.ENTITY_DEATH, entity_id=self._id)
 
         self._state.update("death_tick", self._env.now)
 

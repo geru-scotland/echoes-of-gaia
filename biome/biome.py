@@ -50,13 +50,14 @@ from simulation.core.systems.telemetry.datapoint import Datapoint
 
 class Biome(Environment, BiomeDataProvider, EventHandler):
 
-    def __init__(self, context: BiomeContextData, env: simpy.Environment):
+    def __init__(self, context: BiomeContextData, env: simpy.Environment, clean_dead_entities: bool = False):
         Environment.__init__(self, context, env)
         try:
             self._logger.info(self._context.config.get("type"))
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
-                                                                 fauna_definitions=self._context.fauna_definitions)
+                                                                 fauna_definitions=self._context.fauna_definitions,
+                                                                 cleanup_dead_entities=clean_dead_entities)
             self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
             self._climate_data_manager = ClimateDataManager(self._env, self._climate)
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
@@ -136,12 +137,12 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 # TODO: EVOLUTION CYCLE ha de ser incremental, hata un cap del 60% del lifetime
                 # toma aquí el tiempo y vete incrementando progresivamente
                 if agent:
-                    self._logger.error(f"Running evolution cycle for {species}, delay: {delay}")
+                    self._logger.debug(f"Running evolution cycle for {species}, delay: {delay}")
                     observation = agent.perceive()
                     action = agent.decide(observation)
                     agent.act(action)
                     evolution_cycle_time:  float = agent.get_evolution_cycle_time()
-                    self._logger.error(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
+                    self._logger.debug(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
                     yield self._env.timeout(evolution_cycle_time)
                 else:
                     self._logger.warning(f"Agent for species {species} not found!")
@@ -171,6 +172,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
     def _register_events(self):
         BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
         BiomeEventBus.register(BiomeEvent.REMOVE_ENTITY, self._map_manager.remove_entity)
+        BiomeEventBus.register(BiomeEvent.ENTITY_DEATH, self._map_manager.handle_entity_death)
 
     def get_entity_provider(self) -> EntityProvider:
         return self._entity_provider

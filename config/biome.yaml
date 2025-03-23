@@ -2,13 +2,13 @@ biome:
   climate-model: "climate_model_v1.1"
   map:
     size:
-      - 60 # width
-      - 60 # height
+      - 25 # width
+      - 25 # height
   type: "tropical"
   flora:
     - species: "oak_tree"
-      spawns: 1
-      avg-lifespan: 10  # En años lo pongo
+      spawns: 15
+      avg-lifespan: 30  # En años lo pongo
       components:
         - GrowthComponent:
         - VitalComponent:
@@ -20,7 +20,7 @@ biome:
             heat_resistance: 0.0
 
     - species: "mushroom"
-      spawns: 11
+      spawns: 15
       avg-lifespan: 5
       components:
         - GrowthComponent:
@@ -31,7 +31,7 @@ biome:
             optimal_temperature: 8.0
 
     - species: "bramble"
-      spawns: 5
+      spawns: 18
       avg-lifespan: 7
       components:
         - GrowthComponent:
@@ -43,7 +43,7 @@ biome:
 
   fauna:
     - species: "fox"
-      spawns: 4
+      spawns: 12
       avg-lifespan: 12
       components:
         - GrowthComponent:
@@ -53,7 +53,7 @@ biome:
             cold_resistance: 0.0
 
     - species: "boar"
-      spawns: 5
+      spawns: 11
       avg-lifespan: 16
       components:
         - GrowthComponent:
@@ -62,7 +62,7 @@ biome:
             optimal_temperature: 16.0
 
     - species: "deer"
-      spawns: 4
+      spawns: 9
       avg-lifespan: 6
       components:
         - GrowthComponent:

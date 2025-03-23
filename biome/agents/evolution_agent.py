@@ -95,11 +95,10 @@ class EvolutionAgentAI(Agent):
                 if i < len(entities_sorted):
                     entities_to_remove.append(entities_sorted[i].get_id())
 
-            selection_percentage = random.uniform(0.3, 0.7)
-            k_best = max(1, int(len(entities) * selection_percentage))
+            k_best = self._calculate_k_best(len(entities))
 
             evolved_genes = self._genetic_model.evolve_population(
-                entities_list, climate_data, generation_count=10, k_best=5
+                entities_list, climate_data, generation_count=10, k_best=k_best
             )
 
             for genes in evolved_genes:
@@ -125,6 +124,11 @@ class EvolutionAgentAI(Agent):
         # Nueva generación spawneada, calculo lifespan medio
         average_lifespan: float = self._compute_current_generation_lifespan()
         self._increase_evolution_time_cycle(average_lifespan)
+
+    def _calculate_k_best(self, population_size: int) -> int:
+        # Por ahora pongo 15-25% de la población, con mínimo de 3 y máximo de 15
+        k_best = max(3, min(10, int(population_size * random.uniform(0.15, 0.25))))
+        return k_best
 
     def _compute_current_generation_lifespan(self) -> float:
         if self._entity_type == EntityType.FLORA:

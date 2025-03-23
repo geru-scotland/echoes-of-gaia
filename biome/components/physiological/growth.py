@@ -57,7 +57,8 @@ class GrowthComponent(EntityComponent):
         super()._register_events()
 
     def _calculate_stage_thresholds(self) -> List[float]:
-        return [self._max_size * (i / self._total_stages) for i in range(1, self._total_stages + 1)]
+        total_stages_int = int(self._total_stages)
+        return [self._max_size * (i / total_stages_int) for i in range(1, total_stages_int + 1)]
 
     def _update_growth_modifier(self, modifier: float) -> None:
         self._growth_modifier: float = max(0.0, modifier)
