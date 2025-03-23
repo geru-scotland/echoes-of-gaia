@@ -270,7 +270,7 @@ class GeneticAlgorithmModel:
                     apply_boost = False
                     if attr in adaptive_boost_attrs:
                         if 0 < original_value < (min_val + range_size * 0.1):
-                            apply_boost = False
+                            apply_boost = True
 
                     if apply_boost:
                         if random.random() < 0.8:  # Mayor probabilidad de incremento
