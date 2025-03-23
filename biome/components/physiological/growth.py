@@ -20,6 +20,7 @@ from typing import Optional, List, Dict, Any
 from simpy import Environment as simpyEnv
 
 from biome.components.base.component import EntityComponent
+from biome.systems.components.registry import ComponentRegistry
 from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
@@ -51,7 +52,8 @@ class GrowthComponent(EntityComponent):
 
         self._log_data("Initialized")
 
-        self._env.process(self._update_growth(Timers.Compoments.Physiological.GROWTH))
+        # En lugar de crear su propio proceso SimPy, lo registro en el manager
+        ComponentRegistry.get_growth_manager().register_component(id(self), self)
 
     def _register_events(self):
         super()._register_events()
@@ -60,52 +62,16 @@ class GrowthComponent(EntityComponent):
         total_stages_int = int(self._total_stages)
         return [self._max_size * (i / total_stages_int) for i in range(1, total_stages_int + 1)]
 
-    def _update_growth_modifier(self, modifier: float) -> None:
-        self._growth_modifier: float = max(0.0, modifier)
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
-                                    growth_modifier=self._growth_modifier)
-
-    def _update_growth_efficiency(self, modifier: float) -> None:
-        self._growth_efficiency: float = max(0.0, modifier)
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
-                                    growth_efficiency=self._growth_efficiency)
-
-    def _update_growth(self, timer: Optional[int] = None):
-        yield self._env.timeout(timer)
-        while self._host_alive:
-            if self._current_size < self._max_size:
-
-                biological_age_ratio: float = self._env.now / self._lifespan_in_ticks
-                biological_age_ratio_with_mods =  biological_age_ratio * self._growth_modifier * self._growth_efficiency
-                biological_age_ratio_with_mods = min(1.0, biological_age_ratio_with_mods)
-
-                # Quiero transformar el tiempo lineal, que aumenta constantemente, en un patrón
-                # de crecimiento biológico NO lienal (ya sabes, S)
-                non_linear_growth_completion_ratio = BiologicalGrowthPatterns.sigmoid_growth_curve(biological_age_ratio_with_mods)
-                self._current_size = self._initial_size + (self._max_size - self._initial_size) * non_linear_growth_completion_ratio
-
-                self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
-                                            current_size=self._current_size, tick=self._env.now)
-
-                self._log_data(f"Updating")
-                for stage, threshold in enumerate(self._stage_thresholds):
-                    if self._growth_stage == stage and self._current_size >= threshold:
-                        self._growth_stage += 1
-                        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, GrowthComponent,
-                                                    growth_stage=self._growth_stage)
-                        self._event_notifier.notify(ComponentEvent.STAGE_CHANGE, stage=stage)
-                        self._logger.debug(f"Advanced to growth stage {self._growth_stage}")
-                        break
-
-            yield self._env.timeout(timer)
-
     def _handle_stress_update(self, *args, **kwargs):
         super()._handle_stress_update(*args, **kwargs)
 
         normalized_stress = kwargs.get("normalized_stress", 0.0)
-
         # TODO: pasar todos los factores a config, especificos para estrés, 0.6 etc.
         self._growth_efficiency = max(0.3, self._growth_efficiency * (1.0 - normalized_stress * 0.6))
+
+    def disable_notifier(self):
+        super().disable_notifier()
+        ComponentRegistry.get_growth_manager().unregister_component(id(self))
 
     def _log_data(self, message: Optional[str]):
         if message:

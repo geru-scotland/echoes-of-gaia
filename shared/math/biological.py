@@ -16,7 +16,7 @@
 # =============================================================================
 """
 import math
-
+import numpy as np
 
 class BiologicalGrowthPatterns:
 
@@ -28,6 +28,15 @@ class BiologicalGrowthPatterns:
         raw_growth_value = 1 / (1 + math.exp(-curve_steepness * (relative_age - 0.5)))
 
         return (raw_growth_value - min_bound) / (max_bound - min_bound)
+
+    @staticmethod
+    def sigmoid_growth_curve_vectorized(relative_ages: np.ndarray, curve_steepness: float = 6) -> np.ndarray:
+        min_bound = 1 / (1 + np.exp(curve_steepness / 2))
+        max_bound = 1 / (1 + np.exp(-curve_steepness / 2))
+
+        raw_growth_values = 1 / (1 + np.exp(-curve_steepness * (relative_ages - 0.5)))
+
+        return (raw_growth_values - min_bound) / (max_bound - min_bound)
 
     @staticmethod
     def gompertz_decay(life_proportion: float, decay_onset: float = 0.005, decay_steepness: float = 7.0) -> float:
