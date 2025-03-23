@@ -2,7 +2,7 @@ simulation:
   datapoints: true
   eras:
     amount: 10
-    events-per-era: 3000
+    events-per-era: 5000
 
   cleanup:
     remove_dead_entities: true

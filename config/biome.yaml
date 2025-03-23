@@ -2,12 +2,12 @@ biome:
   climate-model: "climate_model_v1.1"
   map:
     size:
-      - 25 # width
-      - 25 # height
-  type: "tropical"
+      - 67 # width
+      - 61 # height
+  type: "tundra"
   flora:
     - species: "oak_tree"
-      spawns: 15
+      spawns: 12
       avg-lifespan: 30  # En años lo pongo
       components:
         - GrowthComponent:
@@ -31,7 +31,7 @@ biome:
             optimal_temperature: 8.0
 
     - species: "bramble"
-      spawns: 18
+      spawns: 12
       avg-lifespan: 7
       components:
         - GrowthComponent:
