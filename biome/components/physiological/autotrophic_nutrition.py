@@ -111,14 +111,7 @@ class AutotrophicNutritionComponent(EntityComponent):
             "toxicity": self._current_toxicity
         }
 
-    @property
-    def toxicity(self) -> float:
-        return self._current_toxicity
-
-    @property
-    def nutritive_value(self) -> float:
-        return self._current_nutritive_value
-
+    # Getters
     @property
     def nutrient_absorption_rate(self) -> float:
         return self._nutrient_absorption_rate
@@ -134,3 +127,92 @@ class AutotrophicNutritionComponent(EntityComponent):
     @property
     def base_toxicity(self) -> float:
         return self._base_toxicity
+
+    @property
+    def current_nutritive_value(self) -> float:
+        return self._current_nutritive_value
+
+    @property
+    def current_toxicity(self) -> float:
+        return self._current_toxicity
+
+    @property
+    def photosynthesis_efficiency(self) -> float:
+        return self._photosynthesis_efficiency
+
+    @property
+    def stress_ratio(self) -> float:
+        return self._stress_ratio
+
+    @property
+    def energy_ratio(self) -> float:
+        return self._energy_ratio
+
+    @property
+    def energy_reserves(self) -> float:
+        return self._energy_handler.energy_reserves
+
+    @property
+    def max_energy_reserves(self) -> float:
+        return self._energy_handler.max_energy_reserves
+
+    @property
+    def stress_handler(self) -> StressHandler:
+        return self._stress_handler
+
+    @property
+    def energy_handler(self) -> EnergyHandler:
+        return self._energy_handler
+
+    @property
+    def event_notifier(self) -> EventNotifier:
+        return self._event_notifier
+
+    @property
+    def lifespan(self) -> float:
+        return self._lifespan
+
+    @property
+    def is_active(self) -> bool:
+        return self._host_alive
+
+    @property
+    def is_dormant(self) -> bool:
+        return self._is_dormant
+
+    # Setters
+    @nutrient_absorption_rate.setter
+    def nutrient_absorption_rate(self, value: float) -> None:
+        self._nutrient_absorption_rate = value
+
+    @mycorrhizal_rate.setter
+    def mycorrhizal_rate(self, value: float) -> None:
+        self._mycorrhizal_rate = value
+
+    @base_nutritive_value.setter
+    def base_nutritive_value(self, value: float) -> None:
+        self._base_nutritive_value = value
+
+    @base_toxicity.setter
+    def base_toxicity(self, value: float) -> None:
+        self._base_toxicity = value
+
+    @current_nutritive_value.setter
+    def current_nutritive_value(self, value: float) -> None:
+        self._current_nutritive_value = value
+
+    @current_toxicity.setter
+    def current_toxicity(self, value: float) -> None:
+        self._current_toxicity = value
+
+    @photosynthesis_efficiency.setter
+    def photosynthesis_efficiency(self, value: float) -> None:
+        self._photosynthesis_efficiency = value
+
+    @stress_ratio.setter
+    def stress_ratio(self, value: float) -> None:
+        self._stress_ratio = value
+
+    @energy_ratio.setter
+    def energy_ratio(self, value: float) -> None:
+        self._energy_ratio = value

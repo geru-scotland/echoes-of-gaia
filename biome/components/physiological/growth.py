@@ -21,10 +21,8 @@ from simpy import Environment as simpyEnv
 
 from biome.components.base.component import EntityComponent
 from biome.systems.components.registry import ComponentRegistry
-from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
-from shared.enums.events import ComponentEvent
 from shared.timers import Timers
 
 
@@ -89,6 +87,19 @@ class GrowthComponent(EntityComponent):
             "growth_efficiency": self._growth_efficiency
         }
 
+    # Getters
+    @property
+    def growth_stage(self) -> int:
+        return self._growth_stage
+
+    @property
+    def current_size(self) -> float:
+        return self._current_size
+
+    @property
+    def max_size(self) -> float:
+        return self._max_size
+
     @property
     def growth_modifier(self) -> float:
         return self._growth_modifier
@@ -98,9 +109,50 @@ class GrowthComponent(EntityComponent):
         return self._growth_efficiency
 
     @property
-    def max_size(self) -> float:
-        return self._max_size
+    def initial_size(self) -> float:
+        return self._initial_size
+
+    @property
+    def total_stages(self) -> int:
+        return self._total_stages
+
+    @property
+    def stage_thresholds(self) -> List[float]:
+        return self._stage_thresholds
 
     @property
     def lifespan(self) -> float:
-        return self._lifespan_in_ticks / float(Timers.Calendar.YEAR)
+        return self._lifespan_in_ticks
+
+    @property
+    def event_notifier(self) -> EventNotifier:
+        return self._event_notifier
+
+    @property
+    def is_active(self) -> bool:
+        return self._host_alive
+
+    # Setters
+    @growth_stage.setter
+    def growth_stage(self, value: int) -> None:
+        self._growth_stage = value
+
+    @current_size.setter
+    def current_size(self, value: float) -> None:
+        self._current_size = value
+
+    @max_size.setter
+    def max_size(self, value: float) -> None:
+        self._max_size = value
+
+    @growth_modifier.setter
+    def growth_modifier(self, value: float) -> None:
+        self._growth_modifier = value
+
+    @growth_efficiency.setter
+    def growth_efficiency(self, value: float) -> None:
+        self._growth_efficiency = value
+
+    @initial_size.setter
+    def initial_size(self, value: float) -> None:
+        self._initial_size = value

@@ -27,9 +27,6 @@ from biome.systems.components.registry import ComponentRegistry
 from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
-from shared.enums.events import ComponentEvent
-from shared.enums.reasons import DormancyReason, StressReason
-from shared.enums.thresholds import VitalThresholds
 from shared.timers import Timers
 from simulation.core.systems.events.event_bus import SimulationEventBus
 
@@ -133,22 +130,108 @@ class VitalComponent(EntityComponent):
         plt.tight_layout()
         plt.show()
 
+    # Getters
+    @property
+    def vitality(self) -> float:
+        return self._vitality
+
     @property
     def max_vitality(self) -> float:
         return self._max_vitality
+
+    @property
+    def age(self) -> float:
+        return self._age
+
+    @property
+    def biological_age(self) -> float:
+        return self._biological_age
 
     @property
     def aging_rate(self) -> float:
         return self._aging_rate
 
     @property
+    def birth_tick(self) -> int:
+        return self._birth_tick
+
+    @property
+    def dormancy_threshold(self) -> float:
+        return self._dormancy_threshold
+
+    @property
     def health_modifier(self) -> float:
         return self._health_modifier
 
     @property
-    def lifespan(self) -> float:
-        return self._lifespan_in_ticks / (float(Timers.Calendar.YEAR) / float(Timers.Calendar.DAY))
+    def vitality_history(self) -> List[Tuple[float, float]]:
+        return self._vitality_history
+
+    @property
+    def lifespan_in_ticks(self) -> int:
+        return self._lifespan_in_ticks
+
+    @property
+    def lifespan(self) -> int:
+        return self._lifespan_in_ticks
 
     @property
     def stress_level(self) -> float:
         return self._stress_handler.stress_level
+
+    @property
+    def stress_handler(self) -> StressHandler:
+        return self._stress_handler
+
+    @property
+    def event_notifier(self) -> EventNotifier:
+        return self._event_notifier
+
+    @property
+    def is_active(self) -> bool:
+        return self._host_alive
+
+    # Setters
+    @vitality.setter
+    def vitality(self, value: float) -> None:
+        self._vitality = value
+
+    @max_vitality.setter
+    def max_vitality(self, value: float) -> None:
+        self._max_vitality = value
+
+    @age.setter
+    def age(self, value: float) -> None:
+        self._age = value
+
+    @biological_age.setter
+    def biological_age(self, value: float) -> None:
+        self._biological_age = value
+
+    @aging_rate.setter
+    def aging_rate(self, value: float) -> None:
+        self._aging_rate = value
+
+    @birth_tick.setter
+    def birth_tick(self, value: int) -> None:
+        self._birth_tick = value
+
+    @dormancy_threshold.setter
+    def dormancy_threshold(self, value: float) -> None:
+        self._dormancy_threshold = value
+
+    @health_modifier.setter
+    def health_modifier(self, value: float) -> None:
+        self._health_modifier = value
+
+    @vitality_history.setter
+    def vitality_history(self, value: List[Tuple[float, float]]) -> None:
+        self._vitality_history = value
+
+    @lifespan_in_ticks.setter
+    def lifespan_in_ticks(self, value: int) -> None:
+        self._lifespan_in_ticks = value
+
+    @lifespan.setter
+    def lifespan(self, value: int) -> None:
+        self._lifespan = value

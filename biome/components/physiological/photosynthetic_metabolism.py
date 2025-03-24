@@ -106,17 +106,54 @@ class PhotosyntheticMetabolismComponent(EntityComponent):
             "metabolic_activity": self._metabolic_activity,
         }
 
+    # Getters
     @property
     def base_photosynthesis_efficiency(self) -> float:
         return self._base_photosynthesis_efficiency
+
+    @property
+    def photosynthesis_efficiency(self) -> float:
+        return self._photosynthesis_efficiency
 
     @property
     def base_respiration_rate(self) -> float:
         return self._base_respiration_rate
 
     @property
+    def respiration_rate(self) -> float:
+        return self._respiration_rate
+
+    @property
     def metabolic_activity(self) -> float:
         return self._metabolic_activity
+
+    @property
+    def light_availability(self) -> float:
+        return self._light_availability
+
+    @property
+    def temperature_modifier(self) -> float:
+        return self._temperature_modifier
+
+    @property
+    def water_modifier(self) -> float:
+        return self._water_modifier
+
+    @property
+    def biological_age(self) -> Optional[float]:
+        return self._biological_age
+
+    @property
+    def optimal_respiration_ratio(self) -> float:
+        return self._optimal_respiration_ratio
+
+    @property
+    def energy_factor(self) -> float:
+        return self._energy_factor
+
+    @property
+    def lifespan(self) -> float:
+        return self._lifespan
 
     @property
     def energy_reserves(self) -> float:
@@ -125,3 +162,68 @@ class PhotosyntheticMetabolismComponent(EntityComponent):
     @property
     def max_energy_reserves(self) -> float:
         return self._energy_handler.max_energy_reserves
+
+    @property
+    def stress_handler(self) -> StressHandler:
+        return self._stress_handler
+
+    @property
+    def energy_handler(self) -> EnergyHandler:
+        return self._energy_handler
+
+    @property
+    def event_notifier(self) -> EventNotifier:
+        return self._event_notifier
+
+    @property
+    def is_dormant(self) -> bool:
+        return self._is_dormant
+
+    @property
+    def is_active(self) -> bool:
+        return self._host_alive
+
+    # Setters
+    @base_photosynthesis_efficiency.setter
+    def base_photosynthesis_efficiency(self, value: float) -> None:
+        self._base_photosynthesis_efficiency = value
+
+    @photosynthesis_efficiency.setter
+    def photosynthesis_efficiency(self, value: float) -> None:
+        self._photosynthesis_efficiency = value
+
+    @base_respiration_rate.setter
+    def base_respiration_rate(self, value: float) -> None:
+        self._base_respiration_rate = value
+
+    @respiration_rate.setter
+    def respiration_rate(self, value: float) -> None:
+        self._respiration_rate = value
+
+    @metabolic_activity.setter
+    def metabolic_activity(self, value: float) -> None:
+        self._metabolic_activity = value
+
+    @light_availability.setter
+    def light_availability(self, value: float) -> None:
+        self._light_availability = value
+
+    @temperature_modifier.setter
+    def temperature_modifier(self, value: float) -> None:
+        self._temperature_modifier = value
+
+    @water_modifier.setter
+    def water_modifier(self, value: float) -> None:
+        self._water_modifier = value
+
+    @biological_age.setter
+    def biological_age(self, value: Optional[float]) -> None:
+        self._biological_age = value
+
+    @optimal_respiration_ratio.setter
+    def optimal_respiration_ratio(self, value: float) -> None:
+        self._optimal_respiration_ratio = value
+
+    @energy_factor.setter
+    def energy_factor(self, value: float) -> None:
+        self._energy_factor = value

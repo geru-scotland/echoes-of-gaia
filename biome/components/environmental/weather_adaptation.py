@@ -97,6 +97,7 @@ class WeatherAdaptationComponent(EntityComponent):
             "optimal_temperature": self._optimal_temperature,
         }
 
+    # Getters
     @property
     def cold_resistance(self) -> float:
         return self._cold_resistance
@@ -109,3 +110,47 @@ class WeatherAdaptationComponent(EntityComponent):
     def optimal_temperature(self) -> float:
         return self._optimal_temperature
 
+    @property
+    def base_sigma(self) -> float:
+        return self._base_sigma
+
+    @property
+    def max_stress_delta(self) -> float:
+        return self._max_stress_delta
+
+    @property
+    def temperature_exposure_history(self) -> list:
+        return self._temperature_exposure_history
+
+    @property
+    def stress_handler(self) -> StressHandler:
+        return self._stress_handler
+
+    @property
+    def event_notifier(self) -> EventNotifier:
+        return self._event_notifier
+
+    # Setters
+    @cold_resistance.setter
+    def cold_resistance(self, value: float) -> None:
+        self._cold_resistance = value
+
+    @heat_resistance.setter
+    def heat_resistance(self, value: float) -> None:
+        self._heat_resistance = value
+
+    @optimal_temperature.setter
+    def optimal_temperature(self, value: float) -> None:
+        self._optimal_temperature = value
+
+    @base_sigma.setter
+    def base_sigma(self, value: float) -> None:
+        self._base_sigma = value
+
+    @max_stress_delta.setter
+    def max_stress_delta(self, value: float) -> None:
+        self._max_stress_delta = value
+
+    @temperature_exposure_history.setter
+    def temperature_exposure_history(self, value: list) -> None:
+        self._temperature_exposure_history = value

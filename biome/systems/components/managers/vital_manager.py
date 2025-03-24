@@ -15,25 +15,32 @@
 #                                                                              #
 # =============================================================================
 """
+from logging import Logger
+
 import numpy as np
-from typing import Dict, List, Set, Optional, Any
+from typing import Dict, List, Any
 from simpy import Environment as simpyEnv
 
+from biome.components.physiological.vital import VitalComponent
+from biome.systems.components.managers.base import BaseComponentManager
 from shared.enums.events import ComponentEvent
 from shared.enums.enums import ComponentType
+from shared.enums.strings import Loggers
 from shared.enums.thresholds import VitalThresholds
 from shared.enums.reasons import StressReason
 from shared.timers import Timers
 from shared.math.biological import BiologicalGrowthPatterns
+from utils.loggers import LoggerManager
 
 
-class VitalComponentManager:
+class VitalComponentManager(BaseComponentManager[VitalComponent]):
     def __init__(self, env: simpyEnv):
-        self._env = env
-        self._components: Dict[int, Any] = {}
-        self._component_ids = set()
+        super().__init__(env)
+
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
 
         self._age_process = self._env.process(self._update_all_age(Timers.Compoments.Physiological.AGING))
+
         self._vitality_stress_process = self._env.process(
             self._update_all_vitality_stress(Timers.Compoments.Physiological.STRESS_UPDATE))
 
@@ -44,22 +51,6 @@ class VitalComponentManager:
             self._synchronize_aging_rates(Timers.Compoments.Physiological.STRESS_UPDATE)
         )
 
-    def register_component(self, component_id: int, component: Any) -> None:
-        self._components[component_id] = component
-        self._component_ids.add(component_id)
-
-    def unregister_component(self, component_id: int) -> None:
-        if component_id in self._components:
-            del self._components[component_id]
-            self._component_ids.discard(component_id)
-
-    def _get_active_components(self) -> List[Any]:
-        return [comp for comp in self._components.values() if comp._host_alive]
-
-    def _get_non_dormant_components(self) -> List[Any]:
-        return [comp for comp in self._components.values()
-                if comp._host_alive and not comp._is_dormant]
-
     def _update_all_age(self, timer: int):
         yield self._env.timeout(timer)
 
@@ -67,20 +58,20 @@ class VitalComponentManager:
             active_components = self._get_active_components()
 
             if active_components:
-                ages = np.array([comp._age for comp in active_components])
-                aging_rates = np.array([comp._aging_rate for comp in active_components])
+                ages = np.array([comp.age for comp in active_components])
+                aging_rates = np.array([comp.aging_rate for comp in active_components])
 
                 new_ages = ages + timer
                 new_biological_ages = new_ages * aging_rates
 
                 for i, component in enumerate(active_components):
-                    component._age = new_ages[i]
-                    component._biological_age = new_biological_ages[i]
-                    component._event_notifier.notify(
+                    component.age = new_ages[i]
+                    component.biological_age = new_biological_ages[i]
+                    component.event_notifier.notify(
                         ComponentEvent.UPDATE_STATE,
                         ComponentType.VITAL,
-                        age=component._age,
-                        biological_age=component._biological_age
+                        age=component.age,
+                        biological_age=component.biological_age
                     )
 
             yield self._env.timeout(timer)
@@ -92,8 +83,8 @@ class VitalComponentManager:
             active_components = self._get_active_components()
 
             if active_components:
-                vitalities = np.array([comp._vitality for comp in active_components])
-                max_vitalities = np.array([comp._max_vitality for comp in active_components])
+                vitalities = np.array([comp.vitality for comp in active_components])
+                max_vitalities = np.array([comp.max_vitality for comp in active_components])
 
                 vitality_ratios = vitalities / max_vitalities
 
@@ -107,26 +98,26 @@ class VitalComponentManager:
                 for i, component in enumerate(active_components):
                     if critical_mask[i]:
                         stress_change = VitalThresholds.StressChange.CRITICAL
-                        component._stress_handler.modify_stress(stress_change, StressReason.CRITICAL_VITALITY)
-                        component._logger.debug(
+                        component.stress_handler.modify_stress(stress_change, StressReason.CRITICAL_VITALITY)
+                        self._logger.debug(
                             f"Vitality is CRITICAL ({vitality_ratios[i]:.2f}). Increasing stress by {stress_change:}."
                         )
                     elif low_mask[i]:
                         stress_change = VitalThresholds.StressChange.LOW
-                        component._stress_handler.modify_stress(stress_change, StressReason.LOW_VITALITY)
-                        component._logger.debug(
+                        component.stress_handler.modify_stress(stress_change, StressReason.LOW_VITALITY)
+                        self._logger.debug(
                             f"Vitality is LOW ({vitality_ratios[i]:.2f}). Increasing stress by {stress_change}."
                         )
                     elif excellent_mask[i]:
                         stress_change = VitalThresholds.StressChange.EXCELLENT
-                        component._stress_handler.modify_stress(stress_change, StressReason.EXCELLENT_VITALITY)
-                        component._logger.debug(
+                        component.stress_handler.modify_stress(stress_change, StressReason.EXCELLENT_VITALITY)
+                        self._logger.debug(
                             f"Vitality is EXCELLENT ({vitality_ratios[i]:.2f}). Reducing stress by {stress_change}."
                         )
                     elif good_mask[i]:
                         stress_change = VitalThresholds.StressChange.GOOD
-                        component._stress_handler.modify_stress(stress_change, StressReason.GOOD_VITALITY)
-                        component._logger.debug(
+                        component.stress_handler.modify_stress(stress_change, StressReason.GOOD_VITALITY)
+                        self._logger.debug(
                             f"Vitality is GOOD ({vitality_ratios[i]:.2f}). Reducing stress by {stress_change}."
                         )
 
@@ -136,15 +127,16 @@ class VitalComponentManager:
         yield self._env.timeout(timer)
 
         while True:
-            active_components = self._get_non_dormant_components()
+            active_components = self._get_active_components()
 
             if active_components:
-                biological_ages = np.array([comp._biological_age for comp in active_components])
-                lifespans = np.array([comp._lifespan_in_ticks for comp in active_components])
-                health_modifiers = np.array([comp._health_modifier for comp in active_components])
-                max_vitalities = np.array([comp._max_vitality for comp in active_components])
-                stress_levels = np.array([comp._stress_handler.stress_level for comp in active_components])
-                max_stress_levels = np.array([comp._stress_handler.max_stress for comp in active_components])
+                biological_ages = np.array([comp.biological_age for comp in active_components])
+                lifespans = np.array([comp.lifespan_in_ticks for comp in active_components])
+                health_modifiers = np.array([comp.health_modifier for comp in active_components])
+                max_vitalities = np.array([comp.max_vitality for comp in active_components])
+                current_vitalities = np.array([comp.vitality for comp in active_components])
+                stress_levels = np.array([comp.stress_handler.stress_level for comp in active_components])
+                max_stress_levels = np.array([comp.stress_handler.max_stress for comp in active_components])
 
                 completed_lifespan_ratios = np.minimum(1.0, biological_ages / lifespans)
                 completed_lifespan_ratios_with_mods = completed_lifespan_ratios * health_modifiers
@@ -157,35 +149,45 @@ class VitalComponentManager:
                 new_healths = max_vitalities * (1.0 - non_linear_aging_progressions)
                 new_healths[max_stress_mask] -= max_vitalities[max_stress_mask] * 0.05
 
+                combined_mask = ((new_healths <= 0.05 * max_vitalities) &
+                                (new_healths > 0) &
+                                (current_vitalities - new_healths < 0.5))
+
+                if np.any(combined_mask):
+                    min_decay_rate = 0.01
+                    enforced_decay = max_vitalities[combined_mask] * min_decay_rate * completed_lifespan_ratios[
+                        combined_mask]
+                    new_healths[combined_mask] -= enforced_decay
+
                 for i, component in enumerate(active_components):
-                    component._logger.debug(
-                        f"[Vitality Update | DEBUG:Tick={component._env.now}] "
-                        f"Stress level={component._stress_handler.stress_level:4f}]"
-                        f"Age: {component._age} - Biological Age: {component._biological_age}, Lifespan: {component._lifespan_in_ticks}, "
-                        f"Aging rate: {component._aging_rate} "
+                    self._logger.debug(
+                        f"[Vitality Update | DEBUG:Tick={self._env.now}] "
+                        f"Stress level={component.stress_handler.stress_level:4f}]"
+                        f"Age: {component.age} - Biological Age: {component.biological_age}, Lifespan: {component.lifespan_in_ticks}, "
+                        f"Aging rate: {component.aging_rate} "
                         f"Completed Ratio: {completed_lifespan_ratios[i]:.2f}, Aging Progression: {non_linear_aging_progressions[i]:.2f}, "
-                        f"Health Modifier: {component._health_modifier} "
-                        f"New Health: {new_healths[i]:.2f}, Vitality: {component._vitality}"
+                        f"Health Modifier: {component.health_modifier} "
+                        f"New Health: {new_healths[i]:.2f}, Vitality: {component.vitality}"
                     )
 
                     if new_healths[i] <= 0.0 :
-                        component._vitality = 0
-                        component._event_notifier.notify(
+                        component.vitality = 0
+                        component.event_notifier.notify(
                             ComponentEvent.UPDATE_STATE,
                             ComponentType.VITAL,
-                            vitality=component._vitality
+                            vitality=component.vitality
                         )
-                        component._event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL)
+                        component.event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL)
                     else:
-                        component._vitality = max(0, new_healths[i])
-                        component._event_notifier.notify(
+                        component.vitality = max(0, new_healths[i])
+                        component.event_notifier.notify(
                             ComponentEvent.UPDATE_STATE,
                             ComponentType.VITAL,
-                            vitality=component._vitality
+                            vitality=component.vitality
                         )
 
-                    age_in_years = component._age / float(Timers.Calendar.YEAR)
-                    component._vitality_history.append((age_in_years, component._vitality))
+                    age_in_years = component.age / float(Timers.Calendar.YEAR)
+                    component.vitality_history.append((age_in_years, component.vitality))
 
 
             yield self._env.timeout(timer)
@@ -202,7 +204,7 @@ class VitalComponentManager:
 
         if active_components:
             normalized_stresses = np.array([
-                comp._stress_handler.stress_level / comp._stress_handler.max_stress
+                comp.stress_handler.stress_level / comp.stress_handler.max_stress
                 for comp in active_components
             ])
 
@@ -226,7 +228,7 @@ class VitalComponentManager:
                 )
 
             for i, component in enumerate(active_components):
-                component._aging_rate = new_aging_rates[i]
-                component._logger.debug(
-                    f"normalized: {normalized_stresses[i]:.2f} → aging_rate: {component._aging_rate:.2f}"
+                component.aging_rate = new_aging_rates[i]
+                self._logger.debug(
+                    f"normalized: {normalized_stresses[i]:.2f} → aging_rate: {component.aging_rate:.2f}"
                 )
