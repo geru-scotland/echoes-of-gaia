@@ -106,7 +106,6 @@ class GrowthComponentManager:
                         for stage, threshold in enumerate(component._stage_thresholds):
                             if component._growth_stage == stage and component._current_size >= threshold:
                                 component._growth_stage += 1
-                                self._logger.warning(f"Increasing stage: {component._growth_stage}")
                                 component._event_notifier.notify(
                                     ComponentEvent.UPDATE_STATE,
                                     GrowthComponent,

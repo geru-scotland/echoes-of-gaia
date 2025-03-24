@@ -41,8 +41,8 @@ class MetabolicThresholds:
         ABUNDANT = 0.80
 
     class StressChange(EnumBaseFloat):
-        NO_ENERGY = 0.9
-        CRITICAL = 0.015
+        NO_ENERGY = 0.1
+        CRITICAL = 0.010
         LOW = 0.008
         SUFFICIENT = 0.005
         ABUNDANT = 0.003
