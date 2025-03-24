@@ -23,6 +23,7 @@ from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
 from biome.components.handlers.stress_handler import StressHandler
+from biome.systems.components.registry import ComponentRegistry
 from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
@@ -49,7 +50,6 @@ class VitalComponent(EntityComponent):
         self._aging_rate: float = aging_rate
         self._biological_age: float = self._age * aging_rate
         self._dormancy_threshold: float = round(dormancy_threshold, 2)
-        # TODO: BIRTHTIME como timer
         self._health_modifier: float = 1.0
         self._vitality_history: List[Tuple[float, float]] = []  # (age, vitality)
         self._birth_tick: int = self._env.now
@@ -57,147 +57,20 @@ class VitalComponent(EntityComponent):
         self._logger.debug(f"Vital component initialized: Health={self._vitality}/{self._max_vitality}, "
                            f"Age={self._age}")
 
-        self._env.process(self._update_age(Timers.Compoments.Physiological.AGING))
-        self._env.process(self._update_vitality_stress(Timers.Compoments.Physiological.STRESS_UPDATE))
-        self._env.process(self._update_vitality(Timers.Compoments.Physiological.HEALTH_DECAY))
+        ComponentRegistry.get_vital_manager().register_component(id(self), self)
 
     def _register_events(self) -> None:
         super()._register_events()
         self._stress_handler.register_events()
-        self._event_notifier.register(ComponentEvent.STRESS_UPDATED, self._handle_stress_update)
         SimulationEventBus.register("simulation_finished", self._handle_simulation_finished)
 
     def _handle_simulation_finished(self) -> None:
         # self.plot_vitality_curve()
         pass
 
-    def _update_age(self, timer: Optional[int] = None):
-        yield self._env.timeout(timer)
-        while self._host_alive:
-            self._age += timer
-            self._biological_age = self._age * self._aging_rate
-            self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, age=self._age,
-                                        biological_age=self._biological_age)
-
-            yield self._env.timeout(timer)
-
-    def _update_vitality_stress(self, timer: int):
-        yield self._env.timeout(timer)
-
-        while self._host_alive:
-
-            vitality_ratio = self._vitality / self._max_vitality
-
-            if vitality_ratio < VitalThresholds.Health.CRITICAL:
-                stress_change = VitalThresholds.StressChange.CRITICAL
-                self._stress_handler.modify_stress(stress_change, StressReason.CRITICAL_VITALITY)
-                self._logger.debug(
-                    f"Vitality is CRITICAL ({vitality_ratio:.2f}). Increasing stress by {stress_change:}.")
-
-            elif vitality_ratio < VitalThresholds.Health.LOW:
-                stress_change = VitalThresholds.StressChange.LOW
-                self._stress_handler.modify_stress(stress_change, StressReason.LOW_VITALITY)
-                self._logger.debug(
-                    f"Vitality is LOW ({vitality_ratio:.2f}). Increasing stress by {stress_change}.")
-
-            elif vitality_ratio > VitalThresholds.Health.EXCELLENT:
-                stress_change = VitalThresholds.StressChange.EXCELLENT
-                self._stress_handler.modify_stress(stress_change, StressReason.EXCELLENT_VITALITY)
-                self._logger.debug(
-                    f"Vitality is EXCELLENT ({vitality_ratio:.2f}). Reducing stress by {stress_change}.")
-
-            elif vitality_ratio > VitalThresholds.Health.GOOD:
-                stress_change = VitalThresholds.StressChange.GOOD
-                self._stress_handler.modify_stress(stress_change, StressReason.GOOD_VITALITY)
-                self._logger.debug(
-                    f"Vitality is GOOD ({vitality_ratio:.2f}). Reducing stress by {stress_change}.")
-
-            yield self._env.timeout(timer)
-
-    def _update_vitality(self, timer: Optional[int] = None):
-        yield self._env.timeout(timer)
-        while self._host_alive:
-
-            if not self._is_dormant:
-                completed_lifespan_ratio: float = min(1.0, self._biological_age / self._lifespan_in_ticks)
-                completed_lifespan_ratio_with_mods: float = completed_lifespan_ratio * self._health_modifier
-
-                if self._stress_handler.stress_level == self._stress_handler.max_stress:
-                    non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(
-                        completed_lifespan_ratio_with_mods, decay_onset=0.001, decay_steepness=29.0)
-                else:
-                    non_linear_aging_progression = BiologicalGrowthPatterns.gompertz_decay(
-                        completed_lifespan_ratio_with_mods)
-
-                new_health = self._max_vitality * (1.0 - non_linear_aging_progression)
-
-                self._logger.debug(
-                    f"[Vitality Update | DEBUG:Tick={self._env.now}] "
-                    f"Stress level={self._stress_handler.stress_level:4f}]"
-                    f"Age: {self._age} - Biological Age: {self._biological_age}, Lifespan: {self._lifespan_in_ticks}, "
-                    f"Aging rate: {self._aging_rate} "
-                    f"Completed Ratio: {completed_lifespan_ratio:.2f}, Aging Progression: {non_linear_aging_progression:.2f}, "
-                    f"Health Modifier: {self._health_modifier} "
-                    f"New Health: {new_health:.2f}, Vitality: {self._vitality}"
-                )
-
-                self._vitality = max(0, new_health)
-                self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
-                age_in_years = self._age / float(Timers.Calendar.YEAR)
-                self._vitality_history.append((age_in_years, self._vitality))                # TODO: Gestionar en entity, pensar bien la logíca del bloque general de updates
-
-                # si entra en dormancy.
-                # if self._vitality <= self._dormancy_threshold and not self._is_dormant:
-                #     self.request_dormancy(DormancyReason.LOW_VITALITY, True)
-                # elif self._vitality > self._dormancy_threshold and self._is_dormant:
-                #     self.request_dormancy(DormancyReason.LOW_VITALITY, False)
-
-                # TODO: Esto es hack del copón, es para evitar
-                if new_health < 0.01 * self._max_vitality or (self._stress_handler.stress_level == self._stress_handler.max_stress and new_health < 0.015 * self._max_vitality):
-                    # TODO: Death. Gestionar en entity
-                    self._vitality = 0
-                    self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
-                    self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, VitalComponent)
-                    break
-
-            yield self._env.timeout(timer)
-
-    def _handle_stress_update(self, *args, **kwargs):
-
-        normalized_stress: float = kwargs.get("normalized_stress", 0.0)
-
-        if normalized_stress <= 0.2:
-            self._aging_rate = (1
-                                - 11.25 * (normalized_stress ** 2)
-                                + 37.5 * (normalized_stress ** 3))
-        else:
-            self._aging_rate = (0.9921875
-                                - 1.5234375 * normalized_stress
-                                + 4.5703125 * (normalized_stress ** 2)
-                                - 2.5390625 * (normalized_stress ** 3))
-
-        self._logger.debug(
-            f"normalized: {normalized_stress:.2f} → aging_rate: {self._aging_rate:.2f}")
-
-    def apply_damage(self, amount: float) -> None:
-        # Hervíboros comiendo, tiemps extremos...etc
-        self._vitality -= amount * self._biological_age
-        self._vitality = max(0.0, self._vitality)
-
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
-
-        if self._vitality <= 0:
-            self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, VitalComponent)
-
-    def apply_healing(self, amount: float) -> None:
-        # clima favorable, que aplique heals
-        self._vitality += amount * (1 - self._biological_age)
-        self._vitality = min(self._vitality, self._max_vitality)
-
-        self._event_notifier.notify(ComponentEvent.UPDATE_STATE, VitalComponent, vitality=self._vitality)
-
-    def set_health_modifier(self, modifier: float) -> None:
-        self._health_modifier = max(0.0, modifier)
+    def disable_notifier(self):
+        super().disable_notifier()
+        ComponentRegistry.get_vital_manager().unregister_component(id(self))
 
     def get_state(self) -> Dict[str, Any]:
         return {

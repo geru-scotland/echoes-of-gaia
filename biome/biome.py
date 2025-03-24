@@ -27,6 +27,7 @@ from biome.agents.evolution_agent import EvolutionAgentAI
 from biome.environment import Environment
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
+from biome.systems.components.registry import ComponentRegistry
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.registry import EvolutionAgentRegistry
@@ -54,6 +55,9 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         Environment.__init__(self, context, env)
         try:
             self._logger.info(self._context.config.get("type"))
+
+            ComponentRegistry.initialize(env)
+
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions,
