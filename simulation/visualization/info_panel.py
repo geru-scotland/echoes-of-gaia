@@ -195,7 +195,20 @@ class InfoPanel:
                 surface.blit(label_surface, (x + 8, current_y))
 
                 if value:
+                    max_value_width = width - label_surface.get_width() - 25
                     value_surface = self._font.render(value, True, color)
+
+                    if value_surface.get_width() > max_value_width:
+                        smaller_font = pygame.font.SysFont(None, self._font_size - 2)
+                        value_surface = smaller_font.render(value, True, color)
+
+                        if value_surface.get_width() > max_value_width:
+                            for j in range(len(value) - 3, 0, -1):
+                                truncated = value[:j] + "..."
+                                value_surface = smaller_font.render(truncated, True, color)
+                                if value_surface.get_width() <= max_value_width:
+                                    break
+
                     value_x = x + width - value_surface.get_width() - 10
                     surface.blit(value_surface, (value_x, current_y))
 
@@ -345,6 +358,18 @@ class InfoPanel:
                     if 'num_fauna' in self._metrics:
                         data_items.append(("  Fauna:", f"{self._metrics['num_fauna']}", (200, 150, 100)))
 
+                    if 'total_entities' in self._metrics:
+                        data_items.append(("  Total:", f"{self._metrics['num_flora'] + self._metrics['num_fauna']}", (180, 180, 220)))
+
+                    if 'avg_stress' in self._metrics:
+                        stress_value = self._metrics['avg_stress']
+                        stress_color = (100, 200, 100)
+                        if stress_value > 70:
+                            stress_color = (200, 100, 100)
+                        elif stress_value > 30:
+                            stress_color = (200, 200, 100)
+                        data_items.append(("  Avg Stress:", f"{stress_value:.2f}", stress_color))
+
                     if 'avg_toxicity' in self._metrics:
                         tox_value = self._metrics['avg_toxicity']
                         tox_color = (100, 200, 100)
@@ -464,7 +489,55 @@ class InfoPanel:
                 y_left = y_next + section_height
             else:
                 y_left = y_next
+        y_next, expanded = self._render_collapsible_section(
+            self._surface, "ECOLOGICAL METRICS", x_left, y_left + 10, "ecological_metrics")
 
+        if expanded:
+            eco_data_items = []
+
+            if 'climate_adaptation' in self._metrics:
+                adaptation = self._metrics['climate_adaptation']
+                adaptation_color = (100, 200, 100)
+                if adaptation < 0.3:
+                    adaptation_color = (200, 100, 100)
+                elif adaptation < 0.7:
+                    adaptation_color = (200, 200, 100)
+                eco_data_items.append(("Climate Adaptation:", f"{adaptation:.2f}", adaptation_color))
+
+            if 'entity_balance' in self._metrics:
+                balance = self._metrics['entity_balance']
+                balance_color = (100, 200, 100)
+                if balance < 0.3:
+                    balance_color = (200, 100, 100)
+                elif balance < 0.7:
+                    balance_color = (200, 200, 100)
+                eco_data_items.append(("Species Balance:", f"{balance:.2f}", balance_color))
+
+            if any(f'evolution_trend_{i}' in self._metrics for i in range(1, 4)):
+                eco_data_items.append(("Evolution Trends:", "", (180, 200, 220)))
+
+                for i in range(1, 4):
+                    trend_key = f'evolution_trend_{i}'
+                    direction_key = f'evolution_trend_{i}_direction'
+
+                    if trend_key in self._metrics and self._metrics[trend_key]:
+                        trend_text = self._metrics[trend_key]
+                        direction = self._metrics.get(direction_key, 0)
+
+                        if direction > 0:
+                            color = (100, 200, 255)
+                        elif direction < 0:
+                            color = (255, 120, 120)
+                        else:
+                            color = (180, 180, 180)
+
+                        label = f"{i}:"
+                        eco_data_items.append((label, trend_text, color))
+
+            y_left = self._render_info_section(self._surface, "Ecosystem Metrics",
+                                               eco_data_items, x_left + 5, y_next, col_width - 10)
+        else:
+            y_left = y_next
         if self._selected_entity:
             is_dead = False
             if isinstance(self._selected_entity.state_fields, dict) and "general" in self._selected_entity.state_fields:

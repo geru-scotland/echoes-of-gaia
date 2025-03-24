@@ -65,7 +65,9 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
             self._climate_data_manager = ClimateDataManager(self._env, self._climate)
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
-            self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider)
+            self._evolution_registry: EvolutionAgentRegistry = EvolutionAgentRegistry(self._climate_data_manager,
+                                                                                      self._entity_provider)
+            self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider, climate_manager=self._climate_data_manager, evolution_registry=self._evolution_registry)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
 
             self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
@@ -85,7 +87,6 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.Climate.CLIMATE_UPDATE))
 
-        self._evolution_registry: EvolutionAgentRegistry = EvolutionAgentRegistry(self._climate_data_manager, self._entity_provider)
 
         self._initialize_evolution_agents(
             EntityType.FLORA,
@@ -119,7 +120,8 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                     entity_type,
                     species,
                     lifespan,
-                    evolution_cycle_time
+                    evolution_cycle_time,
+                    self._evolution_registry
                 )
 
                 self._evolution_registry.register_agent(species, evolution_agent)

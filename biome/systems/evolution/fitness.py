@@ -216,7 +216,9 @@ def compute_flora_fitness(flora_genes, climate_data):
         excess = flora_genes.base_photosynthesis_efficiency - 0.7
         energy_penalty = 10.0 * (math.exp(4 * excess) - 1)
         fitness -= energy_penalty
+
     min_required_respiration = flora_genes.base_photosynthesis_efficiency * 0.35
+
     if flora_genes.base_respiration_rate < min_required_respiration:
         unrealistic_penalty = (min_required_respiration - flora_genes.base_respiration_rate) * 80.0
         fitness -= unrealistic_penalty

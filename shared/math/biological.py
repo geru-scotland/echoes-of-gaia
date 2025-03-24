@@ -47,5 +47,14 @@ class BiologicalGrowthPatterns:
         return vitality_loss
 
     @staticmethod
+    def gompertz_decay_vectorized(life_proportions: np.ndarray, decay_onset: float = 0.005,
+                                  decay_steepness: float = 7.0) -> np.ndarray:
+        life_proportions = np.clip(life_proportions, 0, 1)
+
+        vitality_loss = 1.0 - np.exp(-decay_onset * np.exp(decay_steepness * life_proportions))
+
+        return vitality_loss
+
+    @staticmethod
     def von_bertalanffy_growth(relative_age: float, growth_constant: float = 2.0) -> float:
         return 1.0 - math.exp(-growth_constant * relative_age)

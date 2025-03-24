@@ -240,6 +240,7 @@ class EcosystemHealthContributor(BaseScoreContributor):
     def calculate(self, biome_data: Dict[str, Any]) -> float:
         health_score = 0.0
         factors_count = 0
+
         if "avg_stress_level" in biome_data:
             stress_level = min(100.0, biome_data["avg_stress_level"])
             stress_factor = 1.0 - (stress_level / 100.0)
@@ -254,6 +255,24 @@ class EcosystemHealthContributor(BaseScoreContributor):
             factors_count += 1
             self._logger.debug(f"Size factor: {size_factor:.2f} from size: {size:.2f}")
 
+        if "climate_adaptation" in biome_data:
+            adaptation = biome_data["climate_adaptation"]
+            health_score += adaptation * 1.0
+            factors_count += 1.0
+            self._logger.debug(f"Climate adaptation factor: {adaptation:.2f}")
+
+        if "entity_balance" in biome_data:
+            balance = biome_data["entity_balance"]
+            health_score += balance * 1.0
+            factors_count += 1.0
+            self._logger.debug(f"Species balance factor: {balance:.2f}")
+
+        if "avg_toxicity" in biome_data:
+            toxicity = min(100.0, biome_data["avg_toxicity"])
+            toxicity_factor = 1.0 - (toxicity / 100.0)
+            health_score += toxicity_factor * 0.8
+            factors_count += 0.8
+            self._logger.debug(f"Toxicity factor: {toxicity_factor:.2f} from toxicity: {toxicity:.2f}")
 
         if factors_count > 0:
             health_score /= factors_count
