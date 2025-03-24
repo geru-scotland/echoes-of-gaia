@@ -84,6 +84,11 @@ class MetricsData(TypedDict):
     avg_size: float
     num_flora: int
     num_fauna: int
+    avg_stress: float
+    evolution_trends: Any
+    entity_balance: Any
+    climate_adaptation: Any
+
 
 class SnapshotData(TypedDict):
     snapshot_id: str

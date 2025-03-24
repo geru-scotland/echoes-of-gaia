@@ -67,8 +67,8 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def _handle_component_update(self, component_class: Type, **kwargs: Any):
         if kwargs:
-            self._logger.debug(f"[Sim tick: {self._env.now} (called in: {kwargs.get("tick")})] Updating entity: {self._descriptor.species} (id: {self._id}) ({self._descriptor.entity_type}),"
-                               f" [component: {component_class.__name__}]: {kwargs}")
+            # self._logger.debug(f"[Sim tick: {self._env.now} (called in: {kwargs.get("tick")})] Updating entity: {self._descriptor.species} (id: {self._id}) ({self._descriptor.entity_type}),"
+            #                    f" [component: {component_class.__name__}]: {kwargs}")
             for key, value in kwargs.items():
                 self._state.update(key, value)
                 if key == "biological_age":

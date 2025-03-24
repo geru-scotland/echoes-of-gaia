@@ -42,7 +42,8 @@ from utils.loggers import LoggerManager
 
 class EvolutionAgentAI(Agent):
     def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider, entity_type: EntityType,
-                 species: FloraSpecies | FaunaSpecies, base_lifespan: float, evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE):
+                 species: FloraSpecies | FaunaSpecies, base_lifespan: float, evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE,
+                 evolution_registry = None):
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
         self._climate_data_manager: ClimateDataManager = climate_data_manager
         self.entity_provider: EntityProvider = entity_provider
@@ -55,6 +56,7 @@ class EvolutionAgentAI(Agent):
         self._species: FloraSpecies = species
         self._species_base_lifespan: float = base_lifespan
         self._logger.info(f"Initialized Evolution Agent for species: {species}")
+        self._evolution_registry = evolution_registry
 
     def perceive(self) -> Observation:
         if self._entity_type == EntityType.FLORA:
@@ -95,7 +97,7 @@ class EvolutionAgentAI(Agent):
                 if i < len(entities_sorted):
                     entities_to_remove.append(entities_sorted[i].get_id())
 
-            k_best = self._calculate_k_best(len(entities))
+            k_best = self._compute_k_best(entities)
 
             evolved_genes = self._genetic_model.evolve_population(
                 entities_list, climate_data, generation_count=10, k_best=k_best
@@ -120,15 +122,23 @@ class EvolutionAgentAI(Agent):
             if species == self._species:
                 self._create_evolved_entity(species, genes)
 
+        self._evolution_registry.record_generation(self._current_evolution_cycle)
 
         # Nueva generación spawneada, calculo lifespan medio
         average_lifespan: float = self._compute_current_generation_lifespan()
         self._increase_evolution_time_cycle(average_lifespan)
 
-    def _calculate_k_best(self, population_size: int) -> int:
-        # Por ahora pongo 15-25% de la población, con mínimo de 3 y máximo de 15
-        k_best = max(3, min(10, int(population_size * random.uniform(0.15, 0.25))))
-        return k_best
+    def _compute_k_best(self, entities: EntityList) -> int:
+        avg_lifespan: float = np.average(np.array([e.lifespan for e in entities]))
+        population_size: float = len(entities)
+        base_k_best = max(3, min(10, int(population_size * random.uniform(0.15, 0.25))))
+
+        base_lifespan = self._species_base_lifespan
+        multiplier = 1 + ((avg_lifespan - base_lifespan) / base_lifespan) * 0.1
+
+        multiplier = max(0.8, min(multiplier, 1.2))
+
+        return int(base_k_best * multiplier)
 
     def _compute_current_generation_lifespan(self) -> float:
         if self._entity_type == EntityType.FLORA:

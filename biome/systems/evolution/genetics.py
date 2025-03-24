@@ -228,7 +228,7 @@ class GeneticAlgorithmModel:
 
         self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
 
-        def mutation_controlled(individual, indpb, entity_type=None, max_change_percent=0.05, min_absolute_change=0.01):
+        def mutation_controlled(individual, indpb, entity_type=None, max_change_percent=0.2, min_absolute_change=0.01):
             if entity_type is None:
                 entity_type = (EntityType.FLORA
                                if len(individual) == len(FLORA_GENE_RANGES)
@@ -274,7 +274,7 @@ class GeneticAlgorithmModel:
 
                     if apply_boost:
                         if random.random() < 0.8:  # Mayor probabilidad de incremento
-                            boost_change = random.uniform(0.05 * range_size, 0.4 * range_size)
+                            boost_change = random.uniform(0.05 * range_size, 0.12 * range_size)
                             new_value = original_value + boost_change
                         else:
                             new_value = max(min_val, original_value * 0.9)
@@ -330,7 +330,7 @@ class GeneticAlgorithmModel:
             # en mutate, mutation_controlled.
             return self.toolbox.mutate(individual, indpb, entity_type)
 
-        self.toolbox.register("mutate_typed", mutate_with_type_wrapper, indpb=0.1)
+        self.toolbox.register("mutate_typed", mutate_with_type_wrapper, indpb=0.2)
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
         stats.register("avg", np.mean)
@@ -338,9 +338,9 @@ class GeneticAlgorithmModel:
         stats.register("max", np.max)
 
         algorithms.eaSimple(population, self.toolbox,
-                            cxpb=0.3, mutpb=0.1,
+                            cxpb=0.4, mutpb=0.2,
                             ngen=generation_count,
-                            stats=stats, verbose=True)
+                            stats=stats, verbose=False)
 
         top_individuals = tools.selBest(population, k=k_best)
 
