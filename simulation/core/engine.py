@@ -25,6 +25,7 @@ import simpy
 from biome.api.biome_api import BiomeAPI
 from biome.systems.managers.biome_data_manager import BiomeDataManager
 from config.settings import Settings
+from shared.enums.events import SimulationEvent
 from shared.timers import Timers
 from shared.enums.strings import Strings, Loggers
 from simulation.core.bootstrap.bootstrap import Bootstrap
@@ -104,7 +105,9 @@ class SimulationEngine:
         self._env.process(self._montly_update(Timers.Calendar.MONTH))
         self._time.log_time(self._env.now)
         self._env.run(until=self._eras * self._events_per_era)
-        SimulationEventBus.trigger("simulation_finished")
+
+        SimulationEventBus.trigger(SimulationEvent.SIMULATION_FINISHED)
+
         if self._datapoints:
             self._context.influxdb.close()
 

@@ -95,7 +95,7 @@ class EvolutionTrendAnalyzer:
         }
 
         for species, history in self._flora_history.items():
-            if len(history) < 2:  
+            if len(history) < 2:
                 continue
 
             species_trends = {}
