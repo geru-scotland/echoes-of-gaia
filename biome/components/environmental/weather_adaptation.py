@@ -27,13 +27,12 @@ from shared.enums.enums import ComponentType, WeatherEvent
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import StressReason
 from shared.enums.thresholds import ClimateThresholds
-from shared.timers import Timers
 
 
 class WeatherAdaptationComponent(EntityComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float,
-                 cold_resistance: float = 1.0,
-                 heat_resistance: float = 1.0,
+                 cold_resistance: float = 0.0,
+                 heat_resistance: float = 0.0,
                  optimal_temperature: float = 22.0,
                  base_sigma: float = 15.0,
                  max_stress_delta: float = 0.2):
