@@ -33,8 +33,8 @@ FLORA_GENE_RANGES: Dict[str, Tuple[Number, Number]] = {
 
     "metabolic_activity": (0.2, 1.0),
     "max_energy_reserves": (50.0, 150.0),
-    "cold_resistance": (0.0, 1.0),
-    "heat_resistance": (0.0, 1.0),
+    "cold_resistance": (0.01, 1.0),
+    "heat_resistance": (0.01, 1.0),
     "optimal_temperature": (-30, 50),
     "nutrient_absorption_rate": (0.1, 1.0),
     "mycorrhizal_rate": (0.01, 0.04),
@@ -54,8 +54,8 @@ FAUNA_GENE_RANGES = {
     "lifespan": (1.0, 1000.0),
 
     # Resistencias
-    "cold_resistance": (0.0, 1.0),
-    "heat_resistance": (0.0, 1.0),
+    "cold_resistance": (0.001, 1.0),
+    "heat_resistance": (0.001, 1.0),
     "optimal_temperature": (-20.0, 40.0),
 
     # Cuando los tenga, especificos a fauna:
