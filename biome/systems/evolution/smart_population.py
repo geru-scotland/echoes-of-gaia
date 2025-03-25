@@ -145,6 +145,7 @@ class SmartPopulationTrendControl(EventHandler):
         self._generations_history.append(next(self._generation_counter))
         if len(self._population_history) > self._max_history_length:
             self._population_history = self._population_history[-self._max_history_length:]
+            self._generations_history = self._generations_history[-self._max_history_length:]
 
     def calculate_adjustment(self) -> float:
         if len(self._population_history) < 2:
