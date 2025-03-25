@@ -525,7 +525,7 @@
       "AutotrophicNutritionComponent": {
         "defaults": {
           "nutrient_absorption_rate": 0.3,
-          "mycorrhizal_rate": 0.01,
+          "mycorrhizal_rate": 0.2,
           "base_nutritive_value": 0.6,
           "base_toxicity": 0.1
         }

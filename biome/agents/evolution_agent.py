@@ -25,6 +25,7 @@ from pandas import DataFrame
 
 from biome.entities.fauna import Fauna
 from biome.systems.events.event_bus import BiomeEventBus
+from biome.systems.evolution.smart_population import SmartPopulationTrendControl
 from shared.enums.events import BiomeEvent
 from shared.enums.enums import FloraSpecies, EntityType, FaunaSpecies
 from biome.entities.flora import Flora
@@ -57,6 +58,13 @@ class EvolutionAgentAI(Agent):
         self._species_base_lifespan: float = base_lifespan
         self._logger.info(f"Initialized Evolution Agent for species: {species}")
         self._evolution_registry = evolution_registry
+        self._smart_population_control: bool = True
+
+        self._population_monitor = SmartPopulationTrendControl(
+            species_name=str(species),
+            base_lifespan=base_lifespan,
+            logger=self._logger
+        )
 
     def perceive(self) -> Observation:
         if self._entity_type == EntityType.FLORA:
@@ -86,16 +94,8 @@ class EvolutionAgentAI(Agent):
             entities_by_species[species].append(entity)
 
         all_evolved_genes = []
-        entities_to_remove = []
 
         for species, entities_list in entities_by_species.items():
-            entities_sorted = sorted(entities_list,
-                                     key=lambda e: self._calculate_entity_fitness(e, climate_data))
-
-            removal_count = max(1, int(len(entities_list) * 0.2))
-            for i in range(removal_count):
-                if i < len(entities_sorted):
-                    entities_to_remove.append(entities_sorted[i].get_id())
 
             k_best = self._compute_k_best(entities)
 
@@ -108,12 +108,9 @@ class EvolutionAgentAI(Agent):
 
         return {
             "evolved_genes": all_evolved_genes,
-            "entities_to_remove": entities_to_remove
         }
 
     def act(self, action: TAction) -> None:
-        for entity_id in action["entities_to_remove"]:
-            pass
 
         self._current_evolution_cycle = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
@@ -129,16 +126,39 @@ class EvolutionAgentAI(Agent):
         self._increase_evolution_time_cycle(average_lifespan)
 
     def _compute_k_best(self, entities: EntityList) -> int:
+        population_adjustment = 1.0
+
+        if self._smart_population_control:
+            current_population = len(entities)
+            self._population_monitor.record_population(current_population)
+
+            trend_adjustment = self._population_monitor.calculate_adjustment()
+            predicted_population = self._population_monitor.predict_future_population(2)
+
+            lifespan_factor = min(1.0, self._species_base_lifespan / (10 * Timers.Calendar.YEAR))
+            critical_threshold = max(3, int(5 * lifespan_factor))
+
+            if 0 < predicted_population < critical_threshold:
+                self._logger.warning(
+                    f"Alert! {self._species} population proyected to decrease to {predicted_population} in 2 generations.")
+                trend_adjustment *= 1.5
+
+            population_adjustment = trend_adjustment
+
         avg_lifespan: float = np.average(np.array([e.lifespan for e in entities]))
         population_size: float = len(entities)
         base_k_best = max(3, min(10, int(population_size * random.uniform(0.15, 0.25))))
 
         base_lifespan = self._species_base_lifespan
         multiplier = 1 + ((avg_lifespan - base_lifespan) / base_lifespan) * 0.1
-
         multiplier = max(0.8, min(multiplier, 1.2))
 
-        return int(base_k_best * multiplier)
+        adjusted_k_best = int(base_k_best * multiplier * population_adjustment)
+
+        self._logger.warning(f"K_best for {self._species}: base={base_k_best}, lifespan_multiplier={multiplier:.2f}, "
+                           f"population_adjustment (smart trend)={population_adjustment:.2f}, final={adjusted_k_best}")
+
+        return adjusted_k_best
 
     def _compute_current_generation_lifespan(self) -> float:
         if self._entity_type == EntityType.FLORA:
@@ -208,7 +228,7 @@ class EvolutionAgentAI(Agent):
         lifespan: float = average_lifespan if average_lifespan else self._species_base_lifespan
         # que sea dinámico, si el lifespan anterior es más que el actual, que lo vuelva a hacer
         if self._evolution_cycle_time < 0.4 * lifespan:
-            self._evolution_cycle_time += lifespan * random.uniform(0.01, 0.03)
+            self._evolution_cycle_time += lifespan * random.uniform(0.001, 0.005)
 
     @property
     def entity_type(self) -> EntityType:

@@ -2,10 +2,13 @@ simulation:
   datapoints: true
   eras:
     amount: 10
-    events-per-era: 1500
+    events-per-era: 21600
 
   cleanup:
     remove_dead_entities: true
+
+  population-control:
+    smart: true
 
   data:
     snapshots:

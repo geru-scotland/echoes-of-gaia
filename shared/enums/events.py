@@ -17,6 +17,8 @@
 """
 from shared.enums.base import EnumBaseStr
 
+class SimulationEvent(EnumBaseStr):
+    SIMULATION_FINISHED = "on_simulation_finished"
 
 class ComponentEvent(EnumBaseStr):
     UPDATE_STATE = "on_component_update"

@@ -24,6 +24,7 @@ from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
 from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.components.registry import ComponentRegistry
+from shared.enums.events import SimulationEvent
 from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
@@ -59,7 +60,7 @@ class VitalComponent(EntityComponent):
     def _register_events(self) -> None:
         super()._register_events()
         self._stress_handler.register_events()
-        SimulationEventBus.register("simulation_finished", self._handle_simulation_finished)
+        SimulationEventBus.register(SimulationEvent.SIMULATION_FINISHED, self._handle_simulation_finished)
 
     def _handle_simulation_finished(self) -> None:
         # self.plot_vitality_curve()
