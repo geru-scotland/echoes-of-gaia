@@ -170,10 +170,10 @@ class SmartPopulationTrendControl(EventHandler):
 
         slope_input = control.Antecedent(np.linspace(-1, 1, 100), 'slope')
         adjustment = control.Consequent(np.linspace(0.5, 2.5, 100), 'adjustment')
+
         # Nota: trapmf: rango plateau, todos los valores se consideran pertenencia completa 1.
         # Es decir, si está en este rango, vale ese adjustement.
         # Y el trimf: quiero un valor central y conforme me alejo , que decrezca linealmente
-        # Fuzzy logic system setup - ADJUSTED FOR YOUR DATA RANGE
 
         slope_input['severe_decline'] = fuzz.trapmf(slope_input.universe, [-0.15, -0.12, -0.09, -0.07])
         slope_input['moderate_decline'] = fuzz.trimf(slope_input.universe, [-0.08, -0.04, -0.01])

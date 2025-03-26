@@ -40,3 +40,4 @@ class Loggers(EnumBaseStr):
     REINFORCEMENT = "reinforcement"
     CLIMATE_AGENT = "climate_agent"
     EVOLUTION_AGENT = "evolution_agent"
+    FAUNA_AGENT = "fauna_agent"

@@ -21,17 +21,16 @@ import numpy as np
 from deap import base, creator, tools, algorithms
 
 from biome.entities.entity import Entity
-from biome.systems.evolution.adaptive_mutation_operator import AdaptiveMutationOperator
+from biome.systems.evolution.mutations.adaptive_mutation_operator import AdaptiveMutationOperator
 from biome.systems.evolution.fitness import compute_fitness
-from biome.systems.evolution.genes.fauna_genes import fauna_genes_to_individual, deap_genes_to_fauna_genes, \
-    extract_genes_from_fauna
-from biome.systems.evolution.genes.flora_genes import flora_genes_to_individual, deap_genes_to_flora_genes, \
-    extract_genes_from_flora
+from biome.systems.evolution.genes.fauna_genes import extract_genes_from_fauna
+from biome.systems.evolution.genes.flora_genes import extract_genes_from_flora
+
 from biome.systems.evolution.genes.genes import Genes
-from shared.enums.enums import EntityType
+from biome.systems.evolution.genetic_converter import GeneticConverter
+from shared.enums.enums import EntityType, MutationType
 from shared.evolution.ranges import FLORA_GENE_RANGES, FAUNA_GENE_RANGES
 from shared.types import ClimateData, EntityList
-
 
 
 def extract_genes_from_entity(entity: Entity) -> Genes:
@@ -41,7 +40,6 @@ def extract_genes_from_entity(entity: Entity) -> Genes:
         return extract_genes_from_fauna(entity)
     else:
         raise ValueError(f"Unsupported entity type: {entity.get_type()}")
-
 
 
 class GeneticAlgorithmModel:
@@ -85,28 +83,21 @@ class GeneticAlgorithmModel:
         population = []
         for entity in entities:
             current_genes = extract_genes_from_entity(entity)
-            if entity_type == EntityType.FLORA:
-                population.append(flora_genes_to_individual(current_genes))
-            else:
-                population.append(fauna_genes_to_individual(current_genes))
+            population.append(GeneticConverter.genes_to_individual(current_genes, entity_type))
 
-        average_lifespan: float = np.average(np.array([e.lifespan for e in entities]))
-        mutation_adaptive_operator: AdaptiveMutationOperator = AdaptiveMutationOperator(indpb=0.01)
-        mutation_adaptive_operator.adapt(entity_type, average_lifespan)
+        average_lifespan = np.average(np.array([e.lifespan for e in entities]))
+        mutation_adaptive_operator = AdaptiveMutationOperator(indpb=0.2)
+        mutation_adaptive_operator.adapt(entity_type, average_lifespan, MutationType.GAUSSIAN)
+
         self.toolbox.register("mutate", mutation_adaptive_operator)
 
         def eval_individual(individual):
-            if entity_type == EntityType.FLORA:
-                genes = deap_genes_to_flora_genes(individual)
-            else:  # FAUNA
-                genes = deap_genes_to_fauna_genes(individual)
-
+            genes = GeneticConverter.individual_to_genes(individual, entity_type)
             return (compute_fitness(genes, climate_data),)
 
         self.toolbox.register("evaluate", eval_individual)
 
         stats = tools.Statistics(lambda ind: ind.fitness.values)
-
         stats.register("avg", np.mean)
         stats.register("min", np.min)
         stats.register("max", np.max)
@@ -117,12 +108,6 @@ class GeneticAlgorithmModel:
                             stats=stats, verbose=False)
 
         top_individuals = tools.selBest(population, k=k_best)
-
-        if entity_type == EntityType.FLORA:
-            evolved_genes = [deap_genes_to_flora_genes(ind) for ind in top_individuals]
-        else:
-            evolved_genes = [deap_genes_to_fauna_genes(ind) for ind in top_individuals]
-
-        self.stats_history.append(stats)
+        evolved_genes = [GeneticConverter.individual_to_genes(ind, entity_type) for ind in top_individuals]
 
         return evolved_genes

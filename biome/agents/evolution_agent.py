@@ -94,6 +94,7 @@ class EvolutionAgentAI(Agent):
             entities_by_species[species].append(entity)
 
         all_evolved_genes = []
+        k_best = 1
 
         for species, entities_list in entities_by_species.items():
 
@@ -108,6 +109,7 @@ class EvolutionAgentAI(Agent):
 
         return {
             "evolved_genes": all_evolved_genes,
+            "k_best": k_best
         }
 
     def act(self, action: TAction) -> None:
@@ -117,6 +119,12 @@ class EvolutionAgentAI(Agent):
 
         for species, genes in action["evolved_genes"]:
             if species == self._species:
+                self._create_evolved_entity(species, genes)
+
+        if action["k_best"] > len(action["evolved_genes"]):
+            remaining: int = action["k_best"] - len(action["evolved_genes"])
+            for i in range(remaining):
+                species, genes = random.choice(action["evolved_genes"])
                 self._create_evolved_entity(species, genes)
 
         self._evolution_registry.record_generation(self._current_evolution_cycle)
@@ -141,7 +149,7 @@ class EvolutionAgentAI(Agent):
             if 0 < predicted_population < critical_threshold:
                 self._logger.warning(
                     f"Alert! {self._species} population proyected to decrease to {predicted_population} in 2 generations.")
-                trend_adjustment *= 1.5
+                trend_adjustment *= 2
 
             population_adjustment = trend_adjustment
 

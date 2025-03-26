@@ -7,7 +7,7 @@ biome:
   type: "tundra"
   flora:
     - species: "oak_tree"
-      spawns: 30
+      spawns: 10
       avg-lifespan: 30  # En años lo pongo
       components:
         - GrowthComponent:
@@ -20,7 +20,7 @@ biome:
             heat_resistance: 0.0
 
     - species: "mushroom"
-      spawns: 19
+      spawns: 10
       avg-lifespan: 7
       components:
         - GrowthComponent:
@@ -31,7 +31,7 @@ biome:
             optimal_temperature: 8.0
 
     - species: "bramble"
-      spawns: 12
+      spawns: 5
       avg-lifespan: 12
       components:
         - GrowthComponent:
@@ -43,7 +43,7 @@ biome:
 
   fauna:
     - species: "fox"
-      spawns: 12
+      spawns: 5
       avg-lifespan: 12
       components:
         - GrowthComponent:
@@ -53,7 +53,7 @@ biome:
             cold_resistance: 0.0
 
     - species: "boar"
-      spawns: 11
+      spawns: 5
       avg-lifespan: 18
       components:
         - GrowthComponent:
@@ -62,7 +62,7 @@ biome:
             optimal_temperature: 16.0
 
     - species: "deer"
-      spawns: 9
+      spawns: 3
       avg-lifespan: 6
       components:
         - GrowthComponent:
