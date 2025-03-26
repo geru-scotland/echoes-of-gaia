@@ -31,6 +31,7 @@ from biome.systems.components.registry import ComponentRegistry
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.registry import EvolutionAgentRegistry
+from biome.systems.evolution.visualization.setup import setup_evolution_visualization_system
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
@@ -38,7 +39,6 @@ from biome.systems.maps.worldmap import WorldMap
 from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
-from biome.systems.state.handler import StateHandler
 from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies, BiomeType, FaunaSpecies, \
     EntityType
 from shared.enums.events import BiomeEvent
@@ -46,7 +46,6 @@ from shared.events.handler import EventHandler
 from shared.timers import Timers
 from shared.types import EntityList, Observation, EntityDefinitions
 from simulation.core.bootstrap.context.context_data import BiomeContextData
-from simulation.core.systems.telemetry.datapoint import Datapoint
 
 
 class Biome(Environment, BiomeDataProvider, EventHandler):
@@ -72,6 +71,8 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
             self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
 
+            self._evolution_tracker = setup_evolution_visualization_system()
+
             self._agents: Dict[AgentType, Agent] = self._initialize_agents()
 
             EventHandler.__init__(self)
@@ -79,6 +80,10 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         except Exception as e:
             self._logger.exception(f"There was an error creating the Biome: {e}")
 
+    def _register_events(self):
+        BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
+        BiomeEventBus.register(BiomeEvent.REMOVE_ENTITY, self._map_manager.remove_entity)
+        BiomeEventBus.register(BiomeEvent.ENTITY_DEATH, self._map_manager.handle_entity_death)
 
     def _initialize_agents(self) -> Dict[AgentType, Agent]:
         agents: Dict[AgentType, Agent] = {}
@@ -175,11 +180,6 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 self._logger.exception(f"An exception ocurred running  agent: {e}. Traceback: {tb}")
                 sys.exit(1)
 
-    def _register_events(self):
-        BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
-        BiomeEventBus.register(BiomeEvent.REMOVE_ENTITY, self._map_manager.remove_entity)
-        BiomeEventBus.register(BiomeEvent.ENTITY_DEATH, self._map_manager.handle_entity_death)
-
     def get_entity_provider(self) -> EntityProvider:
         return self._entity_provider
 
@@ -203,3 +203,5 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
     def compute_state(self):
         pass
+
+

@@ -21,11 +21,15 @@ from logging import Logger
 from typing import List, Dict, Any
 
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
 
 from biome.entities.fauna import Fauna
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.smart_population import SmartPopulationTrendControl
+from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
+from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
+from biome.systems.evolution.visualization.setup import register_evolved_entity, update_species_population
 from shared.enums.events import BiomeEvent
 from shared.enums.enums import FloraSpecies, EntityType, FaunaSpecies
 from biome.entities.flora import Flora
@@ -45,9 +49,10 @@ class EvolutionAgentAI(Agent):
     def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider, entity_type: EntityType,
                  species: FloraSpecies | FaunaSpecies, base_lifespan: float, evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE,
                  evolution_registry = None):
+
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
         self._climate_data_manager: ClimateDataManager = climate_data_manager
-        self.entity_provider: EntityProvider = entity_provider
+        self._entity_provider: EntityProvider = entity_provider
         self._genetic_model: GeneticAlgorithmModel = GeneticAlgorithmModel()
         self._evolution_cycle_time = evolution_cycle_time
         self._evolution_cycle: itertools.count[int] = itertools.count(0)
@@ -59,6 +64,7 @@ class EvolutionAgentAI(Agent):
         self._logger.info(f"Initialized Evolution Agent for species: {species}")
         self._evolution_registry = evolution_registry
         self._smart_population_control: bool = True
+        self._evolution_tracker = EvolutionTracker()
 
         self._population_monitor = SmartPopulationTrendControl(
             species_name=str(species),
@@ -66,11 +72,14 @@ class EvolutionAgentAI(Agent):
             logger=self._logger
         )
 
+    def _register_events(self):
+        BiomeEventBus.register(BiomeEvent.ENTITY_CREATED, self._handle_entity_created)
+
     def perceive(self) -> Observation:
         if self._entity_type == EntityType.FLORA:
-            entities = self.entity_provider.get_flora(only_alive=True)
+            entities = self._entity_provider.get_flora(only_alive=True)
         else:
-            entities = self.entity_provider.get_fauna(only_alive=True)
+            entities = self._entity_provider.get_fauna(only_alive=True)
 
         species_entities = [entity for entity in entities if entity.get_species() == self._species]
 
@@ -101,7 +110,8 @@ class EvolutionAgentAI(Agent):
             k_best = self._compute_k_best(entities)
 
             evolved_genes = self._genetic_model.evolve_population(
-                entities_list, climate_data, generation_count=10, k_best=k_best
+                entities_list, climate_data, self._current_evolution_cycle,
+                generation_count=10, k_best=k_best,
             )
 
             for genes in evolved_genes:
@@ -129,9 +139,31 @@ class EvolutionAgentAI(Agent):
 
         self._evolution_registry.record_generation(self._current_evolution_cycle)
 
-        # Nueva generación spawneada, calculo lifespan medio
+        if hasattr(self, '_evolution_tracker'):
+            if self._entity_type == EntityType.FLORA:
+                entities = self._entity_provider.get_flora(only_alive=True)
+            else:
+                entities = self._entity_provider.get_fauna(only_alive=True)
+
+            species_entities = [e for e in entities if e.get_species() == self._species]
+            population_count = len(species_entities)
+
+            update_species_population(
+                self._evolution_tracker,
+                str(self._species),
+                self._current_evolution_cycle,
+                population_count
+            )
+
         average_lifespan: float = self._compute_current_generation_lifespan()
         self._increase_evolution_time_cycle(average_lifespan)
+
+    def _increase_evolution_time_cycle(self, average_lifespan: float = None) -> None:
+        lifespan: float = average_lifespan if average_lifespan else self._species_base_lifespan
+        # Que sea dinámico, si el lifespan anterior es más que el actual, que lo vuelva a hacer
+        # aunque esto lo gestionaré con smart control seguramente.
+        if self._evolution_cycle_time < 0.4 * lifespan:
+            self._evolution_cycle_time += lifespan * random.uniform(0.001, 0.005)
 
     def _compute_k_best(self, entities: EntityList) -> int:
         population_adjustment = 1.0
@@ -170,9 +202,9 @@ class EvolutionAgentAI(Agent):
 
     def _compute_current_generation_lifespan(self) -> float:
         if self._entity_type == EntityType.FLORA:
-            entities = self.entity_provider.get_flora(only_alive=True)
+            entities = self._entity_provider.get_flora(only_alive=True)
         else:
-            entities = self.entity_provider.get_fauna(only_alive=True)
+            entities = self._entity_provider.get_fauna(only_alive=True)
 
         generation_lifespans = [entity.lifespan for entity in entities
                                 if entity.get_species() == self._species]
@@ -222,21 +254,117 @@ class EvolutionAgentAI(Agent):
                 custom_components=components,
                 evolution_cycle=current_cycle,
             )
+            try:
+                climate_data = self._climate_data_manager.get_data(self._current_evolution_cycle)
+
+                if not climate_data.empty:
+                    if 'temperature_ema' not in climate_data.columns:
+                        climate_averages = self._climate_data_manager.get_current_month_averages()
+                        climate_data = pd.DataFrame({
+                            'temperature_ema': [climate_averages.get('avg_temperature', 20.0)],
+                            'humidity_ema': [climate_averages.get('avg_humidity', 50.0)],
+                            'precipitation_ema': [climate_averages.get('avg_precipitation', 30.0)]
+                        })
+
+                    fitness = compute_fitness(genes, climate_data)
+                    self._evolution_tracker.register_fitness(str(species), self._current_evolution_cycle, fitness)
+            except Exception as e:
+                self._logger.warning(f"No se pudo calcular fitness: {e}")
 
         except Exception as e:
             self._logger.exception(f"Error al crear entidad evolucionada de especie {species}: {e}")
+
+    def _handle_entity_created(self, entity_class, entity_species_enum, species_name, lifespan, custom_components=None,
+                               evolution_cycle=0):
+
+        self._register_new_entity(species_name, evolution_cycle)
+
+    def _register_new_entity(self, species_name, evolution_cycle):
+
+        flora = self._entity_provider.get_flora(only_alive=True)
+        fauna = self._entity_provider.get_fauna(only_alive=True)
+
+        all_entities = flora + fauna
+        target_entities = [
+            entity for entity in all_entities
+            if (str(entity.get_species()) == species_name and
+                entity.get_state_fields().get("general", {}).get("evolution_cycle") == evolution_cycle)
+        ]
+
+        for entity in target_entities:
+            genes = extract_genes_from_entity(entity)
+
+            trait_values = {}
+
+            for trait_name in [
+                "growth_modifier", "growth_efficiency", "max_size",
+                "max_vitality", "aging_rate", "health_modifier",
+                "cold_resistance", "heat_resistance", "optimal_temperature"
+            ]:
+                if hasattr(genes, trait_name):
+                    trait_values[trait_name] = getattr(genes, trait_name)
+
+            if entity.get_type() == EntityType.FLORA:
+                flora_traits = [
+                    "base_photosynthesis_efficiency", "base_respiration_rate",
+                    "metabolic_activity", "nutrient_absorption_rate",
+                    "mycorrhizal_rate", "base_nutritive_value", "base_toxicity"
+                ]
+
+                for trait_name in flora_traits:
+                    if hasattr(genes, trait_name):
+                        trait_values[trait_name] = getattr(genes, trait_name)
+
+            self._evolution_tracker.register_trait_values(
+                str(entity.get_species()),
+                evolution_cycle,
+                trait_values
+            )
+
+            try:
+                climate_data = self._climate_data_manager.get_data(evolution_cycle)[-1:]
+                if not climate_data.empty:
+                    fitness = compute_fitness(genes, climate_data)
+                    self._evolution_tracker.register_fitness(
+                        str(entity.get_species()),
+                        evolution_cycle,
+                        fitness
+                    )
+            except Exception as e:
+                self._logger.warning(f"Fitness couldn't be calculated: {e}")
+
+        self._update_population_counts(species_name, evolution_cycle)
+
+    def _update_population_counts(self, species_name=None, evolution_cycle=None):
+        flora = self._entity_provider.get_flora(only_alive=True)
+        fauna = self._entity_provider.get_fauna(only_alive=True)
+
+        species_counts = {}
+        for entity in flora + fauna:
+            entity_species = str(entity.get_species())
+            entity_cycle = entity.get_state_fields().get("general", {}).get("evolution_cycle", 0)
+
+            if (species_name is not None and evolution_cycle is not None and
+                    (entity_species != species_name or entity_cycle != evolution_cycle)):
+                continue
+
+            if entity_species not in species_counts:
+                species_counts[entity_species] = {}
+
+            if entity_cycle not in species_counts[entity_species]:
+                species_counts[entity_species][entity_cycle] = 0
+
+            species_counts[entity_species][entity_cycle] += 1
+
+        for species, cycle_counts in species_counts.items():
+            for cycle, count in cycle_counts.items():
+                self._evolution_tracker.register_population(species, cycle, count)
 
     def get_species(self) -> FloraSpecies:
         return self._species
 
     def get_evolution_cycle_time(self) -> int:
         return self._evolution_cycle_time
-
-    def _increase_evolution_time_cycle(self, average_lifespan: float = None) -> None:
-        lifespan: float = average_lifespan if average_lifespan else self._species_base_lifespan
-        # que sea dinámico, si el lifespan anterior es más que el actual, que lo vuelva a hacer
-        if self._evolution_cycle_time < 0.4 * lifespan:
-            self._evolution_cycle_time += lifespan * random.uniform(0.001, 0.005)
 
     @property
     def entity_type(self) -> EntityType:

@@ -46,7 +46,7 @@ class SmartPopulationTrendControl(EventHandler):
 
     def _handle_simulation_finished(self):
         import matplotlib.pyplot as plt
-        self._logger.warning(f"Fuzzy logic adjustment history: {self._adjustments_history}")
+        self._logger.debug(f"Fuzzy logic adjustment history: {self._adjustments_history}")
         if len(self._population_history) > 1:
             plt.figure(figsize=(10, 6))
 

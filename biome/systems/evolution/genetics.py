@@ -28,6 +28,7 @@ from biome.systems.evolution.genes.flora_genes import extract_genes_from_flora
 
 from biome.systems.evolution.genes.genes import Genes
 from biome.systems.evolution.genetic_converter import GeneticConverter
+from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
 from shared.enums.enums import EntityType, MutationType
 from shared.evolution.ranges import FLORA_GENE_RANGES, FAUNA_GENE_RANGES
 from shared.types import ClimateData, EntityList
@@ -53,6 +54,7 @@ class GeneticAlgorithmModel:
         self.toolbox = base.Toolbox()
         self._setup_toolbox()
         self.stats_history = []
+        self._genetic_tracker: GeneticCrossoverTracker = GeneticCrossoverTracker()
 
     def _setup_deap(self):
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -74,12 +76,12 @@ class GeneticAlgorithmModel:
         # Para que sea adaptativo, al final registro el operador mutate en cada evolve.
         self.toolbox.register("select", tools.selTournament, tournsize=2) # lo he cambiado de 3 a 2 para ver si la convergencia es más lenta
 
-    def evolve_population(self, entities: EntityList, climate_data: ClimateData, generation_count=1, k_best=5):
+    def evolve_population(self, entities: EntityList, climate_data: ClimateData, current_evo_cycle: int, generation_count=1, k_best=5):
         if not entities:
             return []
 
         entity_type = entities[0].get_type()
-
+        entity_species = entities[0].get_species()
         population = []
         for entity in entities:
             current_genes = extract_genes_from_entity(entity)
@@ -108,6 +110,23 @@ class GeneticAlgorithmModel:
                             stats=stats, verbose=False)
 
         top_individuals = tools.selBest(population, k=k_best)
+
+        original_genes = []
+        for entity in entities[:2]:
+            genes = extract_genes_from_entity(entity)
+            original_genes.append(genes)
+
+        for i, individual in enumerate(top_individuals):
+            evolved_gene = GeneticConverter.individual_to_genes(individual, entity_type)
+
+            if hasattr(self, '_genetic_tracker'):
+                self._genetic_tracker.register_crossover(
+                    str(entity_species),
+                    current_evo_cycle,
+                    original_genes,
+                    evolved_gene
+                )
+
         evolved_genes = [GeneticConverter.individual_to_genes(ind, entity_type) for ind in top_individuals]
 
         return evolved_genes

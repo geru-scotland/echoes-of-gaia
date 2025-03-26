@@ -16,6 +16,7 @@
 ##########################################################################
 """
 from enum import auto
+from typing import TypedDict, NamedTuple, List, Optional, Dict
 
 from shared.enums.base import EnumBaseStr, EnumBaseInt
 
@@ -156,3 +157,20 @@ class Agents:
 class MutationType(EnumBaseInt):
     ADAPTIVE = auto()
     GAUSSIAN = auto()
+
+
+class TraitRecord(NamedTuple):
+    generation: int
+    value: float
+
+
+class SpeciesTraitData(TypedDict):
+    trait_name: str
+    records: List[TraitRecord]
+    trend: Optional[float]
+
+
+class EvolutionSummary(TypedDict):
+    key_adaptations: List[str]
+    fitness_correlation: Dict[str, float]
+    generations_tracked: int

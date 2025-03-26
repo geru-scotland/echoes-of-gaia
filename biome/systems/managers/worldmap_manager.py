@@ -22,10 +22,12 @@ from typing import List, Dict
 from simpy import Environment as simpyEnv
 
 from biome.entities.entity import Entity
+from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.maps.map_allocator import MapAllocator
 from biome.systems.maps.spawn_system import SpawnSystem
 from biome.systems.maps.worldmap import WorldMap
 from shared.enums.enums import EntityType
+from shared.enums.events import BiomeEvent
 from shared.enums.strings import Loggers
 from shared.types import TileMap, EntityList, EntityDefinitions, EntityRegistry, \
     TerrainMap, EntityIndexMap, Position
@@ -68,6 +70,8 @@ class WorldMapManager:
                 evolution_cycle=evolution_cycle
             )
 
+            BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, entity_class=entity_class, entity_species_enum=entity_species_enum, species_name=species_name,
+                                  lifespan=lifespan, custom_components=None, evolution_cycle=evolution_cycle)
             if entity:
                 self._logger.info(f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")
                 return entity
