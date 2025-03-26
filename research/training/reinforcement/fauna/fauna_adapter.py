@@ -15,3 +15,8 @@
 #                                                                              #
 # =============================================================================
 """
+from research.training.reinforcement.adapter import EnvironmentAdapter
+
+
+class FaunaAdapter(EnvironmentAdapter):
+    pass

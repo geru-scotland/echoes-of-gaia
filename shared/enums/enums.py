@@ -15,6 +15,8 @@
 #                                                                        #
 ##########################################################################
 """
+from enum import auto
+
 from shared.enums.base import EnumBaseStr, EnumBaseInt
 
 class BiomeType(EnumBaseStr):
@@ -123,12 +125,23 @@ class WeatherEvent(EnumBaseStr):
     WINDY = "windy"
 
 
-
 class Season(EnumBaseStr):
     SPRING = "spring"
     SUMMER = "summer"
     AUTUMN = "autumn"
     WINTER = "winter"
+
+
+class FaunaAction(EnumBaseInt):
+    MOVE_NORTH = auto()
+    MOVE_SOUTH = auto()
+    MOVE_EAST = auto()
+    MOVE_WEST = auto()
+    EAT = auto()
+    DRINK = auto()
+    REST = auto()
+    HIDE = auto()
+    FORAGE = auto()
 
 class AgentType(EnumBaseStr):
     CLIMATE_AGENT = "climate_agent"
@@ -137,7 +150,9 @@ class AgentType(EnumBaseStr):
 
 class Agents:
     class Reinforcement(EnumBaseInt):
-        NAIVE_CLIMATE = 0
+        NAIVE_CLIMATE = auto()
+        FAUNA = auto()
+
 class MutationType(EnumBaseInt):
     ADAPTIVE = auto()
     GAUSSIAN = auto()

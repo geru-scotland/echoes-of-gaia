@@ -32,7 +32,6 @@ from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
 
-
 class ReinforcementLearningAgent:
     def __init__(self, agent_type: Agents.Reinforcement):
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
