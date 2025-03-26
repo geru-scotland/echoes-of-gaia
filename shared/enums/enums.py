@@ -138,3 +138,6 @@ class AgentType(EnumBaseStr):
 class Agents:
     class Reinforcement(EnumBaseInt):
         NAIVE_CLIMATE = 0
+class MutationType(EnumBaseInt):
+    ADAPTIVE = auto()
+    GAUSSIAN = auto()
