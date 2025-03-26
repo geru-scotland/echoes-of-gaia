@@ -23,7 +23,8 @@ from simpy import Environment as simpyEnv
 
 from biome.components.physiological.vital import VitalComponent
 from biome.systems.components.managers.base import BaseComponentManager
-from shared.enums.events import ComponentEvent
+from biome.systems.events.event_bus import BiomeEventBus
+from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.enums.enums import ComponentType
 from shared.enums.strings import Loggers
 from shared.enums.thresholds import VitalThresholds
@@ -34,10 +35,11 @@ from utils.loggers import LoggerManager
 
 
 class VitalComponentManager(BaseComponentManager[VitalComponent]):
-    def __init__(self, env: simpyEnv):
+    def __init__(self, env: simpyEnv, cleanup_dead_entities: bool = False):
         super().__init__(env)
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
+        self._cleanup_dead_entities: bool = cleanup_dead_entities
 
         self._age_process = self._env.process(self._update_all_age(Timers.Compoments.Physiological.AGING))
 
@@ -170,14 +172,14 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                         f"New Health: {new_healths[i]:.2f}, Vitality: {component.vitality}"
                     )
 
-                    if new_healths[i] <= 0.0 :
+                    if new_healths[i] <= 0.0:
                         component.vitality = 0
                         component.event_notifier.notify(
                             ComponentEvent.UPDATE_STATE,
                             ComponentType.VITAL,
                             vitality=component.vitality
                         )
-                        component.event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL)
+                        component.event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL, cleanup_dead_entities=self._cleanup_dead_entities)
                     else:
                         component.vitality = max(0, new_healths[i])
                         component.event_notifier.notify(

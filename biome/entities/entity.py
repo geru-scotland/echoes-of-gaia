@@ -64,7 +64,6 @@ class Entity(EventHandler, StateHandler, ABC):
         # BiomeEventBus ahora
         BiomeEventBus.register(BiomeEvent.WEATHER_UPDATE, self._handle_weather_update)
 
-
     def _handle_component_update(self, component_class: Type, **kwargs: Any):
         if kwargs:
             # self._logger.debug(f"[Sim tick: {self._env.now} (called in: {kwargs.get("tick")})] Updating entity: {self._descriptor.species} (id: {self._id}) ({self._descriptor.entity_type}),"
@@ -75,10 +74,11 @@ class Entity(EventHandler, StateHandler, ABC):
                     self._event_notifier.notify(ComponentEvent.BIOLOGICAL_AGE_UPDATED, biological_age=value)
 
     def _handle_death(self, *args, **kwargs):
+        cleanup_dead_entities: bool = kwargs.get("cleanup_dead_entities", False)
         self._logger.warning(f"Entity {self._id} ({self._descriptor.species}) has died")
         self._state.update("is_dead", True)
-
         BiomeEventBus.trigger(BiomeEvent.ENTITY_DEATH, entity_id=self._id)
+        self.clear_and_unregister(cleanup_dead_entities)
 
         self._state.update("death_tick", self._env.now)
 

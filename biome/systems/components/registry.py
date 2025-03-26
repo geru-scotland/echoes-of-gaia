@@ -26,7 +26,7 @@ class ComponentRegistry:
     _vital_manager = None
 
     @classmethod
-    def initialize(cls, env: simpyEnv):
+    def initialize(cls, env: simpyEnv, cleanup_dead_entities: bool = False):
         cls._env = env
         # Importo aqui para evitar dep. circulares. TODO: Revisar.
         from biome.systems.components.managers.growth_manager import GrowthComponentManager
@@ -35,7 +35,7 @@ class ComponentRegistry:
         from biome.systems.components.managers.photo_meta_manager import PhotosyntheticMetabolismComponentManager
 
         cls._growth_manager = GrowthComponentManager(env)
-        cls._vital_manager = VitalComponentManager(env)
+        cls._vital_manager = VitalComponentManager(env, cleanup_dead_entities)
         cls._photosynthetic_metabolic_manager = PhotosyntheticMetabolismComponentManager(env)
         cls._autotrophic_nutrition_manager = AutotrophicNutritionComponentManager(env)
 

@@ -105,8 +105,6 @@ class WorldMapManager:
         if position is not None:
             self._map_allocator.free_position(position, habitats)
 
-        entity.clear_and_unregister(clear_components=True)
-
         return True
 
     def handle_entity_death(self, entity_id: int) -> None:

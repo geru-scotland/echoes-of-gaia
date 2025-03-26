@@ -31,6 +31,8 @@ from biome.systems.components.registry import ComponentRegistry
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.registry import EvolutionAgentRegistry
+from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
+from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
 from biome.systems.evolution.visualization.setup import setup_evolution_visualization_system
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
@@ -55,12 +57,14 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         try:
             self._logger.info(self._context.config.get("type"))
 
-            ComponentRegistry.initialize(env)
             self._options: Dict[str, Any] = options
+            cleanup_dead_entities: bool = self._options.get("remove_dead_entities")
+
+            ComponentRegistry.initialize(env, cleanup_dead_entities)
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions,
-                                                                 remove_dead_entities=self._options.get("remove_dead_entities"))
+                                                                 remove_dead_entities=cleanup_dead_entities)
 
             self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
             self._climate_data_manager = ClimateDataManager(self._env, self._climate)
@@ -110,6 +114,11 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                                      species_enum_class: Type[FloraSpecies | FaunaSpecies]) -> None:
         type_name = "flora" if entity_type == EntityType.FLORA else "fauna"
 
+        evolution_tracker: EvolutionTracker = setup_evolution_visualization_system() if self._options.get(
+            "evolution_tracking") else None
+        crossover_tracker: GeneticCrossoverTracker = GeneticCrossoverTracker() if self._options.get(
+            "crossover_tracking") else None
+
         for entity_def in entity_definitions:
             try:
                 species_name = entity_def.get("species", "").lower()
@@ -127,8 +136,8 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                     evolution_cycle_time,
                     self._evolution_registry,
                     smart_population=self._options.get("smart-population"),
-                    evolution_tracking=self._options.get("evolution_tracking"),
-                    crossover_tracking=self._options.get("crossover_tracking"),
+                    evolution_tracker=evolution_tracker,
+                    crossover_tracker=crossover_tracker,
                 )
 
                 self._evolution_registry.register_agent(species, evolution_agent)

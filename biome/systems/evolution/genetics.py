@@ -46,7 +46,7 @@ def extract_genes_from_entity(entity: Entity) -> Genes:
 class GeneticAlgorithmModel:
     _types_created = False
 
-    def __init__(self, crossover_tracking: bool = False):
+    def __init__(self, crossover_tracker: GeneticCrossoverTracker = None):
         if not GeneticAlgorithmModel._types_created:
             self._setup_deap()
             GeneticAlgorithmModel._types_created = True
@@ -54,10 +54,7 @@ class GeneticAlgorithmModel:
         self.toolbox = base.Toolbox()
         self._setup_toolbox()
         self.stats_history = []
-        self._crossover_tracking: bool = crossover_tracking
-
-        if self._crossover_tracking:
-            self._genetic_tracker: GeneticCrossoverTracker = GeneticCrossoverTracker()
+        self._genetic_tracker: GeneticCrossoverTracker = crossover_tracker
 
     def _setup_deap(self):
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -114,7 +111,7 @@ class GeneticAlgorithmModel:
 
         top_individuals = tools.selBest(population, k=k_best)
 
-        if self._crossover_tracking:
+        if self._genetic_tracker:
             original_genes = []
             for entity in entities[:2]:
                 genes = extract_genes_from_entity(entity)
