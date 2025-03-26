@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+from typing import Dict, Any
 
 import simpy
 
@@ -24,8 +25,8 @@ from simulation.core.systems.telemetry.datapoint import Datapoint
 
 
 class BiomeAPI:
-    def __init__(self, context: BiomeContextData, env: simpy.Environment, clean_dead_entities: bool = False):
-       self.biome = Biome(context, env, clean_dead_entities)
+    def __init__(self, context: BiomeContextData, env: simpy.Environment, options: Dict[str, Any] = None):
+       self.biome = Biome(context, env, options)
 
     def update(self, era: int, step: int):
         pass

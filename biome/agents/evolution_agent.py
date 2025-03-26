@@ -17,6 +17,7 @@
 """
 import itertools
 import random
+import sys
 from logging import Logger
 from typing import List, Dict, Any
 
@@ -29,7 +30,8 @@ from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.smart_population import SmartPopulationTrendControl
 from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
 from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
-from biome.systems.evolution.visualization.setup import register_evolved_entity, update_species_population
+from biome.systems.evolution.visualization.setup import register_evolved_entity, update_species_population, \
+    setup_evolution_visualization_system
 from shared.enums.events import BiomeEvent
 from shared.enums.enums import FloraSpecies, EntityType, FaunaSpecies
 from biome.entities.flora import Flora
@@ -40,20 +42,21 @@ from biome.systems.evolution.genetics import GeneticAlgorithmModel, extract_gene
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from shared.enums.strings import Loggers
+from shared.events.handler import EventHandler
 from shared.timers import Timers
 from shared.types import Observation, EntityList
 from utils.loggers import LoggerManager
 
 
-class EvolutionAgentAI(Agent):
-    def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider, entity_type: EntityType,
-                 species: FloraSpecies | FaunaSpecies, base_lifespan: float, evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE,
-                 evolution_registry = None):
+class EvolutionAgentAI(Agent, EventHandler):
+    def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider,
+                 entity_type: EntityType, species: FloraSpecies | FaunaSpecies, base_lifespan: float,
+                 evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE, evolution_registry=None,
+                 smart_population: bool = False, evolution_tracking: bool = False, crossover_tracking: bool = False):
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
         self._climate_data_manager: ClimateDataManager = climate_data_manager
         self._entity_provider: EntityProvider = entity_provider
-        self._genetic_model: GeneticAlgorithmModel = GeneticAlgorithmModel()
         self._evolution_cycle_time = evolution_cycle_time
         self._evolution_cycle: itertools.count[int] = itertools.count(0)
         self._current_evolution_cycle: int = next(self._evolution_cycle)
@@ -63,17 +66,27 @@ class EvolutionAgentAI(Agent):
         self._species_base_lifespan: float = base_lifespan
         self._logger.info(f"Initialized Evolution Agent for species: {species}")
         self._evolution_registry = evolution_registry
-        self._smart_population_control: bool = True
-        self._evolution_tracker = EvolutionTracker()
 
-        self._population_monitor = SmartPopulationTrendControl(
-            species_name=str(species),
-            base_lifespan=base_lifespan,
-            logger=self._logger
-        )
+        self._smart_population_control: bool = smart_population
+        self._evolution_tracking_enabled: bool = evolution_tracking
+        self._crossover_tracking_enabled: bool = crossover_tracking
+
+        self._genetic_model: GeneticAlgorithmModel = GeneticAlgorithmModel(crossover_tracking)
+
+        if self._evolution_tracking_enabled:
+            self._evolution_tracker = setup_evolution_visualization_system()
+
+        if self._smart_population_control:
+            self._population_monitor = SmartPopulationTrendControl(
+                species_name=str(species),
+                base_lifespan=base_lifespan,
+                logger=self._logger
+            )
+        super().__init__()
 
     def _register_events(self):
-        BiomeEventBus.register(BiomeEvent.ENTITY_CREATED, self._handle_entity_created)
+        if self._evolution_tracking_enabled:
+            BiomeEventBus.register(BiomeEvent.ENTITY_CREATED, self._handle_entity_created)
 
     def perceive(self) -> Observation:
         if self._entity_type == EntityType.FLORA:
@@ -139,7 +152,7 @@ class EvolutionAgentAI(Agent):
 
         self._evolution_registry.record_generation(self._current_evolution_cycle)
 
-        if hasattr(self, '_evolution_tracker'):
+        if self._evolution_tracking_enabled:
             if self._entity_type == EntityType.FLORA:
                 entities = self._entity_provider.get_flora(only_alive=True)
             else:
@@ -254,6 +267,10 @@ class EvolutionAgentAI(Agent):
                 custom_components=components,
                 evolution_cycle=current_cycle,
             )
+
+            if not self._evolution_tracking_enabled:
+                return
+
             try:
                 climate_data = self._climate_data_manager.get_data(self._current_evolution_cycle)
 
@@ -280,6 +297,8 @@ class EvolutionAgentAI(Agent):
         self._register_new_entity(species_name, evolution_cycle)
 
     def _register_new_entity(self, species_name, evolution_cycle):
+        if not self._evolution_tracking_enabled:
+            return
 
         flora = self._entity_provider.get_flora(only_alive=True)
         fauna = self._entity_provider.get_fauna(only_alive=True)
@@ -336,6 +355,10 @@ class EvolutionAgentAI(Agent):
         self._update_population_counts(species_name, evolution_cycle)
 
     def _update_population_counts(self, species_name=None, evolution_cycle=None):
+
+        if not self._evolution_tracking_enabled:
+            return
+
         flora = self._entity_provider.get_flora(only_alive=True)
         fauna = self._entity_provider.get_fauna(only_alive=True)
 

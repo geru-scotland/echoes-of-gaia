@@ -50,17 +50,18 @@ from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 class Biome(Environment, BiomeDataProvider, EventHandler):
 
-    def __init__(self, context: BiomeContextData, env: simpy.Environment, clean_dead_entities: bool = False):
+    def __init__(self, context: BiomeContextData, env: simpy.Environment, options: Dict[str, Any]):
         Environment.__init__(self, context, env)
         try:
             self._logger.info(self._context.config.get("type"))
 
             ComponentRegistry.initialize(env)
-
+            self._options: Dict[str, Any] = options
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,
                                                                  fauna_definitions=self._context.fauna_definitions,
-                                                                 cleanup_dead_entities=clean_dead_entities)
+                                                                 remove_dead_entities=self._options.get("remove_dead_entities"))
+
             self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
             self._climate_data_manager = ClimateDataManager(self._env, self._climate)
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
@@ -70,8 +71,6 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
 
             self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
-
-            self._evolution_tracker = setup_evolution_visualization_system()
 
             self._agents: Dict[AgentType, Agent] = self._initialize_agents()
 
@@ -126,7 +125,10 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                     species,
                     lifespan,
                     evolution_cycle_time,
-                    self._evolution_registry
+                    self._evolution_registry,
+                    smart_population=self._options.get("smart-population"),
+                    evolution_tracking=self._options.get("evolution_tracking"),
+                    crossover_tracking=self._options.get("crossover_tracking"),
                 )
 
                 self._evolution_registry.register_agent(species, evolution_agent)
@@ -149,10 +151,12 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 # toma aquí el tiempo y vete incrementando progresivamente
                 if agent:
                     self._logger.debug(f"Running evolution cycle for {species}, delay: {delay}")
+
                     observation = agent.perceive()
                     action = agent.decide(observation)
                     agent.act(action)
                     evolution_cycle_time:  float = agent.get_evolution_cycle_time()
+
                     self._logger.debug(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
                     yield self._env.timeout(evolution_cycle_time)
                 else:

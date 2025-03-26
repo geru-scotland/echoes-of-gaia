@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+import sys
 import traceback
 from logging import Logger
 from typing import List, Dict
@@ -37,14 +38,14 @@ from utils.loggers import LoggerManager
 class WorldMapManager:
 
     def __init__(self, env: simpyEnv, tile_map: TileMap, flora_definitions: EntityDefinitions,
-                 fauna_definitions: EntityDefinitions, cleanup_dead_entities: bool = False):
+                 fauna_definitions: EntityDefinitions, remove_dead_entities: bool = False):
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.WORLDMAP)
         self._logger.info("Creating Worldmap...")
         self._env: simpyEnv = env
         self._terrain_map: TerrainMap = tile_map
         self._map_allocator = MapAllocator(tile_map)
-        self._cleanup_dead_entities: bool = cleanup_dead_entities
+        self._cleanup_dead_entities: bool = remove_dead_entities
 
         try:
             self._spawn_system = SpawnSystem(env, self._map_allocator)

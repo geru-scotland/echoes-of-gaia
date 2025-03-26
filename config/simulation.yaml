@@ -2,7 +2,7 @@ simulation:
   datapoints: true
   eras:
     amount: 10
-    events-per-era: 2000
+    events-per-era: 200
 
   cleanup:
     remove_dead_entities: true
@@ -11,6 +11,11 @@ simulation:
     smart: true
 
   data:
+    visualization:
+      trends: true
+      evolution: true
+      crossover: false
+
     snapshots:
       enabled: true
       period_type: "CUSTOM"

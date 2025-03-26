@@ -16,9 +16,10 @@
 ##########################################################################
 """
 import itertools
+import sys
 import time
 from logging import Logger
-from typing import Optional, cast, Tuple
+from typing import Optional, cast, Tuple, Dict
 
 import simpy
 
@@ -53,10 +54,15 @@ class SimulationEngine:
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._datapoints: bool = self._context.config.get("datapoints", False)
 
-            clean_dead_entities: bool = self._context.config.get("cleanup", {}).get("remove_dead_entities", False)
+            options: Dict[str, bool] = {
+                "smart-population": self._context.config.get("population-control", {}).get("smart", False),
+                "evolution_tracking": self._context.config.get("data", {}).get("visualization", {}).get("evolution", False),
+                "crossover_tracking": self._context.config.get("data", {}).get("visualization", {}).get("crossover", False),
+                "remove_dead_entities": self._context.config.get("cleanup", {}).get("remove_dead_entities", False)
+            }
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
-            self._biome_api = BiomeAPI(biome_context, self._env, clean_dead_entities)
+            self._biome_api = BiomeAPI(biome_context, self._env, options)
 
             if self._datapoints:
                 self._context.influxdb.start()

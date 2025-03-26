@@ -46,7 +46,7 @@ def extract_genes_from_entity(entity: Entity) -> Genes:
 class GeneticAlgorithmModel:
     _types_created = False
 
-    def __init__(self):
+    def __init__(self, crossover_tracking: bool = False):
         if not GeneticAlgorithmModel._types_created:
             self._setup_deap()
             GeneticAlgorithmModel._types_created = True
@@ -54,7 +54,10 @@ class GeneticAlgorithmModel:
         self.toolbox = base.Toolbox()
         self._setup_toolbox()
         self.stats_history = []
-        self._genetic_tracker: GeneticCrossoverTracker = GeneticCrossoverTracker()
+        self._crossover_tracking: bool = crossover_tracking
+
+        if self._crossover_tracking:
+            self._genetic_tracker: GeneticCrossoverTracker = GeneticCrossoverTracker()
 
     def _setup_deap(self):
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -111,15 +114,15 @@ class GeneticAlgorithmModel:
 
         top_individuals = tools.selBest(population, k=k_best)
 
-        original_genes = []
-        for entity in entities[:2]:
-            genes = extract_genes_from_entity(entity)
-            original_genes.append(genes)
+        if self._crossover_tracking:
+            original_genes = []
+            for entity in entities[:2]:
+                genes = extract_genes_from_entity(entity)
+                original_genes.append(genes)
 
-        for i, individual in enumerate(top_individuals):
-            evolved_gene = GeneticConverter.individual_to_genes(individual, entity_type)
+            for i, individual in enumerate(top_individuals):
+                evolved_gene = GeneticConverter.individual_to_genes(individual, entity_type)
 
-            if hasattr(self, '_genetic_tracker'):
                 self._genetic_tracker.register_crossover(
                     str(entity_species),
                     current_evo_cycle,
