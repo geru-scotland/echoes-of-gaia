@@ -54,13 +54,15 @@ class WorldMapManager:
             self._entity_registry: EntityRegistry = self._spawn_system.get_entity_registry()
             self._entity_index_map: EntityIndexMap = self._map_allocator.entity_index_map
 
-            self._world_map = WorldMap(tile_map=tile_map, entity_registry=self._entity_registry, entity_index_map=self._entity_index_map)
+            self._world_map = WorldMap(tile_map=tile_map, entity_registry=self._entity_registry,
+                                       entity_index_map=self._entity_index_map)
 
         except Exception as e:
             tb = traceback.format_exc()
             self._logger.error("There was an exception spawning entities: %s", tb)
 
-    def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float, custom_components: List[Dict] = None, evolution_cycle: int = 0):
+    def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float,
+                   custom_components: List[Dict] = None, evolution_cycle: int = 0):
         try:
             entity = self._spawn_system.spawn(
                 entity_class=entity_class,
@@ -71,10 +73,12 @@ class WorldMapManager:
                 evolution_cycle=evolution_cycle
             )
 
-            BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, entity_class=entity_class, entity_species_enum=entity_species_enum, species_name=species_name,
+            BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, entity_class=entity_class,
+                                  entity_species_enum=entity_species_enum, species_name=species_name,
                                   lifespan=lifespan, custom_components=None, evolution_cycle=evolution_cycle)
             if entity:
-                self._logger.info(f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")
+                self._logger.debug(
+                    f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")
                 return entity
             else:
                 self._logger.warning(f"Entity coudln't be created {entity_class.__name__}, species: {species_name}")
@@ -109,7 +113,7 @@ class WorldMapManager:
 
     def handle_entity_death(self, entity_id: int) -> None:
         if not self._cleanup_dead_entities:
-            self._logger.info(f"Entity {entity_id} died, but remains in world (cleanup disabled)")
+            self._logger.debug(f"Entity {entity_id} died, but remains in world (cleanup disabled)")
             return
 
         if self.remove_entity(entity_id):

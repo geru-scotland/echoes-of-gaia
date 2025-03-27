@@ -71,7 +71,9 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
             self._evolution_registry: EvolutionAgentRegistry = EvolutionAgentRegistry(self._climate_data_manager,
                                                                                       self._entity_provider)
-            self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider, climate_manager=self._climate_data_manager, evolution_registry=self._evolution_registry)
+            self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider,
+                                                                              climate_manager=self._climate_data_manager,
+                                                                              evolution_registry=self._evolution_registry)
             self._score_analyzer: BiomeScoreAnalyzer = BiomeScoreAnalyzer()
 
             self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
@@ -117,7 +119,8 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         return agents
 
     def _initialize_evolution_agents(self, entity_type: EntityType, entity_definitions: EntityDefinitions,
-                                     species_enum_class: Type[FloraSpecies | FaunaSpecies], evolution_tracker: EvolutionTracker,
+                                     species_enum_class: Type[FloraSpecies | FaunaSpecies],
+                                     evolution_tracker: EvolutionTracker,
                                      crossover_tracker: GeneticCrossoverTracker) -> None:
         type_name = "flora" if entity_type == EntityType.FLORA else "fauna"
 
@@ -138,6 +141,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                     evolution_cycle_time,
                     self._evolution_registry,
                     smart_population=self._options.get("smart-population"),
+                    smart_plot=self._options.get("smart_plot"),
                     evolution_tracker=evolution_tracker,
                     crossover_tracker=crossover_tracker,
                 )
@@ -166,7 +170,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                     observation = agent.perceive()
                     action = agent.decide(observation)
                     agent.act(action)
-                    evolution_cycle_time:  float = agent.get_evolution_cycle_time()
+                    evolution_cycle_time: float = agent.get_evolution_cycle_time()
 
                     self._logger.debug(f"EVOLUTION AGENT. CURRENT EVOLUTION CYCLE TIME: {evolution_cycle_time}")
                     yield self._env.timeout(evolution_cycle_time)
@@ -218,5 +222,3 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
     def compute_state(self):
         pass
-
-

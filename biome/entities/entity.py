@@ -75,7 +75,7 @@ class Entity(EventHandler, StateHandler, ABC):
 
     def _handle_death(self, *args, **kwargs):
         cleanup_dead_entities: bool = kwargs.get("cleanup_dead_entities", False)
-        self._logger.warning(f"Entity {self._id} ({self._descriptor.species}) has died")
+        self._logger.debug(f"Entity {self._id} ({self._descriptor.species}) has died")
         self._state.update("is_dead", True)
         BiomeEventBus.trigger(BiomeEvent.ENTITY_DEATH, entity_id=self._id)
         self.clear_and_unregister(cleanup_dead_entities)

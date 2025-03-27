@@ -11,9 +11,17 @@ simulation:
     smart: true
 
   data:
+    storage:
+      base: "research/experiments"
+      simulations: "simulations"
+      trackers:
+        evolution: "evolution"
+        genetic_crossover: "genetic-crossover"
+        trends: "trends"
+
     visualization:
-      trends: true
-      evolution: false
+      smart-trends: false
+      evolution: true
       crossover: false
 
     snapshots:

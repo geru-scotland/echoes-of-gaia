@@ -52,7 +52,8 @@ class EvolutionAgentAI(Agent, EventHandler):
     def __init__(self, climate_data_manager: ClimateDataManager, entity_provider: EntityProvider,
                  entity_type: EntityType, species: FloraSpecies | FaunaSpecies, base_lifespan: float,
                  evolution_cycle_time: int = Timers.Agents.Evolution.EVOLUTION_CYCLE, evolution_registry=None,
-                 smart_population: bool = False, evolution_tracker: EvolutionTracker = None, crossover_tracker: GeneticCrossoverTracker = None):
+                 smart_population: bool = False, smart_plot: bool = False, evolution_tracker: EvolutionTracker = None,
+                 crossover_tracker: GeneticCrossoverTracker = None):
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.EVOLUTION_AGENT)
         self._climate_data_manager: ClimateDataManager = climate_data_manager
@@ -71,12 +72,12 @@ class EvolutionAgentAI(Agent, EventHandler):
         self._genetic_model: GeneticAlgorithmModel = GeneticAlgorithmModel(crossover_tracker)
         self._evolution_tracker: EvolutionTracker = evolution_tracker
 
-
         if self._smart_population_control:
             self._population_monitor = SmartPopulationTrendControl(
                 species_name=str(species),
                 base_lifespan=base_lifespan,
-                logger=self._logger
+                logger=self._logger,
+                smart_plot=smart_plot
             )
         super().__init__()
 
@@ -98,7 +99,7 @@ class EvolutionAgentAI(Agent, EventHandler):
         }
 
     def decide(self, observation: Observation) -> TAction:
-        self._logger.info(f"Making evolution decision for {self._entity_type} species: {self._species}")
+        self._logger.debug(f"Making evolution decision for {self._entity_type} species: {self._species}")
 
         climate_data = observation["climate_data"]
         entities = observation["entities"]
@@ -204,7 +205,7 @@ class EvolutionAgentAI(Agent, EventHandler):
 
         adjusted_k_best = int(base_k_best * multiplier * population_adjustment)
 
-        self._logger.warning(f"K_best for {self._species}: base={base_k_best}, lifespan_multiplier={multiplier:.2f}, "
+        self._logger.debug(f"K_best for {self._species}: base={base_k_best}, lifespan_multiplier={multiplier:.2f}, "
                            f"population_adjustment (smart trend)={population_adjustment:.2f}, final={adjusted_k_best}")
 
         return adjusted_k_best
