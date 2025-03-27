@@ -19,7 +19,7 @@ import itertools
 import sys
 import time
 from logging import Logger
-from typing import Optional, cast, Tuple, Dict
+from typing import Optional, cast, Tuple, Dict, Any
 
 import simpy
 
@@ -32,6 +32,7 @@ from shared.enums.strings import Strings, Loggers
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
 from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
+from simulation.core.experiment_path_manager import ExperimentPathManager
 from simulation.core.systems.events.event_bus import SimulationEventBus
 from simulation.core.systems.telemetry.datapoint import Datapoint
 from simulation.core.systems.time.time import SimulationTime
@@ -54,12 +55,34 @@ class SimulationEngine:
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._datapoints: bool = self._context.config.get("datapoints", False)
 
+            data_storage: Dict[str, Any] = self._context.config.get("data", {}).get("storage", {})
+            trackers: Dict[str, Any] = data_storage.get("trackers", {})
+
+            sim_paths: Dict[str, Any] = {
+                "base": data_storage.get("base", {}),
+                "simulations": data_storage.get("simulations", {}),
+                "evolution": trackers.get("evolution", {}),
+                "genetic_crossover": trackers.get("genetic_crossover", {}),
+                "trends": trackers.get("trends", {}),
+            }
+
             options: Dict[str, bool] = {
                 "smart-population": self._context.config.get("population-control", {}).get("smart", False),
-                "evolution_tracking": self._context.config.get("data", {}).get("visualization", {}).get("evolution", False),
-                "crossover_tracking": self._context.config.get("data", {}).get("visualization", {}).get("crossover", False),
+                "smart_plot": self._context.config.get("data", {}).get("visualization", {}).get("smart-trends", False),
+                "evolution_tracking": self._context.config.get("data", {}).get("visualization", {}).get("evolution",
+                                                                                                        False),
+                "crossover_tracking": self._context.config.get("data", {}).get("visualization", {}).get("crossover",
+                                                                                                        False),
                 "remove_dead_entities": self._context.config.get("cleanup", {}).get("remove_dead_entities", False)
             }
+            print(options)
+            if any([
+                bool(options["evolution_tracking"]),
+                bool(options["crossover_tracking"]),
+                bool(options["smart_plot"])
+            ]):
+                experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+                experiment_path_manager.initialize(sim_paths)
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
             self._biome_api = BiomeAPI(biome_context, self._env, options)
@@ -71,6 +94,7 @@ class SimulationEngine:
                 env=self._env,
                 config=self._context.config
             )
+
             self._data_manager.configure(self._biome_api.biome)
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)
@@ -87,7 +111,6 @@ class SimulationEngine:
         simulation_context = cast(SimulationContextData, context.get(Strings.SIMULATION_CONTEXT))
         return biome_context, simulation_context
 
-
     def _montly_update(self, timer: int):
         yield self._env.timeout(timer)
         while True:
@@ -100,7 +123,7 @@ class SimulationEngine:
                     datapoint_id, simulated_timestamp
                 )
                 if biome_datapoint:
-                     SimulationEventBus.trigger("on_biome_data_collected", biome_datapoint)
+                    SimulationEventBus.trigger("on_biome_data_collected", biome_datapoint)
 
             self._time.log_time(self._env.now)
             yield self._env.timeout(timer)
@@ -117,8 +140,7 @@ class SimulationEngine:
         if self._datapoints:
             self._context.influxdb.close()
 
-            if self._data_manager:
-                self._data_manager.shutdown()
+        if self._data_manager:
+            self._data_manager.shutdown()
 
         self._time.log_time(self._env.now)
-

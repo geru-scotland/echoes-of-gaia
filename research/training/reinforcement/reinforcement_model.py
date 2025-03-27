@@ -15,16 +15,40 @@
 #                                                                              #
 # =============================================================================
 """
-from research.training.reinforcement.climate.naive_climate import NaiveClimateEnvironment
-from research.training.reinforcement.fauna.fauna import FaunaAction
-from research.training.reinforcement.training_agent import ReinforcementLearningAgent
+import os
+from logging import Logger
+
+from stable_baselines3 import PPO, DQN, A2C, SAC
+
 from shared.enums.enums import Agents
-from shared.stores.biome_store import BiomeStore
+from shared.enums.strings import Loggers
+from utils.loggers import LoggerManager
+from utils.paths import get_model_path
+from .config_loader import ConfigLoader
+from shared.types import Observation
 
-BiomeStore.load_ecosystem_data()
 
-if __name__ == "__main__":
-    # Para entrenar el modelo
-    # BiomeStore.load_ecosystem_data()
-    train_agent = ReinforcementLearningAgent(Agents.Reinforcement.FAUNA)
-    train_agent.train()
+class ReinforcementLearningModel:
+    ALGORITHMS = {
+        "PPO": PPO,
+        "DQN": DQN,
+        "A2C": A2C,
+        "SAC": SAC
+    }
+
+    def __init__(self, agent_type: Agents.Reinforcement, model_path: str):
+        self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
+        self._model_path = get_model_path(model_path)
+        self._config = ConfigLoader().get_config(agent_type)
+
+        try:
+            self._logger.info(f"Loading Reinforcement model from {self._model_path}...")
+            algorithm = self._config["model"]["algorithm"]
+            self._model = self.ALGORITHMS[algorithm].load(self._model_path)
+            self._logger.info(f"Model loaded! Using {algorithm} algorithm.")
+        except Exception as e:
+            self._logger.exception(f"Error loading model: {e}")
+
+    def predict(self, observation: Observation) -> int:
+        action, _ = self._model.predict(observation, deterministic=True)
+        return action

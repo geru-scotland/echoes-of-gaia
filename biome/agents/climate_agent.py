@@ -22,8 +22,8 @@ import numpy as np
 from biome.agents.base import Agent
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
-from research.training.reinforcement.rl_model import ReinforcementModel
-from shared.enums.enums import WeatherEvent, BiomeType, Season
+from research.training.reinforcement.reinforcement_model import ReinforcementLearningModel
+from shared.enums.enums import WeatherEvent, BiomeType, Season, Agents
 from shared.enums.strings import Loggers
 from shared.types import Observation
 from utils.loggers import LoggerManager
@@ -34,7 +34,8 @@ class ClimateAgentAI(Agent[ClimateState, WeatherEvent]):
     def __init__(self, climate: ClimateSystem, climate_model: str):
         self._logger: Logger = LoggerManager.get_logger(Loggers.CLIMATE_AGENT)
         self._climate: ClimateSystem = climate
-        self._model: ReinforcementModel = ReinforcementModel(climate_model)
+        self._model: ReinforcementLearningModel = ReinforcementLearningModel(Agents.Reinforcement.NAIVE_CLIMATE,
+                                                                             climate_model)
 
     def perceive(self) -> Observation:
         self._logger.debug("AGENT PERCEIVING")
@@ -64,4 +65,3 @@ class ClimateAgentAI(Agent[ClimateState, WeatherEvent]):
     def act(self, action: WeatherEvent) -> None:
         self._logger.debug(f"AGENT ACTING. Action: {action}")
         self._climate.update(action)
-

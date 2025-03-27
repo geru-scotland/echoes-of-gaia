@@ -15,8 +15,20 @@
 #                                                                              #
 # =============================================================================
 """
+from logging import Logger
+
 from research.training.reinforcement.adapter import EnvironmentAdapter
+from shared.enums.strings import Loggers
+from utils.loggers import LoggerManager
 
 
 class FaunaAdapter(EnvironmentAdapter):
-    pass
+
+    def __init__(self):
+        self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
+
+    def get_observation(self):
+        pass
+
+    def compute_reward(self, action):
+        pass

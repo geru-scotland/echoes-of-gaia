@@ -23,6 +23,7 @@ from matplotlib import pyplot as plt
 from scipy.stats import stats
 
 from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
+from simulation.core.experiment_path_manager import ExperimentPathManager
 
 
 class EvolutionPlotter:
@@ -73,6 +74,14 @@ class EvolutionPlotter:
             ax.legend()
 
         axes[-1].set_xlabel("Generation")
+
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+        if experiment_path_manager:
+            traits_str = "-".join(valid_traits[:min(3, len(valid_traits))])
+            plot_path = experiment_path_manager.get_plot_path("evolution", f"{species}_{traits_str}_evolution")
+            plt.savefig(plot_path)
+
+            print(f"Saved trait evolution plot to: {plot_path}")
         plt.tight_layout()
         plt.subplots_adjust(top=0.92)
         plt.show()
@@ -120,6 +129,14 @@ class EvolutionPlotter:
         plt.ylabel("Population")
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.legend()
+
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+        if experiment_path_manager:
+            species_str = "-".join(valid_species[:min(3, len(valid_species))])
+            plot_path = experiment_path_manager.get_plot_path("trends", f"population_trends")
+            plt.savefig(plot_path)
+            print(f"Saved population trends plot to: {plot_path}")
+
         plt.tight_layout()
         plt.show()
 
@@ -181,9 +198,15 @@ class EvolutionPlotter:
         cbar = fig.colorbar(scatter, ax=ax, shrink=0.5, aspect=5)
         cbar.set_label('Generation')
 
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+        if experiment_path_manager:
+            plot_path = experiment_path_manager.get_plot_path("evolution",
+                                                              f"{species}_{trait_x}_{trait_y}_fitness_landscape")
+            plt.savefig(plot_path)
+            print(f"Saved fitness landscape plot to: {plot_path}")
+
         plt.tight_layout()
         plt.show()
-
 
     def plot_adaptive_landscape(self, species: str, figsize: Tuple[int, int] = (15, 10)) -> None:
         if species not in self.tracker.species_data:
@@ -381,7 +404,11 @@ class EvolutionPlotter:
         plt.suptitle(f"Evolutionary Overview of {species}", fontsize=16)
         plt.tight_layout()
         plt.subplots_adjust(top=0.92)
+
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+        if experiment_path_manager:
+            plot_path = experiment_path_manager.get_plot_path("evolution", f"{species}_adaptive_landscape")
+            plt.savefig(plot_path)
+            print(f"Saved adaptive landscape plot to: {plot_path}")
+
         plt.show()
-
-
-

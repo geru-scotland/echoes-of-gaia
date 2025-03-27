@@ -32,5 +32,6 @@ BIOME_DATA_DIR = os.path.join(BIOME_DIR, 'data')
 TRAINING_DIR = os.path.join(RESEARCH_DIR, 'training')
 MODELS_DIR = os.path.join(TRAINING_DIR, 'models')
 
+
 def get_model_path(model_name: str) -> str:
     return os.path.join(MODELS_DIR, model_name)

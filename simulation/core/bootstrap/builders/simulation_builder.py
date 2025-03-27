@@ -42,7 +42,11 @@ class SimulationBuilder(Builder):
         self._logger.info("[Simulation Builder] Simulation builder...")
         try:
             config: Config = self._settings.config.get("simulation")
-            influxdb_mgr: InfluxDBManager = InfluxDBManager(self._settings.influxdb_config)
+
+            influxdb_mgr = None
+            if config.get("datapoints", False):
+                influxdb_mgr: InfluxDBManager = InfluxDBManager(self._settings.influxdb_config)
+
             self._context = SimulationContextData(config=config, logger_name=Loggers.SIMULATION,
                                                   influxdb=influxdb_mgr)
         except Exception as e:

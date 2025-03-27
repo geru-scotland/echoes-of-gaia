@@ -34,6 +34,8 @@ from utils.loggers import LoggerManager
 class NaiveClimateEnvironment(gym.Env):
     def __init__(self):
         super().__init__()
+
+        self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self.np_random, _ = seeding.np_random(None)
         self.action_space: Discrete = gym.spaces.Discrete(len(WeatherEvent))
 
@@ -47,19 +49,17 @@ class NaiveClimateEnvironment(gym.Env):
 
         self._current_step: int = 0
         self._max_episode_steps: int = 720
-        self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self._climate_adapter: ClimateTrainAdapter = ClimateTrainAdapter(BiomeType.SAVANNA)
 
-
     def reset(self, *, seed=None, options=None) -> ObsType:
-       super().reset(seed=seed, options=options)
-       self._current_step = 0
+        super().reset(seed=seed, options=options)
+        self._current_step = 0
 
-       random_biome = self.np_random.choice(list(BiomeType))
-       self._logger.debug(f"NEW BIOMA: {random_biome}")
-       self._climate_adapter = ClimateTrainAdapter(random_biome)
-       self._logger.debug(f"Initial Data: {self._climate_adapter._state}")
-       return self._climate_adapter.get_observation(), {}
+        random_biome = self.np_random.choice(list(BiomeType))
+        self._logger.debug(f"NEW BIOMA: {random_biome}")
+        self._climate_adapter = ClimateTrainAdapter(random_biome)
+        self._logger.debug(f"Initial Data: {self._climate_adapter._state}")
+        return self._climate_adapter.get_observation(), {}
 
     def step(self, action):
         # TODO: Tensorboar5d

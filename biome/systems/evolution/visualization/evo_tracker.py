@@ -23,6 +23,7 @@ from typing import Dict, List, Set, Tuple, Optional, Any, TypedDict, Union
 from dataclasses import dataclass, field
 
 from shared.enums.enums import EvolutionSummary, TraitRecord
+from simulation.core.experiment_path_manager import ExperimentPathManager
 
 
 @dataclass
@@ -167,6 +168,8 @@ class EvolutionTracker:
             print(f"At least 2 traits are required to generate correlations for {species}")
             return
 
+        import seaborn as sns
+
         data = []
 
         generations = set()
@@ -208,6 +211,12 @@ class EvolutionTracker:
 
         sns.heatmap(corr_matrix, mask=mask, cmap=cmap, vmax=1, vmin=-1, center=0,
                     square=True, linewidths=.5, annot=True, fmt=".2f", cbar_kws={"shrink": .5})
+
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+        if experiment_path_manager:
+            plot_path = experiment_path_manager.get_plot_path("evolution", f"{species}_correlation_matrix")
+            plt.savefig(plot_path)
+            print(f"Saved correlation matrix to: {plot_path}")
 
         plt.title(f'Trait correlation matrix for {species}')
         plt.tight_layout()

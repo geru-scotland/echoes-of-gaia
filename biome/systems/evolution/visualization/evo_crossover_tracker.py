@@ -26,9 +26,9 @@ import seaborn as sns
 
 from biome.systems.evolution.genes.fauna_genes import FaunaGenes
 from biome.systems.evolution.genes.flora_genes import FloraGenes
-from biome.systems.evolution.visualization.evo_plotter import EvolutionPlotter
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
+from simulation.core.experiment_path_manager import ExperimentPathManager
 from simulation.core.systems.events.event_bus import SimulationEventBus
 from utils.loggers import LoggerManager
 
@@ -254,8 +254,19 @@ class GeneticCrossoverTracker:
                         x_pos = x_pos - max_abs_impact * 0.05
                         ax_mutation.text(x_pos, i, annotation, va='center', ha='right', fontsize=8)
 
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+
+        if experiment_path_manager:
+            event = self.crossover_events[event_index]
+            species = event['species']
+            gen = event['generation']
+            plot_path = experiment_path_manager.get_plot_path("genetic_crossover", f"{species}_gen{gen}_crossover")
+            plt.savefig(plot_path)
+            self._logger.info(f"Saved crossover plot to: {plot_path}")
+
         plt.tight_layout()
         plt.show()
+
     def visualize_gene_evolution(self, species: str, traits: List[str],
                                  generations: Optional[List[int]] = None,
                                  figsize: Tuple[int, int] = (15, 10)) -> None:
@@ -356,9 +367,18 @@ class GeneticCrossoverTracker:
 
         plt.suptitle(f'Gene evolution for {species}', fontsize=16)
 
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+
+        if experiment_path_manager:
+            traits_str = "_".join(traits[:2])  # Usa solo los primeros 2 rasgos para el nombre
+            plot_path = experiment_path_manager.get_plot_path("genetic_crossover", f"{species}_{traits_str}_evolution")
+            plt.savefig(plot_path)
+            self._logger.info(f"Saved gene evolution plot to: {plot_path}")
+
         plt.tight_layout()
         plt.subplots_adjust(top=0.95)
         plt.show()
+
     def visualize_evolutionary_path(self, species: str, traits: List[str],
                                     figsize: Tuple[int, int] = (12, 10)) -> None:
         if len(traits) != 2:
@@ -450,8 +470,17 @@ class GeneticCrossoverTracker:
 
         ax.grid(True, linestyle='--', alpha=0.6)
 
+        experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+        if experiment_path_manager:
+            traits_str = "_".join(traits[:2])
+            plot_path = experiment_path_manager.get_plot_path("genetic_crossover",
+                                                              f"{species}_{traits_str}_evolutionary_path")
+            plt.savefig(plot_path)
+            self._logger.info(f"Saved evolutionary path plot to: {plot_path}")
+
         plt.tight_layout()
         plt.show()
+
 def generate_genetic_evolution_summary(tracker: GeneticCrossoverTracker, species: str) -> None:
     if species not in tracker.species_events:
         print(f"No evolutionary data for species {species}")

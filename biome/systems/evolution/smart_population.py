@@ -24,11 +24,12 @@ import numpy as np
 
 from shared.enums.events import SimulationEvent
 from shared.events.handler import EventHandler
+from simulation.core.experiment_path_manager import ExperimentPathManager
 from simulation.core.systems.events.event_bus import SimulationEventBus
 
 
 class SmartPopulationTrendControl(EventHandler):
-    def __init__(self, species_name, base_lifespan, logger):
+    def __init__(self, species_name, base_lifespan, logger, smart_plot: bool = False):
         super().__init__()
         self._species_name = species_name
         self._base_lifespan = base_lifespan
@@ -40,13 +41,19 @@ class SmartPopulationTrendControl(EventHandler):
         self._last_fuzzy_data: Optional[Dict[str, Any]] = {}
         self._max_history_length = 100
         self._generation_counter = itertools.count(0)
+        self._plot_enabled: bool = smart_plot
 
     def _register_events(self):
-            SimulationEventBus.register(SimulationEvent.SIMULATION_FINISHED, self._handle_simulation_finished)
+        SimulationEventBus.register(SimulationEvent.SIMULATION_FINISHED, self._handle_simulation_finished)
 
     def _handle_simulation_finished(self):
+        if not self._plot_enabled:
+            return
+
         import matplotlib.pyplot as plt
+
         self._logger.debug(f"Fuzzy logic adjustment history: {self._adjustments_history}")
+
         if len(self._population_history) > 1:
             plt.figure(figsize=(10, 6))
 
@@ -91,6 +98,12 @@ class SmartPopulationTrendControl(EventHandler):
                          bbox=dict(boxstyle="round,pad=0.5", facecolor="white", alpha=0.8),
                          verticalalignment='top')
 
+            experiment_path_manager: ExperimentPathManager = ExperimentPathManager.get_instance()
+            if experiment_path_manager:
+                plot_path = experiment_path_manager.get_plot_path("trends", f"{self._species_name}_population_trend")
+                plt.savefig(plot_path)
+                self._logger.info(f"Saved population trend plot to: {plot_path}")
+
             plt.title(f'Population Trend for {self._species_name}')
             plt.xlabel('Generation')
             plt.ylabel('Population')
@@ -134,6 +147,12 @@ class SmartPopulationTrendControl(EventHandler):
                     plt.xlabel('Adjustment')
                     plt.grid(True)
 
+                    if experiment_path_manager:
+                        plot_path = experiment_path_manager.get_plot_path("trends",
+                                                                          f"{self._species_name}_fuzzy_control")
+                        plt.savefig(plot_path)
+                        self._logger.info(f"Saved fuzzy control plot to: {plot_path}")
+
                     plt.tight_layout()
                     plt.show()
 
@@ -164,9 +183,8 @@ class SmartPopulationTrendControl(EventHandler):
             normalized_slope = 0
 
         self._slope_history.append(normalized_slope)
-        self._logger.warning(
+        self._logger.debug(
             f"Slope normalized for {self._species_name}: {slope:.2f} (normalized: {normalized_slope:.2f})")
-
 
         slope_input = control.Antecedent(np.linspace(-1, 1, 100), 'slope')
         adjustment = control.Consequent(np.linspace(0.5, 2.5, 100), 'adjustment')
@@ -199,13 +217,12 @@ class SmartPopulationTrendControl(EventHandler):
         normalized_slope = max(min(normalized_slope, 0.3), -0.15)
         simulator.input['slope'] = normalized_slope
 
-
         try:
             simulator.compute()
             adjustment_factor = simulator.output["adjustment"]
 
-            self._logger.info(f"Adjustment factor (fuzzy logic): {adjustment_factor:.4f}")
-            self._logger.info(f"Normalized slope: {normalized_slope:.4f}")
+            self._logger.debug(f"Adjustment factor (fuzzy logic): {adjustment_factor:.4f}")
+            self._logger.debug(f"Normalized slope: {normalized_slope:.4f}")
 
             self._adjustments_history.append((normalized_slope, adjustment_factor))
 

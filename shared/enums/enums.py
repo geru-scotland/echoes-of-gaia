@@ -16,9 +16,10 @@
 ##########################################################################
 """
 from enum import auto
-from typing import TypedDict, NamedTuple, List, Optional, Dict
+from typing import TypedDict, NamedTuple, List, Optional, Dict, Literal, Any
 
 from shared.enums.base import EnumBaseStr, EnumBaseInt
+
 
 class BiomeType(EnumBaseStr):
     TROPICAL = "tropical"
@@ -26,6 +27,7 @@ class BiomeType(EnumBaseStr):
     TAIGA = "taiga"
     SAVANNA = "savanna"
     TUNDRA = "tundra"
+
 
 # Maps
 class TerrainType(EnumBaseInt):
@@ -38,6 +40,7 @@ class TerrainType(EnumBaseInt):
     SNOW = 6
     SAND = 7
 
+
 class ComponentType(EnumBaseStr):
     TRANSFORM = "transform"
     GROWTH = "growth"
@@ -48,11 +51,11 @@ class ComponentType(EnumBaseStr):
     CLIMATE = "climate"
     WEATHER_ADAPTATION = "weather_adaptation"
 
+
 class EntityState(EnumBaseStr):
     HEALTHY = "healthy"
     WEAK = "weak"
     DYING = "dying"
-
 
 
 class EntityType(EnumBaseStr):
@@ -60,21 +63,22 @@ class EntityType(EnumBaseStr):
     FAUNA = "fauna"
     HUMAN = "human"
 
+
 class EntityIndex(EnumBaseInt):
     FLORA = 1
     FAUNA = 2
+
 
 class FloraSpecies(EnumBaseStr):
     OAK_TREE = "oak_tree"
     BRAMBLE = "bramble"
     MUSHROOM = "mushroom"
 
+
 class FaunaSpecies(EnumBaseStr):
     DEER = "deer"
     BOAR = "boar"
     FOX = "fox"
-
-
 
 
 class Habitats:
@@ -89,11 +93,13 @@ class Habitats:
         COASTAL = "coastal"
         ALPINE = "alpine"
 
+
 class CapturePeriod(EnumBaseInt):
     MONTHLY = 60
     WEEKLY = 15
     DAILY = 2
     CUSTOM = -1
+
 
 class CaptureFormat(EnumBaseStr):
     JSON = "json"
@@ -101,11 +107,13 @@ class CaptureFormat(EnumBaseStr):
     MSGPACK_GZ = "msgpack.gz"
     YAML = "yaml"
 
+
 class CaptureType(EnumBaseStr):
     FULL = "full"
     ENTITIES_ONLY = "entities_only"
     TERRAIN_ONLY = "terrain_only"
     METRICS_ONLY = "metrics_only"
+
 
 class WeatherEvent(EnumBaseStr):
     CLEAR = "clear"
@@ -144,15 +152,17 @@ class FaunaAction(EnumBaseInt):
     HIDE = auto()
     FORAGE = auto()
 
+
 class AgentType(EnumBaseStr):
     CLIMATE_AGENT = "climate_agent"
     EVOLUTION_AGENT = "evolution_agent"
 
 
 class Agents:
-    class Reinforcement(EnumBaseInt):
-        NAIVE_CLIMATE = auto()
-        FAUNA = auto()
+    class Reinforcement(EnumBaseStr):
+        NAIVE_CLIMATE = "climate"
+        FAUNA = "fauna"
+
 
 class MutationType(EnumBaseInt):
     ADAPTIVE = auto()
@@ -174,3 +184,35 @@ class EvolutionSummary(TypedDict):
     key_adaptations: List[str]
     fitness_correlation: Dict[str, float]
     generations_tracked: int
+
+
+class Hyperparams(TypedDict):
+    learning_rate: float
+    n_steps: int
+    batch_size: int
+    n_epochs: int
+    gamma: float
+    ent_coef: float
+    verbose: int
+
+
+class ModelConfig(TypedDict):
+    algorithm: Literal["PPO", "DQN", "A2C", "SAC"]
+    policy: str
+    hyperparams: Hyperparams
+    timesteps: int
+
+
+class EnvConfig(TypedDict):
+    env_class: str
+    observation_space: Dict[str, Any]
+    action_space: Dict[str, Any]
+
+
+class ReinforcementConfig(TypedDict):
+    name: str
+    description: str
+    version: str
+    model: ModelConfig
+    environment: EnvConfig
+    output_path: str
