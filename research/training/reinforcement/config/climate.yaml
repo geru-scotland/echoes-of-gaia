@@ -1,0 +1,27 @@
+name: "ClimateModel"
+description: "Reinforcement Model for the climate agent"
+version: "1.1.0"
+model:
+  algorithm: "PPO"
+  policy: "MultiInputPolicy"
+  hyperparams:
+    learning_rate: 3.0e-4
+    n_steps: 2048
+    batch_size: 64
+    n_epochs: 10
+    gamma: 0.99
+    ent_coef: 0.02
+    verbose: 1
+  timesteps: 1000000
+environment:
+  env_class: "NaiveClimateEnvironment"
+  observation_space:
+    type: "Dict"
+    spaces:
+      temperature: [ 0, 50 ]
+      humidity: [ 0, 100 ]
+      pressure: [ 900, 1100 ]
+  action_space:
+    type: "Discrete"
+    n: 8
+output_path: "./models/climate_model_final"

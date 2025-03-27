@@ -15,16 +15,33 @@
 #                                                                              #
 # =============================================================================
 """
-from research.training.reinforcement.climate.naive_climate import NaiveClimateEnvironment
-from research.training.reinforcement.fauna.fauna import FaunaAction
-from research.training.reinforcement.training_agent import ReinforcementLearningAgent
-from shared.enums.enums import Agents
-from shared.stores.biome_store import BiomeStore
+from logging import Logger
 
-BiomeStore.load_ecosystem_data()
+import gymnasium as gym
+from gymnasium import spaces
+from gymnasium.core import ObsType
+from gymnasium.spaces import Discrete
 
-if __name__ == "__main__":
-    # Para entrenar el modelo
-    # BiomeStore.load_ecosystem_data()
-    train_agent = ReinforcementLearningAgent(Agents.Reinforcement.FAUNA)
-    train_agent.train()
+from research.training.registry import EnvironmentRegistry
+from shared.enums.enums import FaunaAction, Agents
+from shared.enums.strings import Loggers
+from utils.loggers import LoggerManager
+
+
+@EnvironmentRegistry.register(Agents.Reinforcement.FAUNA)
+class FaunaEnvironment(gym.Env):
+
+    def __init__(self):
+        super().__init__()
+        self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
+        self.action_space: Discrete = gym.spaces.Discrete(len(FaunaAction))
+        self.observation_space = spaces.Dict({
+        })
+
+    def reset(self, *, seed=None, options=None) -> ObsType:
+        super().reset(seed=seed, options=options)
+        pass
+
+    def step(self, action):
+        pass
+        # return observation, reward, terminated, truncated, {}

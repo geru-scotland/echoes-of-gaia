@@ -15,31 +15,29 @@
 #                                                                              #
 # =============================================================================
 """
-from logging import Logger
+import os
 
-import gymnasium as gym
-from gymnasium import spaces
-from gymnasium.core import ObsType
-from gymnasium.spaces import Discrete
-
-from shared.enums.enums import FaunaAction
-from shared.enums.strings import Loggers
-from utils.loggers import LoggerManager
+from stable_baselines3 import PPO, DQN, A2C, SAC
+from .config_loader import ConfigLoader
+from shared.types import Observation
 
 
-class FaunaEnvironment(gym.Env):
+class ReinforcementModel:
+    ALGORITHMS = {
+        "PPO": PPO,
+        "DQN": DQN,
+        "A2C": A2C,
+        "SAC": SAC
+    }
 
-    def __init__(self):
-        super().__init__()
-        self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
-        self.action_space: Discrete = gym.spaces.Discrete(len(FaunaAction))
-        self.observation_space = spaces.Dict({
-        })
+    def __init__(self, model_path: str):
+        self._model_path = model_path
+        self._model_name = os.path.basename(model_path).split('_')[0]
+        self._config = ConfigLoader().get_config(self._model_name)
 
-    def reset(self, *, seed=None, options=None) -> ObsType:
-        super().reset(seed=seed, options=options)
-        pass
+        algorithm = self._config["model"]["algorithm"]
+        self._model = self.ALGORITHMS[algorithm].load(model_path)
 
-    def step(self, action):
-        pass
-        # return observation, reward, terminated, truncated, {}
+    def predict(self, observation: Observation) -> int:
+        action, _ = self._model.predict(observation, deterministic=True)
+        return action

@@ -1,0 +1,35 @@
+name: "FaunaModel"
+description: "Modelo de Reinforcement para el agente de fauna"
+version: "0.0.1"
+model:
+  algorithm: "DQN"
+  policy: "MultiInputPolicy"
+  hyperparams:
+    learning_rate: 5.0e-4
+    buffer_size: 100000
+    learning_starts: 1000
+    batch_size: 64
+    gamma: 0.99
+    tau: 0.005             # Factor de actualización para la red target
+    train_freq: 4          # Frecuencia de updates, steps básicamente
+    target_update_interval: 1000
+    exploration_fraction: 0.2
+    exploration_initial_eps: 1.0
+    exploration_final_eps: 0.05
+    max_grad_norm: 10
+    verbose: 1
+  timesteps: 500000
+environment:
+  env_class: "FaunaEnvironment"
+  observation_space:
+    type: "Dict"
+    spaces:
+      energy: [ 0, 100 ]
+      health: [ 0, 100 ]
+      nearby_food: [ 0, 10 ]
+      nearby_predators: [ 0, 5 ]
+      temperature: [ 0, 50 ]
+  action_space:
+    type: "Discrete"
+    n: 6
+output_path: "./models/fauna_model_final"

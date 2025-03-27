@@ -15,16 +15,4 @@
 #                                                                              #
 # =============================================================================
 """
-from research.training.reinforcement.climate.naive_climate import NaiveClimateEnvironment
-from research.training.reinforcement.fauna.fauna import FaunaAction
-from research.training.reinforcement.training_agent import ReinforcementLearningAgent
-from shared.enums.enums import Agents
-from shared.stores.biome_store import BiomeStore
-
-BiomeStore.load_ecosystem_data()
-
-if __name__ == "__main__":
-    # Para entrenar el modelo
-    # BiomeStore.load_ecosystem_data()
-    train_agent = ReinforcementLearningAgent(Agents.Reinforcement.FAUNA)
-    train_agent.train()
+ 

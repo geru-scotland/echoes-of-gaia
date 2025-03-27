@@ -15,16 +15,30 @@
 #                                                                              #
 # =============================================================================
 """
-from research.training.reinforcement.climate.naive_climate import NaiveClimateEnvironment
-from research.training.reinforcement.fauna.fauna import FaunaAction
-from research.training.reinforcement.training_agent import ReinforcementLearningAgent
-from shared.enums.enums import Agents
-from shared.stores.biome_store import BiomeStore
+import os
+import yaml
+from typing import Dict, Optional
 
-BiomeStore.load_ecosystem_data()
+from shared.enums.enums import ReinforcementConfig
 
-if __name__ == "__main__":
-    # Para entrenar el modelo
-    # BiomeStore.load_ecosystem_data()
-    train_agent = ReinforcementLearningAgent(Agents.Reinforcement.FAUNA)
-    train_agent.train()
+
+class ConfigLoader:
+    _instance = None
+    _configs: Dict[str, ReinforcementConfig] = {}
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(ConfigLoader, cls).__new__(cls)
+            cls._instance._load_configs()
+        return cls._instance
+
+    def _load_configs(self) -> None:
+        config_dir = os.path.join(os.path.dirname(__file__), 'config')
+        for filename in os.listdir(config_dir):
+            if filename.endswith('.yaml'):
+                model_name = os.path.splitext(filename)[0]
+                with open(os.path.join(config_dir, filename), 'r') as f:
+                    self._configs[model_name] = yaml.safe_load(f)
+
+    def get_config(self, model_name: str) -> Optional[ReinforcementConfig]:
+        return self._configs.get(model_name)
