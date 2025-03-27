@@ -23,6 +23,7 @@ from gymnasium.core import ObsType
 from gymnasium.spaces import Discrete
 
 from research.training.registry import EnvironmentRegistry
+from research.training.reinforcement.fauna.fauna_adapter import FaunaAdapter
 from shared.enums.enums import FaunaAction, Agents
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
@@ -33,10 +34,14 @@ class FaunaEnvironment(gym.Env):
 
     def __init__(self):
         super().__init__()
+
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self.action_space: Discrete = gym.spaces.Discrete(len(FaunaAction))
+
         self.observation_space = spaces.Dict({
         })
+
+        self._fauna_adapter: FaunaAdapter = FaunaAdapter()
 
     def reset(self, *, seed=None, options=None) -> ObsType:
         super().reset(seed=seed, options=options)

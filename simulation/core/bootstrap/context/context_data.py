@@ -17,6 +17,7 @@
 """
 from abc import ABC
 from dataclasses import dataclass
+from typing import Optional
 
 from config.settings import Config
 from shared.enums.enums import BiomeType
@@ -28,6 +29,7 @@ from simulation.core.systems.telemetry.manager import InfluxDBManager
 class ContextData(ABC):
     logger_name: str
 
+
 @dataclass
 class BiomeContextData(ContextData):
     biome_type: BiomeType
@@ -37,7 +39,8 @@ class BiomeContextData(ContextData):
     fauna_definitions: EntityDefinitions
     climate_model: str
 
+
 @dataclass
 class SimulationContextData(ContextData):
     config: Config
-    influxdb: InfluxDBManager
+    influxdb: Optional[InfluxDBManager]

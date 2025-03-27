@@ -26,7 +26,6 @@ class FaunaAdapter(EnvironmentAdapter):
 
     def __init__(self):
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
-        pass
 
     def get_observation(self):
         pass
