@@ -38,7 +38,7 @@ class BiomeSnapshotSystem:
     def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
                  entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
                  config: SnapshotConfig, climate_collector: ClimateDataCollector = None,
-                 biome_type = None, climate_data_manager: ClimateDataManager = None):
+                 biome_type=None, climate_data_manager: ClimateDataManager = None):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._logger.info("Initializing BiomeSnapshotSystem...")
 
