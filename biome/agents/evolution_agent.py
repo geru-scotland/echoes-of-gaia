@@ -17,25 +17,22 @@
 """
 import itertools
 import random
-import sys
 from logging import Logger
 from typing import List, Dict, Any
 
 import numpy as np
 import pandas as pd
-from pandas import DataFrame
 
 from biome.entities.fauna import Fauna
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.smart_population import SmartPopulationTrendControl
 from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
 from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
-from biome.systems.evolution.visualization.setup import register_evolved_entity, update_species_population, \
-    setup_evolution_visualization_system
+from biome.systems.evolution.visualization.setup import update_species_population
 from shared.enums.events import BiomeEvent
 from shared.enums.enums import FloraSpecies, EntityType, FaunaSpecies
 from biome.entities.flora import Flora
-from biome.agents.base import Agent, TAction, TState
+from biome.agents.base import Agent, TAction
 from biome.systems.evolution.fitness import compute_fitness
 from biome.systems.evolution.genes.flora_genes import FloraGenes
 from biome.systems.evolution.genetics import GeneticAlgorithmModel, extract_genes_from_entity
@@ -233,6 +230,7 @@ class EvolutionAgentAI(Agent, EventHandler):
 
     def _create_evolved_entity(self, species, genes: FloraGenes | FaunaSpecies) -> None:
         try:
+
             components: List[Dict[str, Any]] = genes.convert_genes_to_components()
             current_cycle = self._current_evolution_cycle
 
@@ -288,9 +286,7 @@ class EvolutionAgentAI(Agent, EventHandler):
         except Exception as e:
             self._logger.exception(f"Error al crear entidad evolucionada de especie {species}: {e}")
 
-    def _handle_entity_created(self, entity_class, entity_species_enum, species_name, lifespan, custom_components=None,
-                               evolution_cycle=0):
-
+    def _handle_entity_created(self, species_name, evolution_cycle):
         self._register_new_entity(species_name, evolution_cycle)
 
     def _register_new_entity(self, species_name, evolution_cycle):

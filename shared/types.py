@@ -16,12 +16,13 @@
 ##########################################################################
 """
 from pathlib import Path
-from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional, Callable, Union
+from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional, Callable, Union, TypeAlias
 
 import numpy as np
 from numpy import ndarray
 
-from shared.enums.enums import TerrainType, Habitats
+from biome.components.base.component import Component
+from shared.enums.enums import TerrainType, Habitats, EntityType, ComponentType, FaunaSpecies
 
 if TYPE_CHECKING:
     pass
@@ -29,41 +30,41 @@ if TYPE_CHECKING:
 # algo parecido al typedef de c++; y soy un poco más feliz:
 
 # Coordenadas y mapeoss de terrenos
-Coords = Tuple[int, int]
-TileMappings = Dict[TerrainType, List[Coords]]
-TerrainSpritesMapping = Dict[TerrainType, List[Any]]
+Coords: TypeAlias = Tuple[int, int]
+TileMappings: TypeAlias = Dict[TerrainType, List[Coords]]
+TerrainSpritesMapping: TypeAlias = Dict[TerrainType, List[Any]]
 
 # Listas
-EntityList = List["Entity"]
-ComponentDict = Dict["ComponentType", "Component"]
-TerrainList = np.ndarray
-EntityDefinitions = List[Dict[str, Any]]
-ComponentData = Dict[str, Any]
-HabitatList = List[Habitats.Type]
+EntityList: TypeAlias = List["Entity"]
+ComponentDict: TypeAlias = Dict["ComponentType", "Component"]
+TerrainList: TypeAlias = np.ndarray
+EntityDefinitions: TypeAlias = List[Dict[str, Any]]
+ComponentData: TypeAlias = Dict[str, Any]
+HabitatList: TypeAlias = List[Habitats.Type]
 
 # Mapas
-TileMap = np.ndarray
-NoiseMap = np.ndarray
-EntityLayer = List[EntityList]
-TerrainMap = np.ndarray
-EntityIndexMap = np.ndarray
-EntityRegistry = Dict[int, "Entity"]
-Position = Tuple[int, int]
-BiomeStoreData = Dict[str, Any]
-HabitatCache = Dict[Habitats.Type, ndarray]
+TileMap: TypeAlias = np.ndarray
+NoiseMap: TypeAlias = np.ndarray
+EntityLayer: TypeAlias = List[EntityList]
+TerrainMap: TypeAlias = np.ndarray
+EntityIndexMap: TypeAlias = np.ndarray
+EntityRegistry: TypeAlias = Dict[int, "Entity"]
+Position: TypeAlias = Tuple[int, int]
+BiomeStoreData: TypeAlias = Dict[str, Any]
+HabitatCache: TypeAlias = Dict[Habitats.Type, ndarray]
 
 # Snapshots
-SnapshotID = str
-TimeStamp = int
-SimulationTime = int
-EntityData = Dict[str, Any]
-TerrainData = Dict[str, Any]
-BiomeScoreData = Dict[str, Any]
-MetricsData = Dict[str, Any]
-ClimateData = Dict[str, Any]
-PositionData = Tuple[int, int]
-CallbackType = Optional[Callable[[Optional[Path]], None]]
-
+SnapshotID: TypeAlias = str
+TimeStamp: TypeAlias = int
+SimulationTime: TypeAlias = int
+EntityData: TypeAlias = Dict[str, Any]
+TerrainData: TypeAlias = Dict[str, Any]
+BiomeScoreData: TypeAlias = Dict[str, Any]
+MetricsData: TypeAlias = Dict[str, Any]
+ClimateData: TypeAlias = Dict[str, Any]
+PositionData: TypeAlias = Tuple[int, int]
+CallbackType: TypeAlias = Optional[Callable[[Optional[Path]], None]]
 
 # Agents
-Observation = Union[Dict[str, Any]]
+Observation: TypeAlias = Union[Dict[str, Any]]
+Target: TypeAlias = Tuple[FaunaSpecies, EntityType, int]

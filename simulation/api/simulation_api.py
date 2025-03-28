@@ -19,22 +19,44 @@ from logging import getLogger, Logger
 from typing import Optional, Type
 
 from config.settings import Settings
+from shared.enums.enums import SimulationMode
 from shared.enums.strings import Loggers
 from simulation.core.engine import SimulationEngine
 
 
 class SimulationAPI:
-    def __init__(self, settings = Type[Settings]):
+    def __init__(self, settings=Type[Settings], mode: SimulationMode = SimulationMode.NORMAL):
         self._engine: Optional[SimulationEngine] = None
         self._settings: Settings = settings
         self._logger: Logger = getLogger(Loggers.SIMULATION)
+        self._simulation_mode: SimulationMode = mode
 
-    def initialise(self):
+    def _initialise(self):
         self._engine = SimulationEngine(settings=self._settings)
 
     def run(self):
-        self.initialise()
+        self._initialise()
         if not self._engine:
             self._logger.critical("[CRITICAL] Simulation can not be launched, engine failed.")
-            # sys.exit(1)
         self._engine.run()
+
+    def initialise_training(self):
+        self._logger.info("Initialising Simulation on training mode...")
+        self._initialise()
+        if not self._engine:
+            self._logger.critical("[CRITICAL] Simulation can not be launched, engine failed.")
+
+    def finish_training(self):
+        if self._engine:
+            self._engine.shutdown_training()
+
+    def step(self, time_delta: int = 1) -> int:
+        return self._engine.step(time_delta)
+
+    def get_biome(self):
+        return self._engine.get_biome()
+
+    def get_simulation_time(self) -> int:
+        if hasattr(self._engine, '_env'):
+            return self._engine._env.now
+        return 0

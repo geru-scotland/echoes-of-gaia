@@ -1,5 +1,6 @@
 simulation:
   datapoints: false
+
   eras:
     amount: 10
     events-per-era: 500
@@ -20,9 +21,9 @@ simulation:
         trends: "trends"
 
     visualization:
-      smart-trends: false
-      evolution: false
-      crossover: false
+      smart-trends: true
+      evolution: true
+      crossover: true
 
     snapshots:
       enabled: true

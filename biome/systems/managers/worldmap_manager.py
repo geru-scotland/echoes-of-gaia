@@ -27,11 +27,13 @@ from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.maps.map_allocator import MapAllocator
 from biome.systems.maps.spawn_system import SpawnSystem
 from biome.systems.maps.worldmap import WorldMap
-from shared.enums.enums import EntityType
-from shared.enums.events import BiomeEvent
+from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
+from shared.enums.enums import EntityType, FaunaSpecies
+from shared.enums.events import BiomeEvent, SimulationEvent
 from shared.enums.strings import Loggers
 from shared.types import TileMap, EntityList, EntityDefinitions, EntityRegistry, \
     TerrainMap, EntityIndexMap, Position
+from simulation.core.systems.events.event_bus import SimulationEventBus
 from utils.loggers import LoggerManager
 
 
@@ -73,9 +75,14 @@ class WorldMapManager:
                 evolution_cycle=evolution_cycle
             )
 
-            BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, entity_class=entity_class,
-                                  entity_species_enum=entity_species_enum, species_name=species_name,
-                                  lifespan=lifespan, custom_components=None, evolution_cycle=evolution_cycle)
+            BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, species_name=species_name, evolution_cycle=evolution_cycle)
+
+            if TrainingTargetManager.is_training_mode() and not TrainingTargetManager.is_acquired() and entity_species_enum == FaunaSpecies:
+                self._logger.info(f"{TrainingTargetManager.get_target()}")
+                if TrainingTargetManager.is_valid_target(entity.get_species(), entity.get_type(), evolution_cycle):
+                    SimulationEventBus.trigger(SimulationEvent.SIMULATION_TRAIN_TARGET_ACQUIRED, entity=entity,
+                                               generation=evolution_cycle)
+
             if entity:
                 self._logger.debug(
                     f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")

@@ -216,3 +216,8 @@ class ReinforcementConfig(TypedDict):
     model: ModelConfig
     environment: EnvConfig
     output_path: str
+
+
+class SimulationMode(EnumBaseInt):
+    NORMAL = auto()
+    TRAINING = auto()

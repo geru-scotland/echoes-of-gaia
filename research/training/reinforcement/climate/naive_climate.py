@@ -27,6 +27,7 @@ from research.training.registry import EnvironmentRegistry
 from shared.enums.enums import Agents, BiomeType, WeatherEvent, Season
 from research.training.reinforcement.climate.climate_adapter import ClimateTrainAdapter
 from shared.enums.strings import Loggers
+from shared.timers import Timers
 from utils.loggers import LoggerManager
 
 
@@ -48,7 +49,7 @@ class NaiveClimateEnvironment(gym.Env):
         })
 
         self._current_step: int = 0
-        self._max_episode_steps: int = 720
+        self._max_episode_steps: int = Timers.Calendar.YEAR
         self._climate_adapter: ClimateTrainAdapter = ClimateTrainAdapter(BiomeType.SAVANNA)
 
     def reset(self, *, seed=None, options=None) -> ObsType:
