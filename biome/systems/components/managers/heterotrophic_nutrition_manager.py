@@ -35,7 +35,7 @@ class HeterotrophicNutritionComponentManager(BaseComponentManager[HeterotrophicN
         super().__init__(env)
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self._env.process(self._update_all_metabolism(Timers.Compoments.Physiological.METABOLISM))
+        self._env.process(self._update_all_metabolism(Timers.Components.Physiological.METABOLISM))
 
     def _update_all_metabolism(self, timer: int):
         yield self._env.timeout(timer)
