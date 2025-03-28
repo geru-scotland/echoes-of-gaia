@@ -22,8 +22,8 @@ from biome.systems.evolution.genes.flora_genes import FloraGenes
 from biome.systems.evolution.genes.genes import Genes
 from shared.math.constants import epsilon
 
+
 def compute_fitness(genes: Genes, climate_data) -> float:
-    """Calcula el fitness para cualquier tipo de genes."""
     if isinstance(genes, FloraGenes):
         return compute_flora_fitness(genes, climate_data)
     elif isinstance(genes, FaunaGenes):
@@ -39,7 +39,7 @@ def compute_fauna_fitness(fauna_genes: FaunaGenes, climate_data) -> float:
     avg_humidity = climate_data['humidity_ema'].iloc[-1]
     avg_precipitation = climate_data['precipitation_ema'].iloc[-1]
 
-    # 1. Adaptación a temperatura (similar a flora)
+    # 1. Adaptación a temperatura
     optimal_temperature = fauna_genes.optimal_temperature
     temperature_distance = avg_temperature - optimal_temperature
 
@@ -50,20 +50,67 @@ def compute_fauna_fitness(fauna_genes: FaunaGenes, climate_data) -> float:
         sigma_heat = 15.0 / (1.0 - fauna_genes.heat_resistance + 1e-6)
         stress_factor = math.exp(-(temperature_distance ** 2) / (2 * sigma_heat ** 2))
 
-    temperature_score = 5.0 * stress_factor
+    temperature_score = 4.0 * stress_factor
 
-    # 2. Capacidad de supervivencia, especificos de fauna, ya iré poniendo.
-    # mobility_score = 3.0 * fauna_genes.speed
-    # survival_score = 2.0 * fauna_genes.predator_avoidance
-    # foraging_score = 2.5 * fauna_genes.foraging_efficiency
+    # 2. Nutrición y metabolismo
+    nutrition_score = 0.0
 
-    # 3. Salud y vitalidad (compartido con flora)
+    # En fauna, una tasa de hambre moderada es óptima
+    # Muy baja: no busca comida suficientemente; muy alta: consume demasiada energía buscando comida
+    hunger_optimality = 1.0 - abs((fauna_genes.hunger_rate - 1.1) / 0.5) * 2.0
+    nutrition_score += 2.0 * max(0, hunger_optimality)
+
+    # Tasa de sed óptima dependiendo del ambiente
+    thirst_optimality = 0.0
+    if avg_humidity < 40:  # Ambiente seco
+        # En ambiente seco, mejor tasa de sed baja, es para conservación de agua
+        thirst_optimality = 1.0 - (fauna_genes.thirst_rate / 1.6) * 2.0
+    else:  # Ambiente húmedo
+        # si húmedo, tasa de sed moderada es aceptable
+        thirst_optimality = 1.0 - abs((fauna_genes.thirst_rate - 1.5) / 0.4)
+    nutrition_score += 2.0 * max(0, thirst_optimality)
+
+    # Alta eficiencia metabólica siempre es buena
+    nutrition_score += 3.0 * fauna_genes.metabolism_efficiency
+
+    # 3. Reservas de energía - predadores grandes necesitan más, presas pueden ser más ligeras
+    energy_score = 0.0
+    ideal_energy = 100.0 + (
+                fauna_genes.max_size * 20.0)  # Ojo a ver cómo resulta esto - relación entre tamaño y energía
+    energy_optimality = 1.0 - abs((fauna_genes.max_energy_reserves - ideal_energy) / ideal_energy)
+    energy_score += 2.5 * max(0, energy_optimality)
+
+    # 4. Salud y vitalidad
     health_score = 2.0 * (fauna_genes.max_vitality / 200.0)
     aging_score = 1.5 * (1.0 - fauna_genes.aging_rate / 2.0)
 
-    fitness = (temperature_score + health_score + aging_score)
+    # 5. Adaptación climatológica específica para fauna
+    climate_adaptation = 0.0
+
+    # Adaptación a precipitaciones
+    if avg_precipitation > 80:  # Lluvioso
+        if fauna_genes.cold_resistance > 0.3:  # Buena resistencia al frío ayuda en lluvia
+            climate_adaptation += 1.5
+    elif avg_precipitation < 20:  # Seco
+        if fauna_genes.heat_resistance > 0.3:  # Buena resistencia al calor ayuda en sequía
+            climate_adaptation += 1.5
+
+    # Tamaño relacionado con el clima
+    if avg_temperature < 5:  # Clima frío
+        if fauna_genes.max_size > 3.0:  # Tamaño grande ayuda a conservar calor
+            climate_adaptation += 1.0
+    elif avg_temperature > 30:  # Clima caluroso
+        if fauna_genes.max_size < 2.0:  # Tamaño pequeño ayuda a disipar calor (revisar esto bien)
+            climate_adaptation += 1.0
+
+    fitness = temperature_score + nutrition_score + energy_score + health_score + aging_score + climate_adaptation
+
+    # Bonus de supervivencia básica - un mínimo necesario para sobrevivir
+    base_survival_threshold = 3.5 * fauna_genes.metabolism_efficiency
+    fitness = max(fitness, base_survival_threshold)
 
     return fitness
+
 
 def compute_flora_fitness(flora_genes, climate_data):
     fitness: float = 0.0

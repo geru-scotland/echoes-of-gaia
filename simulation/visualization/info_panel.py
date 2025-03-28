@@ -33,6 +33,7 @@ def format_time_value(ticks: float, timers) -> str:
 
     return f"{years}a {months}m {days}d"
 
+
 class InfoPanel:
     def __init__(
             self,
@@ -70,11 +71,11 @@ class InfoPanel:
         self._climate_analysis = None
 
         self._quality_colors = {
-            "critical": (180, 50, 50),      # Rojo mate
-            "unstable": (180, 100, 50),     # Naranja mate
-            "moderate": (180, 160, 50),     # Amarillo mate
-            "healthy": (100, 160, 50),      # Verde claro mate
-            "eden": (50, 160, 80)           # Verde mate
+            "critical": (180, 50, 50),  # Rojo mate
+            "unstable": (180, 100, 50),  # Naranja mate
+            "moderate": (180, 160, 50),  # Amarillo mate
+            "healthy": (100, 160, 50),  # Verde claro mate
+            "eden": (50, 160, 80)  # Verde mate
         }
         self._section_states = {
             "tiempo": True,
@@ -261,8 +262,6 @@ class InfoPanel:
                 factor_surface = self._font.render(factor_text, True, (180, 200, 220))
                 self._surface.blit(factor_surface, (x + 10, current_y))
 
-
-
                 status_surface = self._font.render(status_text, True, status_color)
                 status_x = x + width - status_surface.get_width() - 10
                 self._surface.blit(status_surface, (status_x, current_y))
@@ -297,10 +296,23 @@ class InfoPanel:
                 self._surface, "SIMULATION TIME", x_left, y_left, "tiempo")
 
             if expanded:
+                ticks = self._simulation_time['raw_ticks']
+                from shared.timers import Timers
+
+                months_passed = ticks // Timers.Calendar.MONTH
+                year = months_passed // 12
+                month = (months_passed % 12) + 1
+
+                days_in_month = 30
+                ticks_in_current_month = ticks % Timers.Calendar.MONTH
+                day = (ticks_in_current_month // Timers.Calendar.DAY) + 1
+
+                if day > days_in_month:
+                    day = days_in_month
+
                 data_items = [
-                    ("Year:", f"{self._simulation_time['year']}", (180, 220, 230)),
-                    ("Month:", f"{self._simulation_time['month']}", (180, 220, 230)),
-                    ("Ticks:", f"{self._simulation_time['raw_ticks']}", (180, 220, 230))
+                    ("Date:", f"Year {year}, Month {month}, Day {day}", (180, 220, 230)),
+                    ("System Tick:", f"{ticks}", (150, 190, 220))
                 ]
                 y_left = self._render_info_section(self._surface, "Time", data_items, x_left + 5, y_next,
                                                    col_width - 10)
@@ -359,7 +371,8 @@ class InfoPanel:
                         data_items.append(("  Fauna:", f"{self._metrics['num_fauna']}", (200, 150, 100)))
 
                     if 'total_entities' in self._metrics:
-                        data_items.append(("  Total:", f"{self._metrics['num_flora'] + self._metrics['num_fauna']}", (180, 180, 220)))
+                        data_items.append(
+                            ("  Total:", f"{self._metrics['num_flora'] + self._metrics['num_fauna']}", (180, 180, 220)))
 
                     if 'avg_stress' in self._metrics:
                         stress_value = self._metrics['avg_stress']
@@ -773,7 +786,7 @@ class InfoPanel:
                         elif percentage > 0.7:
                             text_color = (100, 220, 100)
                         else:
-                            text_color = (220, 220, 100)  
+                            text_color = (220, 220, 100)
 
             text_y = current_y + (field_height - self._font.get_height()) // 2
 

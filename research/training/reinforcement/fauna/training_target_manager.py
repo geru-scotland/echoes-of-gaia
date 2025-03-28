@@ -25,7 +25,7 @@ class TrainingTargetManager:
     _target: Target = tuple()
     _acquired: bool = False
     _current_episode: int = 0
-    training_mode: bool = False
+    _training_mode: bool = False
 
     @classmethod
     def set_target(cls, species: FaunaSpecies, entity_type: EntityType, generation: int) -> None:

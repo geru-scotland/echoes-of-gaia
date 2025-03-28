@@ -59,9 +59,19 @@ class WorldMapManager:
             self._world_map = WorldMap(tile_map=tile_map, entity_registry=self._entity_registry,
                                        entity_index_map=self._entity_index_map)
 
+            BiomeEventBus.register(BiomeEvent.MOVE_ENTITY, self.handle_move_entity)
+
         except Exception as e:
             tb = traceback.format_exc()
             self._logger.error("There was an exception spawning entities: %s", tb)
+
+    def handle_move_entity(self, entity_id: int, new_position: Position, success_callback=None):
+        success = self.move_entity(entity_id, new_position)
+
+        if success_callback:
+            success_callback(success)
+
+        return success
 
     def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float,
                    custom_components: List[Dict] = None, evolution_cycle: int = 0):

@@ -61,4 +61,9 @@ FAUNA_GENE_RANGES = {
     # Cuando los tenga, especificos a fauna:
     # "foraging_efficiency": (0.1, 1.0),
     # "predator_avoidance": (0.0, 1.0),
+    "hunger_rate": (0.8, 1.5),
+    "thirst_rate": (1.2, 2.0),
+    "metabolism_efficiency": (0.5, 1.5),
+
+    "movement_energy_cost": (0.5, 2.0),
 }

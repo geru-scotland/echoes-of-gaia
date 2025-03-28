@@ -15,43 +15,24 @@
 #                                                                              #
 # =============================================================================
 """
-from enum import Flag, auto
+from logging import Logger
+
+from simpy import Environment as simpyEnv
+
+from biome.components.kinematics.movement import MovementComponent
+from biome.systems.components.managers.base import BaseComponentManager
+from shared.enums.enums import Direction
+from shared.enums.strings import Loggers
+from shared.timers import Timers
+from utils.loggers import LoggerManager
+from collections import deque
+
+from collections import deque
 
 
-class DormancyReason(Flag):
-    NONE = 0
-    LOW_ENERGY = auto()
-    LOW_VITALITY = auto()
-    ENVIRONMENTAL_STRESS = auto()
-
-
-class StressReason(Flag):
-    NONE = 0
-
-    WATER_SHORTAGE = auto()
-    LIGHT_DEFICIENCY = auto()
-    TOXICITY = auto()
-    DISEASE = auto()
-    PHYSICAL_DAMAGE = auto()
-
-    GOOD_VITALITY = auto()
-    EXCELLENT_VITALITY = auto()
-    LOW_VITALITY = auto()
-    CRITICAL_VITALITY = auto()
-
-    NUTRIENT_DEFICIENCY = auto()
-    ENERGY_ABUNDANCE = auto()
-    ENERGY_SUFFICIENT = auto()
-    NO_ENERGY = auto()
-
-    TEMPERATURE_EXTREME = auto()
-    TEMPERATURE_OPTIMAL = auto()
-
-    HUNGER = auto()
-    THIRST = auto()
-    CRITICAL_CONDITION = auto()
-
-
-class EnergyGainSource(Flag):
-    SOIL_NUTRIENTS = auto()
-    MYCORRHIZAE = auto()
+class MovementComponentManager(BaseComponentManager[MovementComponent]):
+    def __init__(self, env: simpyEnv):
+        super().__init__(env)
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
+        self._env.process(self.move(Timers.Calendar.DAY))
+        self._counter = 0

@@ -29,7 +29,7 @@ from biome.systems.climate.system import ClimateSystem
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.events.event_notifier import EventNotifier
 from biome.systems.state.handler import StateHandler
-from shared.enums.enums import ComponentType, EntityType
+from shared.enums.enums import ComponentType, EntityType, Direction
 from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.enums.strings import Loggers
 from shared.types import ComponentDict, HabitatList
@@ -108,6 +108,9 @@ class Entity(EventHandler, StateHandler, ABC):
     def set_position(self, x, y):
         self._components[ComponentType.TRANSFORM].set_position(x, y)
 
+        if ComponentType.MOVEMENT in self._components:
+            self._event_notifier.notify(ComponentEvent.POSITION_UPDATED, position=(x, y))
+
     def has_attribute(self, attribute: str) -> bool:
         return attribute in self._state
 
@@ -135,6 +138,13 @@ class Entity(EventHandler, StateHandler, ABC):
             if component_fields:
                 fields[component_name] = component_fields
         return fields
+
+    def move(self, direction: Direction):
+        if self._components[ComponentType.MOVEMENT]:
+            self._components[ComponentType.MOVEMENT].move(direction)
+            return
+
+        self._logger.warning(f"Entity couldn't move to direction: {direction}!")
 
     @abstractmethod
     def dump_components(self) -> None:
