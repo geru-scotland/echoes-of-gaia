@@ -18,7 +18,7 @@ model:
     exploration_final_eps: 0.05
     max_grad_norm: 10
     verbose: 1
-  timesteps: 500000
+  timesteps: 5000
 environment:
   env_class: "FaunaEnvironment"
   observation_space:

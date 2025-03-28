@@ -42,7 +42,7 @@ class ClimateSystem:
         self._initial_state: Dict[str, Any] = {}
         self._base_environmental_factors: Dict[str, Any] = {}
         self._weather_event_effects: Dict[WeatherEvent, Dict[Any]] = {}
-        self._seasonal_info:  Dict[Season, Dict[str, int | float]] = {}
+        self._seasonal_info: Dict[Season, Dict[str, int | float]] = {}
         self._load_environmental_data()
 
         self._state: ClimateState = self._initialize_state()
@@ -50,7 +50,6 @@ class ClimateSystem:
         ClimateService.init_service(self._state, self._season_system.get_current_season)
 
         self._record_data_callback: Optional[Callable] = None
-
 
     def _load_environmental_data(self):
         self._base_environmental_factors = BiomeStore.biomes.get(self._biome_type, {}).get("environmental_factors", {})
@@ -95,17 +94,17 @@ class ClimateSystem:
         self._season_system.update(self._handle_new_season)
         self._handle_weather_event(weather_event)
 
-
     def _handle_new_season(self, season: Season) -> None:
         # por ahora, solo la presión atmosférica cambio
-        season_deltas: Dict[str, int|float] = self._seasonal_info.get(season, {}).get("deltas", {})
+        season_deltas: Dict[str, int | float] = self._seasonal_info.get(season, {}).get("deltas", {})
 
         if not season_deltas:
             self._logger.error(f"There weren't any seasonal deltas to update the environmental factors.")
             return
         # TODO: Quizá introducir ruido al delta también
         self._state.atm_pressure += season_deltas["atm_pressure"]
-        self._logger.debug(f"Atmospheric pressure updated: {self._state.atm_pressure} (delta: {season_deltas['atm_pressure']})")
+        self._logger.debug(
+            f"Atmospheric pressure updated: {self._state.atm_pressure} (delta: {season_deltas['atm_pressure']})")
 
     def _handle_weather_event(self, weather_event: WeatherEvent):
         self._logger.debug(f"Handling weather event: {weather_event}")
@@ -137,7 +136,7 @@ class ClimateSystem:
             f"MOD: {mod_temperature}, CURRENT_STATE: {self._state.temperature}"
         )
         self._state.temperature = round(max(PHYSICAL_MIN_TEMP,
-                                      min(self._state.temperature + mod_temperature, PHYSICAL_MAX_TEMP)), 1)
+                                            min(self._state.temperature + mod_temperature, PHYSICAL_MAX_TEMP)), 1)
 
         PHYSICAL_MIN_HUM = CLIMATE_RANGES["humidity"][0]
         PHYSICAL_MAX_HUM = CLIMATE_RANGES["humidity"][1]
@@ -145,7 +144,8 @@ class ClimateSystem:
             f"Humidity - PHYSICAL_MIN: {PHYSICAL_MIN_HUM}, PHYSICAL_MAX: {PHYSICAL_MAX_HUM}, "
             f"MOD: {mod_humidity}, CURRENT_STATE: {self._state.humidity}"
         )
-        self._state.humidity = round(max(PHYSICAL_MIN_HUM, min(self._state.humidity + mod_humidity, PHYSICAL_MAX_HUM)), 1)
+        self._state.humidity = round(max(PHYSICAL_MIN_HUM, min(self._state.humidity + mod_humidity, PHYSICAL_MAX_HUM)),
+                                     1)
 
         PHYSICAL_MIN_PREC = CLIMATE_RANGES["precipitation"][0]
         PHYSICAL_MAX_PREC = CLIMATE_RANGES["precipitation"][1]
@@ -154,7 +154,7 @@ class ClimateSystem:
             f"MOD: {mod_precipitation}, CURRENT_STATE: {self._state.precipitation}"
         )
         self._state.precipitation = round(max(PHYSICAL_MIN_PREC,
-                                        min(self._state.precipitation + mod_precipitation, PHYSICAL_MAX_PREC)), 1)
+                                              min(self._state.precipitation + mod_precipitation, PHYSICAL_MAX_PREC)), 1)
 
         # TODO: Guardar histórico y actualizar el ClimateState
         # con averages de temp, hum y prec, para que los componentes puedan acceder
@@ -191,7 +191,7 @@ class ClimateSystem:
         return self._state.temperature
 
     @property
-    def base_environmental_factors(self) -> Dict[str, int|float]:
+    def base_environmental_factors(self) -> Dict[str, int | float]:
         return self._base_environmental_factors
 
     @property
@@ -199,11 +199,11 @@ class ClimateSystem:
         return self._weather_event_effects
 
     @property
-    def seasonal_info(self) -> Dict[Season, Dict[str, int|float]]:
+    def seasonal_info(self) -> Dict[Season, Dict[str, int | float]]:
         return self._seasonal_info
 
     @property
-    def seasonal_detals(self) -> Dict[Season, Dict[str, int|float]]:
+    def seasonal_detals(self) -> Dict[Season, Dict[str, int | float]]:
         return self._seasonal_info
 
     @property

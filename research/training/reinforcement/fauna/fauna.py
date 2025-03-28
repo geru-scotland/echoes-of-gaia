@@ -16,14 +16,16 @@
 # =============================================================================
 """
 from logging import Logger
+from typing import Dict, Any
 
 import gymnasium as gym
+import numpy as np
 from gymnasium import spaces
 from gymnasium.core import ObsType
 from gymnasium.spaces import Discrete
 
 from research.training.registry import EnvironmentRegistry
-from research.training.reinforcement.fauna.fauna_adapter import FaunaAdapter
+from research.training.reinforcement.fauna.fauna_adapter import FaunaSimulationAdapter
 from shared.enums.enums import FaunaAction, Agents
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
@@ -39,14 +41,60 @@ class FaunaEnvironment(gym.Env):
         self.action_space: Discrete = gym.spaces.Discrete(len(FaunaAction))
 
         self.observation_space = spaces.Dict({
+            "vitality": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+            "age": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+            "nearby_flora": spaces.Box(low=0, high=np.inf, shape=(1,), dtype=np.float32),
+            "nearby_fauna": spaces.Box(low=0, high=np.inf, shape=(1,), dtype=np.float32),
+            "temperature": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+            "humidity": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
         })
 
-        self._fauna_adapter: FaunaAdapter = FaunaAdapter()
+        self._current_step: int = 0
+        # Pongo por ahora cap, por si en algún momento no mueren.
+        self._max_episode_steps: int = 100000
+        self._finished: bool = False
+        self._fauna_adapter: FaunaSimulationAdapter = None
 
-    def reset(self, *, seed=None, options=None) -> ObsType:
+    def reset(self, *, seed=None, options=None) -> tuple:
         super().reset(seed=seed, options=options)
-        pass
+
+        observation = self._get_default_observation()
+
+        if not self._finished:
+            self._fauna_adapter = FaunaSimulationAdapter()
+            self._fauna_adapter.initialize()
+
+            observation = self._fauna_adapter.get_observation()
+
+        return observation, {}
 
     def step(self, action):
-        pass
-        # return observation, reward, terminated, truncated, {}
+        self._current_step += 1
+        self._fauna_adapter.step_environment(action)
+
+        observation = self._fauna_adapter.get_observation()
+        target = self._fauna_adapter.get_target()
+        self._logger.info(f"OBSERVATION FOR {target.get_species()} lifespan: {target.lifespan}")
+
+        reward = self._fauna_adapter.compute_reward(action)
+
+        info = {}
+        terminated = False
+        truncated = False
+
+        if self._current_step >= self._max_episode_steps:
+            self._fauna_adapter.finish_training()
+            self._finished = True
+            terminated = True
+
+        return observation, reward, terminated, truncated, info
+
+    def _get_default_observation(self):
+        return {
+            "vitality": np.array([0.0], dtype=np.float32),
+            "age": np.array([0.0], dtype=np.float32),
+            "nearby_flora": np.array([0], dtype=np.float32),
+            "nearby_fauna": np.array([0], dtype=np.float32),
+            "temperature": np.array([0.5], dtype=np.float32),
+            "humidity": np.array([0.5], dtype=np.float32)
+        }

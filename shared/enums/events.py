@@ -17,8 +17,11 @@
 """
 from shared.enums.base import EnumBaseStr
 
+
 class SimulationEvent(EnumBaseStr):
     SIMULATION_FINISHED = "on_simulation_finished"
+    SIMULATION_TRAIN_TARGET_ACQUIRED = "on_simulation_target_acquired"
+
 
 class ComponentEvent(EnumBaseStr):
     UPDATE_STATE = "on_component_update"
@@ -38,6 +41,7 @@ class ComponentEvent(EnumBaseStr):
     BIOLOGICAL_AGE_UPDATED = "on_biological_age_updated"
     PHOTOSYNTHESIS_UPDATED = "on_photosyntesis_updated"
     ENERGY_ABSORPTION = "on_energy_absorption"
+
 
 class BiomeEvent(EnumBaseStr):
     CREATE_ENTITY = "create_entity"

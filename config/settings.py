@@ -127,7 +127,6 @@ class SimulationSettings(DefaultSettings):
         super().__init__(config_file)
         self._influxdb_config: Dict[str, Any] = self._load_influxdb_config()
 
-
     def _load_influxdb_config(self):
         try:
             return {
@@ -148,9 +147,11 @@ class SimulationSettings(DefaultSettings):
 
 
 class Settings:
-    def __init__(self):
+    def __init__(self, override_configs=None):
         load_dotenv()
         self._log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+
+        self._override_configs = override_configs or {}
 
         self._game_settings = None
         self._scene_settings = None
@@ -177,13 +178,15 @@ class Settings:
     @property
     def biome_settings(self):
         if self._biome_settings is None:
-            self._biome_settings = BiomeSettings()
+            config_file = self._override_configs if self._override_configs else "biome.yaml"
+            self._biome_settings = BiomeSettings(config_file)
         return self._biome_settings
 
     @property
     def simulation_settings(self):
         if self._simulation_settings is None:
-            self._simulation_settings = SimulationSettings()
+            config_file = self._override_configs if self._override_configs else "simulation.yaml"
+            self._simulation_settings = SimulationSettings(config_file)
         return self._simulation_settings
 
     @property

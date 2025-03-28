@@ -24,6 +24,7 @@ from typing import Optional, cast, Tuple, Dict, Any
 import simpy
 
 from biome.api.biome_api import BiomeAPI
+from biome.biome import Biome
 from biome.systems.managers.biome_data_manager import BiomeDataManager
 from config.settings import Settings
 from shared.enums.events import SimulationEvent
@@ -43,10 +44,8 @@ from utils.middleware import log_execution_time
 class SimulationEngine:
     @log_execution_time(context="Biome loading")
     def __init__(self, settings: Settings):
-
         self._env: simpy.Environment = simpy.Environment()
         self._id_generator = itertools.count(0)
-
         try:
             biome_context, simulation_context = self._boot_and_get_contexts(settings)
             self._context = simulation_context
@@ -54,6 +53,7 @@ class SimulationEngine:
             self._eras = self._context.config.get("eras", {}).get("amount", 0)
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._datapoints: bool = self._context.config.get("datapoints", False)
+            self._snapshots: bool = self._context.config.get("data", {}).get("snapshots", {}).get("enabled", False)
 
             data_storage: Dict[str, Any] = self._context.config.get("data", {}).get("storage", {})
             trackers: Dict[str, Any] = data_storage.get("trackers", {})
@@ -75,7 +75,7 @@ class SimulationEngine:
                                                                                                         False),
                 "remove_dead_entities": self._context.config.get("cleanup", {}).get("remove_dead_entities", False)
             }
-            print(options)
+
             if any([
                 bool(options["evolution_tracking"]),
                 bool(options["crossover_tracking"]),
@@ -90,12 +90,13 @@ class SimulationEngine:
             if self._datapoints:
                 self._context.influxdb.start()
 
-            self._data_manager = BiomeDataManager(
-                env=self._env,
-                config=self._context.config
-            )
+            if self._snapshots:
+                self._data_manager = BiomeDataManager(
+                    env=self._env,
+                    config=self._context.config
+                )
 
-            self._data_manager.configure(self._biome_api.biome)
+                self._data_manager.configure(self._biome_api.get_biome())
 
             self._time: SimulationTime = SimulationTime(self._events_per_era)
 
@@ -140,7 +141,30 @@ class SimulationEngine:
         if self._datapoints:
             self._context.influxdb.close()
 
-        if self._data_manager:
+        if self._snapshots and self._data_manager:
             self._data_manager.shutdown()
 
         self._time.log_time(self._env.now)
+
+    def shutdown_training(self):
+        self._logger.info("Shutting down training")
+        SimulationEventBus.trigger(SimulationEvent.SIMULATION_FINISHED)
+
+        if self._datapoints:
+            self._context.influxdb.close()
+
+        if self._snapshots and self._data_manager:
+            self._data_manager.shutdown()
+
+        self._time.log_time(self._env.now)
+
+    def step(self, time_delta: int = 1) -> int:
+        current_time = self._env.now
+
+        self._env.run(until=current_time + time_delta)
+        self._time.log_time(self._env.now)
+
+        return self._env.now
+
+    def get_biome(self) -> Biome:
+        return self._biome_api.get_biome()

@@ -175,6 +175,9 @@ class SmartPopulationTrendControl(EventHandler):
 
         slope = np.polyfit(x, y, deg=1)[0]
         # Con pendiente de recta, ahora calculo la tasa de cambio en el punto de la generación actual.
+        # La idea es que normalized slope sea un indicador comparable sin importar el tamaño de la población.
+        # lo necesita el sistema difusa, para las funciones de membresía, que trabajen más homogéneamente
+        # tipico para interpretar el cambio como proporción, que siempre utilizo la pendiente como valor absoluto
         current_population = self._population_history[-1]
 
         if current_population > 0:
