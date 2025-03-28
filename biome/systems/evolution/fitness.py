@@ -57,26 +57,38 @@ def compute_fauna_fitness(fauna_genes: FaunaGenes, climate_data) -> float:
 
     # En fauna, una tasa de hambre moderada es óptima
     # Muy baja: no busca comida suficientemente; muy alta: consume demasiada energía buscando comida
-    hunger_optimality = 1.0 - abs((fauna_genes.hunger_rate - 1.1) / 0.5) * 2.0
+    # Tasa de hambre - voy optimizar para valores medios-bajos dentro del rango permitido
+    # Rango (0.8, 1.5) con óptimo en ~1.0, pero no me tira bien del todo...
+    hunger_optimality = 0.0
+    if fauna_genes.hunger_rate <= 1.1:
+        # Para valores entre 0.8 y 1.1, dar recompensa alta
+        hunger_optimality = 1.0 - ((1.1 - fauna_genes.hunger_rate) / 0.3) * 0.5  # Penalización txiki
+    else:
+        # Para valores entre 1.1 y 1.5
+        hunger_optimality = 1.0 - ((fauna_genes.hunger_rate - 1.1) / 0.4) * 2.0  # Penalización fuerte
+
     nutrition_score += 2.0 * max(0, hunger_optimality)
 
-    # Tasa de sed óptima dependiendo del ambiente
+    # Tasa de sed - ajustar según humedad
     thirst_optimality = 0.0
     if avg_humidity < 40:  # Ambiente seco
-        # En ambiente seco, mejor tasa de sed baja, es para conservación de agua
-        thirst_optimality = 1.0 - (fauna_genes.thirst_rate / 1.6) * 2.0
+        # En ambiente seco, valorar tasas más bajas pero dentro del rango (1.2-2.0)
+        # Óptimo: cerca de 1.2 (el mínimo permitido)
+        thirst_ratio = (fauna_genes.thirst_rate - 1.2) / 0.8  # Normalizado de 0 a 1
+        thirst_optimality = 1.0 - thirst_ratio * 2.0  # Penalización lineal fuerte
     else:  # Ambiente húmedo
-        # si húmedo, tasa de sed moderada es aceptable
-        thirst_optimality = 1.0 - abs((fauna_genes.thirst_rate - 1.5) / 0.4)
-    nutrition_score += 2.0 * max(0, thirst_optimality)
+        # En ambiente húmedo, valor óptimo cerca de 1.5
+        if fauna_genes.thirst_rate <= 1.5:
+            thirst_optimality = 1.0 - ((1.5 - fauna_genes.thirst_rate) / 0.3) * 0.5  # Penalización leve
+        else:
+            thirst_optimality = 1.0 - ((fauna_genes.thirst_rate - 1.5) / 0.5) * 1.5  # Penalización moderada
 
-    # Alta eficiencia metabólica siempre es buena
-    nutrition_score += 3.0 * fauna_genes.metabolism_efficiency
+    nutrition_score += 2.0 * max(0, thirst_optimality)
 
     # 3. Reservas de energía - predadores grandes necesitan más, presas pueden ser más ligeras
     energy_score = 0.0
     ideal_energy = 100.0 + (
-                fauna_genes.max_size * 20.0)  # Ojo a ver cómo resulta esto - relación entre tamaño y energía
+            fauna_genes.max_size * 20.0)  # Ojo a ver cómo resulta esto - relación entre tamaño y energía
     energy_optimality = 1.0 - abs((fauna_genes.max_energy_reserves - ideal_energy) / ideal_energy)
     energy_score += 2.5 * max(0, energy_optimality)
 
@@ -108,6 +120,19 @@ def compute_fauna_fitness(fauna_genes: FaunaGenes, climate_data) -> float:
     # Bonus de supervivencia básica - un mínimo necesario para sobrevivir
     base_survival_threshold = 3.5 * fauna_genes.metabolism_efficiency
     fitness = max(fitness, base_survival_threshold)
+    hunger_penalty = 5.0 * (fauna_genes.hunger_rate - 0.8) / 0.7  # 0 para valor mínimo, 5 para valor máximo
+    thirst_penalty = 5.0 * (fauna_genes.thirst_rate - 1.2) / 0.8  # 0 para valor mínimo, 5 para valor máximo
+
+    # Resta directamente del fitness total
+    fitness -= hunger_penalty
+    fitness -= thirst_penalty
+
+    # HACK TEMPORAL: creao umbrales que muy fuertemente valores por encima de cierto punto
+    if fauna_genes.hunger_rate > 1.0:
+        fitness -= (fauna_genes.hunger_rate - 1.0) * 8.0
+
+    if fauna_genes.thirst_rate > 1.4:
+        fitness -= (fauna_genes.thirst_rate - 1.4) * 8.0
 
     return fitness
 

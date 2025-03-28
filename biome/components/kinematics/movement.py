@@ -86,14 +86,11 @@ class MovementComponent(EntityComponent):
 
         entity_id = self._host.get_id() if self._host else -1
 
-        def set_validation_result(result: bool):
-            self._movement_valid = result
-
         BiomeEventBus.trigger(
             BiomeEvent.VALIDATE_MOVEMENT,
             entity_id=entity_id,
             new_position=new_position,
-            callback=set_validation_result
+            result_callback=self.set_validation_result
         )
 
         if not self._movement_valid:
@@ -115,6 +112,9 @@ class MovementComponent(EntityComponent):
         return {
             "position": self._current_position if self._current_position else (-1, -1)
         }
+
+    def set_validation_result(self, is_valid: bool):
+        self._movement_valid = is_valid
 
     def _handle_move_result(self, success: bool):
         return success
