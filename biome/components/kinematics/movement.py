@@ -32,7 +32,7 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 from simpy import Environment as simpyEnv
 
@@ -51,6 +51,7 @@ class MovementComponent(EntityComponent):
                  movement_energy_cost: float = 1.0):
         super().__init__(env, ComponentType.MOVEMENT, event_notifier)
 
+        self._movement_valid: bool = False
         self._movement_energy_cost: float = movement_energy_cost
         self._current_position: Position = (-1, -1)
         self._can_move: bool = True
@@ -65,27 +66,55 @@ class MovementComponent(EntityComponent):
         self._current_position = position
 
     def move(self, direction: Direction) -> bool:
-        if not self._can_move:
+        self._logger.info(f"Moving direction: {direction}")
+
+        if direction == Direction.NONE:
+            return
+
+        if self._current_position is None:
+            self._logger.warning("Cannot move: current position is None")
             return False
 
-        energy_component = self._host.get_component(ComponentType.HETEROTROPHIC_NUTRITION)
-        if energy_component and energy_component.energy_reserves < self._movement_energy_cost:
+        y, x = self._current_position
+        dy, dx = direction.value
+        new_position = (y + dy, x + dx)
+
+        self._logger.info(f"Before position: {self._current_position}")
+        self._logger.info(f"After position: {new_position}")
+
+        self._movement_valid = False
+
+        entity_id = self._host.get_id() if self._host else -1
+
+        def set_validation_result(result: bool):
+            self._movement_valid = result
+
+        BiomeEventBus.trigger(
+            BiomeEvent.VALIDATE_MOVEMENT,
+            entity_id=entity_id,
+            new_position=new_position,
+            callback=set_validation_result
+        )
+
+        if not self._movement_valid:
+            self._logger.warning(f"Movement to {new_position} is not valid")
             return False
 
-        delta_row, delta_col = direction.value
-        row, col = self._current_position
-        new_position = (row + delta_row, col + delta_col)
+        BiomeEventBus.trigger(
+            BiomeEvent.MOVE_ENTITY,
+            entity_id=entity_id,
+            new_position=new_position
+        )
 
-        move_success = False
-        BiomeEventBus.trigger(BiomeEvent.MOVE_ENTITY,
-                              entity_id=self._host.get_id(),
-                              new_position=new_position,
-                              success_callback=self._handle_move_result)
+        self._current_position = new_position
+        self._logger.info(f"Current position: {self._current_position}")
 
-        if move_success and energy_component:
-            energy_component.energy_handler.modify_energy(-self._movement_energy_cost)
+        return True
 
-        return move_success
+    def get_state(self) -> Dict[str, Any]:
+        return {
+            "position": self._current_position if self._current_position else (-1, -1)
+        }
 
     def _handle_move_result(self, success: bool):
         return success
@@ -93,9 +122,6 @@ class MovementComponent(EntityComponent):
     def disable_notifier(self):
         super().disable_notifier()
         ComponentRegistry.get_movement_manager().unregister_component(id(self))
-
-    def get_state(self) -> Dict[str, Any]:
-        pass
 
     @property
     def movement_energy_cost(self) -> float:

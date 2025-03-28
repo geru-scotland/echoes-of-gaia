@@ -140,6 +140,9 @@ class Entity(EventHandler, StateHandler, ABC):
         return fields
 
     def move(self, direction: Direction):
+        if direction == Direction.NONE:
+            return
+
         if self._components[ComponentType.MOVEMENT]:
             self._components[ComponentType.MOVEMENT].move(direction)
             return

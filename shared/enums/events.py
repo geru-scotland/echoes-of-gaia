@@ -50,6 +50,7 @@ class BiomeEvent(EnumBaseStr):
     ENTITY_DEATH = "entity_death"
     ENTITY_CREATED = "entity_created"
     MOVE_ENTITY = "move_entity"
+    VALIDATE_MOVEMENT = "validate_movement"
     CLIMATE_CHANGE = "climate_change"
     WEATHER_UPDATE = "on_weather_update"
     SEASON_CHANGE = "season_change"
