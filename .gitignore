@@ -98,3 +98,6 @@ __pycache__/
 simulation/simulation_records/
 tensorboard_logs/
 research/experiments/simulations
+research/training/models
+
+patch.diff
