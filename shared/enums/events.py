@@ -41,6 +41,7 @@ class ComponentEvent(EnumBaseStr):
     BIOLOGICAL_AGE_UPDATED = "on_biological_age_updated"
     PHOTOSYNTHESIS_UPDATED = "on_photosyntesis_updated"
     ENERGY_ABSORPTION = "on_energy_absorption"
+    POSITION_UPDATED = "position_updated"
 
 
 class BiomeEvent(EnumBaseStr):
@@ -48,7 +49,8 @@ class BiomeEvent(EnumBaseStr):
     REMOVE_ENTITY = "remove_entity"
     ENTITY_DEATH = "entity_death"
     ENTITY_CREATED = "entity_created"
-
+    MOVE_ENTITY = "move_entity"
+    VALIDATE_MOVEMENT = "validate_movement"
     CLIMATE_CHANGE = "climate_change"
     WEATHER_UPDATE = "on_weather_update"
     SEASON_CHANGE = "season_change"

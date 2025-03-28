@@ -24,6 +24,7 @@ from simpy import Environment as simpyEnv
 
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
+from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
 from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
 from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
@@ -82,8 +83,9 @@ class SpawnSystem:
                 if data:
                     component_class = get_component_class(class_name)
 
-                    if component_class in [GrowthComponent, VitalComponent, PhotosyntheticMetabolismComponent, WeatherAdaptationComponent,
-                                           AutotrophicNutritionComponent]:
+                    if component_class in [GrowthComponent, VitalComponent, PhotosyntheticMetabolismComponent,
+                                           WeatherAdaptationComponent,
+                                           AutotrophicNutritionComponent, HeterotrophicNutritionComponent]:
                         data.update({"lifespan": lifespan})
 
                     if component_class:
@@ -115,7 +117,7 @@ class SpawnSystem:
             try:
                 entity_species = entity_species_enum(str(spawn.get("species")).lower())
                 habitats: HabitatList = biome_store.get(entity_species, {}).get("habitat", {})
-                amount: int  = spawn.get("spawns")
+                amount: int = spawn.get("spawns")
                 lifespan: float = spawn.get("avg-lifespan", random.randint(1, 20))
 
                 if amount < 1 or amount > 350:
@@ -196,7 +198,8 @@ class SpawnSystem:
                 ]
                 components.append(fixed_components)
 
-        entity = self._create_single_entity(entity_class, entity_species, habitats, lifespan, components, evolution_cycle)
+        entity = self._create_single_entity(entity_class, entity_species, habitats, lifespan, components,
+                                            evolution_cycle)
 
         if entity:
             if entity_class == Flora:

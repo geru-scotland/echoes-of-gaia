@@ -61,19 +61,19 @@ class HabitatManager:
 
             # para convolución una celda, cuenta sus vecinas y no así misma
             kernel_neighbour: ndarray = np.array([[1, 1, 1],
-                                                     [1, 0, 1],
-                                                     [1, 1, 1]])
+                                                  [1, 0, 1],
+                                                  [1, 1, 1]])
 
             # expando en +1 todos los lados, para que no tenga que ser justo la casilla adyacente
             kernel_expanded = np.pad(kernel_neighbour, pad_width=1, mode='constant', constant_values=1)
 
             for habitat, rules in habitat_data.items():
                 in_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
-                                                    for terrain in rules.get(Habitats.Relations.IN, {})],
-                                                   dtype=np.int8)
+                                                 for terrain in rules.get(Habitats.Relations.IN, {})],
+                                                dtype=np.int8)
                 nearby_terrains: ndarray = np.array([int(getattr(TerrainType, terrain))
-                                                        for terrain in rules.get(Habitats.Relations.NEARBY, {})],
-                                                       dtype=np.int8)
+                                                     for terrain in rules.get(Habitats.Relations.NEARBY, {})],
+                                                    dtype=np.int8)
                 in_mask: ndarray = np.isin(terrain_map, in_terrains).astype(np.int8)
                 nearby_mask: ndarray = np.isin(terrain_map, nearby_terrains).astype(np.int8)
                 valid_positions: ndarray = np.empty((0, 2), dtype=np.int8)
@@ -136,7 +136,7 @@ class HabitatManager:
         original_habitats = self._base_habitat_map.get(position, [])
 
         if not original_habitats:
-            self._logger.warning(f"Position {position} didn't have any original habitats")
+            self._logger.warning(f"Position {position} didn't have any original habitats (might be water etc).")
             return
 
         for habitat in original_habitats:

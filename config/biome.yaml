@@ -5,45 +5,12 @@ biome:
       - 67 # width
       - 61 # height
   type: "tropical"
-  flora:
-    - species: "oak_tree"
-      spawns: 20
-      avg-lifespan: 30  # En años lo pongo
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - PhotosyntheticMetabolismComponent:
-        - AutotrophicNutritionComponent:
-        - WeatherAdaptationComponent:
-            optimal_temperature: 20.0
-            cold_resistance: 0.0
-            heat_resistance: 0.0
 
-    - species: "mushroom"
-      spawns: 15
-      avg-lifespan: 7
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - PhotosyntheticMetabolismComponent:
-        - AutotrophicNutritionComponent:
-        - WeatherAdaptationComponent:
-            optimal_temperature: 8.0
 
-    - species: "bramble"
-      spawns: 7
-      avg-lifespan: 12
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - PhotosyntheticMetabolismComponent:
-        - AutotrophicNutritionComponent:
-        - WeatherAdaptationComponent:
-            optimal_temperature: 18.0
 
   fauna:
     - species: "fox"
-      spawns: 5
+      spawns: 1
       avg-lifespan: 12
       components:
         - GrowthComponent:
@@ -51,22 +18,5 @@ biome:
         - WeatherAdaptationComponent:
             optimal_temperature: 5.0
             cold_resistance: 0.0
-
-    - species: "boar"
-      spawns: 5
-      avg-lifespan: 18
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - WeatherAdaptationComponent:
-            optimal_temperature: 16.0
-
-    - species: "deer"
-      spawns: 3
-      avg-lifespan: 6
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - WeatherAdaptationComponent:
-            optimal_temperature: 19.0
-
+        - HeterotrophicNutritionComponent:
+        - MovementComponent:

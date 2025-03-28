@@ -16,7 +16,7 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -32,6 +32,15 @@ class MapAllocator:
         self._tile_map: TileMap = tile_map
         self._entity_index_map: EntityIndexMap = np.full(tile_map.shape, -1, dtype=int)
         self._habitat_manager = HabitatManager(tile_map)
+
+    def is_position_valid(self, position: Position) -> bool:
+        if position is None:
+            return False
+
+        y, x = position
+        height, width = self._entity_index_map.shape
+
+        return 0 <= y < height and 0 <= x < width
 
     def allocate_position(self, entity_id: int, habitats: List) -> Optional[Position]:
         position = self._habitat_manager.get_available_position(habitats)
@@ -71,6 +80,11 @@ class MapAllocator:
         if from_position is None or to_position is None:
             return False
 
+        if not self.is_position_valid(to_position):
+            self._logger.warning(
+                f"Target position {to_position} is outside map boundaries")
+            return False
+
         if self._entity_index_map[from_position] != entity_id:
             self._logger.warning(
                 f"Entity {entity_id} is not at position {from_position}")
@@ -98,6 +112,9 @@ class MapAllocator:
                                     0 <= position[1] < self._entity_index_map.shape[1]):
             return -1
         return self._entity_index_map[position]
+
+    def get_map_shape(self) -> Tuple[int, int]:
+        return self._entity_index_map.shape
 
     @property
     def entity_index_map(self) -> EntityIndexMap:

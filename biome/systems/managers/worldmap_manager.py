@@ -59,9 +59,57 @@ class WorldMapManager:
             self._world_map = WorldMap(tile_map=tile_map, entity_registry=self._entity_registry,
                                        entity_index_map=self._entity_index_map)
 
+            BiomeEventBus.register(BiomeEvent.MOVE_ENTITY, self._handle_move_entity)
+            BiomeEventBus.register(BiomeEvent.VALIDATE_MOVEMENT, self._handle_validate_movement)
+
         except Exception as e:
             tb = traceback.format_exc()
             self._logger.error("There was an exception spawning entities: %s", tb)
+
+    def _handle_move_entity(self, entity_id: int, new_position: Position, success_callback=None):
+        success = self.move_entity(entity_id, new_position)
+
+        if success_callback:
+            success_callback(success)
+
+        return success
+
+    def _handle_validate_movement(self, entity_id: int, new_position: Position, result_callback: Callable) -> None:
+        if entity_id not in self._entity_registry:
+            self._logger.warning(f"Entity {entity_id} not found in registry")
+            result_callback(False)
+            return
+
+        entity = self._entity_registry[entity_id]
+
+        map_height, map_width = self._map_allocator.get_map_shape()
+        y, x = new_position
+
+        if not (0 <= y < map_height and 0 <= x < map_width):
+            self._logger.warning(f"Target position {new_position} is outside map boundaries")
+            result_callback(False)
+            return
+
+        if self._map_allocator.get_entity_at(new_position) != -1:
+            occupier_id = self._map_allocator.get_entity_at(new_position)
+            if occupier_id != entity_id:
+                self._logger.warning(f"Target position {new_position} is already occupied by entity {occupier_id}")
+                result_callback(False)
+                return
+
+        terrain_type = self._world_map.terrain_map[new_position]
+        non_traversable_terrains = {
+            int(TerrainType.WATER_DEEP),
+            int(TerrainType.WATER_MID),
+        }
+
+        if int(terrain_type) in non_traversable_terrains:
+            self._logger.warning(f"Terrain at position {new_position} is not traversable")
+            result_callback(False)
+            return
+
+        # Todo parece estar bien
+        result_callback(True)
 
     def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float,
                    custom_components: List[Dict] = None, evolution_cycle: int = 0):

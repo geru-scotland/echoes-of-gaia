@@ -44,6 +44,12 @@ class FaunaGenes(Genes):
         # aquí pondré genes específicos de fauna
         # self.foraging_efficiency = 0.0
         # self.predator_avoidance = 0.0
+        self.hunger_rate = 0.0
+        self.thirst_rate = 0.0
+        self.metabolism_efficiency = 0.0
+        self.max_energy_reserves = 0.0
+
+        self.movement_energy_cost = 0.0
 
     def convert_genes_to_components(self) -> list[dict[str, any]]:
         components: list[dict[str, any]] = []
@@ -78,7 +84,23 @@ class FaunaGenes(Genes):
         }
         components.append(weather_adaptation_component)
 
-        # TODO: Aquí, cuando ya tenga los especificos de fauna.
+        # Especificos de fauna pongo aquí
+        nutrition_component: dict[str, any] = {
+            "HeterotrophicNutritionComponent": {
+                "max_energy_reserves": self.max_energy_reserves,
+                "hunger_rate": self.hunger_rate,
+                "thirst_rate": self.thirst_rate,
+                "metabolism_efficiency": self.metabolism_efficiency,
+            }
+        }
+        components.append(nutrition_component)
+
+        movement_component: dict[str, any] = {
+            "MovementComponent": {
+                "movement_energy_cost": self.movement_energy_cost,
+            }
+        }
+        components.append(movement_component)
 
         return components
 
@@ -99,8 +121,15 @@ class FaunaGenes(Genes):
     def lifespan(self, value: float):
         self._lifespan = value
 
+
 def extract_genes_from_fauna(fauna_entity: Entity) -> FaunaGenes:
     genes = FaunaGenes()
     extract_common_genes(fauna_entity, genes)
-    # TODO: Específicos de fauna, cuando los tenga
+    heterotrophic_component = fauna_entity.get_component(ComponentType.HETEROTROPHIC_NUTRITION)
+
+    if heterotrophic_component:
+        genes.hunger_rate = heterotrophic_component.hunger_rate
+        genes.thirst_rate = heterotrophic_component.thirst_rate
+        genes.metabolism_efficiency = heterotrophic_component.metabolism_efficiency
+        genes.max_energy_reserves = heterotrophic_component.max_energy_reserves
     return genes

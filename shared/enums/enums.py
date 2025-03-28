@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from enum import auto
+from enum import auto, Enum
 from typing import TypedDict, NamedTuple, List, Optional, Dict, Literal, Any
 
 from shared.enums.base import EnumBaseStr, EnumBaseInt
@@ -46,10 +46,12 @@ class ComponentType(EnumBaseStr):
     GROWTH = "growth"
     PHOTOSYNTHETIC_METABOLISM = "photosynthetic_metabolism"
     AUTOTROPHIC_NUTRITION = "autotrophic_nutrition"
+    HETEROTROPHIC_NUTRITION = "heterotrophic_nutrition"
     STATE = "state"
     VITAL = "vital"
     CLIMATE = "climate"
     WEATHER_ADAPTATION = "weather_adaptation"
+    MOVEMENT = "movement"
 
 
 class EntityState(EnumBaseStr):
@@ -221,3 +223,15 @@ class ReinforcementConfig(TypedDict):
 class SimulationMode(EnumBaseInt):
     NORMAL = auto()
     TRAINING = auto()
+
+
+class Direction(Enum):
+    NORTH = (-1, 0)
+    NORTHEAST = (1, 1)
+    EAST = (0, 1)
+    SOUTHEAST = (-1, 1)
+    SOUTH = (1, 0)
+    SOUTHWEST = (-1, -1)
+    WEST = (0, -1)
+    NORTHWEST = (1, -1)
+    NONE = (0, 0)

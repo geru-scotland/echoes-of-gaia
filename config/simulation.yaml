@@ -3,7 +3,7 @@ simulation:
 
   eras:
     amount: 10
-    events-per-era: 500
+    events-per-era: 100
 
   cleanup:
     remove_dead_entities: false
@@ -21,14 +21,14 @@ simulation:
         trends: "trends"
 
     visualization:
-      smart-trends: true
-      evolution: true
-      crossover: true
+      smart-trends: false
+      evolution: false
+      crossover: false
 
     snapshots:
       enabled: true
       period_type: "CUSTOM"
-      custom_period: 60
+      custom_period: 2
       storage_directory: "simulation_records"
       filename_prefix: "biome_snapshot"
       pretty_print: true

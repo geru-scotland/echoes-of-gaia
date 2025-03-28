@@ -30,23 +30,26 @@ class SimulationTimeInfo:
     year: int
 
     @classmethod
-    def from_ticks(cls, ticks: int) -> 'SimulationTimeInfo':
-        """
-        Convierte ticks en una estructura de tiempo de simulación.
-        Los meses empiezan en 1, los años en 0.
-        """
-        ticks_per_month = 60
-        months_per_year = 12
+    def from_ticks(cls, ticks: int):
+        from shared.timers import Timers
 
-        total_months = ticks // ticks_per_month
-        years = (total_months - 1) // months_per_year
-        months = ((total_months - 1) % months_per_year) + 1
+        month = (ticks // Timers.Calendar.MONTH) % 12
+        year = ticks // (12 * Timers.Calendar.MONTH)
 
+        if month == 0:
+            month = 12
+            if year > 0:
+                year -= 1
+
+        year = max(0, year)
+
+        if ticks < Timers.Calendar.MONTH:
+            month = 1
 
         return cls(
             raw_ticks=ticks,
-            month=months,
-            year=years,
+            month=month,
+            year=year
         )
 
     def to_dict(self) -> Dict[str, int]:
@@ -54,8 +57,8 @@ class SimulationTimeInfo:
             "raw_ticks": self.raw_ticks,
             "month": self.month,
             "year": self.year,
-            "total_months": (self.year * 12) + self.month
         }
+
 
 class SimulationTime:
     def __init__(self, events_per_era: int = 30000):
