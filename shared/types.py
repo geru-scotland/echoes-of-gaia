@@ -22,7 +22,7 @@ import numpy as np
 from numpy import ndarray
 
 from biome.components.base.component import Component
-from shared.enums.enums import TerrainType, Habitats, EntityType, ComponentType, FaunaSpecies
+from shared.enums.enums import TerrainType, Habitats, EntityType, ComponentType, FaunaSpecies, FaunaAction, Direction
 
 if TYPE_CHECKING:
     pass
@@ -49,7 +49,7 @@ EntityLayer: TypeAlias = List[EntityList]
 TerrainMap: TypeAlias = np.ndarray
 EntityIndexMap: TypeAlias = np.ndarray
 EntityRegistry: TypeAlias = Dict[int, "Entity"]
-Position: TypeAlias = Tuple[int, int]
+Position: TypeAlias = Tuple[int | ndarray, int | ndarray]
 BiomeStoreData: TypeAlias = Dict[str, Any]
 HabitatCache: TypeAlias = Dict[Habitats.Type, ndarray]
 
@@ -68,3 +68,4 @@ CallbackType: TypeAlias = Optional[Callable[[Optional[Path]], None]]
 # Agents
 Observation: TypeAlias = Union[Dict[str, Any]]
 Target: TypeAlias = Tuple[FaunaSpecies, EntityType, int]
+DecodedAction: TypeAlias = Union[FaunaAction, Direction]

@@ -205,11 +205,17 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
     def get_world_map(self) -> WorldMap:
         return self._map_manager.get_world_map()
 
+    def get_worldmap_manager(self) -> WorldMapManager:
+        return self._map_manager
+
     def get_entity_collector(self) -> EntityDataCollector:
         return self._entity_collector
 
     def get_climate_collector(self) -> ClimateDataCollector:
         return None
+
+    def get_climate_system(self) -> ClimateState:
+        return self._climate
 
     def get_biome_type(self) -> BiomeType:
         return self._context.biome_type

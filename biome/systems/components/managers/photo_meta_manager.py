@@ -35,9 +35,9 @@ class PhotosyntheticMetabolismComponentManager(BaseComponentManager[Photosynthet
         super().__init__(env)
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self._env.process(self._update_all_metabolism(Timers.Compoments.Physiological.METABOLISM))
-        self._env.process(self._synchronize_photosynthesis_efficiency(Timers.Compoments.Physiological.STRESS_UPDATE))
-        self._env.process(self._update_metabolic_stress(Timers.Compoments.Physiological.STRESS_UPDATE))
+        self._env.process(self._update_all_metabolism(Timers.Components.Physiological.METABOLISM))
+        self._env.process(self._synchronize_photosynthesis_efficiency(Timers.Components.Physiological.STRESS_UPDATE))
+        self._env.process(self._update_metabolic_stress(Timers.Components.Physiological.STRESS_UPDATE))
 
     def _update_metabolic_stress(self, timer: int):
         yield self._env.timeout(timer)

@@ -34,7 +34,7 @@ class GrowthComponentManager(BaseComponentManager[GrowthComponent]):
     def __init__(self, env: simpyEnv):
         super().__init__(env)
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self._process = self._env.process(self._update_all_growth(Timers.Compoments.Physiological.GROWTH))
+        self._process = self._env.process(self._update_all_growth(Timers.Components.Physiological.GROWTH))
 
     def _update_all_growth(self, timer: int):
         yield self._env.timeout(timer)

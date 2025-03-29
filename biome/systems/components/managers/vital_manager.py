@@ -41,16 +41,16 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._cleanup_dead_entities: bool = cleanup_dead_entities
 
-        self._age_process = self._env.process(self._update_all_age(Timers.Compoments.Physiological.AGING))
+        self._age_process = self._env.process(self._update_all_age(Timers.Components.Physiological.AGING))
 
         self._vitality_stress_process = self._env.process(
-            self._update_all_vitality_stress(Timers.Compoments.Physiological.STRESS_UPDATE))
+            self._update_all_vitality_stress(Timers.Components.Physiological.STRESS_UPDATE))
 
         self._vitality_process = self._env.process(
-            self._update_all_vitality(Timers.Compoments.Physiological.HEALTH_DECAY))
+            self._update_all_vitality(Timers.Components.Physiological.HEALTH_DECAY))
 
         self._stress_sync_process = self._env.process(
-            self._synchronize_aging_rates(Timers.Compoments.Physiological.STRESS_UPDATE)
+            self._synchronize_aging_rates(Timers.Components.Physiological.STRESS_UPDATE)
         )
 
     def _update_all_age(self, timer: int):
@@ -92,10 +92,10 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
 
                 critical_mask = vitality_ratios < VitalThresholds.Health.CRITICAL
                 low_mask = (vitality_ratios >= VitalThresholds.Health.CRITICAL) & (
-                            vitality_ratios < VitalThresholds.Health.LOW)
+                        vitality_ratios < VitalThresholds.Health.LOW)
                 excellent_mask = vitality_ratios > VitalThresholds.Health.EXCELLENT
                 good_mask = (vitality_ratios <= VitalThresholds.Health.EXCELLENT) & (
-                            vitality_ratios > VitalThresholds.Health.GOOD)
+                        vitality_ratios > VitalThresholds.Health.GOOD)
 
                 for i, component in enumerate(active_components):
                     if critical_mask[i]:
@@ -146,14 +146,15 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                 max_stress_mask = stress_levels >= max_stress_levels
 
                 non_linear_aging_progressions = np.zeros_like(completed_lifespan_ratios_with_mods)
-                non_linear_aging_progressions = BiologicalGrowthPatterns.gompertz_decay_vectorized(completed_lifespan_ratios_with_mods)
+                non_linear_aging_progressions = BiologicalGrowthPatterns.gompertz_decay_vectorized(
+                    completed_lifespan_ratios_with_mods)
 
                 new_healths = max_vitalities * (1.0 - non_linear_aging_progressions)
                 new_healths[max_stress_mask] -= max_vitalities[max_stress_mask] * 0.05
 
                 combined_mask = ((new_healths <= 0.05 * max_vitalities) &
-                                (new_healths > 0) &
-                                (current_vitalities - new_healths < 0.5))
+                                 (new_healths > 0) &
+                                 (current_vitalities - new_healths < 0.5))
 
                 if np.any(combined_mask):
                     min_decay_rate = 0.01
@@ -179,7 +180,8 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                             ComponentType.VITAL,
                             vitality=component.vitality
                         )
-                        component.event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL, cleanup_dead_entities=self._cleanup_dead_entities)
+                        component.event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL,
+                                                        cleanup_dead_entities=self._cleanup_dead_entities)
                     else:
                         component.vitality = max(0, new_healths[i])
                         component.event_notifier.notify(
@@ -190,7 +192,6 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
 
                     age_in_years = component.age / float(Timers.Calendar.YEAR)
                     component.vitality_history.append((age_in_years, component.vitality))
-
 
             yield self._env.timeout(timer)
 

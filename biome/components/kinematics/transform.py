@@ -43,3 +43,7 @@ class TransformComponent(EntityComponent):
         return {
             "position": (self.x, self.y)
         }
+
+    def disable_notifier(self):
+        self._host_alive = False
+        self._event_notifier = None

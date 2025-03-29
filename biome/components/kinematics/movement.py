@@ -65,19 +65,20 @@ class MovementComponent(EntityComponent):
     def _handle_position_update(self, position: Position):
         self._current_position = position
 
+    def calculate_new_position(self, direction: Direction) -> Position:
+        y, x = self._current_position
+        dy, dx = direction.value
+        new_position = (y + dy, x + dx)
+        return new_position
+
     def move(self, direction: Direction) -> bool:
         self._logger.info(f"Moving direction: {direction}")
-
-        if direction == Direction.NONE:
-            return
 
         if self._current_position is None:
             self._logger.warning("Cannot move: current position is None")
             return False
 
-        y, x = self._current_position
-        dy, dx = direction.value
-        new_position = (y + dy, x + dx)
+        new_position = self.calculate_new_position(direction)
 
         self._logger.info(f"Before position: {self._current_position}")
         self._logger.info(f"After position: {new_position}")

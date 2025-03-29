@@ -17,8 +17,8 @@
 """
 from shared.enums.base import EnumBaseInt
 
-class Timers:
 
+class Timers:
     class Calendar(EnumBaseInt):
         TICK = 1
         DAY = 2
@@ -43,8 +43,7 @@ class Timers:
             SELECTION_PRESSURE = 360
             EVOLUTION_CYCLE = 10000
 
-
-    class Compoments:
+    class Components:
         class Physiological(EnumBaseInt):
             AGING = 2
             HEALTH_DECAY = 2

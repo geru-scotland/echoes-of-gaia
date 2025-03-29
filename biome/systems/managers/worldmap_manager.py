@@ -18,8 +18,9 @@
 import sys
 import traceback
 from logging import Logger
-from typing import List, Dict
+from typing import List, Dict, Optional, Callable
 
+import numpy as np
 from simpy import Environment as simpyEnv
 
 from biome.entities.entity import Entity
@@ -28,7 +29,7 @@ from biome.systems.maps.map_allocator import MapAllocator
 from biome.systems.maps.spawn_system import SpawnSystem
 from biome.systems.maps.worldmap import WorldMap
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import EntityType, FaunaSpecies
+from shared.enums.enums import EntityType, FaunaSpecies, TerrainType
 from shared.enums.events import BiomeEvent, SimulationEvent
 from shared.enums.strings import Loggers
 from shared.types import TileMap, EntityList, EntityDefinitions, EntityRegistry, \
@@ -74,42 +75,45 @@ class WorldMapManager:
 
         return success
 
+    def _is_traversable_position(self, position: Position) -> bool:
+        if self._map_allocator.is_position_valid(position):
+            terrain_type = self._world_map.terrain_map[position]
+            non_traversable_terrains = {
+                int(TerrainType.WATER_DEEP),
+                int(TerrainType.WATER_MID),
+            }
+
+            if int(terrain_type) in non_traversable_terrains:
+                self._logger.warning(f"Terrain at position {position} is not traversable")
+                return False
+
+            return True
+        return False
+
+    def _is_valid_position(self, position: Position, entity_id: Optional[int] = None) -> bool:
+
+        if not self._map_allocator.is_position_valid(position):
+            self._logger.warning(f"Target position {position} is outside map boundaries")
+            return False
+
+        if entity_id and self._map_allocator.get_entity_at(position) != -1:
+            occupier_id = self._map_allocator.get_entity_at(position)
+            if occupier_id != entity_id:
+                self._logger.warning(f"Target position {position} is already occupied by entity {occupier_id}")
+                return False
+
+        if not self._is_traversable_position(position):
+            return False
+
+        return True
+
     def _handle_validate_movement(self, entity_id: int, new_position: Position, result_callback: Callable) -> None:
         if entity_id not in self._entity_registry:
             self._logger.warning(f"Entity {entity_id} not found in registry")
             result_callback(False)
             return
 
-        entity = self._entity_registry[entity_id]
-
-        map_height, map_width = self._map_allocator.get_map_shape()
-        y, x = new_position
-
-        if not (0 <= y < map_height and 0 <= x < map_width):
-            self._logger.warning(f"Target position {new_position} is outside map boundaries")
-            result_callback(False)
-            return
-
-        if self._map_allocator.get_entity_at(new_position) != -1:
-            occupier_id = self._map_allocator.get_entity_at(new_position)
-            if occupier_id != entity_id:
-                self._logger.warning(f"Target position {new_position} is already occupied by entity {occupier_id}")
-                result_callback(False)
-                return
-
-        terrain_type = self._world_map.terrain_map[new_position]
-        non_traversable_terrains = {
-            int(TerrainType.WATER_DEEP),
-            int(TerrainType.WATER_MID),
-        }
-
-        if int(terrain_type) in non_traversable_terrains:
-            self._logger.warning(f"Terrain at position {new_position} is not traversable")
-            result_callback(False)
-            return
-
-        # Todo parece estar bien
-        result_callback(True)
+        result_callback(self._is_valid_position(new_position, entity_id))
 
     def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float,
                    custom_components: List[Dict] = None, evolution_cycle: int = 0):
@@ -123,11 +127,14 @@ class WorldMapManager:
                 evolution_cycle=evolution_cycle
             )
 
+            self._logger.info(f"Creating evolved entity: {entity_class} with ref: {id(entity)}")
+
             BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, species_name=species_name, evolution_cycle=evolution_cycle)
 
-            if TrainingTargetManager.is_training_mode() and not TrainingTargetManager.is_acquired() and entity_species_enum == FaunaSpecies:
+            if entity and TrainingTargetManager.is_training_mode() and not TrainingTargetManager.is_acquired() and entity_species_enum == FaunaSpecies:
                 self._logger.info(f"{TrainingTargetManager.get_target()}")
                 if TrainingTargetManager.is_valid_target(entity.get_species(), entity.get_type(), evolution_cycle):
+                    self._logger.info(f"Selected entity with REF: with ref: {id(entity)}")
                     SimulationEventBus.trigger(SimulationEvent.SIMULATION_TRAIN_TARGET_ACQUIRED, entity=entity,
                                                generation=evolution_cycle)
 
@@ -193,5 +200,5 @@ class WorldMapManager:
     def get_entities(self) -> EntityList:
         return self._world_map.get_entities()
 
-    def _is_valid_position(self):
-        pass
+    def is_valid_position(self, position: Position, entity_id: Optional[int] = None) -> bool:
+        return self._is_valid_position(position, entity_id)

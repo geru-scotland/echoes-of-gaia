@@ -12,6 +12,7 @@ model:
     gamma: 0.99
     ent_coef: 0.02
     verbose: 1
+    tensorboard_log: "./tensorboard_log/climate/"
   timesteps: 1000000
 environment:
   env_class: "NaiveClimateEnvironment"

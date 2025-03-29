@@ -37,10 +37,10 @@ class AutotrophicNutritionComponentManager(BaseComponentManager[AutotrophicNutri
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
 
         self._soil_nutrient_process = self._env.process(
-            self._update_all_soil_nutrient_absorption(Timers.Compoments.Environmental.RESOURCE_ABSORPTION))
+            self._update_all_soil_nutrient_absorption(Timers.Components.Environmental.RESOURCE_ABSORPTION))
 
         self._mycorrhizal_process = self._env.process(
-            self._update_all_mycorrhizal_activity(Timers.Compoments.Environmental.RESOURCE_ABSORPTION))
+            self._update_all_mycorrhizal_activity(Timers.Components.Environmental.RESOURCE_ABSORPTION))
 
     def _update_all_soil_nutrient_absorption(self, timer: int):
         yield self._env.timeout(timer)

@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import atexit
 from logging import Logger
 from typing import Dict, Any
 
@@ -24,6 +25,7 @@ from gymnasium import spaces
 from gymnasium.core import ObsType
 from gymnasium.spaces import Discrete
 
+from biome.entities.entity import Entity
 from research.training.registry import EnvironmentRegistry
 from research.training.reinforcement.fauna.fauna_adapter import FaunaSimulationAdapter
 from shared.enums.enums import FaunaAction, Agents
@@ -51,9 +53,15 @@ class FaunaEnvironment(gym.Env):
 
         self._current_step: int = 0
         # Pongo por ahora cap, por si en algún momento no mueren.
-        self._max_episode_steps: int = 100000
+        self._max_episode_steps: int = 8000
         self._finished: bool = False
         self._fauna_adapter: FaunaSimulationAdapter = None
+
+        atexit.register(self.cleanup)
+
+    def cleanup(self):
+        if self._fauna_adapter:
+            self._fauna_adapter.finish_training_session()
 
     def reset(self, *, seed=None, options=None) -> tuple:
         super().reset(seed=seed, options=options)
@@ -70,22 +78,23 @@ class FaunaEnvironment(gym.Env):
 
     def step(self, action):
         self._current_step += 1
+
+        self._logger.info(f"Received action: {action}")
         self._fauna_adapter.step_environment(action)
-
-        observation = self._fauna_adapter.get_observation()
-        target = self._fauna_adapter.get_target()
-        self._logger.info(f"OBSERVATION FOR {target.get_species()} lifespan: {target.lifespan}")
-
-        reward = self._fauna_adapter.compute_reward(action)
 
         info = {}
         terminated = False
         truncated = False
 
-        if self._current_step >= self._max_episode_steps:
-            self._fauna_adapter.finish_training()
-            self._finished = True
+        observation = self._fauna_adapter.get_observation()
+        target: Entity = self._fauna_adapter.get_target()
+
+        if not target.is_alive():
+            self._logger.error("TERMINATING EPISODE!!")
+            self._fauna_adapter.finish_training_session()
             terminated = True
+
+        reward = self._fauna_adapter.compute_reward(action)
 
         return observation, reward, terminated, truncated, info
 

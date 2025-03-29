@@ -59,6 +59,7 @@ class SpawnSystem:
         if not components:
             if self._request_allocation(entity):
                 return entity
+            self._logger.warning(f"Request allocation denied for entity class {entity_class}")
             return None
 
         for component in components:
@@ -101,6 +102,7 @@ class SpawnSystem:
             return entity
 
         # TODO: Borrar componentes creados
+        self._logger.warning("Entity was not created!")
         entity.clear_and_unregister()
         return None
 
@@ -156,7 +158,7 @@ class SpawnSystem:
         position = self._map_allocator.allocate_position(entity.get_id(), entity.get_habitats())
 
         if position is None:
-            self._logger.warning(
+            self._logger.error(
                 f"Failed to allocate position for entity {entity.get_type()} ({entity.get_species()})(id: {entity.get_id()})!")
             return False
 
@@ -211,6 +213,7 @@ class SpawnSystem:
 
             return entity
 
+        self._logger.warning("Entity NONE after create_single_entity (SpawnSystem)")
         return None
 
     def initial_spawns(self, flora_spawns: EntityDefinitions = None, fauna_spawns: EntityDefinitions = None):
