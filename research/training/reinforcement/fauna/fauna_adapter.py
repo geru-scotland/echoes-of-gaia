@@ -25,6 +25,7 @@ from biome.biome import Biome
 from biome.entities.entity import Entity
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
+from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from config.settings import Settings
 from research.training.reinforcement.adapter import EnvironmentAdapter
@@ -51,7 +52,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
     def __del__(self):
         try:
-            self.finish_training()
+            self._logger.info("Closing Fauna Adapter resources...")
+            self.finish_training_session()
         except Exception as e:
             self._logger.warning(f"Error during cleanup: {e}")
 
@@ -65,8 +67,6 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if entity and generation and not TrainingTargetManager.is_acquired():
             self._target = entity
             TrainingTargetManager.mark_as_acquired()
-            registro = self._worldmap_manager.get_entities()
-            self._logger.info(f"Entidades: {registro}")
             self._logger.info(
                 f"Training target acquired: {entity.get_species()} (ID: {entity.get_id()}) - Generation {generation}")
 
@@ -75,6 +75,10 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         settings = Settings(override_configs="training.yaml")
 
+        SimulationEventBus.clear()
+        BiomeEventBus.clear()
+
+        self._register_events()
         self._simulation_api = SimulationAPI(
             settings=settings,
             mode=SimulationMode.TRAINING,
@@ -99,8 +103,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         )
 
         self._logger.info(f"Waiting for target species: {target_species}, generation: {target_generation}")
-        registro = self._worldmap_manager.get_entities()
-        self._logger.info(f"Entidades: {registro}")
+
         try:
             self._wait_for_target_acquisition()
         except Exception as e:
@@ -128,7 +131,14 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if not TrainingTargetManager.is_acquired():
             raise RuntimeError("Failed to acquire target after maximum attempts")
 
-        self._logger.info("Target acquired successfully")
+        self._logger.info(f"Target acquired successfully: {TrainingTargetManager.get_current_episode()}")
+
+    def step_environment(self, action: int, time_delta: int = 1) -> None:
+        if not self._simulation_api or not self._target:
+            return
+
+        self._target.move(self._action_decode(action))
+        self._simulation_api.step(time_delta)
 
     def compute_reward(self, action: FaunaAction):
         if not self._target or not self._target.is_alive():
@@ -151,30 +161,15 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             return list(Direction)[action]
 
     def compute_movement_reward(self, direction: Direction) -> float:
+
         new_position: Position = self._target.movement_component.calculate_new_position(direction)
 
-        reward = 0.0
-
         if self._worldmap_manager.is_valid_position(new_position, self._target.get_id()):
-            reward += 1
+            return 0.2
         else:
-            reward -= 1
-
-        # # Recompensa por acercarse a agua
-        # # TODO: Comprobar tambien umbrales de estado, thirst level etc.
-        # if self.is_water_nearby(new_position, radius=2):
-        #     reward += 0.5
-        #
-        # # Recompensa por acercarse a comida
-        # food_entities = self.find_food_nearby(new_position, radius=2)
-        # if food_entities:
-        #     reward += 0.3 * len(food_entities)
-        #
-        return reward
+            return -0.5
 
     def get_observation(self):
-        registro = self._worldmap_manager.get_entities()
-        self._logger.info(f"Entidades: {registro}")
         if not self._target:
             return self._get_default_observation()
 
@@ -187,8 +182,10 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
                                                dtype=np.float32)
             observation["age"] = np.array([vital_component.age / vital_component.lifespan],
                                           dtype=np.float32)
+        else:
+            observation["vitality"] = np.array([0.0], dtype=np.float32)
+            observation["age"] = np.array([0.0], dtype=np.float32)
 
-        # 2. Información sobre el entorno cercano
         position = self._target.get_position()
         if position:
             nearby_entities = self._find_nearby_entities(position, radius=3)
@@ -198,6 +195,9 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             observation["nearby_fauna"] = np.array([len([e for e in nearby_entities
                                                          if e.get_type() == EntityType.FAUNA])],
                                                    dtype=np.float32)
+        else:
+            observation["nearby_flora"] = np.array([0], dtype=np.float32)
+            observation["nearby_fauna"] = np.array([0], dtype=np.float32)
 
         # 3. Información climática
         climate_system: ClimateSystem = self._biome.get_climate_system()
@@ -209,6 +209,15 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             observation["humidity"] = np.array([climate_normalizer.normalize(
                 "humidity", climate_state.humidity)],
                 dtype=np.float32)
+        else:
+            observation["temperature"] = np.array([0.5], dtype=np.float32)
+            observation["humidity"] = np.array([0.5], dtype=np.float32)
+
+        expected_keys = ["vitality", "age", "nearby_flora", "nearby_fauna", "temperature", "humidity"]
+        for key in expected_keys:
+            if key not in observation:
+                self._logger.warning(f"Key {key} missing from observation, adding default value")
+                observation[key] = np.array([0.0], dtype=np.float32)
 
         return observation
 
@@ -218,14 +227,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
     def _get_default_observation(self):
         return {}
 
-    def step_environment(self, action: int, time_delta: int = 1) -> None:
-        if not self._simulation_api or not self._target:
-            return
-
-        self._simulation_api.step(time_delta)
-        self._target.move(self._action_decode(action))
-
-    def finish_training(self):
+    def finish_training_session(self):
         if self._simulation_api:
             self._simulation_api.finish_training()
 

@@ -18,51 +18,32 @@ simulation:
 
     snapshots:
       enabled: true
+      period_type: "CUSTOM"
+      custom_period: 2
+      storage_directory: "simulation_records"
+      filename_prefix: "biome_snapshot"
+      pretty_print: true
+      include_real_timestamp: true
+
 
 biome:
   climate-model: "climate_model_v1.1"
   map:
     size:
-      - 20
-      - 20
+      - 30
+      - 30
   type: "tropical"
 
   training_mode: true
 
-  flora:
-    - species: "oak_tree"
-      spawns: 5
-      avg-lifespan: 15
-
-    - species: "bramble"
-      spawns: 4
-      avg-lifespan: 6
-
   fauna:
     - species: "deer"
-      spawns: 3
-      avg-lifespan: 6
+      spawns: 1
+      avg-lifespan: 1
       components:
         - GrowthComponent:
         - VitalComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 10.0
-
-    - species: "boar"
-      spawns: 5
-      avg-lifespan: 18
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - WeatherAdaptationComponent:
-            optimal_temperature: 16.0
-
-    - species: "fox"
-      spawns: 3
-      avg-lifespan: 9
-      components:
-        - GrowthComponent:
-        - VitalComponent:
-        - WeatherAdaptationComponent:
-            optimal_temperature: 19.0
+        - MovementComponent:
 

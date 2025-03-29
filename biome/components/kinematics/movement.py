@@ -74,9 +74,6 @@ class MovementComponent(EntityComponent):
     def move(self, direction: Direction) -> bool:
         self._logger.info(f"Moving direction: {direction}")
 
-        if direction == Direction.NONE:
-            return
-
         if self._current_position is None:
             self._logger.warning("Cannot move: current position is None")
             return False

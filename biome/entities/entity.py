@@ -146,7 +146,7 @@ class Entity(EventHandler, StateHandler, ABC):
         return fields
 
     def move(self, direction: Direction):
-        if direction == Direction.NONE or not self.is_alive():
+        if not self.is_alive():
             return
 
         if self._components[ComponentType.MOVEMENT]:

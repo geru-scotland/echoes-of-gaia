@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import atexit
 from logging import Logger
 from typing import Dict, Any
 
@@ -56,6 +57,12 @@ class FaunaEnvironment(gym.Env):
         self._finished: bool = False
         self._fauna_adapter: FaunaSimulationAdapter = None
 
+        atexit.register(self.cleanup)
+
+    def cleanup(self):
+        if self._fauna_adapter:
+            self._fauna_adapter.finish_training_session()
+
     def reset(self, *, seed=None, options=None) -> tuple:
         super().reset(seed=seed, options=options)
 
@@ -71,6 +78,8 @@ class FaunaEnvironment(gym.Env):
 
     def step(self, action):
         self._current_step += 1
+
+        self._logger.info(f"Received action: {action}")
         self._fauna_adapter.step_environment(action)
 
         info = {}
@@ -82,27 +91,12 @@ class FaunaEnvironment(gym.Env):
 
         if not target.is_alive():
             self._logger.error("TERMINATING EPISODE!!")
-            self._fauna_adapter.finish_training()
+            self._fauna_adapter.finish_training_session()
             terminated = True
-            # terminated = not target.is_alive()
-
-        self._logger.info(f"OBSERVATION FOR {target.get_species()}. Observation: {observation}")
 
         reward = self._fauna_adapter.compute_reward(action)
 
-        # TODO: Si target dead, terminar episodio.
-        if self._current_step >= self._max_episode_steps:
-            self._fauna_adapter.finish_training()
-            self._finished = True
-            terminated = True
-
         return observation, reward, terminated, truncated, info
-
-    def close(self):
-        if self._fauna_adapter is not None and not self._finished:
-            self._fauna_adapter.finish_training()
-            self._finished = True
-        super().close()
 
     def _get_default_observation(self):
         return {
