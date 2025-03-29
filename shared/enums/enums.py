@@ -148,11 +148,11 @@ class FaunaAction(EnumBaseInt):
     MOVE_SOUTH = auto()
     MOVE_EAST = auto()
     MOVE_WEST = auto()
-    EAT = auto()
-    DRINK = auto()
-    REST = auto()
-    HIDE = auto()
-    FORAGE = auto()
+    # EAT = auto()
+    # DRINK = auto()
+    # REST = auto()
+    # HIDE = auto()
+    # FORAGE = auto()
 
 
 class AgentType(EnumBaseStr):
@@ -227,11 +227,11 @@ class SimulationMode(EnumBaseInt):
 
 class Direction(Enum):
     NORTH = (-1, 0)
-    NORTHEAST = (1, 1)
+    NORTHEAST = (-1, 1)
     EAST = (0, 1)
-    SOUTHEAST = (-1, 1)
+    SOUTHEAST = (1, 1)
     SOUTH = (1, 0)
-    SOUTHWEST = (-1, -1)
+    SOUTHWEST = (1, -1)
     WEST = (0, -1)
-    NORTHWEST = (1, -1)
+    NORTHWEST = (-1, -1)
     NONE = (0, 0)

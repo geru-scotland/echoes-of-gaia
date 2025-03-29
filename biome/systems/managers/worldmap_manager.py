@@ -127,11 +127,14 @@ class WorldMapManager:
                 evolution_cycle=evolution_cycle
             )
 
+            self._logger.info(f"Creating evolved entity: {entity_class} with ref: {id(entity)}")
+
             BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, species_name=species_name, evolution_cycle=evolution_cycle)
 
-            if TrainingTargetManager.is_training_mode() and not TrainingTargetManager.is_acquired() and entity_species_enum == FaunaSpecies:
+            if entity and TrainingTargetManager.is_training_mode() and not TrainingTargetManager.is_acquired() and entity_species_enum == FaunaSpecies:
                 self._logger.info(f"{TrainingTargetManager.get_target()}")
                 if TrainingTargetManager.is_valid_target(entity.get_species(), entity.get_type(), evolution_cycle):
+                    self._logger.info(f"Selected entity with REF: with ref: {id(entity)}")
                     SimulationEventBus.trigger(SimulationEvent.SIMULATION_TRAIN_TARGET_ACQUIRED, entity=entity,
                                                generation=evolution_cycle)
 
@@ -197,5 +200,5 @@ class WorldMapManager:
     def get_entities(self) -> EntityList:
         return self._world_map.get_entities()
 
-    def _is_valid_position(self):
-        pass
+    def is_valid_position(self, position: Position, entity_id: Optional[int] = None) -> bool:
+        return self._is_valid_position(position, entity_id)

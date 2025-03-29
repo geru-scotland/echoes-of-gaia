@@ -214,6 +214,9 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
     def get_climate_collector(self) -> ClimateDataCollector:
         return None
 
+    def get_climate_system(self) -> ClimateState:
+        return self._climate
+
     def get_biome_type(self) -> BiomeType:
         return self._context.biome_type
 

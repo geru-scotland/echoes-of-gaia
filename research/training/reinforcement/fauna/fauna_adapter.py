@@ -17,18 +17,23 @@
 """
 import random
 from logging import Logger
+from typing import Tuple
 
 import numpy as np
 
 from biome.biome import Biome
 from biome.entities.entity import Entity
+from biome.systems.climate.state import ClimateState
+from biome.systems.climate.system import ClimateSystem
+from biome.systems.managers.worldmap_manager import WorldMapManager
 from config.settings import Settings
 from research.training.reinforcement.adapter import EnvironmentAdapter
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies
+from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
 from shared.normalization.normalizer import climate_normalizer
+from shared.types import Position, DecodedAction
 from simulation.api.simulation_api import SimulationAPI
 from simulation.core.systems.events.event_bus import SimulationEventBus
 from utils.loggers import LoggerManager
@@ -39,9 +44,16 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self._simulation_api: SimulationAPI = None
         self._biome: Biome = None
+        self._worldmap_manager: WorldMapManager = None
         self._target: Entity = None
         self._logger.info(f"Creating {self.__class__.__name__}...")
         self._register_events()
+
+    def __del__(self):
+        try:
+            self.finish_training()
+        except Exception as e:
+            self._logger.warning(f"Error during cleanup: {e}")
 
     def _register_events(self):
         SimulationEventBus.register(SimulationEvent.SIMULATION_TRAIN_TARGET_ACQUIRED, self._handle_target_acquired)
@@ -50,10 +62,11 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         entity: Entity = kwargs.get("entity", None)
         generation: int = kwargs.get("generation", None)
 
-        if entity and generation:
+        if entity and generation and not TrainingTargetManager.is_acquired():
             self._target = entity
             TrainingTargetManager.mark_as_acquired()
-
+            registro = self._worldmap_manager.get_entities()
+            self._logger.info(f"Entidades: {registro}")
             self._logger.info(
                 f"Training target acquired: {entity.get_species()} (ID: {entity.get_id()}) - Generation {generation}")
 
@@ -69,11 +82,14 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         self._simulation_api.initialise_training()
         self._biome = self._simulation_api.get_biome()
+        self._worldmap_manager = self._biome.get_worldmap_manager()
 
-        TrainingTargetManager.set_training_mode(True)
         TrainingTargetManager.reset()
+        TrainingTargetManager.set_training_mode(True)
 
         target_species = self._select_target_species()
+        # TODO: OJO! Que no se te olvide poner esto debidamente, la idea es
+        # probar diversos rangos de generaciones.
         target_generation = random.randint(1, 4)
 
         TrainingTargetManager.set_target(
@@ -83,6 +99,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         )
 
         self._logger.info(f"Waiting for target species: {target_species}, generation: {target_generation}")
+        registro = self._worldmap_manager.get_entities()
+        self._logger.info(f"Entidades: {registro}")
         try:
             self._wait_for_target_acquisition()
         except Exception as e:
@@ -92,10 +110,10 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         available_species = list(FaunaSpecies)
         selected_species = random.choice(available_species)
 
-        return selected_species
+        return FaunaSpecies.DEER
 
     def _wait_for_target_acquisition(self):
-        max_attempts = 5000
+        max_attempts = 10000
         attempts = 0
 
         self._logger.info("Waiting for target acquisition...")
@@ -112,7 +130,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         self._logger.info("Target acquired successfully")
 
-    def compute_reward(self, action):
+    def compute_reward(self, action: FaunaAction):
         if not self._target or not self._target.is_alive():
             return -10.0
 
@@ -123,9 +141,40 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         vitality_ratio = vital_component.vitality / vital_component.max_vitality
         reward = vitality_ratio * 2.0
 
+        decoded_action: DecodedAction = self._action_decode(action)
+
+        movement_reward: int = self.compute_movement_reward(decoded_action)
+        return reward + movement_reward
+
+    def _action_decode(self, action: int) -> DecodedAction:
+        if action < len(Direction):
+            return list(Direction)[action]
+
+    def compute_movement_reward(self, direction: Direction) -> float:
+        new_position: Position = self._target.movement_component.calculate_new_position(direction)
+
+        reward = 0.0
+
+        if self._worldmap_manager.is_valid_position(new_position, self._target.get_id()):
+            reward += 1
+        else:
+            reward -= 1
+
+        # # Recompensa por acercarse a agua
+        # # TODO: Comprobar tambien umbrales de estado, thirst level etc.
+        # if self.is_water_nearby(new_position, radius=2):
+        #     reward += 0.5
+        #
+        # # Recompensa por acercarse a comida
+        # food_entities = self.find_food_nearby(new_position, radius=2)
+        # if food_entities:
+        #     reward += 0.3 * len(food_entities)
+        #
         return reward
 
     def get_observation(self):
+        registro = self._worldmap_manager.get_entities()
+        self._logger.info(f"Entidades: {registro}")
         if not self._target:
             return self._get_default_observation()
 
@@ -151,7 +200,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
                                                    dtype=np.float32)
 
         # 3. Información climática
-        climate_system = self._biome._climate
+        climate_system: ClimateSystem = self._biome.get_climate_system()
         if climate_system:
             climate_state = climate_system.get_state()
             observation["temperature"] = np.array([climate_normalizer.normalize(
@@ -174,6 +223,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             return
 
         self._simulation_api.step(time_delta)
+        self._target.move(self._action_decode(action))
 
     def finish_training(self):
         if self._simulation_api:

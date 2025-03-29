@@ -34,7 +34,7 @@ from biome.systems.state.handler import StateHandler
 from shared.enums.enums import ComponentType, EntityType, Direction
 from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.enums.strings import Loggers
-from shared.types import ComponentDict, HabitatList
+from shared.types import ComponentDict, HabitatList, Position
 from shared.events.handler import EventHandler
 from biome.components.base.component import EntityComponent
 from utils.loggers import LoggerManager
@@ -104,8 +104,12 @@ class Entity(EventHandler, StateHandler, ABC):
     def get_habitats(self) -> HabitatList:
         return self._habitats
 
-    def get_position(self):
-        return self._components[ComponentType.TRANSFORM].get_position()
+    def get_position(self) -> Optional[Position]:
+        transform_component = self._components.get(ComponentType.TRANSFORM)
+        if transform_component:
+            return transform_component.get_position()
+        self._logger.warning("Trying to get TRANSFORM component from an entity that doesn't have it.")
+        return None
 
     def set_position(self, x, y):
         self._components[ComponentType.TRANSFORM].set_position(x, y)
@@ -142,7 +146,7 @@ class Entity(EventHandler, StateHandler, ABC):
         return fields
 
     def move(self, direction: Direction):
-        if direction == Direction.NONE:
+        if direction == Direction.NONE or not self.is_alive():
             return
 
         if self._components[ComponentType.MOVEMENT]:
@@ -196,6 +200,11 @@ class Entity(EventHandler, StateHandler, ABC):
     @property
     def lifespan(self):
         return self._lifespan
+
+    @property
+    def vitality(self) -> float:
+        if self._components and self._components[ComponentType.VITAL]:
+            return self._components[ComponentType.VITAL].vitality
 
     @property
     def movement_component(self) -> Optional[MovementComponent]:

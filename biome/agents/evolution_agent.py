@@ -134,12 +134,16 @@ class EvolutionAgentAI(Agent, EventHandler):
         self._current_evolution_cycle = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
 
+        self._logger.info(f"EVOLUTION CYCLE: {self._current_evolution_cycle}")
+        self._logger.info(
+            f"Evolution agent is going to create: {len(action["evolved_genes"])} entities: {self._species}")
         for species, genes in action["evolved_genes"]:
             if species == self._species:
                 self._create_evolved_entity(species, genes)
 
         if action["k_best"] > len(action["evolved_genes"]):
             remaining: int = action["k_best"] - len(action["evolved_genes"])
+            self._logger.info(f"Plus {remaining} more:")
             for i in range(remaining):
                 species, genes = random.choice(action["evolved_genes"])
                 self._create_evolved_entity(species, genes)
