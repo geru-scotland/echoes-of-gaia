@@ -44,7 +44,7 @@ class FaunaEnvironment(gym.Env):
 
         self._fov_width: int = local_fov_config.get("size", {}).get("width", 10)
         self._fov_height: int = local_fov_config.get("size", {}).get("height", 10)
-        self._fov_center: int = local_fov_config.get("size", {}).get("center", int(self._fov_width / 2))
+        self._fov_center: int = local_fov_config.get("center", int(self._fov_width / 2))
 
         self.observation_space = spaces.Dict({
             "local_map": spaces.Box(low=-1.0, high=1.0, shape=(self._fov_width, self._fov_height), dtype=np.float32),
