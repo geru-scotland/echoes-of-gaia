@@ -30,7 +30,8 @@ from biome.systems.managers.worldmap_manager import WorldMapManager
 from config.settings import Settings
 from research.training.reinforcement.adapter import EnvironmentAdapter
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction
+from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction, \
+    PositionNotValidReason
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
 from shared.normalization.normalizer import climate_normalizer
@@ -41,7 +42,7 @@ from utils.loggers import LoggerManager
 
 
 class FaunaSimulationAdapter(EnvironmentAdapter):
-    def __init__(self):
+    def __init__(self, fov_width: int, fov_height: int, fov_center):
         self._logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self._simulation_api: SimulationAPI = None
         self._biome: Biome = None
@@ -49,6 +50,11 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._target: Entity = None
         self._logger.info(f"Creating {self.__class__.__name__}...")
         self._register_events()
+        self._fov_width: int = fov_width
+        self._fov_height: int = fov_height
+        self._fov_center: int = fov_center
+
+        self._visited_positions = set()
 
     def __del__(self):
         try:
@@ -69,6 +75,9 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             TrainingTargetManager.mark_as_acquired()
             self._logger.info(
                 f"Training target acquired: {entity.get_species()} (ID: {entity.get_id()}) - Generation {generation}")
+
+    def _is_new_position(self, position: Position) -> bool:
+        return position not in self._visited_positions
 
     def initialize(self):
         self._logger.info(f"Initializing {self.__class__.__name__} ...")
@@ -137,19 +146,21 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if not self._simulation_api or not self._target:
             return
 
+        old_position = self._target.get_position()
+
         self._target.move(self._action_decode(action))
+
+        new_position = self._target.get_position()
+        if new_position and new_position != old_position:
+            self._visited_positions.add(new_position)
+
         self._simulation_api.step(time_delta)
 
     def compute_reward(self, action: FaunaAction):
         if not self._target or not self._target.is_alive():
             return -10.0
 
-        vital_component = self._target.get_component(ComponentType.VITAL)
-        if not vital_component:
-            return 0.0
-
-        vitality_ratio = vital_component.vitality / vital_component.max_vitality
-        reward = vitality_ratio * 2.0
+        reward: float = 0.0
 
         decoded_action: DecodedAction = self._action_decode(action)
 
@@ -161,71 +172,83 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             return list(Direction)[action]
 
     def compute_movement_reward(self, direction: Direction) -> float:
-
         new_position: Position = self._target.movement_component.calculate_new_position(direction)
 
-        if self._worldmap_manager.is_valid_position(new_position, self._target.get_id()):
-            return 0.2
-        else:
-            return -0.5
+        is_valid, reason = self._worldmap_manager.is_valid_position(new_position, self._target.get_id())
+
+        if not is_valid:
+            if reason == PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES:
+                return -1.0
+            elif reason == PositionNotValidReason.POSITION_NON_TRAVERSABLE:
+                return -0.8
+            elif reason == PositionNotValidReason.POSITION_BUSY:
+                return -0.6
+
+        # Reward base por movimiento válido
+        reward = 0.7
+
+        # Bonus por exploración si la posición es nueva
+        # Quiero incentivar un poco, al menos por ahora, a que explore
+        if self._is_new_position(new_position):
+            reward += 0.9
+
+        return reward
 
     def get_observation(self):
         if not self._target:
             return self._get_default_observation()
 
-        observation = {}
+        local_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
 
-        # 1. Estado interno de la fauna
-        vital_component = self._target.get_component(ComponentType.VITAL)
-        if vital_component:
-            observation["vitality"] = np.array([vital_component.vitality / vital_component.max_vitality],
-                                               dtype=np.float32)
-            observation["age"] = np.array([vital_component.age / vital_component.lifespan],
-                                          dtype=np.float32)
-        else:
-            observation["vitality"] = np.array([0.0], dtype=np.float32)
-            observation["age"] = np.array([0.0], dtype=np.float32)
+        exploration_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
 
         position = self._target.get_position()
         if position:
-            nearby_entities = self._find_nearby_entities(position, radius=3)
-            observation["nearby_flora"] = np.array([len([e for e in nearby_entities
-                                                         if e.get_type() == EntityType.FLORA])],
-                                                   dtype=np.float32)
-            observation["nearby_fauna"] = np.array([len([e for e in nearby_entities
-                                                         if e.get_type() == EntityType.FAUNA])],
-                                                   dtype=np.float32)
-        else:
-            observation["nearby_flora"] = np.array([0], dtype=np.float32)
-            observation["nearby_fauna"] = np.array([0], dtype=np.float32)
+            center_y, center_x = self._fov_center, self._fov_center
 
-        # 3. Información climática
-        climate_system: ClimateSystem = self._biome.get_climate_system()
-        if climate_system:
-            climate_state = climate_system.get_state()
-            observation["temperature"] = np.array([climate_normalizer.normalize(
-                "temperature", climate_state.temperature)],
-                dtype=np.float32)
-            observation["humidity"] = np.array([climate_normalizer.normalize(
-                "humidity", climate_state.humidity)],
-                dtype=np.float32)
-        else:
-            observation["temperature"] = np.array([0.5], dtype=np.float32)
-            observation["humidity"] = np.array([0.5], dtype=np.float32)
+            for local_y in range(self._fov_height):
+                for local_x in range(self._fov_width):
+                    world_y = position[0] + (local_y - center_y)
+                    world_x = position[1] + (local_x - center_x)
+                    world_pos = (world_y, world_x)
 
-        expected_keys = ["vitality", "age", "nearby_flora", "nearby_fauna", "temperature", "humidity"]
-        for key in expected_keys:
-            if key not in observation:
-                self._logger.warning(f"Key {key} missing from observation, adding default value")
-                observation[key] = np.array([0.0], dtype=np.float32)
+                    is_valid, reason = self._worldmap_manager.is_valid_position(world_pos, self._target.get_id())
 
-        return observation
+                    if is_valid:
+                        local_map[local_y, local_x] = 1.0
+                    else:
+                        if reason == PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES:
+                            local_map[local_y, local_x] = -1.0
+                        elif reason == PositionNotValidReason.POSITION_BUSY:
+                            local_map[local_y, local_x] = -0.5
+                        elif reason == PositionNotValidReason.POSITION_NON_TRAVERSABLE:
+                            local_map[local_y, local_x] = 0.0
+
+                    if world_pos in self._visited_positions:
+                        exploration_map[local_y, local_x] = 1.0
+                    else:
+                        exploration_map[local_y, local_x] = 0.0
+
+            local_map[center_y, center_x] = 1.0
+
+        return {
+            "local_map": local_map,
+            "exploration_map": exploration_map
+        }
 
     def _find_nearby_entities(self, position, radius):
         return []
 
     def _get_default_observation(self):
-        return {}
+        local_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
+        local_map[self._fov_center, self._fov_center] = 1.0  # Agente
+
+        exploration_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
+
+        return {
+            "local_map": local_map,
+            "exploration_map": exploration_map
+        }
 
     def finish_training_session(self):
         if self._simulation_api:
