@@ -6,20 +6,20 @@ model:
   policy: "MultiInputPolicy"
   hyperparams:
     learning_rate: 5.0e-4
-    buffer_size: 5000
+    buffer_size: 100000
     learning_starts: 1000
     batch_size: 64
     gamma: 0.99
     tau: 0.005             # Factor de actualización para la red target
     train_freq: 4          # Frecuencia de updates, steps básicamente
     target_update_interval: 1000
-    exploration_fraction: 0.2
+    exploration_fraction: 0.3
     exploration_initial_eps: 1.0
     exploration_final_eps: 0.05
     max_grad_norm: 10
     verbose: 1
     tensorboard_log: "./tensorboard_log/dqn/"
-  timesteps: 15000
+  timesteps: 100000
 environment:
   env_class: "FaunaEnvironment"
   observation_space:
@@ -34,3 +34,8 @@ environment:
     type: "Discrete"
     n: 6
 output_path: "./models/fauna_model_final"
+local_fov:
+  size:
+    width: 21
+    height: 21
+  center: 10

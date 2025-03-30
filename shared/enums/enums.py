@@ -206,6 +206,11 @@ class EnvConfig(TypedDict):
     action_space: Dict[str, Any]
 
 
+class LocalFovConfig(TypedDict):
+    size: Dict[str, Any]
+    center: int
+
+
 class ReinforcementConfig(TypedDict):
     name: str
     description: str
@@ -213,6 +218,7 @@ class ReinforcementConfig(TypedDict):
     model: ModelConfig
     environment: EnvConfig
     output_path: str
+    local_fov: LocalFovConfig
 
 
 class SimulationMode(EnumBaseInt):
@@ -225,3 +231,10 @@ class Direction(Enum):
     SOUTH = (1, 0)
     EAST = (0, 1)
     WEST = (0, -1)
+
+
+class PositionNotValidReason(EnumBaseInt):
+    POSITION_OUT_OF_BOUNDARIES = 0
+    POSITION_BUSY = 1
+    POSITION_NON_TRAVERSABLE = 2
+    NONE = 3

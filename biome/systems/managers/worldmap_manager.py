@@ -18,7 +18,7 @@
 import sys
 import traceback
 from logging import Logger
-from typing import List, Dict, Optional, Callable
+from typing import List, Dict, Optional, Callable, Tuple
 
 import numpy as np
 from simpy import Environment as simpyEnv
@@ -29,7 +29,7 @@ from biome.systems.maps.map_allocator import MapAllocator
 from biome.systems.maps.spawn_system import SpawnSystem
 from biome.systems.maps.worldmap import WorldMap
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import EntityType, FaunaSpecies, TerrainType
+from shared.enums.enums import EntityType, FaunaSpecies, TerrainType, PositionNotValidReason
 from shared.enums.events import BiomeEvent, SimulationEvent
 from shared.enums.strings import Loggers
 from shared.types import TileMap, EntityList, EntityDefinitions, EntityRegistry, \
@@ -90,22 +90,23 @@ class WorldMapManager:
             return True
         return False
 
-    def _is_valid_position(self, position: Position, entity_id: Optional[int] = None) -> bool:
+    def _is_valid_position(self, position: Position, entity_id: Optional[int] = None) -> Tuple[
+        bool, PositionNotValidReason]:
 
         if not self._map_allocator.is_position_valid(position):
             self._logger.warning(f"Target position {position} is outside map boundaries")
-            return False
+            return False, PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES
 
         if entity_id and self._map_allocator.get_entity_at(position) != -1:
             occupier_id = self._map_allocator.get_entity_at(position)
             if occupier_id != entity_id:
                 self._logger.warning(f"Target position {position} is already occupied by entity {occupier_id}")
-                return False
+                return False, PositionNotValidReason.POSITION_BUSY
 
         if not self._is_traversable_position(position):
-            return False
+            return False, PositionNotValidReason.POSITION_NON_TRAVERSABLE
 
-        return True
+        return True, PositionNotValidReason.NONE
 
     def _handle_validate_movement(self, entity_id: int, new_position: Position, result_callback: Callable) -> None:
         if entity_id not in self._entity_registry:

@@ -28,7 +28,7 @@ from gymnasium.spaces import Discrete
 from biome.entities.entity import Entity
 from research.training.registry import EnvironmentRegistry
 from research.training.reinforcement.fauna.fauna_adapter import FaunaSimulationAdapter
-from shared.enums.enums import FaunaAction, Agents
+from shared.enums.enums import FaunaAction, Agents, LocalFovConfig
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
@@ -36,19 +36,20 @@ from utils.loggers import LoggerManager
 @EnvironmentRegistry.register(Agents.Reinforcement.FAUNA)
 class FaunaEnvironment(gym.Env):
 
-    def __init__(self):
+    def __init__(self, local_fov_config: LocalFovConfig):
         super().__init__()
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self.action_space: Discrete = gym.spaces.Discrete(len(FaunaAction))
 
+        self._fov_width: int = local_fov_config.get("size", {}).get("width", 10)
+        self._fov_height: int = local_fov_config.get("size", {}).get("height", 10)
+        self._fov_center: int = local_fov_config.get("size", {}).get("center", int(self._fov_width / 2))
+
         self.observation_space = spaces.Dict({
-            "vitality": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
-            "age": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
-            "nearby_flora": spaces.Box(low=0, high=np.inf, shape=(1,), dtype=np.float32),
-            "nearby_fauna": spaces.Box(low=0, high=np.inf, shape=(1,), dtype=np.float32),
-            "temperature": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
-            "humidity": spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32),
+            "local_map": spaces.Box(low=-1.0, high=1.0, shape=(self._fov_width, self._fov_height), dtype=np.float32),
+            "exploration_map": spaces.Box(low=0.0, high=1.0, shape=(self._fov_width, self._fov_height),
+                                          dtype=np.float32)
         })
 
         self._current_step: int = 0
@@ -69,7 +70,7 @@ class FaunaEnvironment(gym.Env):
         observation = self._get_default_observation()
 
         if not self._finished:
-            self._fauna_adapter = FaunaSimulationAdapter()
+            self._fauna_adapter = FaunaSimulationAdapter(self._fov_width, self._fov_height, self._fov_center)
             self._fauna_adapter.initialize()
 
             observation = self._fauna_adapter.get_observation()
@@ -99,11 +100,15 @@ class FaunaEnvironment(gym.Env):
         return observation, reward, terminated, truncated, info
 
     def _get_default_observation(self):
+        """Proporciona una observación predeterminada cuando no hay target."""
+        # Mapa vacío con el agente en el centro
+        local_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
+        local_map[self._fov_center, self._fov_center] = 1.0  # Agente en el centro
+
+        # Mapa de exploración vacío
+        exploration_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
+
         return {
-            "vitality": np.array([0.0], dtype=np.float32),
-            "age": np.array([0.0], dtype=np.float32),
-            "nearby_flora": np.array([0], dtype=np.float32),
-            "nearby_fauna": np.array([0], dtype=np.float32),
-            "temperature": np.array([0.5], dtype=np.float32),
-            "humidity": np.array([0.5], dtype=np.float32)
+            "local_map": local_map,
+            "exploration_map": exploration_map
         }
