@@ -17,18 +17,16 @@
 """
 import atexit
 from logging import Logger
-from typing import Dict, Any
 
 import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
-from gymnasium.core import ObsType
 from gymnasium.spaces import Discrete
 
 from biome.entities.entity import Entity
 from research.training.registry import EnvironmentRegistry
 from research.training.reinforcement.fauna.fauna_adapter import FaunaSimulationAdapter
-from shared.enums.enums import FaunaAction, Agents, LocalFovConfig
+from shared.enums.enums import FaunaAction, Agents, LocalFovConfig, TerrainType
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
@@ -44,12 +42,21 @@ class FaunaEnvironment(gym.Env):
 
         self._fov_width: int = local_fov_config.get("size", {}).get("width", 10)
         self._fov_height: int = local_fov_config.get("size", {}).get("height", 10)
-        self._fov_center: int = local_fov_config.get("size", {}).get("center", int(self._fov_width / 2))
+        self._fov_center: int = local_fov_config.get("center", int(self._fov_width / 2))
 
         self.observation_space = spaces.Dict({
-            "local_map": spaces.Box(low=-1.0, high=1.0, shape=(self._fov_width, self._fov_height), dtype=np.float32),
-            "exploration_map": spaces.Box(low=0.0, high=1.0, shape=(self._fov_width, self._fov_height),
-                                          dtype=np.float32)
+            "terrain_map": spaces.Box(
+                low=0,
+                high=len(list(TerrainType)) - 1,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.int64
+            ),
+            "validity_map": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.float32
+            )
         })
 
         self._current_step: int = 0
@@ -100,15 +107,10 @@ class FaunaEnvironment(gym.Env):
         return observation, reward, terminated, truncated, info
 
     def _get_default_observation(self):
-        """Proporciona una observación predeterminada cuando no hay target."""
-        # Mapa vacío con el agente en el centro
-        local_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
-        local_map[self._fov_center, self._fov_center] = 1.0  # Agente en el centro
-
-        # Mapa de exploración vacío
-        exploration_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
+        terrain_map = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
+        valid_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
-            "local_map": local_map,
-            "exploration_map": exploration_map
+            "terrain_map": terrain_map,
+            "validity_map": valid_mask
         }

@@ -17,7 +17,7 @@
 """
 import random
 from logging import Logger
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 
@@ -31,7 +31,7 @@ from config.settings import Settings
 from research.training.reinforcement.adapter import EnvironmentAdapter
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
 from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction, \
-    PositionNotValidReason
+    PositionNotValidReason, TerrainType
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
 from shared.normalization.normalizer import climate_normalizer
@@ -53,8 +53,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._fov_width: int = fov_width
         self._fov_height: int = fov_height
         self._fov_center: int = fov_center
-
         self._visited_positions = set()
+        self._heatmap = {}
 
     def __del__(self):
         try:
@@ -177,20 +177,26 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         is_valid, reason = self._worldmap_manager.is_valid_position(new_position, self._target.get_id())
 
         if not is_valid:
-            if reason == PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES:
-                return -1.0
-            elif reason == PositionNotValidReason.POSITION_NON_TRAVERSABLE:
-                return -0.8
-            elif reason == PositionNotValidReason.POSITION_BUSY:
-                return -0.6
-
+            return -1.2
         # Reward base por movimiento válido
-        reward = 0.7
+        reward = 0.4
 
         # Bonus por exploración si la posición es nueva
         # Quiero incentivar un poco, al menos por ahora, a que explore
         if self._is_new_position(new_position):
-            reward += 0.9
+            reward += 0.8
+            self._visited_positions.add(new_position)
+        else:
+            reward -= 0.3
+
+        pos_key = tuple(new_position)
+        visits = self._heatmap.get(pos_key, 0)
+
+        # Meto decaimiento exponencial, revisar esto.
+        exploration_reward = 0.8 * (0.7 ** visits)
+        reward += exploration_reward
+
+        self._heatmap[pos_key] = visits + 1
 
         return reward
 
@@ -198,56 +204,39 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if not self._target:
             return self._get_default_observation()
 
-        local_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
-
-        exploration_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
-
         position = self._target.get_position()
+
+        # Obtener mapa local y máscara de validez
+        local_result = None
         if position:
-            center_y, center_x = self._fov_center, self._fov_center
+            local_result = self._worldmap_manager.get_local_map(position, self._fov_width, self._fov_height)
 
-            for local_y in range(self._fov_height):
-                for local_x in range(self._fov_width):
-                    world_y = position[0] + (local_y - center_y)
-                    world_x = position[1] + (local_x - center_x)
-                    world_pos = (world_y, world_x)
+        if local_result is None:
+            # Valores por defecto si no hay información válida
+            local_fov_terrain = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
+            validity_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.bool_)
+        else:
+            local_fov_terrain, validity_mask = local_result
 
-                    is_valid, reason = self._worldmap_manager.is_valid_position(world_pos, self._target.get_id())
+            local_fov_terrain = local_fov_terrain.astype(np.int64)
 
-                    if is_valid:
-                        local_map[local_y, local_x] = 1.0
-                    else:
-                        if reason == PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES:
-                            local_map[local_y, local_x] = -1.0
-                        elif reason == PositionNotValidReason.POSITION_BUSY:
-                            local_map[local_y, local_x] = -0.5
-                        elif reason == PositionNotValidReason.POSITION_NON_TRAVERSABLE:
-                            local_map[local_y, local_x] = 0.0
-
-                    if world_pos in self._visited_positions:
-                        exploration_map[local_y, local_x] = 1.0
-                    else:
-                        exploration_map[local_y, local_x] = 0.0
-
-            local_map[center_y, center_x] = 1.0
+        validity_map = validity_mask.astype(np.float32)
 
         return {
-            "local_map": local_map,
-            "exploration_map": exploration_map
+            "terrain_map": local_fov_terrain,
+            "validity_map": validity_map
         }
 
     def _find_nearby_entities(self, position, radius):
         return []
 
     def _get_default_observation(self):
-        local_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
-        local_map[self._fov_center, self._fov_center] = 1.0  # Agente
-
-        exploration_map = np.zeros((self._fov_width, self._fov_height), dtype=np.float32)
+        terrain_map = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
+        valid_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
-            "local_map": local_map,
-            "exploration_map": exploration_map
+            "terrain_map": terrain_map,
+            "validity_map": valid_mask
         }
 
     def finish_training_session(self):

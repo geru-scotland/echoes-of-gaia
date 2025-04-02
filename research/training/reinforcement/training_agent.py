@@ -52,7 +52,7 @@ class ReinforcementLearningAgent:
         env_class_name = self._config["environment"]["env_class"]
         try:
             environment_class: Type = EnvironmentRegistry.get_by_name(env_class_name)
-            local_fov_config: LocalFovConfig = self._config["local_fov"]["size"]
+            local_fov_config: LocalFovConfig = self._config["local_fov"]
             self._environment: gym.Env = environment_class(local_fov_config)
         except Exception as e:
             self._logger.exception(f"Error retrieving environment {agent_type}: {e}")
@@ -68,11 +68,11 @@ class ReinforcementLearningAgent:
             if not algorithm_class:
                 raise ValueError(f"Unsupported algorithm: {self._config['model']['algorithm']}")
 
-            # policy_kwargs = create_custom_cnn_policy()
+            policy_kwargs = create_custom_cnn_policy()
 
             sb3_model = algorithm_class(
                 policy=self._config["model"]["policy"],
-                # policy_kwargs=policy_kwargs,
+                policy_kwargs=policy_kwargs,
                 env=self._environment,
                 **self._config["model"]["hyperparams"]
             )
