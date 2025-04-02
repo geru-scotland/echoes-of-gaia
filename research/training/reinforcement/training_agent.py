@@ -68,11 +68,11 @@ class ReinforcementLearningAgent:
             if not algorithm_class:
                 raise ValueError(f"Unsupported algorithm: {self._config['model']['algorithm']}")
 
-            # policy_kwargs = create_custom_cnn_policy()
+            policy_kwargs = create_custom_cnn_policy()
 
             sb3_model = algorithm_class(
                 policy=self._config["model"]["policy"],
-                # policy_kwargs=policy_kwargs,
+                policy_kwargs=policy_kwargs,
                 env=self._environment,
                 **self._config["model"]["hyperparams"]
             )

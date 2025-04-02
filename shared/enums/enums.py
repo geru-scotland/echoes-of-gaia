@@ -39,6 +39,7 @@ class TerrainType(EnumBaseInt):
     MOUNTAIN = 5
     SNOW = 6
     SAND = 7
+    UNKNWON = 8
 
 
 class ComponentType(EnumBaseStr):

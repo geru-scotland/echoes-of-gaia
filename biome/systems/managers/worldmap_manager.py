@@ -195,6 +195,45 @@ class WorldMapManager:
 
         return False
 
+    def get_local_map(self, position: Position, width: int, height: int) -> Optional[np.ndarray]:
+        y, x = position
+        map_height, map_width = self._terrain_map.shape
+
+        if not (0 <= y < map_height and 0 <= x < map_width):
+            return None
+
+        # TODO: Quizá cambiar y pasar el centro mejor.
+        half_width = width // 2
+        half_height = height // 2
+
+        terrain_y_start = max(0, y - half_height)
+        terrain_y_end = min(map_height, y + half_height + 1)
+        terrain_x_start = max(0, x - half_width)
+        terrain_x_end = min(map_width, x + half_width + 1)
+
+        local_map = np.full((height, width), TerrainType.UNKNWON, dtype=self._terrain_map.dtype)
+
+        local_y_start = terrain_y_start - (y - half_height)
+        local_y_end = local_y_start + (terrain_y_end - terrain_y_start)
+        local_x_start = terrain_x_start - (x - half_width)
+        local_x_end = local_x_start + (terrain_x_end - terrain_x_start)
+
+        local_map[local_y_start:local_y_end, local_x_start:local_x_end] = self._terrain_map[
+                                                                          terrain_y_start:terrain_y_end,
+                                                                          terrain_x_start:terrain_x_end
+                                                                          ]
+
+        validity_mask = np.full(local_map.shape, False, dtype=bool)
+        validity_mask = (local_map != TerrainType.UNKNWON)
+
+        non_traversable_indices = np.isin(local_map, [TerrainType.WATER_DEEP, TerrainType.WATER_MID])
+
+        traversability_mask = np.ones_like(local_map, dtype=bool)
+        traversability_mask[non_traversable_indices] = False
+        combined_validity_mask = validity_mask & traversability_mask
+
+        return local_map, combined_validity_mask
+
     def get_world_map(self):
         return self._world_map
 
