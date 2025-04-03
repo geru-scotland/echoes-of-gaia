@@ -72,7 +72,7 @@ class MovementComponent(EntityComponent):
         return new_position
 
     def move(self, direction: Direction) -> bool:
-        self._logger.info(f"Moving direction: {direction}")
+        self._logger.debug(f"Moving direction: {direction}")
 
         if self._current_position is None:
             self._logger.warning("Cannot move: current position is None")
@@ -80,8 +80,8 @@ class MovementComponent(EntityComponent):
 
         new_position = self.calculate_new_position(direction)
 
-        self._logger.info(f"Before position: {self._current_position}")
-        self._logger.info(f"After position: {new_position}")
+        self._logger.debug(f"Before position: {self._current_position}")
+        self._logger.debug(f"After position: {new_position}")
 
         self._movement_valid = False
 
@@ -102,7 +102,7 @@ class MovementComponent(EntityComponent):
         )
 
         if not validation_result[0][0]:
-            self._logger.warning(f"Invalid movement")
+            self._logger.debug(f"Invalid movement")
             return False
 
         BiomeEventBus.trigger(
@@ -112,7 +112,7 @@ class MovementComponent(EntityComponent):
         )
 
         self._current_position = new_position
-        self._logger.info(f"Current position: {self._current_position}")
+        self._logger.debug(f"Current position: {self._current_position}")
 
         return True
 

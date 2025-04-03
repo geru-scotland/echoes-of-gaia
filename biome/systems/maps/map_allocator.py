@@ -81,17 +81,17 @@ class MapAllocator:
             return False
 
         if not self.is_position_valid(to_position):
-            self._logger.warning(
+            self._logger.debug(
                 f"Target position {to_position} is outside map boundaries")
             return False
 
         if self._entity_index_map[from_position] != entity_id:
-            self._logger.warning(
+            self._logger.debug(
                 f"Entity {entity_id} is not at position {from_position}")
             return False
 
         if self._entity_index_map[to_position] != -1:
-            self._logger.warning(
+            self._logger.debug(
                 f"Target position {to_position} is already occupied by entity {self._entity_index_map[to_position]}")
             return False
 

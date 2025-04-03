@@ -127,7 +127,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         max_attempts = 10000
         attempts = 0
 
-        self._logger.info("Waiting for target acquisition...")
+        self._logger.debug("Waiting for target acquisition...")
 
         while not TrainingTargetManager.is_acquired() and attempts < max_attempts:
             self._simulation_api.step(1)
@@ -139,7 +139,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if not TrainingTargetManager.is_acquired():
             raise RuntimeError("Failed to acquire target after maximum attempts")
 
-        self._logger.info(f"Target acquired successfully: {TrainingTargetManager.get_current_episode()}")
+        self._logger.debug(f"Target acquired successfully: {TrainingTargetManager.get_current_episode()}")
 
     def step_environment(self, action: int, time_delta: int = 1) -> None:
         if not self._simulation_api or not self._target:
@@ -182,13 +182,13 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         if not is_valid:
             if reason == PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES:
-                self._logger.info("Movement rejected: position out of boundaries. Penalty: -1.0")
+                self._logger.debug("Movement rejected: position out of boundaries. Penalty: -1.0")
                 return -1.0
             elif reason == PositionNotValidReason.POSITION_NON_TRAVERSABLE:
-                self._logger.info("Movement rejected: position non-traversable. Penalty: -0.8")
+                self._logger.debug("Movement rejected: position non-traversable. Penalty: -0.8")
                 return -0.8
             elif reason == PositionNotValidReason.POSITION_BUSY:
-                self._logger.info("Movement rejected: position busy. Penalty: -0.6")
+                self._logger.debug("Movement rejected: position busy. Penalty: -0.6")
                 return -0.6
 
         reward = 0.0
@@ -197,9 +197,9 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if self._current_position == new_position and self._is_new_position(self._current_position):
             reward += 0.4
             self._visited_positions.add(self._current_position)
-            self._logger.info("Position is new. Exploration bonus applied: +0.4")
+            self._logger.debug("Position is new. Exploration bonus applied: +0.4")
 
-        self._logger.info(f"Final reward returned: +{reward}")
+        self._logger.debug(f"Final reward returned: +{reward}")
         return reward
 
     def compute_water_reward(self) -> float:

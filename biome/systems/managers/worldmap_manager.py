@@ -84,7 +84,7 @@ class WorldMapManager:
             }
 
             if int(terrain_type) in non_traversable_terrains:
-                self._logger.warning(f"Terrain at position {position} is not traversable")
+                self._logger.debug(f"Terrain at position {position} is not traversable")
                 return False
 
             return True
@@ -94,13 +94,13 @@ class WorldMapManager:
         bool, PositionNotValidReason]:
 
         if not self._map_allocator.is_position_valid(position):
-            self._logger.warning(f"Target position {position} is outside map boundaries")
+            self._logger.debug(f"Target position {position} is outside map boundaries")
             return False, PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES
 
         if entity_id and self._map_allocator.get_entity_at(position) != -1:
             occupier_id = self._map_allocator.get_entity_at(position)
             if occupier_id != entity_id:
-                self._logger.warning(f"Target position {position} is already occupied by entity {occupier_id}")
+                self._logger.debug(f"Target position {position} is already occupied by entity {occupier_id}")
                 return False, PositionNotValidReason.POSITION_BUSY
 
         if not self._is_traversable_position(position):
@@ -128,14 +128,14 @@ class WorldMapManager:
                 evolution_cycle=evolution_cycle
             )
 
-            self._logger.info(f"Creating evolved entity: {entity_class} with ref: {id(entity)}")
+            self._logger.debug(f"Creating evolved entity: {entity_class} with ref: {id(entity)}")
 
             BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, species_name=species_name, evolution_cycle=evolution_cycle)
 
             if entity and TrainingTargetManager.is_training_mode() and not TrainingTargetManager.is_acquired() and entity_species_enum == FaunaSpecies:
-                self._logger.info(f"{TrainingTargetManager.get_target()}")
+                self._logger.debug(f"{TrainingTargetManager.get_target()}")
                 if TrainingTargetManager.is_valid_target(entity.get_species(), entity.get_type(), evolution_cycle):
-                    self._logger.info(f"Selected entity with REF: with ref: {id(entity)}")
+                    self._logger.debug(f"Selected entity with REF: with ref: {id(entity)}")
                     SimulationEventBus.trigger(SimulationEvent.SIMULATION_TRAIN_TARGET_ACQUIRED, entity=entity,
                                                generation=evolution_cycle)
 
@@ -180,7 +180,7 @@ class WorldMapManager:
             return
 
         if self.remove_entity(entity_id):
-            self._logger.info(f"Entity {entity_id} died and was cleaned up")
+            self._logger.debug(f"Entity {entity_id} died and was cleaned up")
 
     def move_entity(self, entity_id: int, new_position: Position) -> bool:
         if entity_id not in self._entity_registry:

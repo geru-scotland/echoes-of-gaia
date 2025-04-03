@@ -30,8 +30,8 @@ biome:
   climate-model: "climate_model_v1.1"
   map:
     size:
-      - 30
-      - 30
+      - 60
+      - 60
   type: "tropical"
 
   training_mode: true
@@ -39,7 +39,7 @@ biome:
   fauna:
     - species: "deer"
       spawns: 1
-      avg-lifespan: 1
+      avg-lifespan: 6
       components:
         - GrowthComponent:
         - VitalComponent:
