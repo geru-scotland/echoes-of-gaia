@@ -46,4 +46,5 @@ biome:
         - WeatherAdaptationComponent:
             optimal_temperature: 10.0
         - MovementComponent:
+        - HeterotrophicNutritionComponent:
 

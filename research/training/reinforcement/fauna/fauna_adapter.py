@@ -27,9 +27,10 @@ from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from config.settings import Settings
 from research.training.reinforcement.adapter import EnvironmentAdapter
+from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
 from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction, \
-    PositionNotValidReason, TerrainType
+    PositionNotValidReason, TerrainType, BiomeType
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
 from shared.types import Position, DecodedAction
@@ -46,7 +47,6 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._worldmap_manager: WorldMapManager = None
         self._target: Entity = None
         self._logger.info(f"Creating {self.__class__.__name__}...")
-        self._register_events()
         self._fov_width: int = fov_width
         self._fov_height: int = fov_height
         self._fov_center: int = fov_center
@@ -54,6 +54,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._current_position: Optional[Position] = None
         self._visited_positions = set()
         self._heatmap = {}
+        self._current_biome_type: Optional[BiomeType] = None
+        self._register_events()
 
     def __del__(self):
         try:
@@ -80,9 +82,12 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
     def initialize(self):
         self._logger.info(f"Initializing {self.__class__.__name__} ...")
+        random_config = TrainingConfigManager.generate_random_config("training.yaml")
+        temp_config_path = TrainingConfigManager.save_temp_config(random_config)
 
-        settings = Settings(override_configs="training.yaml")
-
+        self._current_biome_type = BiomeType(random_config['biome']['type'])
+        print(random_config)
+        settings = Settings(override_configs=temp_config_path)
         SimulationEventBus.clear()
         BiomeEventBus.clear()
 
@@ -151,7 +156,31 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         self._current_position = self._target.get_position()
 
+        self._check_and_drink_water()
+
         self._simulation_api.step(time_delta)
+
+    def _check_and_drink_water(self) -> None:
+        if not self._target or not self._target.is_alive():
+            return
+
+        position = self._target.get_position()
+        if not position:
+            return
+
+        try:
+            terrain = self._worldmap_manager.get_terrain_at(position)
+
+            if terrain in [TerrainType.WATER_SHALLOW]:
+                # La cantidad de hidratación depende del nivel actual de sed
+                # Cuanto más sediento, más hidratación, por ahora me cuadra
+                current_thirst = self._target.thirst_level
+                hydration_value = 5.0 + (100.0 - current_thirst) * 0.1
+                # Consumir agua
+                self._target.consume_water(hydration_value)
+                self._logger.debug(f"Consuming water: +{hydration_value} hydratation")
+        except Exception as e:
+            self._logger.warning(f"Error verifiying terrain while trying to drink: {e}")
 
     def compute_reward(self, action: FaunaAction):
         if not self._target or not self._target.is_alive():
@@ -203,10 +232,42 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         return reward
 
     def compute_water_reward(self) -> float:
-        reward = 0.0
-        position: Position = self._target.get_position()
+        if not self._target or not self._target.is_alive():
+            return 0.0
 
-        return reward
+        reward = 0.0
+        position = self._target.get_position()
+
+        if not position:
+            return 0.0
+
+        try:
+            terrain = self._worldmap_manager.get_terrain_at(position)
+
+            thirst_ratio = 1.0 - (self._target.thirst_level / 100.0)
+
+            if terrain in [TerrainType.WATER_SHALLOW]:
+                # Aqui recompensa si la sed es alta, proporcionalemnte
+                # TODO: Invertir numéricamente el thirsty level mejor
+                if thirst_ratio > 0.7:  # MUY sediento
+                    reward += 1
+                    self._logger.debug("Drinking water because VERY thirsty: +1.2")
+                elif thirst_ratio > 0.4:  # Moderadamente
+                    reward += 0.4
+                    self._logger.debug("Drinking water because moderately thirsty: +0.8")
+                elif thirst_ratio > 0.1:  # Ligero
+                    reward += 0.1
+                    self._logger.debug("Drinking water while slightly thirsty: +0.3")
+
+            if thirst_ratio > 0.9:
+                reward -= 0.5
+                self._logger.debug("Extremely thirsty penalization: -0.5")
+
+            return reward
+
+        except Exception as e:
+            self._logger.warning(f"Errr computing water reard: {e}")
+            return 0.0
 
     def get_observation(self):
         if not self._target:
@@ -214,13 +275,11 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         position = self._target.get_position()
 
-        # Obtener mapa local y máscara de validez
         local_result = None
         if position:
             local_result = self._worldmap_manager.get_local_map(position, self._fov_width, self._fov_height)
 
         if local_result is None:
-            # Valores por defecto si no hay información válida
             local_fov_terrain = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
             validity_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.bool_)
             visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.bool_)
@@ -245,10 +304,18 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         validity_map = validity_mask.astype(np.float32)
         visited_map = visited_mask.astype(np.float32)
 
+        thirst_level = 0.0
+        biome_type_idx = list(BiomeType).index(self._biome.get_biome_type())
+
+        if self._target and self._target.is_alive():
+            thirst_level = self._target.thirst_level / 100.0  # OJO, normalizo, que si no no tiraba bien.
+
         return {
+            "biome_type": biome_type_idx,
             "terrain_map": local_fov_terrain,
             "validity_map": validity_map,
-            "visited_map": visited_map
+            "visited_map": visited_map,
+            "thirst_level": np.array([thirst_level], dtype=np.float32)
         }
 
     def _find_nearby_entities(self, position, radius):
@@ -260,9 +327,11 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
+            "biome_type": BiomeType.TROPICAL,
             "terrain_map": terrain_map,
             "validity_map": valid_mask,
             "visited_map": visited_mask,
+            "thirst_level": np.array([1.0], dtype=np.float32)  # Por defecto, sin sed (invertido, tengo que cambiar)
         }
 
     def finish_training_session(self):

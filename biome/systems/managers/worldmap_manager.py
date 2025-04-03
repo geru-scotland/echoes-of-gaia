@@ -195,6 +195,26 @@ class WorldMapManager:
 
         return False
 
+    def _is_water_nearby(self, position: Position) -> bool:
+        if not position:
+            return False
+
+        # FOV local centrado en la posición, parche 3x3 por ahora
+        local_result = self.get_local_map(position, 3, 3)
+        if local_result is None:
+            return False
+
+        local_terrain, _ = local_result
+
+        water_terrains = [
+            int(TerrainType.WATER_SHALLOW),
+            int(TerrainType.WATER_MID),
+            int(TerrainType.WATER_DEEP)
+        ]
+
+        water_mask = np.isin(local_terrain, water_terrains)
+
+        return np.any(water_mask)
     def get_local_map(self, position: Position, width: int, height: int) -> Optional[np.ndarray]:
         y, x = position
         map_height, map_width = self._terrain_map.shape

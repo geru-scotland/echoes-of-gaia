@@ -26,7 +26,7 @@ from gymnasium.spaces import Discrete
 from biome.entities.entity import Entity
 from research.training.registry import EnvironmentRegistry
 from research.training.reinforcement.fauna.fauna_adapter import FaunaSimulationAdapter
-from shared.enums.enums import FaunaAction, Agents, LocalFovConfig, TerrainType
+from shared.enums.enums import FaunaAction, Agents, LocalFovConfig, TerrainType, BiomeType
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
@@ -36,6 +36,7 @@ class FaunaEnvironment(gym.Env):
 
     def __init__(self, local_fov_config: LocalFovConfig):
         super().__init__()
+        self._episode_number: int = 0
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self.action_space: Discrete = gym.spaces.Discrete(len(FaunaAction))
@@ -45,6 +46,7 @@ class FaunaEnvironment(gym.Env):
         self._fov_center: int = local_fov_config.get("center", int(self._fov_width / 2))
 
         self.observation_space = spaces.Dict({
+            "biome_type": spaces.Discrete(len(BiomeType)),
             "terrain_map": spaces.Box(
                 low=0,
                 high=len(list(TerrainType)) - 1,
@@ -61,6 +63,12 @@ class FaunaEnvironment(gym.Env):
                 low=0.0,
                 high=1.0,
                 shape=(self._fov_height, self._fov_width),
+                dtype=np.float32
+            ),
+            "thirst_level": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(1,),
                 dtype=np.float32
             )
         })
@@ -79,6 +87,14 @@ class FaunaEnvironment(gym.Env):
 
     def reset(self, *, seed=None, options=None) -> tuple:
         super().reset(seed=seed, options=options)
+        self._episode_number += 1
+
+        def format_boxed_title(title: str, width: int = 60, border: str = "#") -> str:
+            line = border * width
+            padded_title = f"{border}{title.center(width - 2)}{border}"
+            return "\n" + line + "\n" + padded_title + "\n" + line + "\n"
+
+        self._logger.info(format_boxed_title(f"STARTING EPISODE #{self._episode_number}"))
 
         observation = self._get_default_observation()
 
@@ -93,7 +109,12 @@ class FaunaEnvironment(gym.Env):
     def step(self, action):
         self._current_step += 1
 
-        self._logger.info(f"Received action: {action}")
+        if self._current_step % 5000 == 0:
+            line = "-" * 60
+            step_msg = f"STEP CHECKPOINT: {self._current_step} steps into EPISODE #{self._episode_number}"
+            self._logger.info("\n" + line + f"\n{step_msg.center(60)}\n" + line + "\n")
+
+        self._logger.debug(f"Received action: {action}")
         self._fauna_adapter.step_environment(action)
 
         info = {}
@@ -118,7 +139,9 @@ class FaunaEnvironment(gym.Env):
         visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
+            "biome_type": BiomeType.TROPICAL,
             "terrain_map": terrain_map,
             "validity_map": valid_mask,
             "visited_map": visited_mask,
+            "thirst_level": np.array([1.0], dtype=np.float32)
         }
