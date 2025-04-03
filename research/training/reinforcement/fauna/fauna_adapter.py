@@ -23,8 +23,6 @@ import numpy as np
 
 from biome.biome import Biome
 from biome.entities.entity import Entity
-from biome.systems.climate.state import ClimateState
-from biome.systems.climate.system import ClimateSystem
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from config.settings import Settings
@@ -34,7 +32,6 @@ from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaS
     PositionNotValidReason, TerrainType
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
-from shared.normalization.normalizer import climate_normalizer
 from shared.types import Position, DecodedAction
 from simulation.api.simulation_api import SimulationAPI
 from simulation.core.systems.events.event_bus import SimulationEventBus
@@ -177,26 +174,20 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         is_valid, reason = self._worldmap_manager.is_valid_position(new_position, self._target.get_id())
 
         if not is_valid:
-            return -1.2
+            if reason == PositionNotValidReason.POSITION_OUT_OF_BOUNDARIES:
+                return -1.0
+            elif reason == PositionNotValidReason.POSITION_NON_TRAVERSABLE:
+                return -0.8
+            elif reason == PositionNotValidReason.POSITION_BUSY:
+                return -0.6
+
         # Reward base por movimiento válido
-        reward = 0.4
+        reward = 0.7
 
         # Bonus por exploración si la posición es nueva
         # Quiero incentivar un poco, al menos por ahora, a que explore
         if self._is_new_position(new_position):
-            reward += 0.8
-            self._visited_positions.add(new_position)
-        else:
-            reward -= 0.3
-
-        pos_key = tuple(new_position)
-        visits = self._heatmap.get(pos_key, 0)
-
-        # Meto decaimiento exponencial, revisar esto.
-        exploration_reward = 0.8 * (0.7 ** visits)
-        reward += exploration_reward
-
-        self._heatmap[pos_key] = visits + 1
+            reward += 0.9
 
         return reward
 
