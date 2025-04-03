@@ -65,8 +65,8 @@ class MovementComponent(EntityComponent):
     def _handle_position_update(self, position: Position):
         self._current_position = position
 
-    def calculate_new_position(self, direction: Direction) -> Position:
-        y, x = self._current_position
+    def calculate_new_position(self, direction: Direction, previous_position: Position = None) -> Position:
+        y, x = previous_position if previous_position else self._current_position
         dy, dx = direction.value
         new_position = (y + dy, x + dx)
         return new_position

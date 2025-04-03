@@ -111,7 +111,7 @@ class WorldMapManager:
     def _handle_validate_movement(self, entity_id: int, new_position: Position, result_callback: Callable) -> None:
         if entity_id not in self._entity_registry:
             self._logger.warning(f"Entity {entity_id} not found in registry")
-            result_callback(False)
+            result_callback(False, PositionNotValidReason.NONE)
             return
 
         result_callback(self._is_valid_position(new_position, entity_id))

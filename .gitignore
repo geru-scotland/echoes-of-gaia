@@ -102,3 +102,5 @@ research/experiments/simulations
 research/training/models
 
 patch.diff
+
+*.tsv
