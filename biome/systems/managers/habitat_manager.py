@@ -136,7 +136,7 @@ class HabitatManager:
         original_habitats = self._base_habitat_map.get(position, [])
 
         if not original_habitats:
-            self._logger.warning(f"Position {position} didn't have any original habitats (might be water etc).")
+            self._logger.debug(f"Position {position} didn't have any original habitats (might be water etc).")
             return
 
         for habitat in original_habitats:

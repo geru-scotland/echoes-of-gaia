@@ -23,26 +23,34 @@ import torch as th
 import torch.nn as nn
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
-from shared.enums.enums import TerrainType
+from shared.enums.enums import TerrainType, BiomeType
 
 
 class CNNFeaturesExtractor(BaseFeaturesExtractor):
-    def __init__(self, observation_space: gym.spaces.Dict, features_dim: int = 256, embedding_dim: int = 8):
+    def __init__(self, observation_space: gym.spaces.Dict, features_dim: int = 256, terrain_embedding_dim: int = 8,
+                 biome_embedding_dim: int = 8):
         super(CNNFeaturesExtractor, self).__init__(observation_space, features_dim)
 
         local_map_space = observation_space.spaces["terrain_map"]
+
         num_terrain_types = len(list(TerrainType))
+        num_biome_types = len(list(BiomeType))
 
         self.terrain_embedding = nn.Embedding(
             num_embeddings=num_terrain_types,
-            embedding_dim=embedding_dim,
+            embedding_dim=terrain_embedding_dim,
             padding_idx=TerrainType.UNKNWON.value
+        )
+
+        self.biome_embedding = nn.Embedding(
+            num_embeddings=num_biome_types,
+            embedding_dim=biome_embedding_dim
         )
 
         h, w = local_map_space.shape
 
         self.cnn = nn.Sequential(
-            nn.Conv2d(embedding_dim + 2, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(terrain_embedding_dim + 2, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
@@ -50,22 +58,28 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         )
 
         cnn_out_size = 64 * h * w
+        biome_embedd_flat_size = biome_embedding_dim * num_biome_types
+        thirst_feature_size = 1
 
+        combined_features_size = cnn_out_size + biome_embedd_flat_size + thirst_feature_size
         self.linear = nn.Sequential(
-            nn.Linear(cnn_out_size, 512),
+            nn.Linear(combined_features_size, 512),
             nn.ReLU(),
             nn.Linear(512, features_dim),
             nn.ReLU(),
         )
 
-        self.print_terrain_embeddings()
+        # self.print_terrain_embeddings()
+        # self.print_biome_embeddings()
 
     def forward(self, observations) -> th.Tensor:
 
         # Para aclararme (Batch, width, height)
+        biome_index = observations["biome_type"].long()
         terrain_indices = observations["terrain_map"].long()
         valid_map = observations["validity_map"]
         visited_map = observations["visited_map"]
+        thirst_level = observations["thirst_level"]
 
         max_index = len(list(TerrainType)) - 1
         terrain_indices = torch.clamp(terrain_indices, 0, max_index)
@@ -76,15 +90,28 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         # (Batch, channels/num_embedd, width, hegiht)
         terrain_embedded = terrain_embedded.permute(0, 3, 1, 2)
 
+        biome_embedded = self.biome_embedding(biome_index)
         # Agrego dimensión de canal: (Batch, 1, width, height)
         validity_channel = valid_map.unsqueeze(1)
         visited_channel = visited_map.unsqueeze(1)
+
+        # Nota: a CNN, sólo mapas espaciales, disposición 2D.
         # +1 canal (lámina en el stack), le agrego a num_embedd + 1 con el validity channel + 1 visited
         combined_maps = torch.cat([terrain_embedded, validity_channel, visited_channel], dim=1)
-
         cnn_features = self.cnn(combined_maps)
 
-        return self.linear(cnn_features)
+        thirst_features = thirst_level.view(thirst_level.size(0), -1)
+        biome_embedded = biome_embedded.view(biome_embedded.size(0), -1)
+
+        # print(f"[DEBUG] cnn_features shape: {cnn_features.shape}")
+        # print(f"[DEBUG] biome_embedded shape: {biome_embedded.shape}")
+        # print(f"[DEBUG] thirst_features shape: {thirst_features.shape}")
+
+        combined_features = torch.cat([cnn_features, biome_embedded, thirst_features], dim=1)
+        # print(f"[DEBUG] combined_features shape: {combined_features.shape}")
+
+        # self.print_biome_embeddings()
+        return self.linear(combined_features)
 
         # print(f"\n=== TERRAIN MAP STATS ===")
         # print(f"Shape: {terrain_indices.shape}")
@@ -144,9 +171,10 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
     def save_terrain_embeddings(self, path: str = "./"):
         import os
-        import numpy as np
+        from datetime import datetime
 
         os.makedirs(path, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         terrain_names = {
             0: "WATER_DEEP",
@@ -162,8 +190,8 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
         embedding_weights = self.terrain_embedding.weight.detach().cpu().numpy()
 
-        metadata_path = os.path.join(path, "metadata.tsv")
-        vectors_path = os.path.join(path, "vectors.tsv")
+        metadata_path = os.path.join(path, f"terrain_metadata_{timestamp}.tsv")
+        vectors_path = os.path.join(path, f"terrain_embedding_{timestamp}.tsv")
 
         with open(metadata_path, "w") as f:
             for idx in terrain_names:
@@ -174,7 +202,32 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
                 vector = "\t".join(f"{x:.8f}" for x in embedding_weights[idx])
                 f.write(f"{vector}\n")
 
-        print(f"Embeddings stored {metadata_path} and {vectors_path}")
+        print(f"Terrain embeddings stored in {metadata_path} and {vectors_path}")
+
+    def save_biome_embeddings(self, path: str = "./"):
+        import os
+        from datetime import datetime
+
+        os.makedirs(path, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        biome_names = {idx: biome.value for idx, biome in enumerate(BiomeType)}
+
+        embedding_weights = self.biome_embedding.weight.detach().cpu().numpy()
+
+        metadata_path = os.path.join(path, f"biome_metadata_{timestamp}.tsv")
+        vectors_path = os.path.join(path, f"biome_embedding_{timestamp}.tsv")
+
+        with open(metadata_path, "w") as f:
+            for idx in range(len(biome_names)):
+                f.write(f"{biome_names[idx]}\n")
+
+        with open(vectors_path, "w") as f:
+            for idx in range(len(biome_names)):
+                vector = "\t".join(f"{x:.8f}" for x in embedding_weights[idx])
+                f.write(f"{vector}\n")
+
+        print(f"Biome embeddings stored in {metadata_path} and {vectors_path}")
 
     def print_terrain_embeddings(self):
         import pandas as pd
@@ -230,10 +283,35 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         print("\n[Terrain Frequency in Current Batch]")
         print(df)
 
+    def print_biome_embeddings(self):
+        import pandas as pd
+
+        embedding_weights = self.biome_embedding.weight.detach().cpu().numpy()
+
+        biome_names = {
+            0: "TROPICAL",
+            1: "DESERT",
+            2: "TAIGA",
+            3: "SAVANNA",
+            4: "TUNDRA",
+        }
+
+        rows = []
+        for idx, name in biome_names.items():
+            vector = embedding_weights[idx]
+            rows.append({"Index": idx, "Name": name, "Embedding": vector})
+
+        df = pd.DataFrame(rows)
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.width', 1000)
+        pd.set_option('display.max_colwidth', None)
+        print("\n[Biome Embeddings]")
+        print(df)
+
 
 def create_custom_cnn_policy():
     policy_kwargs = dict(
         features_extractor_class=CNNFeaturesExtractor,
-        features_extractor_kwargs=dict(features_dim=256),
+        features_extractor_kwargs=dict(features_dim=256)
     )
     return policy_kwargs

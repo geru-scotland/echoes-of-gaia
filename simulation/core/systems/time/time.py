@@ -74,4 +74,4 @@ class SimulationTime:
     def log_time(self, event_count: int):
         era = self.get_current_era(event_count)
         event_number = self.get_event_number_in_era(event_count)
-        self._logger.info(f"Simulated events: {event_count}, Era={era}, Event in Era={event_number}")
+        self._logger.debug(f"Simulated events: {event_count}, Era={era}, Event in Era={event_number}")

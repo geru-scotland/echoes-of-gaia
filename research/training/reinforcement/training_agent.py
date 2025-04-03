@@ -56,6 +56,7 @@ class SaveEmbeddingsCallback(BaseCallback):
 
         if extractor and hasattr(extractor, "save_terrain_embeddings"):
             extractor.save_terrain_embeddings(self.save_path)
+            extractor.save_biome_embeddings(self.save_path)
         else:
             print("[WARN] No extractor or method save_terrain_embeddings found.")
 
