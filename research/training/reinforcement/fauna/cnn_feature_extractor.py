@@ -42,7 +42,7 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         h, w = local_map_space.shape
 
         self.cnn = nn.Sequential(
-            nn.Conv2d(embedding_dim + 1, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(embedding_dim + 2, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
@@ -61,16 +61,26 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         self.print_terrain_embeddings()
 
     def forward(self, observations) -> th.Tensor:
+
+        # Para aclararme (Batch, width, height)
         terrain_indices = observations["terrain_map"].long()
-        valid_mask = observations["validity_map"]
+        valid_map = observations["validity_map"]
+        visited_map = observations["visited_map"]
+
         max_index = len(list(TerrainType)) - 1
         terrain_indices = torch.clamp(terrain_indices, 0, max_index)
 
         terrain_embedded = self.terrain_embedding(terrain_indices)
+        # Al pasar por capa de embeddings: (Batch, width, height, num_embeddings)
+        # Reordeno dimensiones para que los num_embedding sean los canales y estén en dim 1
+        # (Batch, channels/num_embedd, width, hegiht)
         terrain_embedded = terrain_embedded.permute(0, 3, 1, 2)
 
-        validity_channel = valid_mask.unsqueeze(1)
-        combined_maps = torch.cat([terrain_embedded, validity_channel], dim=1)
+        # Agrego dimensión de canal: (Batch, 1, width, height)
+        validity_channel = valid_map.unsqueeze(1)
+        visited_channel = visited_map.unsqueeze(1)
+        # +1 canal (lámina en el stack), le agrego a num_embedd + 1 con el validity channel + 1 visited
+        combined_maps = torch.cat([terrain_embedded, validity_channel, visited_channel], dim=1)
 
         cnn_features = self.cnn(combined_maps)
 
@@ -82,9 +92,9 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         # print(f"Unique values: {torch.unique(terrain_indices).tolist()}")
         #
         # print(f"\n=== VALIDITY MAP STATS ===")
-        # print(f"Shape: {valid_mask.shape}")
+        # print(f"Shape: {valid_map.shape}")
         # print(
-        #     f"Valid positions: {valid_mask.sum().item()}/{valid_mask.numel()} ({valid_mask.sum().item() / valid_mask.numel() * 100:.2f}%)")
+        #     f"Valid positions: {valid_map.sum().item()}/{valid_map.numel()} ({valid_map.sum().item() / valid_map.numel() * 100:.2f}%)")
         #
         # if terrain_indices.shape[0] > 0:
         #     # Crear mapas visuales para el primer elemento del batch
@@ -108,7 +118,7 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         #         print(row_str)
         #
         #     print("\n=== FIRST VALIDITY MAP IN BATCH ===")
-        #     validity_map = valid_mask[0].cpu().numpy()
+        #     validity_map = valid_map[0].cpu().numpy()
         #
         #     for row in validity_map:
         #         row_str = " ".join(["✓" if val > 0.5 else "✗" for val in row])

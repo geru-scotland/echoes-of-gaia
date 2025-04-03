@@ -148,6 +148,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._target.move(self._action_decode(action))
 
         new_position = self._target.get_position()
+
         if new_position and new_position != old_position:
             self._visited_positions.add(new_position)
 
@@ -162,6 +163,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         decoded_action: DecodedAction = self._action_decode(action)
 
         movement_reward: int = self.compute_movement_reward(decoded_action)
+        water_reward: int = self.compute_water_reward()
         return reward + movement_reward
 
     def _action_decode(self, action: int) -> DecodedAction:
@@ -182,12 +184,12 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
                 return -0.6
 
         # Reward base por movimiento válido
-        reward = 0.7
+        reward = 0.0
 
         # Bonus por exploración si la posición es nueva
         # Quiero incentivar un poco, al menos por ahora, a que explore
         if self._is_new_position(new_position):
-            reward += 0.9
+            reward += 0.7
 
         return reward
 
@@ -206,16 +208,32 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             # Valores por defecto si no hay información válida
             local_fov_terrain = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
             validity_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.bool_)
+            visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.bool_)
         else:
             local_fov_terrain, validity_mask = local_result
 
             local_fov_terrain = local_fov_terrain.astype(np.int64)
+            visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+
+            center_y, center_x = self._fov_height // 2, self._fov_width // 2
+
+            for y in range(self._fov_height):
+                for x in range(self._fov_width):
+                    # Convierto coords de esta celda, a posición global
+                    global_y = position[0] + (y - center_y)
+                    global_x = position[1] + (x - center_x)
+                    global_pos = (global_y, global_x)
+
+                    if global_pos in self._visited_positions:
+                        visited_mask[y, x] = 1.0
 
         validity_map = validity_mask.astype(np.float32)
+        visited_map = visited_mask.astype(np.float32)
 
         return {
             "terrain_map": local_fov_terrain,
-            "validity_map": validity_map
+            "validity_map": validity_map,
+            "visited_map": visited_map
         }
 
     def _find_nearby_entities(self, position, radius):
@@ -224,10 +242,12 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
     def _get_default_observation(self):
         terrain_map = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
         valid_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+        visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
             "terrain_map": terrain_map,
-            "validity_map": valid_mask
+            "validity_map": valid_mask,
+            "visited_map": visited_mask,
         }
 
     def finish_training_session(self):
