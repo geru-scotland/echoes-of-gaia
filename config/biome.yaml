@@ -2,21 +2,20 @@ biome:
   climate-model: "climate_model_v1.1"
   map:
     size:
-      - 67 # width
-      - 61 # height
-  type: "tropical"
+      - 20
+      - 20
+  type: "desert"
 
-
+  training_mode: true
 
   fauna:
-    - species: "fox"
+    - species: "deer"
       spawns: 1
-      avg-lifespan: 12
+      avg-lifespan: 1
       components:
         - GrowthComponent:
         - VitalComponent:
         - WeatherAdaptationComponent:
-            optimal_temperature: 5.0
-            cold_resistance: 0.0
-        - HeterotrophicNutritionComponent:
+            optimal_temperature: 10.0
         - MovementComponent:
+

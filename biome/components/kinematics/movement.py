@@ -39,7 +39,7 @@ from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
 from biome.systems.components.registry import ComponentRegistry
 from biome.systems.events.event_notifier import EventNotifier
-from shared.enums.enums import ComponentType, Direction
+from shared.enums.enums import ComponentType, Direction, PositionNotValidReason
 from shared.enums.events import ComponentEvent, BiomeEvent
 from biome.systems.events.event_bus import BiomeEventBus
 from shared.types import Position
@@ -65,8 +65,8 @@ class MovementComponent(EntityComponent):
     def _handle_position_update(self, position: Position):
         self._current_position = position
 
-    def calculate_new_position(self, direction: Direction) -> Position:
-        y, x = self._current_position
+    def calculate_new_position(self, direction: Direction, previous_position: Position = None) -> Position:
+        y, x = previous_position if previous_position else self._current_position
         dy, dx = direction.value
         new_position = (y + dy, x + dx)
         return new_position
@@ -87,15 +87,22 @@ class MovementComponent(EntityComponent):
 
         entity_id = self._host.get_id() if self._host else -1
 
+        validation_result = [False]
+        validation_reason = [None]
+
+        def validation_callback(is_valid: bool, reason: PositionNotValidReason = PositionNotValidReason.NONE):
+            validation_result[0] = is_valid
+            validation_reason[0] = reason
+
         BiomeEventBus.trigger(
             BiomeEvent.VALIDATE_MOVEMENT,
-            entity_id=entity_id,
+            entity_id=self._host.get_id(),
             new_position=new_position,
-            result_callback=self.set_validation_result
+            result_callback=validation_callback
         )
 
-        if not self._movement_valid:
-            self._logger.warning(f"Movement to {new_position} is not valid")
+        if not validation_result[0][0]:
+            self._logger.warning(f"Invalid movement")
             return False
 
         BiomeEventBus.trigger(

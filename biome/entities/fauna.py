@@ -17,11 +17,12 @@
 """
 from typing import Any
 
+from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums.enums import FaunaSpecies
+from shared.enums.enums import FaunaSpecies, ComponentType
 from shared.types import HabitatList
 
 
@@ -43,3 +44,16 @@ class Fauna(Entity):
 
     def compute_state(self):
         pass
+
+    def consume_water(self, hidration_value: float):
+        nutrition_component: HeterotrophicNutritionComponent = self._components.get(
+            ComponentType.HETEROTROPHIC_NUTRITION, None)
+        if self.components and nutrition_component:
+            nutrition_component.consume_water(hidration_value)
+
+    @property
+    def thirst_level(self) -> float:
+        nutrition_component: HeterotrophicNutritionComponent = self._components.get(
+            ComponentType.HETEROTROPHIC_NUTRITION, None)
+        if self.components and nutrition_component:
+            return nutrition_component.thirst_level

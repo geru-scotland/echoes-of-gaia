@@ -21,6 +21,8 @@ from typing import Type
 from logging import Logger
 
 import gymnasium as gym
+from stable_baselines3.common.callbacks import BaseCallback
+
 from research.training.registry import EnvironmentRegistry
 
 import stable_baselines3 as sb3
@@ -31,6 +33,31 @@ from research.training.reinforcement.fauna.cnn_feature_extractor import create_c
 from shared.enums.enums import Agents, LocalFovConfig
 from utils.loggers import LoggerManager
 from shared.enums.strings import Loggers
+
+
+class SaveEmbeddingsCallback(BaseCallback):
+    def _on_step(self) -> bool:
+        return True
+
+    def __init__(self, save_path="./embeddings", verbose=0):
+        super().__init__(verbose)
+        self.save_path = save_path
+
+    def _on_training_end(self) -> None:
+        extractor = None
+
+        # Intento primero para PPO/A2C
+        if hasattr(self.model, "policy"):
+            extractor = getattr(self.model.policy, "features_extractor", None)
+
+        # Si no lo encuentra y es DQN, entonces q_net
+        if extractor is None and hasattr(self.model, "q_net"):
+            extractor = getattr(self.model.q_net, "features_extractor", None)
+
+        if extractor and hasattr(extractor, "save_terrain_embeddings"):
+            extractor.save_terrain_embeddings(self.save_path)
+        else:
+            print("[WARN] No extractor or method save_terrain_embeddings found.")
 
 
 class ReinforcementLearningAgent:
@@ -69,7 +96,7 @@ class ReinforcementLearningAgent:
                 raise ValueError(f"Unsupported algorithm: {self._config['model']['algorithm']}")
 
             policy_kwargs = create_custom_cnn_policy()
-
+            callback = SaveEmbeddingsCallback()
             sb3_model = algorithm_class(
                 policy=self._config["model"]["policy"],
                 policy_kwargs=policy_kwargs,
@@ -78,7 +105,7 @@ class ReinforcementLearningAgent:
             )
 
             total_timesteps = self._config["model"]["timesteps"]
-            sb3_model.learn(total_timesteps=total_timesteps)
+            sb3_model.learn(total_timesteps=total_timesteps, callback=callback)
 
             output_path = self._config["output_path"]
             os.makedirs(os.path.dirname(output_path), exist_ok=True)

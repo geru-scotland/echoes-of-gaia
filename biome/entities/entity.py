@@ -22,6 +22,7 @@ from typing import Any, Dict, Type, Optional
 from simpy import Environment as simpyEnv
 
 from biome.components.kinematics.movement import MovementComponent
+from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState

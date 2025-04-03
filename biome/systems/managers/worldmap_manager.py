@@ -111,7 +111,7 @@ class WorldMapManager:
     def _handle_validate_movement(self, entity_id: int, new_position: Position, result_callback: Callable) -> None:
         if entity_id not in self._entity_registry:
             self._logger.warning(f"Entity {entity_id} not found in registry")
-            result_callback(False)
+            result_callback(False, PositionNotValidReason.NONE)
             return
 
         result_callback(self._is_valid_position(new_position, entity_id))
@@ -233,6 +233,19 @@ class WorldMapManager:
         combined_validity_mask = validity_mask & traversability_mask
 
         return local_map, combined_validity_mask
+
+    def get_terrain_at(self, position: Position):
+        try:
+            y, x = position
+
+            if not (0 <= y < self._terrain_map.shape[0] and 0 <= x < self._terrain_map.shape[1]):
+                raise IndexError(f"Position {position} is out of map boundaries")
+
+            return TerrainType(self._terrain_map[y, x])
+
+        except ValueError as e:
+            self._logger.error(f"Invalid position format: {e}")
+            raise
 
     def get_world_map(self):
         return self._world_map

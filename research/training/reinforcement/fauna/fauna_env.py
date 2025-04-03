@@ -56,6 +56,12 @@ class FaunaEnvironment(gym.Env):
                 high=1.0,
                 shape=(self._fov_height, self._fov_width),
                 dtype=np.float32
+            ),
+            "visited_map": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.float32
             )
         })
 
@@ -109,8 +115,10 @@ class FaunaEnvironment(gym.Env):
     def _get_default_observation(self):
         terrain_map = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
         valid_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+        visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
             "terrain_map": terrain_map,
-            "validity_map": valid_mask
+            "validity_map": valid_mask,
+            "visited_map": visited_mask,
         }

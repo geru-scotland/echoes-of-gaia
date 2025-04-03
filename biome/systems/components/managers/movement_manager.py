@@ -21,18 +21,11 @@ from simpy import Environment as simpyEnv
 
 from biome.components.kinematics.movement import MovementComponent
 from biome.systems.components.managers.base import BaseComponentManager
-from shared.enums.enums import Direction
 from shared.enums.strings import Loggers
-from shared.timers import Timers
 from utils.loggers import LoggerManager
-from collections import deque
-
-from collections import deque
 
 
 class MovementComponentManager(BaseComponentManager[MovementComponent]):
     def __init__(self, env: simpyEnv):
         super().__init__(env)
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self._env.process(self.move(Timers.Calendar.DAY))
-        self._counter = 0
