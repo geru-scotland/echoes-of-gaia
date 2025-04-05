@@ -57,3 +57,17 @@ class Fauna(Entity):
             ComponentType.HETEROTROPHIC_NUTRITION, None)
         if self.components and nutrition_component:
             return nutrition_component.thirst_level
+
+    @property
+    def energy_reserves(self) -> float:
+        nutrition_component: HeterotrophicNutritionComponent = self._components.get(
+            ComponentType.HETEROTROPHIC_NUTRITION, None)
+        if self.components and nutrition_component:
+            return nutrition_component.energy_reserves
+
+    @property
+    def max_energy_reserves(self) -> float:
+        nutrition_component: HeterotrophicNutritionComponent = self._components.get(
+            ComponentType.HETEROTROPHIC_NUTRITION, None)
+        if self.components and nutrition_component:
+            return nutrition_component.max_energy_reserves

@@ -42,6 +42,8 @@ class ComponentEvent(EnumBaseStr):
     PHOTOSYNTHESIS_UPDATED = "on_photosyntesis_updated"
     ENERGY_ABSORPTION = "on_energy_absorption"
     POSITION_UPDATED = "position_updated"
+    ENERGY_CRITICAL = "on_critical_energy_level"
+    ENERGY_RESTORED = "on_normal_energy_level"
 
 
 class BiomeEvent(EnumBaseStr):

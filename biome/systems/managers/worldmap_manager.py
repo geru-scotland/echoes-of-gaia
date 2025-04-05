@@ -174,6 +174,9 @@ class WorldMapManager:
 
         return True
 
+    def has_alive_entities(self):
+        return any(entity.is_alive() for entity in self.get_entities())
+
     def handle_entity_death(self, entity_id: int) -> None:
         if not self._cleanup_dead_entities:
             self._logger.debug(f"Entity {entity_id} died, but remains in world (cleanup disabled)")

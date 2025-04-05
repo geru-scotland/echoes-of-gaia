@@ -22,6 +22,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
 from biome.components.base.component import EntityComponent
+from biome.components.handlers.energy_handler import EnergyHandler
 from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.components.registry import ComponentRegistry
 from shared.enums.events import SimulationEvent
@@ -33,16 +34,18 @@ from simulation.core.systems.events.event_bus import SimulationEventBus
 
 
 class VitalComponent(EntityComponent):
-    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 5.0, health_modifier: float = 1.0,
+    def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 5.0,
+                 health_modifier: float = 1.0,
                  vitality: float = 100.0, max_vitality: float = 100.0, age: float = 0.0, aging_rate: float = 1.0,
-                 dormancy_threshold: float = 25.0):
+                 dormancy_threshold: float = 25.0, max_energy_reserves: float = 100.0):
 
         self._stress_handler: StressHandler = StressHandler(event_notifier, lifespan)
+        self._energy_handler: EnergyHandler = EnergyHandler(event_notifier, max_energy_reserves)
 
         super().__init__(env, ComponentType.VITAL, event_notifier, lifespan)
 
         self._lifespan_in_ticks: int = int((lifespan * float(Timers.Calendar.YEAR)))
-        self._vitality: float = round(vitality, 2)
+        self._vitality: float = round(max_vitality, 2)
         self._max_vitality: float = round(max_vitality, 2)
         self._age: float = age
         self._aging_rate: float = aging_rate
@@ -51,7 +54,8 @@ class VitalComponent(EntityComponent):
         self._health_modifier: float = 1.0
         self._vitality_history: List[Tuple[float, float]] = []  # (age, vitality)
         self._birth_tick: int = self._env.now
-
+        self._accumulated_decay: float = 0.0
+        self._accumulated_stress: float = 0.0
         self._logger.debug(f"Vital component initialized: Health={self._vitality}/{self._max_vitality}, "
                            f"Age={self._age}")
 
@@ -60,6 +64,7 @@ class VitalComponent(EntityComponent):
     def _register_events(self) -> None:
         super()._register_events()
         self._stress_handler.register_events()
+        self._energy_handler.register_events()
         SimulationEventBus.register(SimulationEvent.SIMULATION_FINISHED, self._handle_simulation_finished)
 
     def _handle_simulation_finished(self) -> None:
@@ -80,6 +85,12 @@ class VitalComponent(EntityComponent):
             "max_vitality": self._max_vitality,
             "health_modifier": self._health_modifier,
         }
+
+    def increase_accumulated_decay(self, value: float) -> None:
+        self._accumulated_decay += value
+
+    def increase_accumulated_stress(self, value: float) -> None:
+        self._accumulated_stress += value
 
     def plot_vitality_curve(self) -> None:
         if not self._vitality_history:
@@ -192,7 +203,24 @@ class VitalComponent(EntityComponent):
     def is_active(self) -> bool:
         return self._host_alive
 
-    # Setters
+    @property
+    def energy_handler(self) -> EnergyHandler:
+        return self._energy_handler
+
+    @property
+    def energy_reserves(self) -> float:
+        return self._energy_handler.energy_reserves
+
+    @property
+    def accumulated_decay(self) -> float:
+        return self._accumulated_decay
+
+    @property
+    def accumulated_stress(self) -> float:
+        return self._accumulated_stress
+
+        # Setters
+
     @vitality.setter
     def vitality(self, value: float) -> None:
         self._vitality = value

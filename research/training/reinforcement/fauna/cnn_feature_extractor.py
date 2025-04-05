@@ -50,7 +50,7 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         h, w = local_map_space.shape
 
         self.cnn = nn.Sequential(
-            nn.Conv2d(terrain_embedding_dim + 2, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(terrain_embedding_dim + 4, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
@@ -60,8 +60,9 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         cnn_out_size = 64 * h * w
         biome_embedd_flat_size = biome_embedding_dim * num_biome_types
         thirst_feature_size = 1
+        energy_reserves_feature_size = 1
 
-        combined_features_size = cnn_out_size + biome_embedd_flat_size + thirst_feature_size
+        combined_features_size = cnn_out_size + biome_embedd_flat_size + thirst_feature_size + energy_reserves_feature_size
         self.linear = nn.Sequential(
             nn.Linear(combined_features_size, 512),
             nn.ReLU(),
@@ -79,7 +80,11 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         terrain_indices = observations["terrain_map"].long()
         valid_map = observations["validity_map"]
         visited_map = observations["visited_map"]
+        flora_map = observations["flora_map"]
+        fauna_map = observations["fauna_map"]
         thirst_level = observations["thirst_level"]
+        energy_reserves = observations["energy_reserves"]
+        # TODO: Vitality
 
         max_index = len(list(TerrainType)) - 1
         terrain_indices = torch.clamp(terrain_indices, 0, max_index)
@@ -95,19 +100,28 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         validity_channel = valid_map.unsqueeze(1)
         visited_channel = visited_map.unsqueeze(1)
 
+        flora_map = flora_map.unsqueeze(1)
+        fauna_map = fauna_map.unsqueeze(1)
+
         # Nota: a CNN, sólo mapas espaciales, disposición 2D.
         # +1 canal (lámina en el stack), le agrego a num_embedd + 1 con el validity channel + 1 visited
-        combined_maps = torch.cat([terrain_embedded, validity_channel, visited_channel], dim=1)
+        combined_maps = torch.cat([terrain_embedded,
+                                   validity_channel,
+                                   visited_channel,
+                                   flora_map,
+                                   fauna_map
+                                   ], dim=1)
         cnn_features = self.cnn(combined_maps)
 
         thirst_features = thirst_level.view(thirst_level.size(0), -1)
+        energy_reserves_features = energy_reserves.view(energy_reserves.size(0), -1)
         biome_embedded = biome_embedded.view(biome_embedded.size(0), -1)
 
         # print(f"[DEBUG] cnn_features shape: {cnn_features.shape}")
         # print(f"[DEBUG] biome_embedded shape: {biome_embedded.shape}")
         # print(f"[DEBUG] thirst_features shape: {thirst_features.shape}")
 
-        combined_features = torch.cat([cnn_features, biome_embedded, thirst_features], dim=1)
+        combined_features = torch.cat([cnn_features, biome_embedded, thirst_features, energy_reserves_features], dim=1)
         # print(f"[DEBUG] combined_features shape: {combined_features.shape}")
 
         # self.print_biome_embeddings()

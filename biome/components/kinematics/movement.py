@@ -74,6 +74,10 @@ class MovementComponent(EntityComponent):
     def move(self, direction: Direction) -> bool:
         self._logger.debug(f"Moving direction: {direction}")
 
+        heterotrophic_component = self._host.get_component(ComponentType.HETEROTROPHIC_NUTRITION)
+        if heterotrophic_component and heterotrophic_component.energy_reserves <= 0:
+            self._logger.debug("Cannot move: energy depleted")
+            return False
         if self._current_position is None:
             self._logger.warning("Cannot move: current position is None")
             return False
