@@ -72,7 +72,7 @@ class SpawnSystem:
                     if isinstance(value, (int, float)):
                         # Variación del 10%
                         if value != 1.0 or value != 0.0:
-                            variation = random.uniform(0.9, 1.1)
+                            variation = random.uniform(0.7, 1.3)
                             defaults[key] = value * variation
 
                 # Primera vez con esta sintaxis

@@ -65,7 +65,25 @@ class FaunaEnvironment(gym.Env):
                 shape=(self._fov_height, self._fov_width),
                 dtype=np.float32
             ),
+            "flora_map": spaces.Box(
+                low=0,
+                high=1,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.int8
+            ),
+            "fauna_map": spaces.Box(
+                low=0,
+                high=1,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.int8
+            ),
             "thirst_level": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(1,),
+                dtype=np.float32
+            ),
+            "energy_reserves": spaces.Box(
                 low=0.0,
                 high=1.0,
                 shape=(1,),
@@ -75,7 +93,7 @@ class FaunaEnvironment(gym.Env):
 
         self._current_step: int = 0
         # Pongo por ahora cap, por si en algún momento no mueren.
-        self._max_episode_steps: int = 8000
+        self._max_episode_steps: int = 4000
         self._finished: bool = False
         self._fauna_adapter: FaunaSimulationAdapter = None
 
@@ -98,11 +116,18 @@ class FaunaEnvironment(gym.Env):
 
         observation = self._get_default_observation()
 
-        if not self._finished:
+        max_attempts = 8
+        attempt = 0
+        while not self._finished and attempt < max_attempts:
             self._fauna_adapter = FaunaSimulationAdapter(self._fov_width, self._fov_height, self._fov_center)
-            self._fauna_adapter.initialize()
-
-            observation = self._fauna_adapter.get_observation()
+            correct_init: bool = self._fauna_adapter.initialize()
+            if correct_init:
+                observation = self._fauna_adapter.get_observation()
+                break
+            attempt += 1
+            self._logger.warning("Couldn't acquire a target. Retrying...")
+        else:
+            self._logger.error(f"Target acquisition failed {max_attempts} times. Aborting")
 
         return observation, {}
 
@@ -137,11 +162,16 @@ class FaunaEnvironment(gym.Env):
         terrain_map = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
         valid_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
         visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+        flora_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+        fauna_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
             "biome_type": BiomeType.TROPICAL,
             "terrain_map": terrain_map,
             "validity_map": valid_mask,
             "visited_map": visited_mask,
-            "thirst_level": np.array([1.0], dtype=np.float32)
+            "flora_mask": flora_mask,
+            "fauna_mask": fauna_mask,
+            "thirst_level": np.array([1.0], dtype=np.float32),
+            "energy_reserves": np.array([1.0], dtype=np.float32)
         }

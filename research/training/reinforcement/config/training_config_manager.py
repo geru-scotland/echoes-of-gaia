@@ -40,7 +40,7 @@ class TrainingConfigManager:
             {
                 "species": str(FaunaSpecies.DEER).lower(),
                 "spawns": 1,
-                "avg-lifespan": 6,
+                "avg-lifespan": random.randint(1, 7),
                 "components": [
                     {"GrowthComponent": {}},
                     {"VitalComponent": {}},

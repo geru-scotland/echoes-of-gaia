@@ -139,28 +139,23 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                 current_vitalities = np.array([comp.vitality for comp in active_components])
                 stress_levels = np.array([comp.stress_handler.stress_level for comp in active_components])
                 max_stress_levels = np.array([comp.stress_handler.max_stress for comp in active_components])
+                energy_reserves = np.array([comp.energy_reserves for comp in active_components])
+                accumulated_decays = np.array([comp.accumulated_decay for comp in active_components])
+                accumulated_stress = np.array([comp.accumulated_stress for comp in active_components])
 
                 completed_lifespan_ratios = np.minimum(1.0, biological_ages / lifespans)
                 completed_lifespan_ratios_with_mods = completed_lifespan_ratios * health_modifiers
 
-                max_stress_mask = stress_levels >= max_stress_levels
+                max_stress_mask = stress_levels >= max_stress_levels - 0.5
+                energy_critical_mask = energy_reserves <= 0.1
 
-                non_linear_aging_progressions = np.zeros_like(completed_lifespan_ratios_with_mods)
                 non_linear_aging_progressions = BiologicalGrowthPatterns.gompertz_decay_vectorized(
                     completed_lifespan_ratios_with_mods)
 
                 new_healths = max_vitalities * (1.0 - non_linear_aging_progressions)
-                new_healths[max_stress_mask] -= max_vitalities[max_stress_mask] * 0.05
 
-                combined_mask = ((new_healths <= 0.05 * max_vitalities) &
-                                 (new_healths > 0) &
-                                 (current_vitalities - new_healths < 0.5))
-
-                if np.any(combined_mask):
-                    min_decay_rate = 0.01
-                    enforced_decay = max_vitalities[combined_mask] * min_decay_rate * completed_lifespan_ratios[
-                        combined_mask]
-                    new_healths[combined_mask] -= enforced_decay
+                new_healths[energy_critical_mask] -= accumulated_decays[energy_critical_mask]
+                new_healths[max_stress_mask] -= accumulated_stress[max_stress_mask]
 
                 for i, component in enumerate(active_components):
                     self._logger.debug(
@@ -172,6 +167,11 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                         f"Health Modifier: {component.health_modifier} "
                         f"New Health: {new_healths[i]:.2f}, Vitality: {component.vitality}"
                     )
+                    if energy_critical_mask[i]:
+                        component.increase_accumulated_decay(1.0)
+
+                    if max_stress_mask[i]:
+                        component.increase_accumulated_stress(1.0)
 
                     if new_healths[i] <= 0.0:
                         component.vitality = 0
@@ -211,7 +211,7 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                 for comp in active_components
             ])
 
-            low_stress_mask = normalized_stresses <= 0.2
+            low_stress_mask = normalized_stresses <= 0.1
             high_stress_mask = ~low_stress_mask
 
             new_aging_rates = np.zeros_like(normalized_stresses)

@@ -145,8 +145,9 @@ class EvolutionAgentAI(Agent, EventHandler):
             remaining: int = action["k_best"] - len(action["evolved_genes"])
             self._logger.debug(f"Plus {remaining} more:")
             for i in range(remaining):
-                species, genes = random.choice(action["evolved_genes"])
-                self._create_evolved_entity(species, genes)
+                if action["evolved_genes"]:
+                    species, genes = random.choice(action["evolved_genes"])
+                    self._create_evolved_entity(species, genes)
 
         self._evolution_registry.record_generation(self._current_evolution_cycle)
 

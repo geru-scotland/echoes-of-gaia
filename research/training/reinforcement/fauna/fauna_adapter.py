@@ -107,6 +107,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         target_species = self._select_target_species()
         # TODO: OJO! Que no se te olvide poner esto debidamente, la idea es
         # probar diversos rangos de generaciones.
+        # TODO: Que coja 3-4 después de más runs quizá
         target_generation = random.randint(1, 4)
 
         TrainingTargetManager.set_target(
@@ -118,7 +119,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._logger.info(f"Waiting for target species: {target_species}, generation: {target_generation}")
 
         try:
-            self._wait_for_target_acquisition()
+            return self._wait_for_target_acquisition()
         except Exception as e:
             self._logger.warning(e)
 
@@ -128,23 +129,29 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         return FaunaSpecies.DEER
 
-    def _wait_for_target_acquisition(self):
-        max_attempts = 10000
+    def _wait_for_target_acquisition(self) -> bool:
+        max_attempts = 5000
         attempts = 0
 
         self._logger.debug("Waiting for target acquisition...")
 
         while not TrainingTargetManager.is_acquired() and attempts < max_attempts:
+
+            if not self._worldmap_manager.has_alive_entities():
+                self._logger.warning("There are no living entities in the worldmap, reseting.")
+                break
+
             self._simulation_api.step(1)
             attempts += 1
-
             if attempts % 100 == 0:
                 self._logger.debug(f"Waiting for target... {attempts} steps")
 
         if not TrainingTargetManager.is_acquired():
-            raise RuntimeError("Failed to acquire target after maximum attempts")
+            self._logger.warning("Failed to acquire target after maximum attempts")
+            return False
 
         self._logger.debug(f"Target acquired successfully: {TrainingTargetManager.get_current_episode()}")
+        return True
 
     def step_environment(self, action: int, time_delta: int = 1) -> None:
         if not self._simulation_api or not self._target:
@@ -152,7 +159,12 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         self._previous_position = self._target.get_position()
 
-        self._target.move(self._action_decode(action))
+        nutrition_component = self._target.get_component(ComponentType.HETEROTROPHIC_NUTRITION)
+        if nutrition_component and nutrition_component.energy_reserves <= 0:
+            pass
+        else:
+            # Me puedo mover
+            self._target.move(self._action_decode(action))
 
         self._current_position = self._target.get_position()
 
@@ -283,8 +295,10 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             local_fov_terrain = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
             validity_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.bool_)
             visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.bool_)
+            flora_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
+            fauna_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
         else:
-            local_fov_terrain, validity_mask = local_result
+            local_fov_terrain, validity_mask, flora_mask, fauna_mask = local_result
 
             local_fov_terrain = local_fov_terrain.astype(np.int64)
             visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
@@ -303,19 +317,26 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         validity_map = validity_mask.astype(np.float32)
         visited_map = visited_mask.astype(np.float32)
+        flora_map = flora_mask.astype(np.float32)
+        fauna_map = fauna_mask.astype(np.float32)
 
         thirst_level = 0.0
+        energy_reserves = 0.0
         biome_type_idx = list(BiomeType).index(self._biome.get_biome_type())
 
         if self._target and self._target.is_alive():
             thirst_level = self._target.thirst_level / 100.0  # OJO, normalizo, que si no no tiraba bien.
+            energy_reserves = self._target.energy_reserves / self._target.max_energy_reserves
 
         return {
             "biome_type": biome_type_idx,
             "terrain_map": local_fov_terrain,
             "validity_map": validity_map,
             "visited_map": visited_map,
-            "thirst_level": np.array([thirst_level], dtype=np.float32)
+            "flora_map": flora_map,
+            "fauna_map": fauna_map,
+            "thirst_level": np.array([thirst_level], dtype=np.float32),
+            "energy_reserves": np.array([energy_reserves], dtype=np.float32)
         }
 
     def _find_nearby_entities(self, position, radius):
@@ -331,7 +352,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             "terrain_map": terrain_map,
             "validity_map": valid_mask,
             "visited_map": visited_mask,
-            "thirst_level": np.array([1.0], dtype=np.float32)  # Por defecto, sin sed (invertido, tengo que cambiar)
+            "thirst_level": np.array([1.0], dtype=np.float32),  # Por defecto, sin sed (invertido, tengo que cambiar)
+            "energy_reserves": np.array([1.0], dtype=np.float32)
         }
 
     def finish_training_session(self):
