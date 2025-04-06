@@ -21,14 +21,15 @@ from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums.enums import FloraSpecies
+from shared.enums.enums import FloraSpecies, ComponentType
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import DormancyReason
 from shared.types import HabitatList
 
 
 class Flora(Entity):
-    def __init__(self, id: int, env: simpyEnv, flora_type: FloraSpecies, habitats: HabitatList, lifespan: float, evolution_cycle: int = 0):
+    def __init__(self, id: int, env: simpyEnv, flora_type: FloraSpecies, habitats: HabitatList, lifespan: float,
+                 evolution_cycle: int = 0):
         descriptor: EntityDescriptor = EntityDescriptor.create_flora(flora_type)
         super().__init__(id, env, descriptor, habitats, lifespan, evolution_cycle)
         self._logger.debug(f"Flora entity initialized: {flora_type}")
@@ -66,6 +67,12 @@ class Flora(Entity):
     def compute_state(self):
         pass
 
+    def get_nutritive_value(self) -> float:
+        autotrophic_component = self.get_component(ComponentType.AUTOTROPHIC_NUTRITION)
+        if autotrophic_component:
+            return autotrophic_component.current_nutritive_value
+        return 0.5
+
     def dump_components(self) -> None:
         if not self._components:
             self._logger.error(f"Entity '{self._flora_type}' has no components.")
@@ -74,5 +81,6 @@ class Flora(Entity):
         self._logger.debug(f"Entity '{self._flora_type}' Components:")
         for component_type, component in self._components.items():
             component_attrs = vars(component)
-            formatted_attrs = ", ".join(f"{k}={v.__class__}" for k, v in component_attrs.items() if not k.startswith("_"))
+            formatted_attrs = ", ".join(
+                f"{k}={v.__class__}" for k, v in component_attrs.items() if not k.startswith("_"))
             self._logger.debug(f" - {component_type}: {formatted_attrs}")

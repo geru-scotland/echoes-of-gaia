@@ -26,6 +26,7 @@ from biome.systems.components.managers.base import BaseComponentManager
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import StressReason
 from shared.enums.strings import Loggers
+from shared.enums.thresholds import ThirstThresholds, HungerThresholds
 from shared.timers import Timers
 from utils.loggers import LoggerManager
 
@@ -56,19 +57,19 @@ class HeterotrophicNutritionComponentManager(BaseComponentManager[HeterotrophicN
                 new_hunger_levels = np.maximum(0.0, hunger_levels - hunger_rates)
                 new_thirst_levels = np.maximum(0.0, thirst_levels - thirst_rates)
 
-                hunger_stress_factors = (1.0 - new_hunger_levels / 100.0) * 0.1
-                thirst_stress_factors = (1.0 - new_thirst_levels / 100.0) * 0.15
+                critical_hunger_mask = new_hunger_levels < 100.0 * HungerThresholds.Level.CRITICAL
+                low_hunger_mask = (new_hunger_levels >= 100.0 * HungerThresholds.Level.CRITICAL) & (
+                        new_hunger_levels < 100.0 * HungerThresholds.Level.LOW)
+                normal_hunger_mask = (new_hunger_levels >= 100.0 * HungerThresholds.Level.LOW) & (
+                        new_hunger_levels < 100.0 * HungerThresholds.Level.NORMAL)
+                satisfied_hunger_mask = new_hunger_levels >= 100.0 * HungerThresholds.Level.SATISFIED
 
-                critical_hunger_mask = new_hunger_levels < 10.0
-
-                if np.any(critical_hunger_mask):
-                    critical_factors = 0.5 * np.exp(5.0 * (1.0 - new_hunger_levels[critical_hunger_mask] / 10.0))
-                    hunger_stress_factors[critical_hunger_mask] = critical_factors
-
-                critical_thirst_mask = new_thirst_levels < 10.0
-                if np.any(critical_thirst_mask):
-                    critical_factors = 0.8 * np.exp(6.0 * (1.0 - new_thirst_levels[critical_thirst_mask] / 10.0))
-                    thirst_stress_factors[critical_thirst_mask] = critical_factors
+                critical_thirst_mask = new_thirst_levels < 100.0 * ThirstThresholds.Level.CRITICAL
+                low_thirst_mask = (new_thirst_levels >= 100.0 * ThirstThresholds.Level.CRITICAL) & (
+                        new_thirst_levels < 100.0 * ThirstThresholds.Level.LOW)
+                normal_thirst_mask = (new_thirst_levels >= 100.0 * ThirstThresholds.Level.LOW) & (
+                        new_thirst_levels < 100.0 * ThirstThresholds.Level.NORMAL)
+                satisfied_thirst_mask = new_thirst_levels >= 100.0 * ThirstThresholds.Level.SATISFIED
 
                 energy_ratios = energy_levels / max_energy
                 energy_stress_factors = np.zeros_like(energy_ratios)
@@ -76,12 +77,6 @@ class HeterotrophicNutritionComponentManager(BaseComponentManager[HeterotrophicN
                 if np.any(critical_energy_mask):
                     energy_stress_factors[critical_energy_mask] = 1.0 * np.exp(
                         4.0 * (1.0 - energy_ratios[critical_energy_mask] / 0.1))
-
-                multi_critical_factors = np.zeros_like(hunger_stress_factors)
-                multi_critical_mask = (new_hunger_levels < 15.0) & (new_thirst_levels < 15.0)
-                if np.any(multi_critical_mask):
-                    multi_critical_factors[
-                        multi_critical_mask] = 2.0
 
                 energy_penalties = hunger_rates * 0.5 + thirst_rates * 0.5
 
@@ -108,18 +103,40 @@ class HeterotrophicNutritionComponentManager(BaseComponentManager[HeterotrophicN
 
                     component.energy_handler.modify_energy(-energy_penalties[i])
 
-                    if hunger_stress_factors[i] > 0.01:
-                        component.stress_handler.modify_stress(hunger_stress_factors[i], StressReason.HUNGER)
+                    if critical_hunger_mask[i]:
+                        component.stress_handler.modify_stress(HungerThresholds.StressChange.CRITICAL,
+                                                               StressReason.HUNGER)
+                        self._logger.debug(f"CRITICAL hunger stress applied: +{HungerThresholds.StressChange.CRITICAL}")
+                    elif low_hunger_mask[i]:
+                        component.stress_handler.modify_stress(HungerThresholds.StressChange.LOW, StressReason.HUNGER)
+                        self._logger.debug(f"LOW hunger stress applied: +{HungerThresholds.StressChange.LOW}")
+                    elif normal_hunger_mask[i]:
+                        component.stress_handler.modify_stress(HungerThresholds.StressChange.NORMAL,
+                                                               StressReason.HUNGER)
+                    elif satisfied_hunger_mask[i]:
+                        component.stress_handler.modify_stress(HungerThresholds.StressChange.SATISFIED,
+                                                               StressReason.HUNGER)
+                        self._logger.debug(
+                            f"SATISFIED hunger relief applied: {HungerThresholds.StressChange.SATISFIED}")
 
-                    if thirst_stress_factors[i] > 0.01:
-                        component.stress_handler.modify_stress(thirst_stress_factors[i], StressReason.THIRST)
+                    if critical_thirst_mask[i]:
+                        component.stress_handler.modify_stress(ThirstThresholds.StressChange.CRITICAL,
+                                                               StressReason.THIRST)
+                        self._logger.debug(f"CRITICAL thirst stress applied: +{ThirstThresholds.StressChange.CRITICAL}")
+                    elif low_thirst_mask[i]:
+                        component.stress_handler.modify_stress(ThirstThresholds.StressChange.LOW, StressReason.THIRST)
+                        self._logger.debug(f"LOW thirst stress applied: +{ThirstThresholds.StressChange.LOW}")
+                    elif normal_thirst_mask[i]:
+                        component.stress_handler.modify_stress(ThirstThresholds.StressChange.NORMAL,
+                                                               StressReason.THIRST)
+                    elif satisfied_thirst_mask[i]:
+                        component.stress_handler.modify_stress(ThirstThresholds.StressChange.SATISFIED,
+                                                               StressReason.THIRST)
+                        self._logger.debug(
+                            f"SATISFIED thirst relief applied: {ThirstThresholds.StressChange.SATISFIED}")
 
                     if energy_stress_factors[i] > 0.01:
                         component.stress_handler.modify_stress(energy_stress_factors[i], StressReason.NO_ENERGY)
-
-                    if multi_critical_factors[i] > 0:
-                        component.stress_handler.modify_stress(multi_critical_factors[i],
-                                                               StressReason.CRITICAL_CONDITION)
 
                     self._logger.debug(
                         f"[Metabolic Update | {component.__class__.__name__}] "

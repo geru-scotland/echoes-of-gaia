@@ -8,7 +8,7 @@ simulation:
     remove_dead_entities: true
 
   population-control:
-    smart: false
+    smart: true
 
   data:
     visualization:
@@ -36,9 +36,21 @@ biome:
 
   training_mode: true
 
+  flora:
+    - species: "oak_tree"
+      spawns: 20
+      avg-lifespan: 30
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 28.0
+        - AutotrophicNutritionComponent:
+
+
   fauna:
     - species: "deer"
-      spawns: 1
+      spawns: 6
       avg-lifespan: 6
       components:
         - GrowthComponent:

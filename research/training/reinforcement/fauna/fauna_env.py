@@ -88,6 +88,24 @@ class FaunaEnvironment(gym.Env):
                 high=1.0,
                 shape=(1,),
                 dtype=np.float32
+            ),
+            "vitality": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(1,),
+                dtype=np.float32
+            ),
+            "stress_level": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(1,),
+                dtype=np.float32
+            ),
+            "hunger_level": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(1,),
+                dtype=np.float32
             )
         })
 
@@ -173,5 +191,8 @@ class FaunaEnvironment(gym.Env):
             "flora_mask": flora_mask,
             "fauna_mask": fauna_mask,
             "thirst_level": np.array([1.0], dtype=np.float32),
-            "energy_reserves": np.array([1.0], dtype=np.float32)
+            "energy_reserves": np.array([1.0], dtype=np.float32),
+            "vitality": np.array([1.0], dtype=np.float32),
+            "stress_level": np.array([0.0], dtype=np.float32),
+            "hunger_level": np.array([0.0], dtype=np.float32),
         }

@@ -239,3 +239,9 @@ class PositionNotValidReason(EnumBaseInt):
     POSITION_BUSY = 1
     POSITION_NON_TRAVERSABLE = 2
     NONE = 3
+
+
+class DietType(Enum):
+    HERBIVORE = "herbivore"
+    CARNIVORE = "carnivore"
+    OMNIVORE = "omnivore"

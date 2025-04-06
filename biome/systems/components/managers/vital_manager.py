@@ -211,7 +211,7 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                 for comp in active_components
             ])
 
-            low_stress_mask = normalized_stresses <= 0.1
+            low_stress_mask = normalized_stresses <= 0.2
             high_stress_mask = ~low_stress_mask
 
             new_aging_rates = np.zeros_like(normalized_stresses)
@@ -231,6 +231,7 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                 )
 
             for i, component in enumerate(active_components):
+                # TODO: No actualizo el state aquí, revisar por qué no lo hice, creo que fué despiste simplemente.
                 component.aging_rate = new_aging_rates[i]
                 self._logger.debug(
                     f"normalized: {normalized_stresses[i]:.2f} → aging_rate: {component.aging_rate:.2f}"

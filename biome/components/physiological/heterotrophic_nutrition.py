@@ -71,9 +71,12 @@ class HeterotrophicNutritionComponent(EntityComponent):
 
     def consume_food(self, nutrition_value: float) -> None:
         energy_gain = nutrition_value * self._metabolism_efficiency
-        hunger_reduction = min(self._max_level - self._hunger_level, nutrition_value)
+        hunger_factor = 5.0 + (100.0 - self._hunger_level) * 0.25
+        amplified_nutrition = nutrition_value * hunger_factor
+        hunger_reduction = min(self._max_level - self._hunger_level, amplified_nutrition)
 
         self._hunger_level = min(self._max_level, self._hunger_level + hunger_reduction)
+        energy_gain = amplified_nutrition * self._metabolism_efficiency
         self._energy_handler.modify_energy(energy_gain)
 
         self._event_notifier.notify(
@@ -86,7 +89,7 @@ class HeterotrophicNutritionComponent(EntityComponent):
         thirst_reduction = min(self._max_level - self._thirst_level, hydration_value)
         self._thirst_level = min(self._max_level, self._thirst_level + thirst_reduction)
 
-        energy_boost = hydration_value * 0.1
+        energy_boost = hydration_value * 0.3
         self._energy_handler.modify_energy(energy_boost)
 
         self._event_notifier.notify(

@@ -51,7 +51,8 @@ class StressHandler(AttributeHandler, ABC):
         lifespan_factor = 1.0 / math.sqrt(max(1.0, self._lifespan))
 
         old_stress = self._stress_level
-        new_stress = max(0.0, min(self._stress_level + delta * lifespan_factor, self._max_stress))
+        stress_change = delta * lifespan_factor
+        new_stress = max(0.0, min(old_stress + stress_change, self._max_stress))
         rounded_stress = round(new_stress, 4)
 
         self._logger.debug(f"[STRESS DEBUG] - New Calculated Stress (Before Rounding): {new_stress}")
