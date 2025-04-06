@@ -3,7 +3,7 @@ simulation:
 
   eras:
     amount: 10
-    events-per-era: 100
+    events-per-era: 200
 
   cleanup:
     remove_dead_entities: false

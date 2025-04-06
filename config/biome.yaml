@@ -2,20 +2,33 @@ biome:
   climate-model: "climate_model_v1.1"
   map:
     size:
-      - 20
-      - 20
-  type: "desert"
+      - 60
+      - 60
+  type: "tropical"
 
   training_mode: true
-
-  fauna:
-    - species: "deer"
-      spawns: 1
-      avg-lifespan: 1
+  flora:
+    - species: "oak_tree"
+      spawns: 20
+      avg-lifespan: 30
       components:
         - GrowthComponent:
         - VitalComponent:
         - WeatherAdaptationComponent:
-            optimal_temperature: 10.0
+            optimal_temperature: 28.0
+        - AutotrophicNutritionComponent:
+
+
+  fauna:
+    - species: "deer"
+      spawns: 40
+      diet: "hervibore"
+      avg-lifespan: 4
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 28.0
         - MovementComponent:
+        - HeterotrophicNutritionComponent:
 

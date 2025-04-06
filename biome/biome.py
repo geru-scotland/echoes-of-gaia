@@ -130,7 +130,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 species = species_enum_class(species_name)
 
                 lifespan = entity_def.get("avg-lifespan", 5.0) * float(Timers.Calendar.YEAR)
-                evolution_cycle_time = int(lifespan * 0.15)
+                evolution_cycle_time = int(lifespan * 0.05)
 
                 evolution_agent = EvolutionAgentAI(
                     self._climate_data_manager,

@@ -59,10 +59,19 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
         cnn_out_size = 64 * h * w
         biome_embedd_flat_size = biome_embedding_dim * num_biome_types
+
+        # Se me está yendo un poco de madre ahora con tantos 1, pero lo pongo explícito
+        # por claridad, cambiar quizá hacia el final esto.
         thirst_feature_size = 1
         energy_reserves_feature_size = 1
+        vitality_feature_size = 1
+        stress_level_feature_size = 1
+        hunger_level_feature_size = 1
 
-        combined_features_size = cnn_out_size + biome_embedd_flat_size + thirst_feature_size + energy_reserves_feature_size
+        combined_features_size = (cnn_out_size + biome_embedd_flat_size +
+                                  thirst_feature_size + energy_reserves_feature_size +
+                                  vitality_feature_size + stress_level_feature_size + hunger_level_feature_size)
+
         self.linear = nn.Sequential(
             nn.Linear(combined_features_size, 512),
             nn.ReLU(),
@@ -84,8 +93,11 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         fauna_map = observations["fauna_map"]
         thirst_level = observations["thirst_level"]
         energy_reserves = observations["energy_reserves"]
-        # TODO: Vitality
+        vitality = observations["vitality"]
+        stress_level = observations["stress_level"]
+        hunger_level = observations["hunger_level"]
 
+        # TODO: COMPROBAR BIEN LOS FAUNA Y FLORA MAP
         max_index = len(list(TerrainType)) - 1
         terrain_indices = torch.clamp(terrain_indices, 0, max_index)
 
@@ -116,12 +128,17 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         thirst_features = thirst_level.view(thirst_level.size(0), -1)
         energy_reserves_features = energy_reserves.view(energy_reserves.size(0), -1)
         biome_embedded = biome_embedded.view(biome_embedded.size(0), -1)
-
+        vitality_features = vitality.view(vitality.size(0), -1)
+        stress_level_features = stress_level.view(stress_level.size(0), -1)
+        hunger_level_features = hunger_level.view(hunger_level.size(0), -1)
         # print(f"[DEBUG] cnn_features shape: {cnn_features.shape}")
         # print(f"[DEBUG] biome_embedded shape: {biome_embedded.shape}")
         # print(f"[DEBUG] thirst_features shape: {thirst_features.shape}")
 
-        combined_features = torch.cat([cnn_features, biome_embedded, thirst_features, energy_reserves_features], dim=1)
+        combined_features = torch.cat([
+            cnn_features, biome_embedded, thirst_features, energy_reserves_features,
+            vitality_features, stress_level_features, hunger_level_features
+        ], dim=1)
         # print(f"[DEBUG] combined_features shape: {combined_features.shape}")
 
         # self.print_biome_embeddings()

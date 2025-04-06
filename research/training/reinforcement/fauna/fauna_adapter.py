@@ -17,12 +17,14 @@
 """
 import random
 from logging import Logger
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict
 
 import numpy as np
+from typing_extensions import Any
 
 from biome.biome import Biome
 from biome.entities.entity import Entity
+from biome.entities.fauna import Fauna
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from config.settings import Settings
@@ -30,7 +32,7 @@ from research.training.reinforcement.adapter import EnvironmentAdapter
 from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
 from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction, \
-    PositionNotValidReason, TerrainType, BiomeType
+    PositionNotValidReason, TerrainType, BiomeType, DietType
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
 from shared.types import Position, DecodedAction
@@ -45,7 +47,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._simulation_api: SimulationAPI = None
         self._biome: Biome = None
         self._worldmap_manager: WorldMapManager = None
-        self._target: Entity = None
+        self._target: Fauna = None
         self._logger.info(f"Creating {self.__class__.__name__}...")
         self._fov_width: int = fov_width
         self._fov_height: int = fov_height
@@ -55,6 +57,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._visited_positions = set()
         self._heatmap = {}
         self._current_biome_type: Optional[BiomeType] = None
+        self._previous_states: Dict[str, Any] = {}
         self._register_events()
 
     def __del__(self):
@@ -137,7 +140,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         while not TrainingTargetManager.is_acquired() and attempts < max_attempts:
 
-            if not self._worldmap_manager.has_alive_entities():
+            if not self._worldmap_manager.has_alive_entities(type=EntityType.FAUNA):
                 self._logger.warning("There are no living entities in the worldmap, reseting.")
                 break
 
@@ -169,6 +172,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._current_position = self._target.get_position()
 
         self._check_and_drink_water()
+        self._check_and_eat_food()
 
         self._simulation_api.step(time_delta)
 
@@ -187,13 +191,230 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
                 # La cantidad de hidratación depende del nivel actual de sed
                 # Cuanto más sediento, más hidratación, por ahora me cuadra
                 current_thirst = self._target.thirst_level
-                hydration_value = 5.0 + (100.0 - current_thirst) * 0.1
-                # Consumir agua
+                hydration_value = 5.0 + (100.0 - current_thirst) * 0.3
                 self._target.consume_water(hydration_value)
                 self._logger.debug(f"Consuming water: +{hydration_value} hydratation")
         except Exception as e:
             self._logger.warning(f"Error verifiying terrain while trying to drink: {e}")
 
+    # TODO: Hacer un sistema de food y water, para gestionar esto
+    def _check_and_eat_food(self) -> None:
+        if not self._target or not self._target.is_alive():
+            return
+
+        position = self._target.get_position()
+        if not position:
+            return
+
+        try:
+            nearby_entities = self._worldmap_manager.get_entities_near(position, radius=1)
+
+            diet_type = self._target.diet_type
+
+            # Herbívoros
+            if diet_type == DietType.HERBIVORE and nearby_entities[EntityType.FLORA]:
+                for flora in nearby_entities[EntityType.FLORA]:
+                    nutritive_value = flora.get_nutritive_value()
+                    self._target.consume_vegetal(nutritive_value)
+                    self._logger.info(f"Consuming plant: +{nutritive_value} nutrition")
+
+                    if random.random() < 0.1:
+                        self._worldmap_manager.remove_entity(flora.get_id())
+                        self._logger.debug(f"Plant {flora.get_id()} was completely consumed")
+                    return
+
+            # Carnívoros
+            elif diet_type == DietType.CARNIVORE and nearby_entities[EntityType.FAUNA]:
+                potential_prey = [prey for prey in nearby_entities[EntityType.FAUNA]
+                                  if hasattr(prey, 'diet_type') and prey.diet_type == DietType.HERBIVORE]
+
+                if potential_prey:
+                    prey = random.choice(potential_prey)
+
+                    nutritive_value = 1.0
+                    growth_component = prey.get_component(ComponentType.GROWTH)
+                    if growth_component:
+                        nutritive_value *= growth_component.current_size
+
+                    vital_component = prey.get_component(ComponentType.VITAL)
+                    if vital_component:
+                        nutritive_value *= (vital_component.vitality / vital_component.max_vitality)
+
+                    self._target.consume_prey(nutritive_value)
+                    self._logger.debug(f"Consuming prey: +{nutritive_value} nutrition")
+
+                    hunt_success = random.random()
+                    if hunt_success < 0.2:
+                        if vital_component:
+                            vital_component.vitality = 0
+                        self._logger.debug(f"Prey {prey.get_id()} was killed")
+                    return
+
+            elif diet_type == DietType.OMNIVORE:
+                # Prioridad a proteína animal
+                if nearby_entities[EntityType.FAUNA]:
+                    potential_prey = [prey for prey in nearby_entities[EntityType.FAUNA]
+                                      if hasattr(prey, 'diet_type') and prey.diet_type == DietType.HERBIVORE]
+
+                    if potential_prey:
+                        # TODO: Similar a la lógica de carnivoros, investigar un poco a ver diferencias
+                        pass
+
+                elif nearby_entities[EntityType.FLORA]:
+                    # TODO: Lo mismo, echar un ojo a ver.
+                    pass
+
+        except Exception as e:
+            self._logger.warning(f"Error checking for food: {e}")
+
+    def handle_feeding(self, entity_id: int) -> bool:
+        if entity_id not in self._worldmap_manager.g_entity_registry:
+            return False
+
+        entity = self._worldmap_manager.get_entity_by_id(entity_id)
+
+        if not entity.is_alive() or entity.get_type() != EntityType.FAUNA:
+            return False
+
+        position = entity.get_position()
+        if not position:
+            return False
+
+        nearby_entities = self._worldmap_manager.get_entities_near(position)
+
+        # herviboros/omnivoros - los nutro con flora
+        if entity.diet_type in [DietType.HERBIVORE, DietType.OMNIVORE] and nearby_entities[EntityType.FLORA]:
+            for flora in nearby_entities[EntityType.FLORA]:
+                nutritive_value = flora.get_nutritive_value()
+                entity.consume_vegetal(nutritive_value)
+
+                if random.random() < 0.1:  # TODO: Hacer esto bien, en función de la vitalidad de la flora etc.
+                    self._worldmap_manager.remove_entity(flora.get_id())
+                    self._logger.debug(f"Plant {flora.get_id()} was completely consumed and removed")
+
+                return True
+
+        # carnivoros/omnivoros - hago que se puedan nutrir de otra fauna
+        if entity.diet_type in [DietType.CARNIVORE, DietType.OMNIVORE] and nearby_entities[EntityType.FAUNA]:
+
+            potential_prey = [prey for prey in nearby_entities[EntityType.FAUNA]
+                              if prey.diet_type == DietType.HERBIVORE]
+
+            if potential_prey:
+                prey = random.choice(potential_prey)
+                # Coger mejor de nutritive value
+                nutritive_value = 1.0
+                growth_component = prey.get_component(ComponentType.GROWTH)
+                if growth_component:
+                    nutritive_value *= growth_component.current_size
+
+                vital_component = prey.get_component(ComponentType.VITAL)
+                if vital_component:
+                    nutritive_value *= (vital_component.vitality / vital_component.max_vitality)
+
+                entity.consume_prey(nutritive_value)
+
+                hunt_success = random.random()
+                if hunt_success < 0.2:  # Lo mismo que con flora, hacer que vaya en función de ciertos parámetros.
+                    prey.get_component(ComponentType.VITAL).vitality = 0
+                    self._logger.debug(f"Prey {prey.get_id()} was killed and consumed")
+
+                return True
+
+        return False
+
+    def compute_reward(self, action: FaunaAction):
+        if not self._target or not self._target.is_alive():
+            return -10.0
+
+        reward: float = 0.0
+
+        decoded_action: DecodedAction = self._action_decode(action)
+
+        movement_reward: int = self.compute_movement_reward(decoded_action)
+
+        physiological_reward: float = self.compute_physiological_state_reward()
+        return reward + movement_reward + physiological_reward
+
+    def _action_decode(self, action: int) -> DecodedAction:
+        if action < len(Direction):
+            return list(Direction)[action]
+
+    def compute_physiological_state_reward(self) -> float:
+        if not self._target or not self._target.is_alive():
+            return 0.0
+
+        reward: float = 0.0
+
+        thirst_level: float = self._target.thirst_level / 100.0
+        energy_ratio: float = self._target.energy_reserves / self._target.max_energy_reserves
+        hunger_level: float = self._target.hunger_level / 100.0
+        vitality: float = self._target.vitality / self._target.max_vitality
+        stress_level: float = self._target.stress_level / 100.0
+
+        thirst_ratio: float = 1.0 - thirst_level
+        hunger_ratio: float = 1.0 - hunger_level
+
+        reward += 0.05
+
+        if energy_ratio > 0.6:
+            reward += 0.1
+        if thirst_ratio < 0.3:
+            reward += 0.1
+        if hunger_ratio < 0.3:
+            reward += 0.1
+
+        if vitality > 0.6:
+            reward += 0.05
+        if stress_level < 0.4:
+            reward += 0.05
+
+        if hunger_ratio > 0.85:
+            reward -= 0.4
+        if thirst_ratio > 0.85:
+            reward -= 0.4
+        if energy_ratio < 0.15:
+            reward -= 0.3
+
+        if vitality < 0.2:
+            reward -= 0.1
+        if stress_level > 0.8:
+            reward -= 0.1
+
+        if hasattr(self, '_previous_states'):
+            prev_states = self._previous_states
+
+            if 'thirst_ratio' in prev_states and thirst_ratio < prev_states['thirst_ratio']:
+                improvement = prev_states['thirst_ratio'] - thirst_ratio
+                reward += 0.8 * improvement
+
+            if 'hunger_ratio' in prev_states and hunger_ratio < prev_states['hunger_ratio']:
+                improvement = prev_states['hunger_ratio'] - hunger_ratio
+                reward += 0.8 * improvement
+
+            if 'energy_ratio' in prev_states and energy_ratio > prev_states['energy_ratio']:
+                improvement = energy_ratio - prev_states['energy_ratio']
+                reward += 0.6 * improvement
+
+            if 'vitality' in prev_states:
+                if vitality >= prev_states['vitality'] - 0.01:
+                    reward += 0.2
+                    self._logger.debug("Vitality maintained: +0.2")
+
+            if 'stress_level' in prev_states:
+                if stress_level <= prev_states['stress_level'] + 0.01:
+                    reward += 0.2
+                    self._logger.debug("Stress managed: +0.2")
+
+        self._previous_states = {
+            'thirst_ratio': thirst_ratio,
+            'hunger_ratio': hunger_ratio,
+            'energy_ratio': energy_ratio,
+            'vitality': vitality,
+            'stress_level': stress_level
+        }
+
+        return reward
     def compute_reward(self, action: FaunaAction):
         if not self._target or not self._target.is_alive():
             return -10.0
@@ -236,7 +457,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         # self._logger.info("Movement accepted. Base reward: 0.0")
 
         if self._current_position == new_position and self._is_new_position(self._current_position):
-            reward += 0.4
+            reward += 0.2
             self._visited_positions.add(self._current_position)
             self._logger.debug("Position is new. Exploration bonus applied: +0.4")
 
@@ -289,7 +510,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         local_result = None
         if position:
-            local_result = self._worldmap_manager.get_local_map(position, self._fov_width, self._fov_height)
+            local_result = self._worldmap_manager.get_local_maps(position, self._fov_width, self._fov_height)
 
         if local_result is None:
             local_fov_terrain = np.full((self._fov_height, self._fov_width), TerrainType.UNKNWON.value, dtype=np.int64)
@@ -324,9 +545,17 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         energy_reserves = 0.0
         biome_type_idx = list(BiomeType).index(self._biome.get_biome_type())
 
+        vitality = 0.0
+        stress_level = 0.0
+        hunger_level = 0.
+
         if self._target and self._target.is_alive():
             thirst_level = self._target.thirst_level / 100.0  # OJO, normalizo, que si no no tiraba bien.
             energy_reserves = self._target.energy_reserves / self._target.max_energy_reserves
+
+            vitality = self._target.vitality / self._target.max_vitality
+            stress_level = self._target.stress_level / 100.0
+            hunger_level = self._target.hunger_level / 100.0
 
         return {
             "biome_type": biome_type_idx,
@@ -336,7 +565,10 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             "flora_map": flora_map,
             "fauna_map": fauna_map,
             "thirst_level": np.array([thirst_level], dtype=np.float32),
-            "energy_reserves": np.array([energy_reserves], dtype=np.float32)
+            "energy_reserves": np.array([energy_reserves], dtype=np.float32),
+            "vitality": np.array([vitality], dtype=np.float32),
+            "stress_level": np.array([stress_level], dtype=np.float32),
+            "hunger_level": np.array([hunger_level], dtype=np.float32)
         }
 
     def _find_nearby_entities(self, position, radius):
@@ -353,7 +585,10 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             "validity_map": valid_mask,
             "visited_map": visited_mask,
             "thirst_level": np.array([1.0], dtype=np.float32),  # Por defecto, sin sed (invertido, tengo que cambiar)
-            "energy_reserves": np.array([1.0], dtype=np.float32)
+            "energy_reserves": np.array([1.0], dtype=np.float32),
+            "vitality": np.array([1.0], dtype=np.float32),
+            "stress_level": np.array([0.0], dtype=np.float32),
+            "hunger_level": np.array([0.0], dtype=np.float32),
         }
 
     def finish_training_session(self):

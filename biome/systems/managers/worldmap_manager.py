@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+import random
 import sys
 import traceback
 from logging import Logger
@@ -29,7 +30,7 @@ from biome.systems.maps.map_allocator import MapAllocator
 from biome.systems.maps.spawn_system import SpawnSystem
 from biome.systems.maps.worldmap import WorldMap
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import EntityType, FaunaSpecies, TerrainType, PositionNotValidReason
+from shared.enums.enums import EntityType, FaunaSpecies, TerrainType, PositionNotValidReason, DietType, ComponentType
 from shared.enums.events import BiomeEvent, SimulationEvent
 from shared.enums.strings import Loggers
 from shared.types import TileMap, EntityList, EntityDefinitions, EntityRegistry, \
@@ -174,8 +175,8 @@ class WorldMapManager:
 
         return True
 
-    def has_alive_entities(self):
-        return any(entity.is_alive() for entity in self.get_entities())
+    def has_alive_entities(self, type: EntityType):
+        return any(entity.is_alive() for entity in self.get_entities(type))
 
     def handle_entity_death(self, entity_id: int) -> None:
         if not self._cleanup_dead_entities:
@@ -198,12 +199,45 @@ class WorldMapManager:
 
         return False
 
+    def get_entities_near(self, position: Position, radius: int = 1) -> Dict[EntityType, List[Entity]]:
+        result = {
+            EntityType.FLORA: [],
+            EntityType.FAUNA: []
+        }
+
+        if not position:
+            return result
+
+        y, x = position
+        map_height, map_width = self._terrain_map.shape
+
+        y_start = max(0, y - radius)
+        y_end = min(map_height, y + radius + 1)
+        x_start = max(0, x - radius)
+        x_end = min(map_width, x + radius + 1)
+
+        region = self._entity_index_map[y_start:y_end, x_start:x_end]
+
+        entity_ids = np.unique(region)
+        entity_ids = entity_ids[entity_ids != -1]
+
+        for entity_id in entity_ids:
+            if entity_id == self._entity_index_map[y, x]:
+                continue
+
+            if entity_id in self._entity_registry:
+                entity = self._entity_registry[entity_id]
+                if entity.is_alive():
+                    result[entity.get_type()].append(entity)
+
+        return result
+
     def _is_water_nearby(self, position: Position) -> bool:
         if not position:
             return False
 
         # FOV local centrado en la posición, parche 3x3 por ahora
-        local_result = self.get_local_map(position, 3, 3)
+        local_result = self.get_local_maps(position, 3, 3)
         if local_result is None:
             return False
 
@@ -218,44 +252,71 @@ class WorldMapManager:
         water_mask = np.isin(local_terrain, water_terrains)
 
         return np.any(water_mask)
-    def get_local_map(self, position: Position, width: int, height: int) -> Optional[np.ndarray]:
+
+    def find_food_nearby(self, position: Position, radius: int) -> List[Entity]:
+        return self.find_entities_in_radius(position, radius, EntityType.FLORA)
+
+    def get_local_maps(self, position: Position, width: int, height: int) -> Optional[
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
         y, x = position
         map_height, map_width = self._terrain_map.shape
 
         if not (0 <= y < map_height and 0 <= x < map_width):
             return None
 
-        # TODO: Quizá cambiar y pasar el centro mejor.
         half_width = width // 2
         half_height = height // 2
 
-        terrain_y_start = max(0, y - half_height)
-        terrain_y_end = min(map_height, y + half_height + 1)
-        terrain_x_start = max(0, x - half_width)
-        terrain_x_end = min(map_width, x + half_width + 1)
+        fov_y_start = max(0, y - half_height)
+        fov_y_end = min(map_height, y + half_height + 1)
+        fov_x_start = max(0, x - half_width)
+        fov_x_end = min(map_width, x + half_width + 1)
 
-        local_map = np.full((height, width), TerrainType.UNKNWON, dtype=self._terrain_map.dtype)
+        local_y_start = fov_y_start - (y - half_height)
+        local_y_end = local_y_start + (fov_y_end - fov_y_start)
+        local_x_start = fov_x_start - (x - half_width)
+        local_x_end = local_x_start + (fov_x_end - fov_x_start)
 
-        local_y_start = terrain_y_start - (y - half_height)
-        local_y_end = local_y_start + (terrain_y_end - terrain_y_start)
-        local_x_start = terrain_x_start - (x - half_width)
-        local_x_end = local_x_start + (terrain_x_end - terrain_x_start)
+        local_terrain_map = np.full((height, width), TerrainType.UNKNWON, dtype=self._terrain_map.dtype)
+        local_entity_map = np.full((height, width), -1, dtype=self._entity_index_map.dtype)
 
-        local_map[local_y_start:local_y_end, local_x_start:local_x_end] = self._terrain_map[
-                                                                          terrain_y_start:terrain_y_end,
-                                                                          terrain_x_start:terrain_x_end
-                                                                          ]
+        local_terrain_map[local_y_start:local_y_end, local_x_start:local_x_end] = self._terrain_map[
+                                                                                  fov_y_start:fov_y_end,
+                                                                                  fov_x_start:fov_x_end
+                                                                                  ]
 
-        validity_mask = np.full(local_map.shape, False, dtype=bool)
-        validity_mask = (local_map != TerrainType.UNKNWON)
+        local_entity_map[local_y_start:local_y_end, local_x_start:local_x_end] = self._entity_index_map[
+                                                                                 fov_y_start:fov_y_end,
+                                                                                 fov_x_start:fov_x_end
+                                                                                 ]
 
-        non_traversable_indices = np.isin(local_map, [TerrainType.WATER_DEEP, TerrainType.WATER_MID])
-
-        traversability_mask = np.ones_like(local_map, dtype=bool)
-        traversability_mask[non_traversable_indices] = False
+        validity_mask = (local_terrain_map != TerrainType.UNKNWON)
+        non_traversable_indices = np.isin(local_terrain_map, [TerrainType.WATER_DEEP, TerrainType.WATER_MID])
+        traversability_mask = ~non_traversable_indices
         combined_validity_mask = validity_mask & traversability_mask
 
-        return local_map, combined_validity_mask
+        flora_map = np.zeros((height, width), dtype=np.int8)
+        fauna_map = np.zeros((height, width), dtype=np.int8)
+
+        entity_ids = np.unique(local_entity_map)
+        entity_ids = entity_ids[entity_ids != -1]
+
+        for entity_id in entity_ids:
+            entity = self._entity_registry.get(entity_id)
+
+            if not entity or not entity.is_alive():
+                continue
+
+            entity_position = np.where(local_entity_map == entity_id)
+
+            y_pos, x_pos = entity_position[0][0], entity_position[1][0]
+
+            if entity.get_type() == EntityType.FLORA:
+                flora_map[y_pos, x_pos] = 1
+            elif entity.get_type() == EntityType.FAUNA:
+                fauna_map[y_pos, x_pos] = 1
+
+        return local_terrain_map, combined_validity_mask, flora_map, fauna_map
 
     def get_terrain_at(self, position: Position):
         try:
@@ -273,8 +334,12 @@ class WorldMapManager:
     def get_world_map(self):
         return self._world_map
 
-    def get_entities(self) -> EntityList:
-        return self._world_map.get_entities()
+    def get_entities(self, type: EntityType) -> EntityList:
+        return [flora for flora in self._world_map.get_entities()
+                if flora.get_type() == type]
+
+    def get_entity_by_id(self, id: int) -> Entity:
+        return self._entity_registry[id]
 
     def is_valid_position(self, position: Position, entity_id: Optional[int] = None) -> bool:
         return self._is_valid_position(position, entity_id)

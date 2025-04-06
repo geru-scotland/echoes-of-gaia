@@ -44,13 +44,41 @@ class MetabolicThresholds:
         NO_ENERGY = 0.1
         CRITICAL = 0.010
         LOW = 0.008
-        SUFFICIENT = 0.005
-        ABUNDANT = 0.003
+        SUFFICIENT = -0.01
+        ABUNDANT = -0.03
 
     class EfficiencyModifier(EnumBaseFloat):
         MIN_PHOTOSYNTHESIS = 0.4
         PHOTOSYNTHESIS_REDUCTION = 0.2
         RESPIRATION_INCREASE = 0.4
+
+
+class HungerThresholds:
+    class Level(EnumBaseFloat):
+        CRITICAL = 0.10
+        LOW = 0.30
+        NORMAL = 0.70
+        SATISFIED = 0.90
+
+    class StressChange(EnumBaseFloat):
+        CRITICAL = 0.035
+        LOW = 0.020
+        NORMAL = 0.0
+        SATISFIED = -0.010
+
+
+class ThirstThresholds:
+    class Level(EnumBaseFloat):
+        CRITICAL = 0.10
+        LOW = 0.30
+        NORMAL = 0.70
+        SATISFIED = 0.90
+
+    class StressChange(EnumBaseFloat):
+        CRITICAL = 0.040
+        LOW = 0.025
+        NORMAL = 0.0
+        SATISFIED = -0.015
 
 
 class ClimateThresholds:
