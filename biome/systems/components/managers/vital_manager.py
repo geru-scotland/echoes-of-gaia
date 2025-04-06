@@ -157,16 +157,18 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                 new_healths[energy_critical_mask] -= accumulated_decays[energy_critical_mask]
                 new_healths[max_stress_mask] -= accumulated_stress[max_stress_mask]
 
+                LOW_VITALITY_THRESHOLD = 0.10  # 10% de la vitalidad máxima
+                LOW_VITALITY_DECAY_RATE = 0.05  # 5% de decay por iteración
+
+                low_vitality_mask = (new_healths / max_vitalities) < LOW_VITALITY_THRESHOLD
+
+                if np.any(low_vitality_mask):
+                    # Aplica un decay adicional de 5% a las entidades con baja vitalidad
+                    additional_decay = max_vitalities[low_vitality_mask] * LOW_VITALITY_DECAY_RATE
+                    new_healths[low_vitality_mask] -= additional_decay
+
                 for i, component in enumerate(active_components):
-                    self._logger.debug(
-                        f"[Vitality Update | DEBUG:Tick={self._env.now}] "
-                        f"Stress level={component.stress_handler.stress_level:4f}]"
-                        f"Age: {component.age} - Biological Age: {component.biological_age}, Lifespan: {component.lifespan_in_ticks}, "
-                        f"Aging rate: {component.aging_rate} "
-                        f"Completed Ratio: {completed_lifespan_ratios[i]:.2f}, Aging Progression: {non_linear_aging_progressions[i]:.2f}, "
-                        f"Health Modifier: {component.health_modifier} "
-                        f"New Health: {new_healths[i]:.2f}, Vitality: {component.vitality}"
-                    )
+
                     if energy_critical_mask[i]:
                         component.increase_accumulated_decay(1.0)
 
