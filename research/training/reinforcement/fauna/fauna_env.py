@@ -110,6 +110,7 @@ class FaunaEnvironment(gym.Env):
         })
 
         self._current_step: int = 0
+        self._episode_step: int = 0
         # Pongo por ahora cap, por si en algún momento no mueren.
         self._max_episode_steps: int = 4000
         self._finished: bool = False
@@ -123,6 +124,7 @@ class FaunaEnvironment(gym.Env):
 
     def reset(self, *, seed=None, options=None) -> tuple:
         super().reset(seed=seed, options=options)
+        self._episode_step = 0
         self._episode_number += 1
 
         def format_boxed_title(title: str, width: int = 60, border: str = "#") -> str:
@@ -150,11 +152,12 @@ class FaunaEnvironment(gym.Env):
         return observation, {}
 
     def step(self, action):
+        self._episode_step += 1
         self._current_step += 1
 
-        if self._current_step % 5000 == 0:
+        if self._current_step % 250 == 0:
             line = "-" * 60
-            step_msg = f"STEP CHECKPOINT: {self._current_step} steps into EPISODE #{self._episode_number}"
+            step_msg = f"STEP CHECKPOINT: {self._episode_step} steps into EPISODE #{self._episode_number}"
             self._logger.info("\n" + line + f"\n{step_msg.center(60)}\n" + line + "\n")
 
         self._logger.debug(f"Received action: {action}")

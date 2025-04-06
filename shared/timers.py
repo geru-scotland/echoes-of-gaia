@@ -43,6 +43,9 @@ class Timers:
             SELECTION_PRESSURE = 360
             EVOLUTION_CYCLE = 10000
 
+        class Fauna(EnumBaseInt):
+            FAUNA_UPDATE = 1
+
     class Components:
         class Physiological(EnumBaseInt):
             AGING = 2

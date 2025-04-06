@@ -24,6 +24,7 @@ import simpy
 from biome.agents.base import Agent
 from biome.agents.climate_agent import ClimateAgentAI
 from biome.agents.evolution_agent import EvolutionAgentAI
+from biome.agents.fauna_agent import FaunaAgentAI
 from biome.environment import Environment
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
@@ -42,7 +43,7 @@ from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, Biom
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies, BiomeType, FaunaSpecies, \
-    EntityType
+    EntityType, SimulationMode
 from shared.enums.events import BiomeEvent
 from shared.events.handler import EventHandler
 from shared.timers import Timers
@@ -52,7 +53,8 @@ from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 class Biome(Environment, BiomeDataProvider, EventHandler):
 
-    def __init__(self, context: BiomeContextData, env: simpy.Environment, options: Dict[str, Any]):
+    def __init__(self, context: BiomeContextData, env: simpy.Environment, mode: SimulationMode,
+                 options: Dict[str, Any]):
         Environment.__init__(self, context, env)
         try:
             self._logger.info(self._context.config.get("type"))
@@ -78,7 +80,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
             self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
 
-            self._agents: Dict[AgentType, Agent] = self._initialize_agents()
+            self._agents: Dict[AgentType, Agent] = self._initialize_agents(mode)
 
             EventHandler.__init__(self)
             self._logger.info("Biome is ready!")
@@ -90,12 +92,22 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         BiomeEventBus.register(BiomeEvent.REMOVE_ENTITY, self._map_manager.remove_entity)
         BiomeEventBus.register(BiomeEvent.ENTITY_DEATH, self._map_manager.handle_entity_death)
 
-    def _initialize_agents(self) -> Dict[AgentType, Agent]:
+    def _initialize_agents(self, mode: SimulationMode) -> Dict[AgentType, Agent]:
         agents: Dict[AgentType, Agent] = {}
 
         climate_agent: ClimateAgentAI = ClimateAgentAI(self._climate, self._context.climate_model)
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.Climate.CLIMATE_UPDATE))
+
+        if mode == SimulationMode.NORMAL:
+            fauna_agent: FaunaAgentAI = FaunaAgentAI(
+                self._context.fauna_model,
+                self._entity_provider,
+                self._map_manager,
+                self._context.biome_type
+            )
+            agents.update({AgentType.FAUNA_AGENT: fauna_agent})
+            self._env.process(self._run_agent(AgentType.FAUNA_AGENT, Timers.Agents.Fauna.FAUNA_UPDATE))
 
         evolution_tracker: EvolutionTracker = setup_evolution_visualization_system() if self._options.get(
             "evolution_tracking") else None

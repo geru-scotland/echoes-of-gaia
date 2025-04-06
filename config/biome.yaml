@@ -1,5 +1,6 @@
 biome:
   climate-model: "climate_model_v1.1"
+  fauna-model: "fauna_model_final"
   map:
     size:
       - 60
@@ -9,7 +10,7 @@ biome:
   training_mode: true
   flora:
     - species: "oak_tree"
-      spawns: 20
+      spawns: 50
       avg-lifespan: 30
       components:
         - GrowthComponent:
@@ -18,11 +19,20 @@ biome:
             optimal_temperature: 28.0
         - AutotrophicNutritionComponent:
 
+    - species: "mushroom"
+      spawns: 20
+      avg-lifespan: 7
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 10.0
+        - AutotrophicNutritionCompone:
 
   fauna:
     - species: "deer"
-      spawns: 40
-      diet: "hervibore"
+      spawns: 20
+      diet: "herbivore"
       avg-lifespan: 4
       components:
         - GrowthComponent:

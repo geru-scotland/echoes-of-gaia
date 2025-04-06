@@ -17,9 +17,10 @@
 """
 from typing import Tuple
 
+from biome.entities.entity import Entity
 from biome.systems.maps.worldmap import WorldMap
 from shared.enums.enums import EntityType
-from shared.types import EntityList
+from shared.types import EntityList, EntityRegistry
 
 
 class EntityProvider:
@@ -33,7 +34,8 @@ class EntityProvider:
         fauna: EntityList = self.get_entities_by_type(entities, EntityType.FAUNA)
         return flora, fauna
 
-    def get_entities_by_type(self, entities: EntityList, entity_type: EntityType, only_alive: bool = False) -> EntityList:
+    def get_entities_by_type(self, entities: EntityList, entity_type: EntityType,
+                             only_alive: bool = False) -> EntityList:
         if only_alive:
             return [entity for entity in entities if entity.get_type() == entity_type and entity.is_alive()]
 
@@ -47,3 +49,8 @@ class EntityProvider:
         entities: EntityList = self._world_map.get_entities(only_alive)
         return self.get_entities_by_type(entities, EntityType.FAUNA, only_alive)
 
+    def get_entity_by_id(self, id: int) -> Entity:
+        if self._world_map:
+            entity_registry: EntityRegistry = self._world_map.entity_registry
+            if entity_registry:
+                return entity_registry.get(id)
