@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Any
+from typing import Any, Set
 
 from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
@@ -23,8 +23,8 @@ from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums.enums import FaunaSpecies, ComponentType, DietType
-from shared.types import HabitatList
+from shared.enums.enums import FaunaSpecies, ComponentType, DietType, Direction
+from shared.types import HabitatList, Position
 
 
 class Fauna(Entity):
@@ -37,6 +37,7 @@ class Fauna(Entity):
         self._diet_type = diet_type
         self._logger.debug(f"FAUNA CREATED: {fauna_type}")
         self._habitats: HabitatList = habitats
+        self._visited_positions: Set = set()
 
     def _register_events(self):
         super()._register_events()
@@ -67,6 +68,13 @@ class Fauna(Entity):
             enhanced_value = nutritive_value * 1.5
             nutrition_component.consume_food(enhanced_value)
             self._logger.debug(f"Consuming prey: +{enhanced_value} nutrition")
+
+    def move(self, direction: Direction):
+        super().move(direction)
+        new_position: Position = self.get_position()
+
+        if new_position not in self._visited_positions:
+            self._visited_positions.add(new_position)
 
     @property
     def thirst_level(self) -> float:
@@ -122,11 +130,7 @@ class Fauna(Entity):
         return 0.0
 
     @property
-    def hunger_level(self) -> float:
-        nutrition_component: HeterotrophicNutritionComponent = self._components.get(
-            ComponentType.HETEROTROPHIC_NUTRITION, None)
-        if self.components and nutrition_component:
-            return nutrition_component.hunger_level
-        return 0.0
+    def visited_positions(self) -> Set:
+        return self._visited_positions
 
 # TODO: Getters para stres

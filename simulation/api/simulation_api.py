@@ -32,7 +32,7 @@ class SimulationAPI:
         self._simulation_mode: SimulationMode = mode
 
     def _initialise(self):
-        self._engine = SimulationEngine(settings=self._settings)
+        self._engine = SimulationEngine(settings=self._settings, mode=self._simulation_mode)
 
     def run(self):
         self._initialise()

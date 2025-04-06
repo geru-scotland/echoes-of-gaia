@@ -20,12 +20,14 @@ from typing import Dict, Any
 import simpy
 
 from biome.biome import Biome
+from shared.enums.enums import SimulationMode
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 
 class BiomeAPI:
-    def __init__(self, context: BiomeContextData, env: simpy.Environment, options: Dict[str, Any] = None):
-        self._biome = Biome(context, env, options)
+    def __init__(self, context: BiomeContextData, env: simpy.Environment, mode: SimulationMode,
+                 options: Dict[str, Any] = None):
+        self._biome = Biome(context, env, mode, options)
 
     def update(self, era: int, step: int):
         pass

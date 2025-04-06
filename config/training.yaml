@@ -38,13 +38,23 @@ biome:
 
   flora:
     - species: "oak_tree"
-      spawns: 20
+      spawns: 40
       avg-lifespan: 30
       components:
         - GrowthComponent:
         - VitalComponent:
         - WeatherAdaptationComponent:
             optimal_temperature: 28.0
+        - AutotrophicNutritionComponent:
+
+    - species: "mushroom"
+      spawns: 10
+      avg-lifespan: 7
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 10.0
         - AutotrophicNutritionComponent:
 
 

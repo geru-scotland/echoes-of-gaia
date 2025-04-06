@@ -71,10 +71,12 @@ class MapConfigurator(ConfiguratorStrategy):
     def get_tile_map(self) -> TileMap:
         return self._map.tile_map
 
+
 class BiomeBuilder(Builder):
     """
     Cargar settings, inicializar sistemas de eventosGra
     """
+
     def __init__(self, settings: BiomeSettings):
         super().__init__()
         self._settings = settings
@@ -94,12 +96,14 @@ class BiomeBuilder(Builder):
             flora: EntityDefinitions = config.get("flora", {})
             fauna: EntityDefinitions = config.get("fauna", {})
             climate_model: str = config.get("climate-model", {})
+            fauna_model = config.get('fauna-model', '')
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
             self._context = BiomeContextData(biome_type=config.get("type"),
                                              tile_map=map_configurator.get_tile_map(),
                                              config=config, logger_name=Loggers.BIOME,
                                              flora_definitions=flora, fauna_definitions=fauna,
-                                             climate_model=climate_model)
+                                             climate_model=climate_model,
+                                             fauna_model=fauna_model)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Biome: {e}")

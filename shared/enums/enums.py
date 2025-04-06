@@ -150,10 +150,14 @@ class FaunaAction(EnumBaseInt):
     MOVE_EAST = 2
     MOVE_WEST = 3
 
+    def __str__(self):
+        return str(self.value)
+
 
 class AgentType(EnumBaseStr):
     CLIMATE_AGENT = "climate_agent"
     EVOLUTION_AGENT = "evolution_agent"
+    FAUNA_AGENT = "fauna_agent"
 
 
 class Agents:

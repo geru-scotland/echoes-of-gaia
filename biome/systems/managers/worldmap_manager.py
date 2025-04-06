@@ -318,6 +318,24 @@ class WorldMapManager:
 
         return local_terrain_map, combined_validity_mask, flora_map, fauna_map
 
+    def get_local_visited_map(self, entity: Entity, fov_width: int, fov_height: int) -> np.ndarray:
+        position: Position = entity.get_position()
+        center_y, center_x = fov_width // 2, fov_height // 2
+
+        visited_mask = np.zeros((fov_width, fov_height), dtype=np.bool_)
+
+        for y in range(fov_width):
+            for x in range(fov_height):
+                # Convierto coords de esta celda, a posición global
+                global_y = position[0] + (y - center_y)
+                global_x = position[1] + (x - center_x)
+                global_pos = (global_y, global_x)
+
+                if global_pos in entity.visited_positions:
+                    visited_mask[y, x] = 1.0
+
+        return visited_mask
+
     def get_terrain_at(self, position: Position):
         try:
             y, x = position

@@ -3,7 +3,7 @@ simulation:
 
   eras:
     amount: 10
-    events-per-era: 200
+    events-per-era: 100
 
   cleanup:
     remove_dead_entities: false
@@ -28,7 +28,7 @@ simulation:
     snapshots:
       enabled: true
       period_type: "CUSTOM"
-      custom_period: 2
+      custom_period: 1
       storage_directory: "simulation_records"
       filename_prefix: "biome_snapshot"
       pretty_print: true

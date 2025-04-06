@@ -27,6 +27,7 @@ from biome.api.biome_api import BiomeAPI
 from biome.biome import Biome
 from biome.systems.managers.biome_data_manager import BiomeDataManager
 from config.settings import Settings
+from shared.enums.enums import SimulationMode
 from shared.enums.events import SimulationEvent
 from shared.timers import Timers
 from shared.enums.strings import Strings, Loggers
@@ -43,10 +44,11 @@ from utils.middleware import log_execution_time
 
 class SimulationEngine:
     @log_execution_time(context="Biome loading")
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Settings, mode: SimulationMode):
         self._env: simpy.Environment = simpy.Environment()
         self._id_generator = itertools.count(0)
         try:
+            self._simulation_mode: SimulationMode = mode
             biome_context, simulation_context = self._boot_and_get_contexts(settings)
             self._context = simulation_context
 
@@ -85,7 +87,7 @@ class SimulationEngine:
                 experiment_path_manager.initialize(sim_paths)
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
-            self._biome_api = BiomeAPI(biome_context, self._env, options)
+            self._biome_api = BiomeAPI(biome_context, self._env, self._simulation_mode, options)
 
             if self._datapoints:
                 self._context.influxdb.start()

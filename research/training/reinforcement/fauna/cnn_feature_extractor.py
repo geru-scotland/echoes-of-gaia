@@ -49,6 +49,7 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
         h, w = local_map_space.shape
 
+        # TODO: Max pooling, mirar a ver.
         self.cnn = nn.Sequential(
             nn.Conv2d(terrain_embedding_dim + 4, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
