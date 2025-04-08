@@ -23,18 +23,19 @@ import torch as th
 import torch.nn as nn
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
-from shared.enums.enums import TerrainType, BiomeType
+from shared.enums.enums import TerrainType, BiomeType, DietType
 
 
 class CNNFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space: gym.spaces.Dict, features_dim: int = 256, terrain_embedding_dim: int = 8,
-                 biome_embedding_dim: int = 8):
+                 biome_embedding_dim: int = 8, diet_embedding_dim: int = 8):
         super(CNNFeaturesExtractor, self).__init__(observation_space, features_dim)
 
         local_map_space = observation_space.spaces["terrain_map"]
 
         num_terrain_types = len(list(TerrainType))
         num_biome_types = len(list(BiomeType))
+        num_diet_types = len(list(DietType))
 
         self.terrain_embedding = nn.Embedding(
             num_embeddings=num_terrain_types,
@@ -47,11 +48,16 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
             embedding_dim=biome_embedding_dim
         )
 
+        self.diet_embedding = nn.Embedding(
+            num_embeddings=num_diet_types,
+            embedding_dim=diet_embedding_dim
+        )
+
         h, w = local_map_space.shape
 
         # TODO: Max pooling, mirar a ver.
         self.cnn = nn.Sequential(
-            nn.Conv2d(terrain_embedding_dim + 4, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(terrain_embedding_dim + 5, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
@@ -60,6 +66,7 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
         cnn_out_size = 64 * h * w
         biome_embedd_flat_size = biome_embedding_dim * num_biome_types
+        diet_embedd_flat_size = diet_embedding_dim * num_diet_types  # Lo mismo, como no puedo aplicar convoluciones, al no ser espacial, concanteno
 
         # Se me está yendo un poco de madre ahora con tantos 1, pero lo pongo explícito
         # por claridad, cambiar quizá hacia el final esto.
@@ -68,10 +75,12 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         vitality_feature_size = 1
         stress_level_feature_size = 1
         hunger_level_feature_size = 1
+        somatic_integrity_feature_size = 1
 
-        combined_features_size = (cnn_out_size + biome_embedd_flat_size +
+        combined_features_size = (cnn_out_size + biome_embedd_flat_size + diet_embedd_flat_size +
                                   thirst_feature_size + energy_reserves_feature_size +
-                                  vitality_feature_size + stress_level_feature_size + hunger_level_feature_size)
+                                  vitality_feature_size + stress_level_feature_size + hunger_level_feature_size
+                                  + somatic_integrity_feature_size)
 
         self.linear = nn.Sequential(
             nn.Linear(combined_features_size, 512),
@@ -88,15 +97,18 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         # Para aclararme (Batch, width, height)
         biome_index = observations["biome_type"].long()
         terrain_indices = observations["terrain_map"].long()
+        diet_index = observations["diet_type"].long()
         valid_map = observations["validity_map"]
         visited_map = observations["visited_map"]
         flora_map = observations["flora_map"]
-        fauna_map = observations["fauna_map"]
+        prey_map = observations["prey_map"]
+        predator_map = observations["predator_map"]
         thirst_level = observations["thirst_level"]
         energy_reserves = observations["energy_reserves"]
         vitality = observations["vitality"]
         stress_level = observations["stress_level"]
         hunger_level = observations["hunger_level"]
+        somatic_integrity = observations["somatic_integrity"]
 
         # TODO: COMPROBAR BIEN LOS FAUNA Y FLORA MAP
         max_index = len(list(TerrainType)) - 1
@@ -109,12 +121,15 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         terrain_embedded = terrain_embedded.permute(0, 3, 1, 2)
 
         biome_embedded = self.biome_embedding(biome_index)
+        diet_embedded = self.diet_embedding(diet_index)
+
         # Agrego dimensión de canal: (Batch, 1, width, height)
         validity_channel = valid_map.unsqueeze(1)
         visited_channel = visited_map.unsqueeze(1)
 
         flora_map = flora_map.unsqueeze(1)
-        fauna_map = fauna_map.unsqueeze(1)
+        prey_map = prey_map.unsqueeze(1)
+        predator_map = predator_map.unsqueeze(1)
 
         # Nota: a CNN, sólo mapas espaciales, disposición 2D.
         # +1 canal (lámina en el stack), le agrego a num_embedd + 1 con el validity channel + 1 visited
@@ -122,23 +137,27 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
                                    validity_channel,
                                    visited_channel,
                                    flora_map,
-                                   fauna_map
+                                   prey_map,
+                                   predator_map
                                    ], dim=1)
         cnn_features = self.cnn(combined_maps)
 
         thirst_features = thirst_level.view(thirst_level.size(0), -1)
         energy_reserves_features = energy_reserves.view(energy_reserves.size(0), -1)
         biome_embedded = biome_embedded.view(biome_embedded.size(0), -1)
+        diet_embedded = diet_embedded.view(diet_embedded.size(0), -1)
         vitality_features = vitality.view(vitality.size(0), -1)
         stress_level_features = stress_level.view(stress_level.size(0), -1)
         hunger_level_features = hunger_level.view(hunger_level.size(0), -1)
+        somatic_integrity_features = somatic_integrity.view(somatic_integrity.size(0), -1)
         # print(f"[DEBUG] cnn_features shape: {cnn_features.shape}")
         # print(f"[DEBUG] biome_embedded shape: {biome_embedded.shape}")
         # print(f"[DEBUG] thirst_features shape: {thirst_features.shape}")
 
         combined_features = torch.cat([
             cnn_features, biome_embedded, thirst_features, energy_reserves_features,
-            vitality_features, stress_level_features, hunger_level_features
+            vitality_features, stress_level_features, hunger_level_features, diet_embedded,
+            somatic_integrity_features
         ], dim=1)
         # print(f"[DEBUG] combined_features shape: {combined_features.shape}")
 

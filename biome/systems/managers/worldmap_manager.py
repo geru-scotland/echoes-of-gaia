@@ -25,12 +25,14 @@ import numpy as np
 from simpy import Environment as simpyEnv
 
 from biome.entities.entity import Entity
+from biome.entities.fauna import Fauna
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.maps.map_allocator import MapAllocator
 from biome.systems.maps.spawn_system import SpawnSystem
 from biome.systems.maps.worldmap import WorldMap
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import EntityType, FaunaSpecies, TerrainType, PositionNotValidReason, DietType, ComponentType
+from shared.enums.enums import EntityType, FaunaSpecies, TerrainType, PositionNotValidReason, DietType, ComponentType, \
+    FloraSpecies
 from shared.enums.events import BiomeEvent, SimulationEvent
 from shared.enums.strings import Loggers
 from shared.types import TileMap, EntityList, EntityDefinitions, EntityRegistry, \
@@ -129,7 +131,8 @@ class WorldMapManager:
                 evolution_cycle=evolution_cycle
             )
 
-            self._logger.debug(f"Creating evolved entity: {entity_class} with ref: {id(entity)}")
+            self._logger.debug(
+                f"Creating evolved entity: {entity_class}, species {species_name} and with ref: {id(entity)}")
 
             BiomeEventBus.trigger(BiomeEvent.ENTITY_CREATED, species_name=species_name, evolution_cycle=evolution_cycle)
 
@@ -175,8 +178,11 @@ class WorldMapManager:
 
         return True
 
-    def has_alive_entities(self, type: EntityType):
-        return any(entity.is_alive() for entity in self.get_entities(type))
+    def has_alive_entities(self, type: EntityType, species: Optional[FaunaSpecies | FloraSpecies] = None) -> bool:
+        return any(
+            entity.is_alive() and (species is None or entity.get_species() == species)
+            for entity in self.get_entities(type)
+        )
 
     def handle_entity_death(self, entity_id: int) -> None:
         if not self._cleanup_dead_entities:
@@ -232,32 +238,9 @@ class WorldMapManager:
 
         return result
 
-    def _is_water_nearby(self, position: Position) -> bool:
-        if not position:
-            return False
-
-        # FOV local centrado en la posición, parche 3x3 por ahora
-        local_result = self.get_local_maps(position, 3, 3)
-        if local_result is None:
-            return False
-
-        local_terrain, _ = local_result
-
-        water_terrains = [
-            int(TerrainType.WATER_SHALLOW),
-            int(TerrainType.WATER_MID),
-            int(TerrainType.WATER_DEEP)
-        ]
-
-        water_mask = np.isin(local_terrain, water_terrains)
-
-        return np.any(water_mask)
-
-    def find_food_nearby(self, position: Position, radius: int) -> List[Entity]:
-        return self.find_entities_in_radius(position, radius, EntityType.FLORA)
-
-    def get_local_maps(self, position: Position, width: int, height: int) -> Optional[
-        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
+    def get_local_maps(self, position: Position, diet_type: DietType, species: FaunaSpecies, width: int, height: int) -> \
+            Optional[
+                Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
         y, x = position
         map_height, map_width = self._terrain_map.shape
 
@@ -294,9 +277,12 @@ class WorldMapManager:
         non_traversable_indices = np.isin(local_terrain_map, [TerrainType.WATER_DEEP, TerrainType.WATER_MID])
         traversability_mask = ~non_traversable_indices
         combined_validity_mask = validity_mask & traversability_mask
+        obstacle_mask = (local_entity_map != -1)
+        final_traversability_mask = combined_validity_mask & (~obstacle_mask)
 
         flora_map = np.zeros((height, width), dtype=np.int8)
-        fauna_map = np.zeros((height, width), dtype=np.int8)
+        prey_map = np.zeros((height, width), dtype=np.int8)
+        predator_map = np.zeros((height, width), dtype=np.int8)
 
         entity_ids = np.unique(local_entity_map)
         entity_ids = entity_ids[entity_ids != -1]
@@ -313,12 +299,28 @@ class WorldMapManager:
 
             if entity.get_type() == EntityType.FLORA:
                 flora_map[y_pos, x_pos] = 1
+
             elif entity.get_type() == EntityType.FAUNA:
-                fauna_map[y_pos, x_pos] = 1
+                if entity.get_species() != species:
+                    if diet_type == DietType.HERBIVORE:
+                        if entity.diet_type in (DietType.CARNIVORE, DietType.OMNIVORE):
+                            predator_map[y_pos, x_pos] = 1
 
-        return local_terrain_map, combined_validity_mask, flora_map, fauna_map
+                    elif diet_type == DietType.CARNIVORE:
+                        if entity.diet_type == DietType.HERBIVORE:
+                            prey_map[y_pos, x_pos] = 1
+                        elif entity.diet_type in (DietType.CARNIVORE, DietType.OMNIVORE):
+                            predator_map[y_pos, x_pos] = 1
 
-    def get_local_visited_map(self, entity: Entity, fov_width: int, fov_height: int) -> np.ndarray:
+                    elif diet_type == DietType.OMNIVORE:
+                        if entity.diet_type == DietType.HERBIVORE:
+                            prey_map[y_pos, x_pos] = 1
+                        elif entity.diet_type == DietType.CARNIVORE:
+                            predator_map[y_pos, x_pos] = 1
+
+        return local_terrain_map, final_traversability_mask, flora_map, prey_map, predator_map
+
+    def get_local_visited_map(self, entity: Fauna, fov_width: int, fov_height: int) -> np.ndarray:
         position: Position = entity.get_position()
         center_y, center_x = fov_width // 2, fov_height // 2
 
@@ -326,7 +328,6 @@ class WorldMapManager:
 
         for y in range(fov_width):
             for x in range(fov_height):
-                # Convierto coords de esta celda, a posición global
                 global_y = position[0] + (y - center_y)
                 global_x = position[1] + (x - center_x)
                 global_pos = (global_y, global_x)

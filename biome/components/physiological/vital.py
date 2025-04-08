@@ -25,7 +25,7 @@ from biome.components.base.component import EntityComponent
 from biome.components.handlers.energy_handler import EnergyHandler
 from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.components.registry import ComponentRegistry
-from shared.enums.events import SimulationEvent
+from shared.enums.events import SimulationEvent, ComponentEvent
 from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
@@ -59,6 +59,9 @@ class VitalComponent(EntityComponent):
         self._logger.debug(f"Vital component initialized: Health={self._vitality}/{self._max_vitality}, "
                            f"Age={self._age}")
 
+        self._somatic_integrity: float = 100.0
+        self._max_somatic_integrity: float = 100.0
+        self._integrity_regeneration_rate: float = 0.5
         ComponentRegistry.get_vital_manager().register_component(id(self), self)
 
     def _register_events(self) -> None:
@@ -91,6 +94,51 @@ class VitalComponent(EntityComponent):
 
     def increase_accumulated_stress(self, value: float) -> None:
         self._accumulated_stress += value
+
+    def apply_damage(self, damage_amount: float, source_entity_id: Optional[int] = None) -> None:
+        if not self._host_alive:
+            return
+
+        old_integrity = self._somatic_integrity
+        self._somatic_integrity = max(0, self._somatic_integrity - damage_amount)
+        self._logger.debug(f"APPLYING DAMAGE. Damage: {damage_amount} Somatic integrity: {self.somatic_integrity}")
+
+        self._event_notifier.notify(
+            ComponentEvent.UPDATE_STATE,
+            VitalComponent,
+            somatic_integrity=self._somatic_integrity
+        )
+
+        self._logger.debug(
+            f"Physical damage applied: -{damage_amount:.2f} (from {old_integrity:.2f} to {self._somatic_integrity:.2f})")
+
+        if self._somatic_integrity <= 0:
+            self._vitality = 0
+            self._event_notifier.notify(
+                ComponentEvent.ENTITY_DEATH,
+                component=ComponentType.VITAL,
+                cleanup_dead_entities=True
+            )
+
+    def heal_integrity(self, healing_amount: float) -> None:
+
+        if not self._host_alive:
+            return
+
+        old_integrity = self._somatic_integrity
+        self._somatic_integrity = min(self._max_somatic_integrity, self._somatic_integrity + healing_amount)
+
+        self._event_notifier.notify(
+            ComponentEvent.UPDATE_STATE,
+            VitalComponent,
+            somatic_integrity=self._somatic_integrity
+        )
+
+        self._logger.debug(
+            f"Physical integrity healed: +{healing_amount:.2f} (from {old_integrity:.2f} to {self._somatic_integrity:.2f})")
+
+    def get_integrity_percentage(self) -> float:
+        return (self._somatic_integrity / self._max_somatic_integrity) * 100.0
 
     def plot_vitality_curve(self) -> None:
         if not self._vitality_history:
@@ -218,6 +266,18 @@ class VitalComponent(EntityComponent):
     @property
     def accumulated_stress(self) -> float:
         return self._accumulated_stress
+
+    @property
+    def somatic_integrity(self) -> float:
+        return self._somatic_integrity
+
+    @property
+    def max_somatic_integrity(self) -> float:
+        return self._max_somatic_integrity
+
+    @property
+    def somatic_integrity_regen_rate(self) -> float:
+        return self._integrity_regeneration_rate
 
         # Setters
 
