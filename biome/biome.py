@@ -99,7 +99,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.Climate.CLIMATE_UPDATE))
 
-        if mode == SimulationMode.NORMAL:
+        if mode in (SimulationMode.NORMAL, SimulationMode.TRAINING_WITH_RL_MODEL):
             fauna_agent: FaunaAgentAI = FaunaAgentAI(
                 self._context.fauna_model,
                 self._entity_provider,

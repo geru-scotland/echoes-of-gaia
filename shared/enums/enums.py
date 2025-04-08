@@ -82,6 +82,7 @@ class FaunaSpecies(EnumBaseStr):
     DEER = "deer"
     BOAR = "boar"
     FOX = "fox"
+    PANTHER = "panther"
 
 
 class Habitats:
@@ -229,6 +230,8 @@ class ReinforcementConfig(TypedDict):
 class SimulationMode(EnumBaseInt):
     NORMAL = auto()
     TRAINING = auto()
+    TRAINING_WITH_RL_MODEL = auto()
+    TRAINING_FINISHED = auto()
 
 
 class Direction(Enum):

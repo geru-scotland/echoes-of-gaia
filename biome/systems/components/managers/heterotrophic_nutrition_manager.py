@@ -101,6 +101,14 @@ class HeterotrophicNutritionComponentManager(BaseComponentManager[HeterotrophicN
                             thirst_level=component.thirst_level
                         )
 
+                    if new_hunger_levels[i] <= 0.01 or new_thirst_levels[i] <= 0.01:
+                        severe_penalty = component.energy_handler.max_energy_reserves * 0.05
+                        energy_penalties[i] += severe_penalty
+                        self._logger.debug(
+                            f"CRITICAL condition! Hunger={new_hunger_levels[i]:.2f}, Thirst={new_thirst_levels[i]:.2f}. "
+                            f"Applied severe energy penalty: -{severe_penalty:.2f}"
+                        )
+
                     component.energy_handler.modify_energy(-energy_penalties[i])
 
                     if critical_hunger_mask[i]:

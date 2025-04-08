@@ -15,7 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
-from typing import Any, Set
+from typing import Any, Set, Optional
 
 from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
 from biome.components.physiological.vital import VitalComponent
@@ -75,6 +75,37 @@ class Fauna(Entity):
 
         if new_position not in self._visited_positions:
             self._visited_positions.add(new_position)
+
+    def apply_damage(self, damage_amount: float, source_entity_id: Optional[int] = None) -> None:
+        vital_component = self.get_component(ComponentType.VITAL)
+        if vital_component:
+            vital_component.apply_damage(damage_amount, source_entity_id)
+
+    def heal_integrity(self, healing_amount: float) -> None:
+        vital_component = self.get_component(ComponentType.VITAL)
+        if vital_component:
+            vital_component.heal_integrity(healing_amount)
+
+    @property
+    def somatic_integrity(self) -> float:
+        vital_component = self.get_component(ComponentType.VITAL)
+        if vital_component:
+            return vital_component.somatic_integrity
+        return 0.0
+
+    @property
+    def max_somatic_integrity(self) -> float:
+        vital_component = self.get_component(ComponentType.VITAL)
+        if vital_component:
+            return vital_component.max_somatic_integrity
+        return 0.0
+
+    @property
+    def integrity_percentage(self) -> float:
+        vital_component = self.get_component(ComponentType.VITAL)
+        if vital_component:
+            return vital_component.get_integrity_percentage()
+        return 0.0
 
     @property
     def thirst_level(self) -> float:

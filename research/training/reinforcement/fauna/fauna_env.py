@@ -26,7 +26,7 @@ from gymnasium.spaces import Discrete
 from biome.entities.entity import Entity
 from research.training.registry import EnvironmentRegistry
 from research.training.reinforcement.fauna.fauna_adapter import FaunaSimulationAdapter
-from shared.enums.enums import FaunaAction, Agents, LocalFovConfig, TerrainType, BiomeType
+from shared.enums.enums import FaunaAction, Agents, LocalFovConfig, TerrainType, BiomeType, DietType
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 
@@ -47,6 +47,7 @@ class FaunaEnvironment(gym.Env):
 
         self.observation_space = spaces.Dict({
             "biome_type": spaces.Discrete(len(BiomeType)),
+            "diet_type": spaces.Discrete(len(DietType)),
             "terrain_map": spaces.Box(
                 low=0,
                 high=len(list(TerrainType)) - 1,
@@ -71,7 +72,13 @@ class FaunaEnvironment(gym.Env):
                 shape=(self._fov_height, self._fov_width),
                 dtype=np.int8
             ),
-            "fauna_map": spaces.Box(
+            "prey_map": spaces.Box(
+                low=0,
+                high=1,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.int8
+            ),
+            "predator_map": spaces.Box(
                 low=0,
                 high=1,
                 shape=(self._fov_height, self._fov_width),
@@ -102,6 +109,12 @@ class FaunaEnvironment(gym.Env):
                 dtype=np.float32
             ),
             "hunger_level": spaces.Box(
+                low=0.0,
+                high=1.0,
+                shape=(1,),
+                dtype=np.float32
+            ),
+            "somatic_integrity": spaces.Box(
                 low=0.0,
                 high=1.0,
                 shape=(1,),
@@ -184,18 +197,22 @@ class FaunaEnvironment(gym.Env):
         valid_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
         visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
         flora_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
-        fauna_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+        prey_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+        predator_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
 
         return {
             "biome_type": BiomeType.TROPICAL,
+            "diet_type": DietType.HERBIVORE,
             "terrain_map": terrain_map,
             "validity_map": valid_mask,
             "visited_map": visited_mask,
-            "flora_mask": flora_mask,
-            "fauna_mask": fauna_mask,
+            "flora_map": flora_mask,
+            "prey_map": prey_mask,
+            "predator_map": predator_mask,
             "thirst_level": np.array([1.0], dtype=np.float32),
             "energy_reserves": np.array([1.0], dtype=np.float32),
             "vitality": np.array([1.0], dtype=np.float32),
             "stress_level": np.array([0.0], dtype=np.float32),
             "hunger_level": np.array([0.0], dtype=np.float32),
+            "somatic_integrity": np.array([1.0], dtype=np.float32),
         }

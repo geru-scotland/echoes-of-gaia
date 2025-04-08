@@ -903,6 +903,7 @@
   },
   "fauna": {
     "deer": {
+      "diet": "herbivore",
       "components": [
       ],
       "habitat": [
@@ -910,6 +911,7 @@
       ]
     },
     "boar": {
+      "diet": "herbivore",
       "components": [
         "GrowthComponent"
       ],
@@ -918,10 +920,19 @@
       ]
     },
     "fox": {
+      "diet": "herbivore",
       "components": [
       ],
       "habitat": [
         "thicket"
+      ]
+    },
+    "panther": {
+      "diet": "carnivore",
+      "components": [
+      ],
+      "habitat": [
+        "forest"
       ]
     }
   },

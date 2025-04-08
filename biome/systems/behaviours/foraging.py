@@ -29,7 +29,7 @@ from utils.loggers import LoggerManager
 from shared.enums.strings import Loggers
 
 
-class ForagingSystem:
+class ForagingBehaviour:
 
     def __init__(self, worldmap_manager: WorldMapManager):
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
@@ -96,6 +96,7 @@ class ForagingSystem:
 
         for flora in flora_entities:
             nutritive_value = flora.get_nutritive_value()
+            flora.apply_damage(15.0, self._target.get_id())
             self._target.consume_vegetal(nutritive_value)
             self._logger.debug(f"Consuming plant: +{nutritive_value} nutrition")
 
@@ -108,19 +109,44 @@ class ForagingSystem:
     def _process_carnivore_feeding(self, nearby_entities: Dict[EntityType, List[Entity]]) -> bool:
         fauna_entities = nearby_entities.get(EntityType.FAUNA, [])
         if not fauna_entities:
+            self._logger.debug(f"[HUNTING] No fauna entities nearby. Entities: {nearby_entities}")
             return False
 
-        potential_prey = [prey for prey in fauna_entities
-                          if prey.diet_type == DietType.HERBIVORE
-                          and prey.get_id() != self._target.get_id() and prey.get_species() != self._target.get_species()]
+        self._logger.debug(f"[HUNTING] Nearby fauna entities ({len(fauna_entities)} total):")
+        for f in fauna_entities:
+            info = (
+                f"ID={f.get_id()}, SPECIES={f.get_species()}, "
+                f"DIET={f.diet_type.name}, "
+                f"VITALITY={f.vitality:.2f}/{f.max_vitality:.2f}, "
+                f"ENERGY={f.energy_reserves:.2f}/{f.max_energy_reserves:.2f}, "
+                f"HUNGER={f.hunger_level:.2f}, THIRST={f.thirst_level:.2f}, "
+                f"STRESS={f.stress_level:.2f}"
+            )
+            self._logger.debug(f"[HUNTING] Entity -> {info}")
+
+        potential_prey = []
+        for prey in fauna_entities:
+            if prey.diet_type != DietType.HERBIVORE:
+                self._logger.debug(f"[REJECTED] ID={prey.get_id()} rejected: Not herbivore.")
+                continue
+            if prey.get_id() == self._target.get_id():
+                self._logger.debug(f"[REJECTED] ID={prey.get_id()} rejected: Is self.")
+                continue
+            if prey.get_species() == self._target.get_species():
+                self._logger.debug(f"[REJECTED] ID={prey.get_id()} rejected: Same species.")
+                continue
+            potential_prey.append(prey)
 
         if not potential_prey:
+            self._logger.debug("[HUNTING] No valid prey found after filters.")
             return False
 
         prey = random.choice(potential_prey)
+        self._logger.debug(f"[HUNTING] Prey selected: ID={prey.get_id()}, SPECIES={prey.get_species()}")
 
-        nutritive_value = self._calculate_prey_nutritive_value(prey)
+        nutritive_value = self._calculate_prey_nutritive_value(prey) + 4.0
 
+        prey.apply_damage(15.0, self._target.get_id())
         self._target.consume_prey(nutritive_value)
         self._logger.debug(f"Consuming prey: +{nutritive_value} nutrition")
 
