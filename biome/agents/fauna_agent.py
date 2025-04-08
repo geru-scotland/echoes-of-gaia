@@ -90,7 +90,7 @@ class FaunaAgentAI(Agent[Observation, FaunaAction]):
                     self._logger.debug(f"Trying to move entity {entity_id} to {action}")
                     direction = self._action_to_direction(action)
                     self._logger.debug(f"Moving to {direction}")
-                    self._logger.debug(f"Previous positin {fauna_entity.get_position()}")
+                    self._logger.debug(f"Previous position {fauna_entity.get_position()}")
                     previous_position: Position = fauna_entity.get_position()
                     fauna_entity.move(direction)
                     new_position: Position = fauna_entity.get_position()
@@ -102,7 +102,9 @@ class FaunaAgentAI(Agent[Observation, FaunaAction]):
                     self._logger.debug(f"Post position {fauna_entity.get_position()}")
 
             except Exception as e:
-                self._logger.warning(f"Error executing action for fauna entity {entity_id}: {e}")
+                fauna_entity: Fauna = self._worldmap_manager.get_entity_by_id(entity_id)
+                self._logger.warning(
+                    f"Error executing action for fauna entity {entity_id} (Pos: {fauna_entity.get_position()}, species: {fauna_entity.get_species()}): {e}")
 
     def _prepare_entity_observation(self, entity: Fauna) -> Dict[str, Any]:
         position = entity.get_position()
@@ -131,7 +133,7 @@ class FaunaAgentAI(Agent[Observation, FaunaAction]):
                 visited_map = visited_mask.astype(np.float32)
 
         thirst_level = 0.0
-        energy_reserves = 0.00
+        energy_reserves = 0.0
         vitality = 0.0
         stress_level = 0.0
         hunger_level = 0.0

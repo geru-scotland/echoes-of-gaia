@@ -57,7 +57,7 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
         # TODO: Max pooling, mirar a ver.
         self.cnn = nn.Sequential(
-            nn.Conv2d(terrain_embedding_dim + 5, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(terrain_embedding_dim + 7, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
@@ -103,6 +103,8 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         flora_map = observations["flora_map"]
         prey_map = observations["prey_map"]
         predator_map = observations["predator_map"]
+        water_map = observations["water_map"]
+        food_map = observations["food_map"]
         thirst_level = observations["thirst_level"]
         energy_reserves = observations["energy_reserves"]
         vitality = observations["vitality"]
@@ -126,6 +128,8 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         # Agrego dimensión de canal: (Batch, 1, width, height)
         validity_channel = valid_map.unsqueeze(1)
         visited_channel = visited_map.unsqueeze(1)
+        water_channel = water_map.unsqueeze(1)
+        food_channel = food_map.unsqueeze(1)
 
         flora_map = flora_map.unsqueeze(1)
         prey_map = prey_map.unsqueeze(1)
@@ -138,7 +142,9 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
                                    visited_channel,
                                    flora_map,
                                    prey_map,
-                                   predator_map
+                                   predator_map,
+                                   water_channel,
+                                   food_channel
                                    ], dim=1)
         cnn_features = self.cnn(combined_maps)
 

@@ -84,6 +84,18 @@ class FaunaEnvironment(gym.Env):
                 shape=(self._fov_height, self._fov_width),
                 dtype=np.int8
             ),
+            "water_map": spaces.Box(
+                low=0,
+                high=1,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.int8
+            ),
+            "food_map": spaces.Box(
+                low=0,
+                high=1,
+                shape=(self._fov_height, self._fov_width),
+                dtype=np.int8
+            ),
             "thirst_level": spaces.Box(
                 low=0.0,
                 high=1.0,
@@ -199,6 +211,8 @@ class FaunaEnvironment(gym.Env):
         flora_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
         prey_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
         predator_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
+        water_map = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
+        food_map = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
 
         return {
             "biome_type": BiomeType.TROPICAL,
@@ -209,6 +223,8 @@ class FaunaEnvironment(gym.Env):
             "flora_map": flora_mask,
             "prey_map": prey_mask,
             "predator_map": predator_mask,
+            "water_map": water_map,
+            "food_map": food_map,
             "thirst_level": np.array([1.0], dtype=np.float32),
             "energy_reserves": np.array([1.0], dtype=np.float32),
             "vitality": np.array([1.0], dtype=np.float32),

@@ -240,7 +240,7 @@ class WorldMapManager:
 
     def get_local_maps(self, position: Position, diet_type: DietType, species: FaunaSpecies, width: int, height: int) -> \
             Optional[
-                Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
+                Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
         y, x = position
         map_height, map_width = self._terrain_map.shape
 
@@ -283,6 +283,12 @@ class WorldMapManager:
         flora_map = np.zeros((height, width), dtype=np.int8)
         prey_map = np.zeros((height, width), dtype=np.int8)
         predator_map = np.zeros((height, width), dtype=np.int8)
+        water_map = np.zeros((height, width), dtype=np.int8)
+        food_map = np.zeros((height, width), dtype=np.int8)
+
+        water_positions = np.where(local_terrain_map == TerrainType.WATER_SHALLOW)
+        if len(water_positions[0]) > 0:
+            water_map[water_positions] = 1
 
         entity_ids = np.unique(local_entity_map)
         entity_ids = entity_ids[entity_ids != -1]
@@ -299,6 +305,8 @@ class WorldMapManager:
 
             if entity.get_type() == EntityType.FLORA:
                 flora_map[y_pos, x_pos] = 1
+                if diet_type in [DietType.HERBIVORE, DietType.OMNIVORE]:
+                    food_map[y_pos, x_pos] = 1
 
             elif entity.get_type() == EntityType.FAUNA:
                 if entity.get_species() != species:
@@ -309,16 +317,17 @@ class WorldMapManager:
                     elif diet_type == DietType.CARNIVORE:
                         if entity.diet_type == DietType.HERBIVORE:
                             prey_map[y_pos, x_pos] = 1
+                            food_map[y_pos, x_pos] = 1
                         elif entity.diet_type in (DietType.CARNIVORE, DietType.OMNIVORE):
                             predator_map[y_pos, x_pos] = 1
 
                     elif diet_type == DietType.OMNIVORE:
                         if entity.diet_type == DietType.HERBIVORE:
                             prey_map[y_pos, x_pos] = 1
+                            food_map[y_pos, x_pos] = 1
                         elif entity.diet_type == DietType.CARNIVORE:
                             predator_map[y_pos, x_pos] = 1
-
-        return local_terrain_map, final_traversability_mask, flora_map, prey_map, predator_map
+        return local_terrain_map, final_traversability_mask, flora_map, prey_map, predator_map, water_map, food_map
 
     def get_local_visited_map(self, entity: Fauna, fov_width: int, fov_height: int) -> np.ndarray:
         position: Position = entity.get_position()
