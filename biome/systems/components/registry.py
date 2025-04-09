@@ -29,7 +29,7 @@ class ComponentRegistry:
     _movement_component = None
 
     @classmethod
-    def initialize(cls, env: simpyEnv, cleanup_dead_entities: bool = False):
+    def initialize(cls, env: simpyEnv, cleanup_dead_entities: bool = True):
         cls._env = env
         # Importo aqui para evitar dep. circulares. TODO: Revisar.
         from biome.systems.components.managers.growth_manager import GrowthComponentManager

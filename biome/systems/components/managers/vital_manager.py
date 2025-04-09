@@ -35,7 +35,7 @@ from utils.loggers import LoggerManager
 
 
 class VitalComponentManager(BaseComponentManager[VitalComponent]):
-    def __init__(self, env: simpyEnv, cleanup_dead_entities: bool = False):
+    def __init__(self, env: simpyEnv, cleanup_dead_entities: bool = True):
         super().__init__(env)
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)

@@ -174,7 +174,7 @@ class WorldMapManager:
                 del self._spawn_system.fauna_registry[entity_id]
 
         if position is not None:
-            self._map_allocator.free_position(position, habitats)
+            self._map_allocator.free_position(position)
 
         return True
 
