@@ -53,7 +53,8 @@ class SpawnSystem:
 
     def _create_single_entity(self, entity_class, entity_species, habitats: HabitatList,
                               lifespan: float, components: List[Dict], evolution_cycle: int = 0,
-                              diet_type: DietType = None) -> Optional[Entity]:
+                              diet_type: DietType = None, biome_store: Optional[Dict[str, Any]] = None) -> Optional[
+        Entity]:
         entity_id: int = next(self._id_generator)
 
         if entity_class == Fauna and diet_type:
@@ -66,13 +67,14 @@ class SpawnSystem:
             return self._finalize_entity_creation(entity)
 
         for component in components:
-            self._add_components_to_entity(entity, component, lifespan)
+            self._add_components_to_entity(entity, component, lifespan, biome_store)
 
         return self._finalize_entity_creation(entity)
 
-    def _add_components_to_entity(self, entity: Entity, component_dict: Dict, lifespan: float) -> None:
+    def _add_components_to_entity(self, entity: Entity, component_dict: Dict, lifespan: float,
+                                  biome_store: Dict[str, Any]) -> None:
         for class_name, attribute_dict in component_dict.items():
-            defaults = self._get_component_defaults(class_name)
+            defaults = self._get_component_defaults(class_name, entity.get_species(), biome_store)
             data = {**defaults, **(attribute_dict or {})}
 
             if not data:
@@ -93,8 +95,15 @@ class SpawnSystem:
             except Exception as e:
                 self._logger.error(f"Error creating component {class_name}: {e}")
 
-    def _get_component_defaults(self, class_name: str) -> Dict:
+    def _get_component_defaults(self, class_name: str, entity_species: str, biome_store: Dict[str, Any]) -> Dict:
+
         defaults = BiomeStore.components.get(class_name, {}).get("defaults", {}).copy()
+
+        species_components = biome_store.get(entity_species, {}).get("components", {})
+        entity_specific = species_components.get(class_name, {})
+
+        if entity_specific:
+            defaults.update(entity_specific)
 
         for key, value in defaults.items():
             if isinstance(value, (int, float)) and value not in (0.0, 1.0):
@@ -120,7 +129,7 @@ class SpawnSystem:
 
     @log_execution_time(context="Entities created")
     def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_species_enum,
-                         biome_store) -> EntityRegistry:
+                         biome_store: Dict[str, Any]) -> EntityRegistry:
         if not spawns:
             return {}
 
@@ -167,10 +176,11 @@ class SpawnSystem:
             for _ in range(amount):
                 if entity_class == Fauna:
                     entity = self._create_single_entity(
-                        entity_class, entity_species, habitats, lifespan, components, diet_type=diet_type)
+                        entity_class, entity_species, habitats, lifespan, components, diet_type=diet_type,
+                        biome_store=biome_store)
                 else:
                     entity = self._create_single_entity(
-                        entity_class, entity_species, habitats, lifespan, components)
+                        entity_class, entity_species, habitats, lifespan, components, biome_store=biome_store)
 
                 if entity:
                     entity_registry[entity.get_id()] = entity
@@ -213,7 +223,7 @@ class SpawnSystem:
 
         # 4. Instancio la entidad
         entity = self._create_single_entity(entity_class, entity_species, habitats, lifespan, components,
-                                            evolution_cycle, diet)
+                                            evolution_cycle, diet, biome_store)
 
         # 5. Registro la entida en main registry, flora, fauna etc.
         if entity:
@@ -250,24 +260,22 @@ class SpawnSystem:
 
         return entity_species, habitats, diet_type
 
-    def _prepare_components(self, entity_species, custom_components: List[Dict], biome_store) -> List[Dict]:
+    def _prepare_components(self, entity_species, custom_components: List[Dict], biome_store: Dict[str, Any]) -> List[
+        Dict]:
         components = []
 
         if custom_components:
             components.extend(custom_components)
 
         fixed_components = BiomeStore.components.get("fixed_components", [])
-        components.append(fixed_components)
+        if fixed_components:
+            components.append(fixed_components)
 
-        if not components or (len(components) == 1 and components[0] == fixed_components):
-            store_components: List[str] = biome_store.get(entity_species, {}).get("components", [])
-            if store_components:
-                components = [
-                    {cmp: BiomeStore.components.get(cmp, {}).get("defaults", {})}
-                    for cmp in store_components
-                    if BiomeStore.components.get(cmp)
-                ]
-                components.append(fixed_components)
+        entity_components = biome_store.get(entity_species, {}).get("components", {})
+        if entity_components:
+            for comp_name, comp_params in entity_components.items():
+                if not any(comp_name in comp_dict for comp_dict in components):
+                    components.append({comp_name: comp_params})
 
         return components
 

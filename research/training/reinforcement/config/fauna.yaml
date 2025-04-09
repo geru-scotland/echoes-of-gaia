@@ -19,7 +19,7 @@ model:
     max_grad_norm: 1.0
     verbose: 1
     tensorboard_log: "./tensorboard_log/dqn/"
-  timesteps: 65000
+  timesteps: 190000
 environment:
   env_class: "FaunaEnvironment"
   observation_space:
@@ -36,6 +36,6 @@ environment:
 output_path: "./models/fauna_model_final"
 local_fov:
   size:
-    width: 15
-    height: 15
-  center: 7
+    width: 25
+    height: 25
+  center: 12

@@ -486,8 +486,10 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             flora_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
             prey_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
             predator_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
+            water_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
+            food_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
         else:
-            local_fov_terrain, validity_mask, flora_mask, prey_mask, predator_mask = local_result
+            local_fov_terrain, validity_mask, flora_mask, prey_mask, predator_mask, water_mask, food_mask = local_result
 
             local_fov_terrain = local_fov_terrain.astype(np.int64)
             visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
@@ -509,6 +511,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         flora_map = flora_mask.astype(np.float32)
         prey_map = prey_mask.astype(np.float32)
         predator_map = predator_mask.astype(np.float32)
+        water_map = water_mask.astype(np.float32)
+        food_map = food_mask.astype(np.float32)
 
         thirst_level = 0.0
         energy_reserves = 0.0
@@ -538,6 +542,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             "flora_map": flora_map,
             "prey_map": prey_map,
             "predator_map": predator_map,
+            "water_map": water_map,
+            "food_map": food_map,
             "thirst_level": np.array([thirst_level], dtype=np.float32),
             "energy_reserves": np.array([energy_reserves], dtype=np.float32),
             "vitality": np.array([vitality], dtype=np.float32),
@@ -552,7 +558,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         visited_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.float32)
         prey_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
         predator_mask = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
-
+        water_map = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
+        food_map = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
         return {
             "biome_type": BiomeType.TROPICAL,
             "diet_type": DietType.HERBIVORE,
@@ -561,6 +568,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             "visited_map": visited_mask,
             "prey_map": prey_mask,
             "predator_map": predator_mask,
+            "water_map": water_map,
+            "food_map": food_map,
             "thirst_level": np.array([1.0], dtype=np.float32),  # Por defecto, sin sed (invertido, tengo que cambiar)
             "energy_reserves": np.array([1.0], dtype=np.float32),
             "vitality": np.array([1.0], dtype=np.float32),

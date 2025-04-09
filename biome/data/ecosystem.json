@@ -879,23 +879,16 @@
   },
   "flora": {
     "oak_tree": {
-      "components": [
-        "GrowthComponent"
-      ],
       "habitat": [
         "forest"
       ]
     },
     "bramble": {
-      "components": [
-      ],
       "habitat": [
         "thicket"
       ]
     },
     "mushroom": {
-      "components": [
-      ],
       "habitat": [
         "fungal_zone"
       ]
@@ -904,33 +897,35 @@
   "fauna": {
     "deer": {
       "diet": "herbivore",
-      "components": [
-      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -10.0,
+          "cold_resistance": 0.2,
+          "heat_resistance": 0.4
+        },
+        "GrowthComponent": {
+          "growth_modifier": 1.2,
+          "max_size": 2.5
+        }
+      },
       "habitat": [
         "thicket"
       ]
     },
     "boar": {
       "diet": "herbivore",
-      "components": [
-        "GrowthComponent"
-      ],
       "habitat": [
         "thicket"
       ]
     },
     "fox": {
       "diet": "herbivore",
-      "components": [
-      ],
       "habitat": [
         "thicket"
       ]
     },
     "panther": {
       "diet": "carnivore",
-      "components": [
-      ],
       "habitat": [
         "forest"
       ]

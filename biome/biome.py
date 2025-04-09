@@ -61,7 +61,6 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
 
             self._options: Dict[str, Any] = options
             cleanup_dead_entities: bool = self._options.get("remove_dead_entities")
-
             ComponentRegistry.initialize(env, cleanup_dead_entities)
             self._map_manager: WorldMapManager = WorldMapManager(self._env, tile_map=self._context.tile_map,
                                                                  flora_definitions=self._context.flora_definitions,

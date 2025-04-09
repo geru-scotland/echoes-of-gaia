@@ -99,8 +99,8 @@ class MapAllocator:
         self._entity_index_map[to_position] = entity_id
 
         # Actualizar hábitats
-        self._habitat_manager.remove_position(from_position)
-        self._habitat_manager.add_position(to_position)
+        self._habitat_manager.remove_position(to_position)
+        self._habitat_manager.add_position(from_position)
 
         return True
 

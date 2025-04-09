@@ -104,6 +104,8 @@ class PursuitAndFleeBehaviour:
 
         if abs(y_diff) > abs(x_diff):
             return Direction.NORTH if y_diff < 0 else Direction.SOUTH
+        else:
+            return Direction.WEST if x_diff < 0 else Direction.EAST
 
     def _calculate_pursuit_direction(self, my_pos: Position, target_pos: Position) -> Direction:
         y_diff = target_pos[0] - my_pos[0]
