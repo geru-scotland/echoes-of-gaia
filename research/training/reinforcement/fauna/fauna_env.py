@@ -215,8 +215,8 @@ class FaunaEnvironment(gym.Env):
         food_map = np.zeros((self._fov_height, self._fov_width), dtype=np.int8)
 
         return {
-            "biome_type": BiomeType.TROPICAL,
-            "diet_type": DietType.HERBIVORE,
+            "biome_type": list(BiomeType).index(BiomeType.TROPICAL),
+            "diet_type": list(DietType).index(DietType.HERBIVORE),
             "terrain_map": terrain_map,
             "validity_map": valid_mask,
             "visited_map": visited_mask,
