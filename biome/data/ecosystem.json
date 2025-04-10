@@ -834,6 +834,125 @@
     }
   },
   "habitats": {
+    "rainforest_canopy": {
+      "IN": [
+        "GRASS"
+      ],
+      "NEARBY": [
+        "GRASS",
+        "WATER_SHALLOW"
+      ]
+    },
+    "tropical_wetland": {
+      "IN": [
+        "WATER_SHALLOW",
+        "SHORE"
+      ],
+      "NEARBY": [
+        "GRASS"
+      ]
+    },
+    "tropical_understory": {
+      "IN": [
+        "GRASS"
+      ],
+      "NEARBY": [
+        "MOUNTAIN"
+      ]
+    },
+    "sand_dunes": {
+      "IN": [
+        "SAND"
+      ],
+      "NEARBY": [
+        "SAND"
+      ]
+    },
+    "rocky_desert": {
+      "IN": [
+        "SAND",
+        "MOUNTAIN"
+      ],
+      "NEARBY": []
+    },
+    "desert_oasis": {
+      "IN": [
+        "WATER_SHALLOW"
+      ],
+      "NEARBY": [
+        "SAND"
+      ]
+    },
+    "coniferous_forest": {
+      "IN": [
+        "GRASS"
+      ],
+      "NEARBY": [
+        "SNOW",
+        "MOUNTAIN"
+      ]
+    },
+    "taiga_clearing": {
+      "IN": [
+        "GRASS"
+      ],
+      "NEARBY": [
+        "SNOW"
+      ]
+    },
+    "rocky_taiga": {
+      "IN": [
+        "MOUNTAIN"
+      ],
+      "NEARBY": [
+        "GRASS",
+        "SNOW"
+      ]
+    },
+    "grassland": {
+      "IN": [
+        "GRASS"
+      ],
+      "NEARBY": []
+    },
+    "savanna_woodland": {
+      "IN": [
+        "GRASS"
+      ],
+      "NEARBY": [
+        "MOUNTAIN"
+      ]
+    },
+    "seasonal_river": {
+      "IN": [
+        "WATER_SHALLOW"
+      ],
+      "NEARBY": [
+        "GRASS"
+      ]
+    },
+    "permafrost_plains": {
+      "IN": [
+        "SNOW"
+      ],
+      "NEARBY": [
+      ]
+    },
+    "alpine_slopes": {
+      "IN": [
+        "MOUNTAIN",
+        "SNOW"
+      ],
+      "NEARBY": []
+    },
+    "tundra_lake": {
+      "IN": [
+        "WATER_SHALLOW"
+      ],
+      "NEARBY": [
+        "SNOW"
+      ]
+    },
     "forest": {
       "IN": [
         "GRASS"
@@ -881,25 +1000,610 @@
     "oak_tree": {
       "habitat": [
         "forest"
-      ]
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 21.0,
+          "heat_resistance": 0.1,
+          "cold_resistance": 0.2
+        },
+        "VitalComponent": {}
+      }
     },
     "bramble": {
       "habitat": [
         "thicket"
-      ]
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 10.0,
+          "heat_resistance": 0.4,
+          "cold_resistance": 0.6
+        },
+        "VitalComponent": {}
+      }
     },
     "mushroom": {
       "habitat": [
         "fungal_zone"
-      ]
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 10.0,
+          "heat_resistance": 0.2,
+          "cold_resistance": 0.7
+        },
+        "VitalComponent": {}
+      }
+    },
+    "heliconia": {
+      "habitat": [
+        "rainforest_canopy",
+        "tropical_understory"
+      ],
+      "components": {
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.9,
+          "respiration_rate": 0.2,
+          "metabolic_activity": 0.9
+        },
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 28.0,
+          "heat_resistance": 0.8,
+          "cold_resistance": 0.1
+        },
+        "GrowthComponent": {
+          "growth_modifier": 1.7,
+          "growth_efficiency": 0.9,
+          "max_size": 2.0
+        }
+      }
+    },
+    "mangrove": {
+      "habitat": [
+        "tropical_wetland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 27.0,
+          "heat_resistance": 0.7,
+          "cold_resistance": 0.1
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.9,
+          "mycorrhizal_rate": 0.035,
+          "base_nutritive_value": 0.7
+        },
+        "GrowthComponent": {
+          "growth_modifier": 1.2,
+          "growth_efficiency": 0.8,
+          "max_size": 4.0
+        }
+      }
+    },
+    "orchid": {
+      "habitat": [
+        "rainforest_canopy"
+      ],
+      "components": {
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.85,
+          "respiration_rate": 0.15,
+          "metabolic_activity": 0.7
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.5,
+          "mycorrhizal_rate": 0.04,
+          "base_nutritive_value": 0.4
+        },
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 26.0,
+          "heat_resistance": 0.7,
+          "cold_resistance": 0.1
+        }
+      }
+    },
+    "banana_tree": {
+      "habitat": [
+        "tropical_understory",
+        "tropical_wetland"
+      ],
+      "components": {
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.8,
+          "respiration_rate": 0.2,
+          "metabolic_activity": 0.8
+        },
+        "GrowthComponent": {
+          "growth_modifier": 1.5,
+          "growth_efficiency": 0.8,
+          "max_size": 3.0
+        },
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 29.0,
+          "heat_resistance": 0.75,
+          "cold_resistance": 0.05
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.8,
+          "mycorrhizal_rate": 0.03,
+          "base_nutritive_value": 0.8
+        }
+      }
+    },
+    "cactus": {
+      "habitat": [
+        "sand_dunes",
+        "rocky_desert"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 35.0,
+          "heat_resistance": 0.95,
+          "cold_resistance": 0.3
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.7,
+          "respiration_rate": 0.05,
+          "metabolic_activity": 0.6
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.5,
+          "mycorrhizal_rate": 0.02,
+          "base_nutritive_value": 0.5
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.4,
+          "growth_efficiency": 0.6,
+          "max_size": 3.0
+        }
+      }
+    },
+    "date_palm": {
+      "habitat": [
+        "desert_oasis"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 32.0,
+          "heat_resistance": 0.9,
+          "cold_resistance": 0.2
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.6,
+          "growth_efficiency": 0.7,
+          "max_size": 4.0
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.75,
+          "respiration_rate": 0.1,
+          "metabolic_activity": 0.7
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.7,
+          "mycorrhizal_rate": 0.02,
+          "base_nutritive_value": 0.7
+        }
+      }
+    },
+    "desert_sage": {
+      "habitat": [
+        "rocky_desert"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 33.0,
+          "heat_resistance": 0.9,
+          "cold_resistance": 0.4
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.65,
+          "respiration_rate": 0.07,
+          "metabolic_activity": 0.5
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.3,
+          "growth_efficiency": 0.6,
+          "max_size": 1.0
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.4,
+          "mycorrhizal_rate": 0.01,
+          "base_nutritive_value": 0.6
+        }
+      }
+    },
+    "prickly_pear": {
+      "habitat": [
+        "sand_dunes",
+        "rocky_desert"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 36.0,
+          "heat_resistance": 0.93,
+          "cold_resistance": 0.35
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.7,
+          "respiration_rate": 0.06,
+          "metabolic_activity": 0.55
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.45,
+          "mycorrhizal_rate": 0.015,
+          "base_nutritive_value": 0.65,
+          "base_toxicity": 0.3
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.5,
+          "growth_efficiency": 0.65,
+          "max_size": 2.0
+        }
+      }
+    },
+    "pine_tree": {
+      "habitat": [
+        "coniferous_forest",
+        "rocky_taiga"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 0.0,
+          "heat_resistance": 0.3,
+          "cold_resistance": 0.9
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.3,
+          "growth_efficiency": 0.7,
+          "max_size": 5.0
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.6,
+          "respiration_rate": 0.1,
+          "metabolic_activity": 0.5
+        }
+      }
+    },
+    "arctic_moss": {
+      "habitat": [
+        "taiga_clearing"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -5.0,
+          "heat_resistance": 0.2,
+          "cold_resistance": 0.9
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.5,
+          "respiration_rate": 0.08,
+          "metabolic_activity": 0.4
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.2,
+          "growth_efficiency": 0.5,
+          "max_size": 0.1
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.3,
+          "mycorrhizal_rate": 0.025,
+          "base_nutritive_value": 0.4
+        }
+      }
+    },
+    "spruce_tree": {
+      "habitat": [
+        "coniferous_forest"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -2.0,
+          "heat_resistance": 0.25,
+          "cold_resistance": 0.95
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.25,
+          "growth_efficiency": 0.65,
+          "max_size": 4.5
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.55,
+          "respiration_rate": 0.09,
+          "metabolic_activity": 0.45
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.6,
+          "mycorrhizal_rate": 0.03,
+          "base_nutritive_value": 0.5
+        }
+      }
+    },
+    "winterberry": {
+      "habitat": [
+        "taiga_clearing",
+        "coniferous_forest"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -3.0,
+          "heat_resistance": 0.3,
+          "cold_resistance": 0.85
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.4,
+          "growth_efficiency": 0.6,
+          "max_size": 0.8
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.6,
+          "respiration_rate": 0.1,
+          "metabolic_activity": 0.5
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.5,
+          "mycorrhizal_rate": 0.025,
+          "base_nutritive_value": 0.7,
+          "base_toxicity": 0.4
+        }
+      }
+    },
+    "acacia_tree": {
+      "habitat": [
+        "savanna_woodland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 30.0,
+          "heat_resistance": 0.8,
+          "cold_resistance": 0.2
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.6,
+          "growth_efficiency": 0.7,
+          "max_size": 4.0
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.7,
+          "mycorrhizal_rate": 0.03,
+          "base_nutritive_value": 0.6
+        }
+      }
+    },
+    "savanna_grass": {
+      "habitat": [
+        "grassland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 28.0,
+          "heat_resistance": 0.75,
+          "cold_resistance": 0.3
+        },
+        "GrowthComponent": {
+          "growth_modifier": 1.5,
+          "growth_efficiency": 0.8,
+          "max_size": 0.8
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.75,
+          "respiration_rate": 0.15,
+          "metabolic_activity": 0.8
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.6,
+          "mycorrhizal_rate": 0.02,
+          "base_nutritive_value": 0.7
+        }
+      }
+    },
+    "baobab_tree": {
+      "habitat": [
+        "savanna_woodland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 29.0,
+          "heat_resistance": 0.85,
+          "cold_resistance": 0.15
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.4,
+          "growth_efficiency": 0.7,
+          "max_size": 5.0
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.7,
+          "respiration_rate": 0.1,
+          "metabolic_activity": 0.6
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.65,
+          "mycorrhizal_rate": 0.025,
+          "base_nutritive_value": 0.6
+        }
+      }
+    },
+    "aloe_vera": {
+      "habitat": [
+        "grassland",
+        "savanna_woodland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 32.0,
+          "heat_resistance": 0.85,
+          "cold_resistance": 0.25
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.7,
+          "growth_efficiency": 0.7,
+          "max_size": 0.6
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.7,
+          "respiration_rate": 0.12,
+          "metabolic_activity": 0.65
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.5,
+          "mycorrhizal_rate": 0.02,
+          "base_nutritive_value": 0.75,
+          "base_toxicity": 0.2
+        }
+      }
+    },
+    "arctic_willow": {
+      "habitat": [
+        "permafrost_plains"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -10.0,
+          "heat_resistance": 0.2,
+          "cold_resistance": 0.95
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.2,
+          "growth_efficiency": 0.5,
+          "max_size": 1.0
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.5,
+          "respiration_rate": 0.1,
+          "metabolic_activity": 0.4
+        }
+      }
+    },
+    "tundra_lichen": {
+      "habitat": [
+        "alpine_slopes"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -15.0,
+          "heat_resistance": 0.1,
+          "cold_resistance": 0.98
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.1,
+          "growth_efficiency": 0.4,
+          "max_size": 0.1
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.45,
+          "respiration_rate": 0.05,
+          "metabolic_activity": 0.3
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.3,
+          "mycorrhizal_rate": 0.01,
+          "base_nutritive_value": 0.5
+        }
+      }
+    },
+    "arctic_cotton_grass": {
+      "habitat": [
+        "permafrost_plains",
+        "tundra_lake"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -8.0,
+          "heat_resistance": 0.15,
+          "cold_resistance": 0.9
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.3,
+          "growth_efficiency": 0.5,
+          "max_size": 0.3
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.55,
+          "respiration_rate": 0.08,
+          "metabolic_activity": 0.45
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.4,
+          "mycorrhizal_rate": 0.02,
+          "base_nutritive_value": 0.6
+        }
+      }
+    },
+    "saxifrage": {
+      "habitat": [
+        "alpine_slopes",
+        "permafrost_plains"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -12.0,
+          "heat_resistance": 0.2,
+          "cold_resistance": 0.92
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.25,
+          "growth_efficiency": 0.45,
+          "max_size": 0.2
+        },
+        "PhotosyntheticMetabolismComponent": {
+          "photosynthesis_efficiency": 0.5,
+          "respiration_rate": 0.07,
+          "metabolic_activity": 0.4
+        },
+        "AutotrophicNutritionComponent": {
+          "nutrient_absorption_rate": 0.35,
+          "mycorrhizal_rate": 0.015,
+          "base_nutritive_value": 0.5
+        }
+      }
     }
   },
   "fauna": {
     "deer": {
       "diet": "herbivore",
+      "habitat": [
+        "thicket"
+      ],
       "components": {
         "WeatherAdaptationComponent": {
-          "optimal_temperature": -10.0,
+          "optimal_temperature": 25.0,
+          "cold_resistance": 0.2,
+          "heat_resistance": 0.4
+        },
+        "VitalComponent": {},
+        "GrowthComponent": {
+          "growth_modifier": 1.2,
+          "max_size": 2.5
+        }
+      }
+    },
+    "boar": {
+      "diet": "herbivore",
+      "habitat": [
+        "thicket"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 25.0,
+          "cold_resistance": 0.2,
+          "heat_resistance": 0.4
+        },
+        "VitalComponent": {},
+        "GrowthComponent": {
+          "growth_modifier": 1.2,
+          "max_size": 2.5
+        }
+      }
+    },
+    "fox": {
+      "diet": "herbivore",
+      "habitat": [
+        "thicket"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 25.0,
           "cold_resistance": 0.2,
           "heat_resistance": 0.4
         },
@@ -907,33 +1611,584 @@
           "growth_modifier": 1.2,
           "max_size": 2.5
         }
-      },
-      "habitat": [
-        "thicket"
-      ]
-    },
-    "boar": {
-      "diet": "herbivore",
-      "habitat": [
-        "thicket"
-      ]
-    },
-    "fox": {
-      "diet": "herbivore",
-      "habitat": [
-        "thicket"
-      ]
+      }
     },
     "panther": {
       "diet": "carnivore",
       "habitat": [
         "forest"
-      ]
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 25.0,
+          "cold_resistance": 0.2,
+          "heat_resistance": 0.4
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.5,
+          "thirst_rate": 0.8,
+          "metabolism_efficiency": 1.5
+        },
+        "GrowthComponent": {
+          "growth_modifier": 1.2,
+          "max_size": 2.5
+        }
+      }
+    },
+    "toucan": {
+      "diet": "omnivore",
+      "habitat": [
+        "rainforest_canopy"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 26.0,
+          "heat_resistance": 0.65,
+          "cold_resistance": 0.1
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.6
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 1.2,
+          "thirst_rate": 1.3,
+          "metabolism_efficiency": 1.3
+        }
+      }
+    },
+    "capybara": {
+      "diet": "herbivore",
+      "habitat": [
+        "tropical_wetland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 29.0,
+          "heat_resistance": 0.75,
+          "cold_resistance": 0.1
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.9,
+          "thirst_rate": 1.3,
+          "metabolism_efficiency": 1.4
+        },
+        "VitalComponent": {
+          "max_vitality": 120.0,
+          "aging_rate": 0.85,
+          "health_modifier": 1.2
+        }
+      }
+    },
+    "jaguar": {
+      "diet": "carnivore",
+      "habitat": [
+        "rainforest_canopy",
+        "tropical_understory"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 28.0,
+          "heat_resistance": 0.7,
+          "cold_resistance": 0.2
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.7
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.9,
+          "thirst_rate": 1.4,
+          "metabolism_efficiency": 1.3
+        },
+        "VitalComponent": {
+          "max_vitality": 140.0,
+          "aging_rate": 0.75,
+          "health_modifier": 1.4
+        }
+      }
+    },
+    "poison_dart_frog": {
+      "diet": "carnivore",
+      "habitat": [
+        "tropical_understory"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 25.0,
+          "heat_resistance": 0.6,
+          "cold_resistance": 0.05
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.4
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.85,
+          "thirst_rate": 1.3,
+          "metabolism_efficiency": 1.0
+        },
+        "VitalComponent": {
+          "max_vitality": 70.0,
+          "aging_rate": 1.1,
+          "health_modifier": 0.9
+        }
+      }
+    },
+    "desert_fox": {
+      "diet": "carnivore",
+      "habitat": [
+        "sand_dunes"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 32.0,
+          "heat_resistance": 0.9,
+          "cold_resistance": 0.4
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.8,
+          "thirst_rate": 1.2,
+          "metabolism_efficiency": 1.4
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.5
+        },
+        "VitalComponent": {
+          "max_vitality": 90.0,
+          "aging_rate": 0.9,
+          "health_modifier": 1.1
+        }
+      }
+    },
+    "scorpion": {
+      "diet": "carnivore",
+      "habitat": [
+        "rocky_desert"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 35.0,
+          "heat_resistance": 0.95,
+          "cold_resistance": 0.3
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.3
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.8,
+          "thirst_rate": 1.0,
+          "metabolism_efficiency": 1.2
+        },
+        "VitalComponent": {
+          "max_vitality": 60.0,
+          "aging_rate": 0.7,
+          "health_modifier": 0.9
+        }
+      }
+    },
+    "camel": {
+      "diet": "herbivore",
+      "habitat": [
+        "sand_dunes",
+        "rocky_desert"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 34.0,
+          "heat_resistance": 0.95,
+          "cold_resistance": 0.45
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.6
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.8,
+          "thirst_rate": 0.8,
+          "metabolism_efficiency": 1.6
+        },
+        "VitalComponent": {
+          "max_vitality": 130.0,
+          "aging_rate": 0.65,
+          "health_modifier": 1.4
+        }
+      }
+    },
+    "desert_lizard": {
+      "diet": "carnivore",
+      "habitat": [
+        "sand_dunes",
+        "rocky_desert"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 38.0,
+          "heat_resistance": 0.98,
+          "cold_resistance": 0.1
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.35
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.9,
+          "thirst_rate": 1.0,
+          "metabolism_efficiency": 1.3
+        },
+        "VitalComponent": {
+          "max_vitality": 70.0,
+          "aging_rate": 0.8,
+          "health_modifier": 1.0
+        }
+      }
+    },
+    "wolf": {
+      "diet": "carnivore",
+      "habitat": [
+        "coniferous_forest"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -5.0,
+          "heat_resistance": 0.3,
+          "cold_resistance": 0.8
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.7
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.9,
+          "thirst_rate": 1.3,
+          "metabolism_efficiency": 1.2
+        },
+        "VitalComponent": {
+          "max_vitality": 130.0,
+          "aging_rate": 0.7,
+          "health_modifier": 1.3
+        }
+      }
+    },
+    "moose": {
+      "diet": "herbivore",
+      "habitat": [
+        "taiga_clearing"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -2.0,
+          "heat_resistance": 0.2,
+          "cold_resistance": 0.85
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 1.1
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 1.0,
+          "thirst_rate": 1.4,
+          "metabolism_efficiency": 1.1
+        },
+        "GrowthComponent": {
+          "growth_modifier": 1.0,
+          "growth_efficiency": 0.9,
+          "max_size": 4.5
+        },
+        "VitalComponent": {
+          "max_vitality": 160.0,
+          "aging_rate": 0.6,
+          "health_modifier": 1.5
+        }
+      }
+    },
+    "lynx": {
+      "diet": "carnivore",
+      "habitat": [
+        "coniferous_forest",
+        "taiga_clearing"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -8.0,
+          "heat_resistance": 0.3,
+          "cold_resistance": 0.85
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.6
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.85,
+          "thirst_rate": 1.2,
+          "metabolism_efficiency": 1.3
+        },
+        "VitalComponent": {
+          "max_vitality": 110.0,
+          "aging_rate": 0.8,
+          "health_modifier": 1.2
+        }
+      }
+    },
+    "snowshoe_hare": {
+      "diet": "herbivore",
+      "habitat": [
+        "taiga_clearing",
+        "coniferous_forest"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -10.0,
+          "heat_resistance": 0.2,
+          "cold_resistance": 0.9
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.4
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 1.1,
+          "thirst_rate": 1.3,
+          "metabolism_efficiency": 1.2
+        },
+        "VitalComponent": {
+          "max_vitality": 80.0,
+          "aging_rate": 1.2,
+          "health_modifier": 0.9
+        }
+      }
+    },
+    "lion": {
+      "diet": "carnivore",
+      "habitat": [
+        "grassland",
+        "savanna_woodland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 28.0,
+          "heat_resistance": 0.7,
+          "cold_resistance": 0.3
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.9
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.85,
+          "thirst_rate": 1.3,
+          "metabolism_efficiency": 1.3
+        },
+        "VitalComponent": {
+          "max_vitality": 150.0,
+          "aging_rate": 0.65,
+          "health_modifier": 1.5
+        }
+      }
+    },
+    "zebra": {
+      "diet": "herbivore",
+      "habitat": [
+        "grassland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 27.0,
+          "heat_resistance": 0.75,
+          "cold_resistance": 0.3
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.7
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 1.1,
+          "thirst_rate": 1.5,
+          "metabolism_efficiency": 1.2
+        },
+        "VitalComponent": {
+          "max_vitality": 120.0,
+          "aging_rate": 0.8,
+          "health_modifier": 1.3
+        }
+      }
+    },
+    "elephant": {
+      "diet": "herbivore",
+      "habitat": [
+        "savanna_woodland",
+        "seasonal_river"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 26.0,
+          "heat_resistance": 0.8,
+          "cold_resistance": 0.2
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 1.2
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 1.3,
+          "thirst_rate": 1.6,
+          "metabolism_efficiency": 1.0
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.7,
+          "growth_efficiency": 0.8,
+          "max_size": 5.0
+        },
+        "VitalComponent": {
+          "max_vitality": 200.0,
+          "aging_rate": 0.5,
+          "health_modifier": 1.8
+        }
+      }
+    },
+    "hyena": {
+      "diet": "carnivore",
+      "habitat": [
+        "grassland"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": 30.0,
+          "heat_resistance": 0.8,
+          "cold_resistance": 0.3
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.65
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.8,
+          "thirst_rate": 1.3,
+          "metabolism_efficiency": 1.4
+        },
+        "VitalComponent": {
+          "max_vitality": 120.0,
+          "aging_rate": 0.75,
+          "health_modifier": 1.2
+        }
+      }
+    },
+    "polar_bear": {
+      "diet": "herbivore",
+      "habitat": [
+        "permafrost_plains",
+        "tundra_lake"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -15.0,
+          "heat_resistance": 0.1,
+          "cold_resistance": 0.95
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.8,
+          "growth_efficiency": 0.7,
+          "max_size": 5.0
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.85,
+          "thirst_rate": 1.2,
+          "metabolism_efficiency": 1.4
+        },
+        "VitalComponent": {
+          "max_vitality": 180.0,
+          "aging_rate": 0.6,
+          "health_modifier": 1.7
+        }
+      }
+    },
+    "arctic_fox": {
+      "diet": "omnivore",
+      "habitat": [
+        "permafrost_plains"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -18.0,
+          "heat_resistance": 0.1,
+          "cold_resistance": 0.92
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.8,
+          "thirst_rate": 1.1,
+          "metabolism_efficiency": 1.5
+        },
+        "VitalComponent": {
+          "max_vitality": 90.0,
+          "aging_rate": 0.8,
+          "health_modifier": 1.2
+        }
+      }
+    },
+    "musk_ox": {
+      "diet": "herbivore",
+      "habitat": [
+        "permafrost_plains"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -12.0,
+          "heat_resistance": 0.05,
+          "cold_resistance": 0.98
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 1.0
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.9,
+          "thirst_rate": 1.2,
+          "metabolism_efficiency": 1.3
+        },
+        "GrowthComponent": {
+          "growth_modifier": 0.6,
+          "growth_efficiency": 0.7,
+          "max_size": 4.0
+        },
+        "VitalComponent": {
+          "max_vitality": 160.0,
+          "aging_rate": 0.7,
+          "health_modifier": 1.5
+        }
+      }
+    },
+    "arctic_hare": {
+      "diet": "herbivore",
+      "habitat": [
+        "permafrost_plains",
+        "alpine_slopes"
+      ],
+      "components": {
+        "WeatherAdaptationComponent": {
+          "optimal_temperature": -15.0,
+          "heat_resistance": 0.1,
+          "cold_resistance": 0.9
+        },
+        "MovementComponent": {
+          "movement_energy_cost": 0.4
+        },
+        "HeterotrophicNutritionComponent": {
+          "hunger_rate": 0.95,
+          "thirst_rate": 1.1,
+          "metabolism_efficiency": 1.4
+        },
+        "VitalComponent": {
+          "max_vitality": 75.0,
+          "aging_rate": 1.1,
+          "health_modifier": 1.0
+        }
+      }
     }
   },
   "components": {
     "fixed_components": {
-      "TransformComponent": {}
+      "flora": {
+        "TransformComponent": {},
+        "VitalComponent": {},
+        "PhotosyntheticMetabolismComponent": {},
+        "AutotrophicNutritionComponent": {},
+        "GrowthComponent": {},
+        "WeatherAdaptationComponent": {}
+      },
+      "fauna": {
+        "VitalComponent": {},
+        "HeterotrophicNutritionComponent": {},
+        "GrowthComponent": {},
+        "WeatherAdaptationComponent": {},
+        "TransformComponent": {},
+        "MovementComponent": {}
+      }
     },
     "VitalComponent": {
       "defaults": {

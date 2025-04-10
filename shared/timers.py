@@ -26,6 +26,7 @@ class Timers:
         MONTH = 60
         SEASON = 180
         YEAR = 720
+        REAL_YEAR = 360
 
     class System(EnumBaseInt):
         CLIMATE_UPDATE = 2

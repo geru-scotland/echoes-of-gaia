@@ -39,7 +39,7 @@ class ReinforcementLearningModel:
     def __init__(self, agent_type: Agents.Reinforcement, model_path: str):
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self._model_path = get_model_path(model_path)
-        self._config = ConfigLoader().get_config(agent_type)
+        self._config = ConfigLoader().get_agent_config(agent_type)
 
         try:
             self._logger.info(f"Loading Reinforcement model from {self._model_path}...")

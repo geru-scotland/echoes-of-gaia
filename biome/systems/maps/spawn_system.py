@@ -52,7 +52,7 @@ class SpawnSystem:
         self._map_allocator: MapAllocator = map_allocator
 
     def _create_single_entity(self, entity_class, entity_species, habitats: HabitatList,
-                              lifespan: float, components: List[Dict], evolution_cycle: int = 0,
+                              lifespan: float, components: Dict[str, Dict[str, Any]], evolution_cycle: int = 0,
                               diet_type: DietType = None, biome_store: Optional[Dict[str, Any]] = None) -> Optional[
         Entity]:
         entity_id: int = next(self._id_generator)
@@ -66,34 +66,30 @@ class SpawnSystem:
         if not components:
             return self._finalize_entity_creation(entity)
 
-        for component in components:
-            self._add_components_to_entity(entity, component, lifespan, biome_store)
+        self._add_components_to_entity(entity, components, lifespan)
 
         return self._finalize_entity_creation(entity)
 
-    def _add_components_to_entity(self, entity: Entity, component_dict: Dict, lifespan: float,
-                                  biome_store: Dict[str, Any]) -> None:
-        for class_name, attribute_dict in component_dict.items():
-            defaults = self._get_component_defaults(class_name, entity.get_species(), biome_store)
-            data = {**defaults, **(attribute_dict or {})}
-
-            if not data:
-                continue
-
+    def _add_components_to_entity(self, entity: Entity, components_dict: Dict[str, Dict[str, Any]],
+                                  lifespan: float) -> None:
+        for class_name, params in components_dict.items():
             component_class = get_component_class(class_name)
             if not component_class:
                 self._logger.debug(f"Class not found: {class_name}")
                 continue
 
+            data = params.copy() if params else {}
+
             if self._requires_lifespan(component_class):
-                data.update({"lifespan": lifespan})
+                data["lifespan"] = lifespan
 
             try:
                 component_instance = component_class(self._env, entity.event_notifier, **data)
-                self._logger.debug(f"ADDING COMPONENT {component_instance.__class__} to {entity.type}")
+                self._logger.debug(
+                    f"Adding componente {component_instance.__class__.__name__} a {entity.get_type()}")
                 entity.add_component(component_instance)
             except Exception as e:
-                self._logger.error(f"Error creating component {class_name}: {e}")
+                self._logger.error(f"Error creating the component {class_name}: {e}", exc_info=True)
 
     def _get_component_defaults(self, class_name: str, entity_species: str, biome_store: Dict[str, Any]) -> Dict:
 
@@ -120,12 +116,34 @@ class SpawnSystem:
         ]
 
     def _finalize_entity_creation(self, entity: Entity) -> Optional[Entity]:
-        if self._request_allocation(entity):
-            return entity
+        try:
+            self._logger.debug(f"=== CREATING ENTITY ===")
+            self._logger.debug(f"ID: {entity.get_id()}")
+            self._logger.debug(f"Type: {entity.get_type()}")
+            self._logger.debug(f"Species: {entity.get_species()}")
+            self._logger.debug(f"Habitats: {entity.get_habitats()}")
 
-        self._logger.warning("Entity allocation failed!")
-        entity.clear_and_unregister()
-        return None
+            self._logger.debug("Components:")
+            for comp_type, component in entity.components.items():
+                self._logger.debug(f"  - {comp_type}: {component.__class__.__name__}")
+                if hasattr(component, 'event_notifier'):
+                    is_valid = component.event_notifier is not None
+                    self._logger.debug(f"    event_notifier: {'OK' if is_valid else 'None (POTENTIAL ERROR)'}")
+
+                for attr_name, attr_value in vars(component).items():
+                    if not attr_name.startswith('_') and not callable(attr_value):
+                        self._logger.debug(f"    {attr_name}: {attr_value}")
+
+            if self._request_allocation(entity):
+                return entity
+
+            self._logger.warning("Entity allocation failed!")
+            entity.clear_and_unregister()
+            return None
+        except Exception as e:
+            self._logger.error(f"Error finalizing entity creation: {e}", exc_info=True)
+            entity.clear_and_unregister()
+            return None
 
     @log_execution_time(context="Entities created")
     def _create_entities(self, spawns: EntityDefinitions, entity_class, entity_species_enum,
@@ -136,54 +154,34 @@ class SpawnSystem:
         self._logger.info(f"Creating entities... {entity_class.__name__}...")
         entity_registry: EntityRegistry = {}
 
-        for spawn in spawns:
+        for spawn_definition in spawns:
             try:
-                entity_species = entity_species_enum(str(spawn.get("species")).lower())
-                habitats: HabitatList = biome_store.get(entity_species, {}).get("habitat", {})
-                amount: int = spawn.get("spawns")
-                lifespan: float = spawn.get("avg-lifespan", random.randint(1, 20))
-
-                diet_type = DietType.HERBIVORE
-                if entity_class == Fauna and "diet" in spawn:
-                    diet_str = spawn.get("diet", "herbivore").lower()
-                    try:
-                        diet_type = DietType(diet_str)
-                        self._logger.debug(f"Diet type set to {diet_type} for {entity_species}")
-                    except ValueError:
-                        self._logger.warning(f"Invalid diet type '{diet_str}', using default: herbivore")
+                species_name = str(spawn_definition.get("species", "")).lower()
+                amount = spawn_definition.get("spawns", 0)
+                lifespan = spawn_definition.get("avg-lifespan", random.randint(1, 20))
+                custom_components = spawn_definition.get("components", [])
 
                 if amount < 1 or amount > 350:
                     raise ValueError(f"Invalid spawn amount: {amount}. Must be between 1 and 150.")
                 if lifespan <= 0:
                     raise ValueError(f"Invalid avg-lifespan amount: {lifespan}. Must be higher than 0")
+
+                for _ in range(amount):
+                    entity = self.spawn(
+                        entity_class=entity_class,
+                        entity_species_enum=entity_species_enum,
+                        species_name=species_name,
+                        lifespan=lifespan,
+                        custom_components=custom_components,
+                        biome_store=biome_store,
+                    )
+
+                    if entity:
+                        entity_registry[entity.get_id()] = entity
+
             except (AttributeError, ValueError) as e:
                 self._logger.exception(f"There was an error loading {entity_class.__name__} spawns: {e}")
                 continue
-
-            components = spawn.get("components", [])
-            fixed_components = BiomeStore.components.get("fixed_components", [])
-            components.append(fixed_components)
-
-            if not components:
-                store_components: List[str] = biome_store.get(entity_species, {}).get("components", [])
-                if store_components:
-                    components = [
-                        {cmp: BiomeStore.components.get(cmp, {}).get("defaults", {})}
-                        for cmp in store_components
-                        if BiomeStore.components.get(cmp)
-                    ]
-
-            for _ in range(amount):
-                if entity_class == Fauna:
-                    entity = self._create_single_entity(
-                        entity_class, entity_species, habitats, lifespan, components, diet_type=diet_type,
-                        biome_store=biome_store)
-                else:
-                    entity = self._create_single_entity(
-                        entity_class, entity_species, habitats, lifespan, components, biome_store=biome_store)
-
-                if entity:
-                    entity_registry[entity.get_id()] = entity
 
         return entity_registry
 
@@ -219,7 +217,7 @@ class SpawnSystem:
             return None
 
         # 3. Preparo los componentes
-        components = self._prepare_components(entity_species, custom_components, biome_store)
+        components = self._prepare_components(entity_species, entity_class, custom_components, biome_store)
 
         # 4. Instancio la entidad
         entity = self._create_single_entity(entity_class, entity_species, habitats, lifespan, components,
@@ -260,22 +258,68 @@ class SpawnSystem:
 
         return entity_species, habitats, diet_type
 
-    def _prepare_components(self, entity_species, custom_components: List[Dict], biome_store: Dict[str, Any]) -> List[
-        Dict]:
-        components = []
+    def _prepare_components(self, entity_species, entity_class, custom_components: List[Dict],
+                            biome_store: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+        components = {}
 
+        entity_type = "flora" if entity_class == Flora else "fauna"
+
+        fixed_components = BiomeStore.components.get("fixed_components", {}).get(entity_type, {})
+        fixed_component_names = list(fixed_components.keys())
+
+        species_components = biome_store.get(entity_species, {}).get("components", {})
+
+        custom_component_map = {}
         if custom_components:
-            components.extend(custom_components)
+            for comp_dict in custom_components:
+                for comp_name, comp_params in comp_dict.items():
+                    custom_component_map[comp_name] = comp_params
 
-        fixed_components = BiomeStore.components.get("fixed_components", [])
-        if fixed_components:
-            components.append(fixed_components)
+        for comp_name in fixed_component_names:
+            default_values = BiomeStore.components.get(comp_name, {}).get("defaults", {})
+            if default_values is None:
+                default_values = {}
+            else:
+                default_values = default_values.copy()
 
-        entity_components = biome_store.get(entity_species, {}).get("components", {})
-        if entity_components:
-            for comp_name, comp_params in entity_components.items():
-                if not any(comp_name in comp_dict for comp_dict in components):
-                    components.append({comp_name: comp_params})
+            components[comp_name] = default_values
+
+            if comp_name in species_components:
+                if species_components[comp_name] is not None:
+                    components[comp_name].update(species_components[comp_name])
+
+            if comp_name in custom_component_map:
+                if custom_component_map[comp_name] is not None:
+                    components[comp_name].update(custom_component_map[comp_name])
+
+        for comp_name, comp_params in species_components.items():
+            if comp_name not in components:
+                default_values = BiomeStore.components.get(comp_name, {}).get("defaults", {})
+                if default_values is None:
+                    default_values = {}
+                else:
+                    default_values = default_values.copy()
+
+                components[comp_name] = default_values
+
+                if comp_params is not None:
+                    components[comp_name].update(comp_params)
+
+                if comp_name in custom_component_map and custom_component_map[comp_name] is not None:
+                    components[comp_name].update(custom_component_map[comp_name])
+
+        for comp_name, comp_params in custom_component_map.items():
+            if comp_name not in components:
+                default_values = BiomeStore.components.get(comp_name, {}).get("defaults", {})
+                if default_values is None:
+                    default_values = {}
+                else:
+                    default_values = default_values.copy()
+
+                components[comp_name] = default_values
+
+                if comp_params is not None:
+                    components[comp_name].update(comp_params)
 
         return components
 

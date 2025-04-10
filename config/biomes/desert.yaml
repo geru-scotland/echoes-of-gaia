@@ -1,0 +1,40 @@
+biome:
+  type: "desert"
+
+  flora:
+    - species: "cactus"
+      spawns: 30
+      avg-lifespan: 25
+
+    - species: "date_palm"
+      spawns: 8
+      avg-lifespan: 15
+
+    - species: "desert_sage"
+      spawns: 20
+      avg-lifespan: 6
+
+    - species: "prickly_pear"
+      spawns: 25
+      avg-lifespan: 10
+
+  fauna:
+    - species: "desert_fox"
+      spawns: 5
+      diet: "carnivore"
+      avg-lifespan: 8
+
+    - species: "scorpion"
+      spawns: 15
+      diet: "carnivore"
+      avg-lifespan: 3
+
+    - species: "camel"
+      spawns: 4
+      diet: "herbivore"
+      avg-lifespan: 12
+
+    - species: "desert_lizard"
+      spawns: 10
+      diet: "carnivore"
+      avg-lifespan: 5

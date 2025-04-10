@@ -58,13 +58,18 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         # TODO: Max pooling, mirar a ver.
         self.cnn = nn.Sequential(
             nn.Conv2d(terrain_embedding_dim + 7, 32, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.Flatten(),
         )
+        h_pooled = h // 2
+        w_pooled = w // 2
+        cnn_out_size = 64 * h_pooled * w_pooled
 
-        cnn_out_size = 64 * h * w
         biome_embedd_flat_size = biome_embedding_dim * num_biome_types
         diet_embedd_flat_size = diet_embedding_dim * num_diet_types  # Lo mismo, como no puedo aplicar convoluciones, al no ser espacial, concanteno
 
@@ -85,6 +90,7 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         self.linear = nn.Sequential(
             nn.Linear(combined_features_size, 512),
             nn.ReLU(),
+            nn.Dropout(0.2),
             nn.Linear(512, features_dim),
             nn.ReLU(),
         )

@@ -16,6 +16,7 @@
 ##########################################################################
 """
 import logging
+import time
 from dataclasses import dataclass
 from typing import Dict
 
@@ -64,6 +65,7 @@ class SimulationTime:
     def __init__(self, events_per_era: int = 30000):
         self._logger: logging.Logger = LoggerManager.get_logger(Loggers.SIMULATION)
         self.events_per_era = events_per_era
+        self._start_time = time.time()
 
     def get_current_era(self, event_count: int) -> int:
         return event_count // self.events_per_era
@@ -74,4 +76,7 @@ class SimulationTime:
     def log_time(self, event_count: int):
         era = self.get_current_era(event_count)
         event_number = self.get_event_number_in_era(event_count)
-        self._logger.debug(f"Simulated events: {event_count}, Era={era}, Event in Era={event_number}")
+        elapsed_seconds = time.time() - self._start_time
+        self._logger.debug(
+            f"Simulated events: {event_count}, Era: {era}, Event in Era: {event_number}"
+            f" in {elapsed_seconds:.2f} seconds")
