@@ -258,7 +258,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         if energy_ratio > 0.5:
             reward += 0.3
-        if thirst_ratio > 0.3:
+        if thirst_ratio > 0.4:
             reward += 0.5
         if hunger_ratio > 0.3:
             reward += 0.5
@@ -270,7 +270,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if stress_level < 0.4:
             reward += 0.05
 
-        if hunger_ratio < 0.85 or thirst_ratio < 0.85:
+        if hunger_ratio < 0.2 or thirst_ratio < 0.2:
             reward -= 0.8
 
         if energy_ratio < 0.15:
@@ -287,11 +287,11 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
             if 'thirst_ratio' in prev_states and thirst_ratio > prev_states['thirst_ratio']:
                 improvement = thirst_ratio - prev_states['thirst_ratio']
-                reward += 5 * improvement
+                reward += 3 * improvement
 
             if 'hunger_ratio' in prev_states and hunger_ratio > prev_states['hunger_ratio']:
                 improvement = hunger_ratio - prev_states['hunger_ratio']
-                reward += 5 * improvement
+                reward += 3 * improvement
 
             if 'energy_ratio' in prev_states and energy_ratio > prev_states['energy_ratio']:
                 improvement = energy_ratio - prev_states['energy_ratio']
@@ -387,7 +387,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
                 moving_away = self._local_interaction_simulator.is_moving_away_from(my_pos, other_pos, direction)
                 distance = self._local_interaction_simulator.calculate_manhattan_distance(my_pos, other_pos)
 
-                threat_factor = max(1.0, min(1.0, 5.0 / distance))
+                threat_factor = max(1.0, min(1.0, 3.0 / distance))
 
                 if moving_away:
                     reward += 0.6 * threat_factor

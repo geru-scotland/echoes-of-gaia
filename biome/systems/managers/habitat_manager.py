@@ -115,7 +115,7 @@ class HabitatManager:
         self._logger.warning(f"No available positions found for habitats: {habitats}")
         return None
 
-    def remove_position(self, position: Position) -> None:
+    def remove_from_available_habitats(self, position: Position) -> None:
         if position is None:
             return
 
@@ -129,7 +129,7 @@ class HabitatManager:
                 self._habitat_cache[habitat] = filtered_positions
                 self._logger.debug(f"Removed position {position} from habitat {habitat}")
 
-    def add_position(self, position: Position) -> None:
+    def restore_habitat(self, position: Position) -> None:
         if position is None:
             return
 

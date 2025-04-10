@@ -34,13 +34,16 @@ from utils.loggers import LoggerManager
 
 class FaunaAgentAI(Agent[Observation, FaunaAction]):
     def __init__(self, fauna_model: str, entity_provider: EntityProvider, worldmap_manager: WorldMapManager,
-                 biome_type: BiomeType):
+                 biome_type: BiomeType, local_fov: Dict[str, Any]):
         self._model = ReinforcementLearningModel(Agents.Reinforcement.FAUNA, fauna_model)
         self._logger = LoggerManager.get_logger(Loggers.FAUNA_AGENT)
         self._entity_provider = entity_provider
         self._worldmap_manager = worldmap_manager
         self._foraging_behaviour = ForagingBehaviour(worldmap_manager)
         self._biome_type_idx: int = list(BiomeType).index(biome_type)
+        self._local_fov_width: int = local_fov.get("size", {}).get("width", 15)
+        self._local_fov_height: int = local_fov.get("size", {}).get("height", 15)
+        self._local_fov_center: int = local_fov.get("size", {}).get("center", 15)
 
     def perceive(self) -> Observation:
         fauna_entities = self._entity_provider.get_fauna(only_alive=True)
@@ -102,34 +105,37 @@ class FaunaAgentAI(Agent[Observation, FaunaAction]):
                     self._logger.debug(f"Post position {fauna_entity.get_position()}")
 
             except Exception as e:
-                fauna_entity: Fauna = self._worldmap_manager.get_entity_by_id(entity_id)
                 self._logger.warning(
-                    f"Error executing action for fauna entity {entity_id} (Pos: {fauna_entity.get_position()}, species: {fauna_entity.get_species()}): {e}")
+                    f"Error executing action for fauna entity {entity_id}): {e}")
 
     def _prepare_entity_observation(self, entity: Fauna) -> Dict[str, Any]:
         position = entity.get_position()
-        fov_size = 15
 
-        terrain_map = np.zeros((fov_size, fov_size), dtype=np.int32)
-        validity_map = np.zeros((fov_size, fov_size), dtype=np.float32)
-        visited_map = np.zeros((fov_size, fov_size), dtype=np.float32)
-        flora_map = np.zeros((fov_size, fov_size), dtype=np.int8)
-        prey_map = np.zeros((fov_size, fov_size), dtype=np.int8)
-        predator_map = np.zeros((fov_size, fov_size), dtype=np.int8)
+        terrain_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.int32)
+        validity_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.float32)
+        visited_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.float32)
+        flora_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.int8)
+        prey_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.int8)
+        predator_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.int8)
+        water_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.int8)
+        food_map = np.zeros((self._local_fov_height, self._local_fov_width), dtype=np.int8)
 
         if position:
             local_maps = self._worldmap_manager.get_local_maps(position, entity.diet_type, entity.get_species(),
-                                                               fov_size, fov_size)
+                                                               self._local_fov_width, self._local_fov_height)
             if local_maps:
-                terrain_map, validity_map, flora_map, prey_map, predator_map = local_maps
+                terrain_map, validity_map, flora_map, prey_map, predator_map, water_map, food_map = local_maps
 
                 terrain_map = terrain_map.astype(np.int64)
                 validity_map = validity_map.astype(np.float32)
                 flora_map = flora_map.astype(np.float32)
                 prey_map = prey_map.astype(np.float32)
                 predator_map = predator_map.astype(np.float32)
+                water_map = water_map.astype(np.float32)
+                food_map = food_map.astype(np.float32)
 
-                visited_mask = self._worldmap_manager.get_local_visited_map(entity, fov_size, fov_size)
+                visited_mask = self._worldmap_manager.get_local_visited_map(entity, self._local_fov_width,
+                                                                            self._local_fov_height)
                 visited_map = visited_mask.astype(np.float32)
 
         thirst_level = 0.0
@@ -159,6 +165,8 @@ class FaunaAgentAI(Agent[Observation, FaunaAction]):
             "flora_map": flora_map,
             "prey_map": prey_map,
             "predator_map": predator_map,
+            "water_map": water_map,
+            "food_map": food_map,
             "thirst_level": np.array([thirst_level], dtype=np.float32),
             "hunger_level": np.array([hunger_level], dtype=np.float32),
             "energy_reserves": np.array([energy_reserves], dtype=np.float32),

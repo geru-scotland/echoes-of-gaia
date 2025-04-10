@@ -55,7 +55,7 @@ class MapAllocator:
                 f"Position {position} is already occupied in index map by entity {self._entity_index_map[position]}")
             return None
 
-        self._habitat_manager.remove_position(position)
+        self._habitat_manager.remove_from_available_habitats(position)
 
         self._entity_index_map[position] = entity_id
 
@@ -72,35 +72,35 @@ class MapAllocator:
 
         self._entity_index_map[position] = -1
 
-        self._habitat_manager.add_position(position)
+        self._habitat_manager.restore_habitat(position)
 
         return entity_id
 
-    def move_entity(self, entity_id: int, from_position: Position, to_position: Position, habitats: List) -> bool:
-        if from_position is None or to_position is None:
+    def move_entity(self, entity_id: int, old_position: Position, new_position: Position, habitats: List) -> bool:
+        if old_position is None or new_position is None:
             return False
 
-        if not self.is_position_valid(to_position):
+        if not self.is_position_valid(new_position):
             self._logger.debug(
-                f"Target position {to_position} is outside map boundaries")
+                f"Target position {new_position} is outside map boundaries")
             return False
 
-        if self._entity_index_map[from_position] != entity_id:
+        if self._entity_index_map[old_position] != entity_id:
             self._logger.debug(
-                f"Entity {entity_id} is not at position {from_position}")
+                f"Entity {entity_id} is not at position {old_position}")
             return False
 
-        if self._entity_index_map[to_position] != -1:
+        if self._entity_index_map[new_position] != -1:
             self._logger.debug(
-                f"Target position {to_position} is already occupied by entity {self._entity_index_map[to_position]}")
+                f"Target position {new_position} is already occupied by entity {self._entity_index_map[new_position]}")
             return False
 
-        self._entity_index_map[from_position] = -1
-        self._entity_index_map[to_position] = entity_id
+        self._entity_index_map[old_position] = -1
+        self._entity_index_map[new_position] = entity_id
 
-        # Actualizar hábitats
-        self._habitat_manager.remove_position(to_position)
-        self._habitat_manager.add_position(from_position)
+        # Pongo nombres más expresivos, que me hice la picha un lio.
+        self._habitat_manager.restore_habitat(old_position)
+        self._habitat_manager.remove_from_available_habitats(new_position)
 
         return True
 
