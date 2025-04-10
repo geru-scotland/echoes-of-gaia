@@ -24,6 +24,7 @@ from biome.entities.fauna import Fauna
 from biome.entities.flora import Flora
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from shared.enums.enums import ComponentType, EntityType, TerrainType, DietType
+from shared.enums.events import ComponentEvent
 from shared.types import Position
 from utils.loggers import LoggerManager
 from shared.enums.strings import Loggers
@@ -100,9 +101,9 @@ class ForagingBehaviour:
             self._target.consume_vegetal(nutritive_value)
             self._logger.debug(f"Consuming plant: +{nutritive_value} nutrition")
 
-            # TODO: Hacer esto bien, que reste vitalidad a la planta etc.
+            # TODO: Hacer esto bien, flora.die()  o algo asi y que tenga esto
             if random.random() < 0.1:
-                self._worldmap_manager.remove_entity(flora.get_id())
+                flora.die()
                 self._logger.debug(f"Plant {flora.get_id()} was completely consumed")
             return
 
@@ -155,6 +156,12 @@ class ForagingBehaviour:
             vital_component = prey.get_component(ComponentType.VITAL)
             if vital_component:
                 vital_component.vitality = 0
+                vital_component.event_notifier.notify(
+                    ComponentEvent.UPDATE_STATE,
+                    ComponentType.VITAL,
+                    vitality=vital_component.vitality
+                )
+                vital_component.event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL)
                 # TODO: NOTIFICAR ENTITY DEATH EN PREY
                 self._logger.debug(f"Prey {prey.get_id()} was killed")
 

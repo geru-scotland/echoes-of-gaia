@@ -1,0 +1,40 @@
+biome:
+  type: "tropical"
+
+  flora:
+    - species: "heliconia"
+      spawns: 25
+      avg-lifespan: 5
+
+    - species: "mangrove"
+      spawns: 15
+      avg-lifespan: 12
+
+    - species: "orchid"
+      spawns: 30
+      avg-lifespan: 3
+
+    - species: "banana_tree"
+      spawns: 20
+      avg-lifespan: 8
+
+  fauna:
+    - species: "toucan"
+      spawns: 8
+      diet: "omnivore"
+      avg-lifespan: 7
+
+    - species: "capybara"
+      spawns: 6
+      diet: "herbivore"
+      avg-lifespan: 5
+
+    - species: "jaguar"
+      spawns: 3
+      diet: "carnivore"
+      avg-lifespan: 10
+
+    - species: "poison_dart_frog"
+      spawns: 12
+      diet: "carnivore"
+      avg-lifespan: 4

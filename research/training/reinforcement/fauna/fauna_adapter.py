@@ -33,12 +33,12 @@ from config.settings import Settings
 from research.training.reinforcement.adapter import EnvironmentAdapter
 from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
 from research.training.reinforcement.fauna.entity_interaction import LocalInteractionSimulator
-
 from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
 from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction, \
     PositionNotValidReason, TerrainType, BiomeType, DietType
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
+from shared.timers import Timers
 from shared.types import Position, DecodedAction
 from simulation.api.simulation_api import SimulationAPI
 from simulation.core.systems.events.event_bus import SimulationEventBus
@@ -212,7 +212,13 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
     def compute_reward(self, action: FaunaAction):
         if not self._target or not self._target.is_alive():
-            return -10.0
+            time_lived_ratio: float = 1 - (
+                    self._target.get_age_after_death() / (self._target.lifespan * Timers.Calendar.REAL_YEAR))
+            penalization: float = -15 * time_lived_ratio
+            self._logger.info(self._target.get_age_after_death())
+            self._logger.info(self._target.lifespan * Timers.Calendar.REAL_YEAR)
+            self._logger.info(f"DIED WITH RATIO: {time_lived_ratio}, granted {penalization} points penalization")
+            return penalization
 
         reward: float = 0.0
         movement_reward: float = 0.0
@@ -253,9 +259,9 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         if energy_ratio > 0.5:
             reward += 0.3
         if thirst_ratio > 0.3:
-            reward += 0.4
+            reward += 0.5
         if hunger_ratio > 0.3:
-            reward += 0.4
+            reward += 0.5
         if somatic_integrity > 0.5:
             reward += 0.3
 
@@ -272,6 +278,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         if vitality < 0.2:
             reward -= 0.1
+
         if stress_level > 0.8:
             reward -= 0.2
 
@@ -280,15 +287,15 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
             if 'thirst_ratio' in prev_states and thirst_ratio > prev_states['thirst_ratio']:
                 improvement = thirst_ratio - prev_states['thirst_ratio']
-                reward += 2.5 * improvement
+                reward += 5 * improvement
 
             if 'hunger_ratio' in prev_states and hunger_ratio > prev_states['hunger_ratio']:
                 improvement = hunger_ratio - prev_states['hunger_ratio']
-                reward += 2.5 * improvement
+                reward += 5 * improvement
 
             if 'energy_ratio' in prev_states and energy_ratio > prev_states['energy_ratio']:
                 improvement = energy_ratio - prev_states['energy_ratio']
-                reward += 1.5 * improvement
+                reward += 2 * improvement
 
             # if 'vitality' in prev_states:
             #     if vitality >= prev_states['vitality'] - 0.01:
@@ -415,57 +422,6 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
                         reward -= avoidance_penalty
                         self._logger.debug(f"Predator avoiding prey while hungry: -{avoidance_penalty:.3f}")
         return reward
-
-    # def compute_pursuit_reward(self, direction: Direction) -> float:
-    #     if not self._target or not self._target.is_alive():
-    #         return 0.0
-    #
-    #     reward = 0.0
-    #     position = self._target.get_position()
-    #     if not position:
-    #         return 0.0
-    #
-    #     nearby_entities = self._worldmap_manager.get_entities_near(position, radius=3)
-    #
-    #     # predators, potential_prey = self._pursuit_behaviour.identify_predator_prey_dynamics(nearby_entities)
-    #
-    #     # Si somos herbívoros (presas potenciales)
-    #     if self._target.diet_type == DietType.HERBIVORE and predators:
-    #         my_pos = self._target.get_position()
-    #         for predator in predators:
-    #             other_pos = predator.get_position()
-    #             if not other_pos:
-    #                 continue
-    #
-    #             # Recompensa por alejarse de depredadores
-    #             if self._pursuit_behaviour.is_moving_away_from(my_pos, other_pos, direction):
-    #                 distance = self._pursuit_behaviour.manhattan_distance(my_pos, other_pos)
-    #                 threat_factor = max(0.1, min(1.0, 5.0 / distance))  # Mayor amenaza si está más cerca
-    #                 reward += 0.1 * threat_factor  # Hasta +0.1 por huir de un depredador cercano
-    #                 self._logger.debug(f"Prey fleeing from predator: +{0.1 * threat_factor:.3f}")
-    #
-    #     # Si somos carnívoros (depredadores)
-    #     elif self._target.diet_type in [DietType.CARNIVORE, DietType.OMNIVORE] and potential_prey:
-    #         my_pos = self._target.get_position()
-    #         for prey in potential_prey:
-    #             other_pos = prey.get_position()
-    #             if not other_pos:
-    #                 continue
-    #
-    #             # Calculamos un factor combinado de hambre y energía para la motivación de caza
-    #             hunger_factor = (100.0 - self._target.hunger_level) / 100.0
-    #             energy_factor = self._target.energy_reserves / self._target.max_energy_reserves
-    #             hunting_motivation = hunger_factor * energy_factor  # Solo caza activamente si tiene hambre Y energía
-    #
-    #             distance = self._pursuit_behaviour.manhattan_distance(my_pos, other_pos)
-    #             proximity_bonus = max(0.1, min(1.0, 3.0 / distance))  # Bonus por estar cerca
-    #
-    #             if self._pursuit_behaviour.is_moving_towards(my_pos, other_pos, direction):
-    #                 pursuit_reward = 0.6 * hunting_motivation * proximity_bonus  # Hasta +0.15 en condiciones óptimas
-    #                 reward += pursuit_reward
-    #                 self._logger.info(f"Predator pursuing prey: +{pursuit_reward:.3f}")
-    #
-    #     return reward
 
     def get_observation(self):
         if not self._target:

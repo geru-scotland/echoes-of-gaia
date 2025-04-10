@@ -34,7 +34,6 @@ from utils.loggers import LoggerManager
 
 class Component(EventHandler):
     def __init__(self, env: simpyEnv, type: ComponentType, event_notifier: EventNotifier):
-
         self._event_notifier: EventNotifier = event_notifier
         super().__init__()
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
@@ -48,7 +47,7 @@ class Component(EventHandler):
 
     @abstractmethod
     def _register_events(self):
-       raise NotImplementedError
+        raise NotImplementedError
 
     @abstractmethod
     def get_state(self) -> Dict[str, Any]:

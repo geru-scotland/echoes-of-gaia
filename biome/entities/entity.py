@@ -77,7 +77,7 @@ class Entity(EventHandler, StateHandler, ABC):
                     self._event_notifier.notify(ComponentEvent.BIOLOGICAL_AGE_UPDATED, biological_age=value)
 
     def _handle_death(self, *args, **kwargs):
-        cleanup_dead_entities: bool = kwargs.get("cleanup_dead_entities", False)
+        cleanup_dead_entities: bool = kwargs.get("cleanup_dead_entities", True)
         self._logger.debug(f"Entity {self._id} ({self._descriptor.species}) has died")
         self._state.update("is_dead", True)
         BiomeEventBus.trigger(BiomeEvent.ENTITY_DEATH, entity_id=self._id)
@@ -182,6 +182,24 @@ class Entity(EventHandler, StateHandler, ABC):
         if clear_components:
             self._components = {}
         self._event_notifier = None
+
+    def die(self):
+        vital_component = self.get_component(ComponentType.VITAL)
+        if vital_component:
+            vital_component.vitality = 0
+            self._event_notifier.notify(
+                ComponentEvent.UPDATE_STATE,
+                ComponentType.VITAL,
+                vitality=vital_component.vitality
+            )
+            self._event_notifier.notify(ComponentEvent.ENTITY_DEATH, ComponentType.VITAL)
+
+    def get_age_after_death(self) -> float:
+        if not self.is_alive():
+            return self._state.get("age", 0.0)
+
+        if self._components and self._components[ComponentType.VITAL]:
+            return self._components[ComponentType.VITAL].age
 
     @property
     def type(self):

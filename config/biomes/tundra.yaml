@@ -1,0 +1,40 @@
+biome:
+  type: "tundra"
+
+  flora:
+    - species: "arctic_willow"
+      spawns: 15
+      avg-lifespan: 20
+
+    - species: "tundra_lichen"
+      spawns: 30
+      avg-lifespan: 15
+
+    - species: "arctic_cotton_grass"
+      spawns: 25
+      avg-lifespan: 5
+
+    - species: "saxifrage"
+      spawns: 20
+      avg-lifespan: 6
+
+  fauna:
+    - species: "polar_bear"
+      spawns: 3
+      diet: "carnivore"
+      avg-lifespan: 15
+
+    - species: "arctic_fox"
+      spawns: 7
+      diet: "omnivore"
+      avg-lifespan: 6
+
+    - species: "musk_ox"
+      spawns: 5
+      diet: "herbivore"
+      avg-lifespan: 12
+
+    - species: "arctic_hare"
+      spawns: 12
+      diet: "herbivore"
+      avg-lifespan: 3

@@ -72,7 +72,8 @@ class ReinforcementLearningAgent:
     def __init__(self, agent_type: Agents.Reinforcement):
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)
         self._model_name = agent_type
-        self._config = ConfigLoader().get_config(agent_type)
+        self._config = ConfigLoader().get_agent_config(agent_type)
+        self._biome_config = ConfigLoader().get_biome_config()
 
         if not self._config:
             raise ValueError(f"No configuration found for model: {agent_type}")
@@ -80,7 +81,7 @@ class ReinforcementLearningAgent:
         env_class_name = self._config["environment"]["env_class"]
         try:
             environment_class: Type = EnvironmentRegistry.get_by_name(env_class_name)
-            local_fov_config: LocalFovConfig = self._config["local_fov"]
+            local_fov_config: LocalFovConfig = self._biome_config["local_fov"]
             self._environment: gym.Env = environment_class(local_fov_config)
         except Exception as e:
             self._logger.exception(f"Error retrieving environment {agent_type}: {e}")
