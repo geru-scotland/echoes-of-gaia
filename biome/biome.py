@@ -218,7 +218,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 sys.exit(1)
 
     def _run_climate_environmental_factors_update(self, delay: int):
-        self._env.timeout(delay)
+        yield self._env.timeout(delay)
         while True:
             self._climate.environmental_factors_update()
             yield self._env.timeout(delay)
