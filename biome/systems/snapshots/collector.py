@@ -159,6 +159,7 @@ class SnapshotCollector:
                     entity_data["diet_type"] = str(entity.diet_type.value)
 
             return entity_data
+
         except Exception as e:
             self._logger.error(f"Error collecting data for entity {entity.get_id()}: {e}")
             return {"id": entity.get_id(), "error": str(e)}

@@ -19,7 +19,7 @@ from typing import Dict, List, Tuple, Optional, Any, Callable, TypedDict, Union
 
 import pygame
 
-from shared.enums.enums import Season, BiomeType
+from shared.enums.enums import Season, BiomeType, DietType
 
 Point = Tuple[int, int]
 Size = Tuple[int, int]
@@ -33,10 +33,12 @@ EventCallback = Callable[[pygame.event.Event], bool]
 TerrainSprite = pygame.Surface
 EntitySprite = pygame.Surface
 
+
 class TerrainTypeInfo(TypedDict):
     id: int
     name: str
     color: Color
+
 
 class SnapshotTimeInfo(TypedDict):
     raw_ticks: int
@@ -44,17 +46,21 @@ class SnapshotTimeInfo(TypedDict):
     year: int
     total_months: int
 
+
 class TerrainMapData(TypedDict):
     terrain_map: List[List[int]]
     terrain_types: Dict[str, str]
     map_dimensions: Tuple[int, int]
 
+
 class EntityComponentData(TypedDict):
     transform: Optional[Dict[str, Any]]
+
 
 class EntityStateFields(TypedDict):
     toxicity: Optional[float]
     size: Optional[float]
+
 
 class EntityData(TypedDict):
     id: int
@@ -65,6 +71,8 @@ class EntityData(TypedDict):
     is_dead: bool
     components: Dict[str, Any]
     evolution_cycle: int
+    diet_type: Optional[DietType]
+
 
 class BiomeScoreContributorData(TypedDict):
     population_balance: float
@@ -73,11 +81,13 @@ class BiomeScoreContributorData(TypedDict):
     biodiversity: float
     ecosystem_health: float
 
+
 class BiomeScoreData(TypedDict):
     score: float
     normalized_score: float
     quality: str
     contributor_scores: BiomeScoreContributorData
+
 
 class MetricsData(TypedDict):
     avg_toxicity: float
@@ -102,6 +112,7 @@ class SnapshotData(TypedDict):
     entities: Dict[str, EntityData]
     metrics: MetricsData
     biome_score: BiomeScoreData
+
 
 class ViewerConfig(TypedDict):
     cell_size: int

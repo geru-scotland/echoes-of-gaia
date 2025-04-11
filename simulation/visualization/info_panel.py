@@ -624,19 +624,15 @@ class InfoPanel:
                     type_color = (220, 150, 150)
 
                 type_text = f"Type: {str(self._selected_entity.type).capitalize()}"
+                if self._selected_entity.type == "fauna" and hasattr(self._selected_entity, 'diet_type'):
+                    type_text += f" | Diet: {str(self._selected_entity.diet_type).capitalize()}"
+
                 type_surface = self._font.render(type_text, True, type_color)
                 self._surface.blit(type_surface, (x_right + 15, y_next + 42))
 
                 species_text = f"Species: {str(self._selected_entity.species).capitalize()}"
                 species_surface = self._font.render(species_text, True, type_color)
                 self._surface.blit(species_surface, (x_right + 15, y_next + 67))
-
-                if self._selected_entity.type == "fauna" and hasattr(self._selected_entity, 'diet_type'):
-                    diet_text = f"Diet: {str(self._selected_entity.diet_type).capitalize()}"
-                    diet_surface = self._font.render(diet_text, True, type_color)
-
-                    diet_x = x_right + 40 - diet_surface.get_width() - 15
-                    self._surface.blit(diet_surface, (diet_x, y_next + 67))
 
                 position_text = f"Position: {self._selected_entity.position}"
                 position_surface = self._font.render(position_text, True, (180, 200, 220))
