@@ -67,9 +67,11 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                                                                  fauna_definitions=self._context.fauna_definitions,
                                                                  remove_dead_entities=cleanup_dead_entities)
 
+            self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
+
             self._climate: ClimateSystem = ClimateSystem(self._context.biome_type, Season.SPRING)
             self._climate_data_manager = ClimateDataManager(self._env, self._climate)
-            self._entity_provider: EntityProvider = EntityProvider(self._map_manager.get_world_map())
+
             self._evolution_registry: EvolutionAgentRegistry = EvolutionAgentRegistry(self._climate_data_manager,
                                                                                       self._entity_provider)
             self._entity_collector: EntityDataCollector = EntityDataCollector(entity_provider=self._entity_provider,
@@ -80,6 +82,9 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             self._climate.configure_record_callback(self._climate_data_manager.record_daily_data)
 
             self._agents: Dict[AgentType, Agent] = self._initialize_agents(mode)
+
+            self._climate.set_entity_provider(self._entity_provider)
+            self._env.process(self._run_climate_environmental_factors_update(Timers.Calendar.DAY))
 
             EventHandler.__init__(self)
             self._logger.info("Biome is ready!")
@@ -98,7 +103,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         agents.update({AgentType.CLIMATE_AGENT: climate_agent})
         self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.Climate.CLIMATE_UPDATE))
         local_fov_config: Dict[str, Any] = self._context.config.get("map", {}).get("local_fov", {})
-        
+
         if mode in (SimulationMode.NORMAL, SimulationMode.TRAINING_WITH_RL_MODEL):
             fauna_agent: FaunaAgentAI = FaunaAgentAI(
                 self._context.fauna_model,
@@ -211,6 +216,12 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 tb = traceback.format_exc()
                 self._logger.exception(f"An exception ocurred running  agent: {e}. Traceback: {tb}")
                 sys.exit(1)
+
+    def _run_climate_environmental_factors_update(self, delay: int):
+        self._env.timeout(delay)
+        while True:
+            self._climate.environmental_factors_update()
+            yield self._env.timeout(delay)
 
     def get_entity_provider(self) -> EntityProvider:
         return self._entity_provider

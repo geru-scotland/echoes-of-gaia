@@ -96,8 +96,9 @@ class ForagingBehaviour:
             return False
 
         for flora in flora_entities:
+            # Toxicidad, implementar
             nutritive_value = flora.get_nutritive_value()
-            flora.apply_damage(15.0, self._target.get_id())
+            flora.apply_damage(5.0, self._target.get_id())
             self._target.consume_vegetal(nutritive_value)
             self._logger.debug(f"Consuming plant: +{nutritive_value} nutrition")
 

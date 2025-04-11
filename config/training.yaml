@@ -31,16 +31,16 @@ biome:
   fauna-model: "fauna_model_pursuits"
   map:
     size:
-      - 45
-      - 45
+      - 35
+      - 35
   type: "tropical"
 
   training_mode: true
 
   flora:
     - species: "oak_tree"
-      spawns: 30
-      avg-lifespan: 12
+      spawns: 35
+      avg-lifespan: 8
       components:
         - GrowthComponent:
         - VitalComponent:
@@ -49,8 +49,8 @@ biome:
         - AutotrophicNutritionComponent:
 
     - species: "mushroom"
-      spawns: 25
-      avg-lifespan: 7
+      spawns: 35
+      avg-lifespan: 5
       components:
         - GrowthComponent:
         - VitalComponent:
@@ -59,8 +59,8 @@ biome:
         - AutotrophicNutritionComponent:
 
     - species: "bramble"
-      spawns: 25
-      avg-lifespan: 14
+      spawns: 30
+      avg-lifespan: 6
       components:
         - GrowthComponent:
         - VitalComponent:
@@ -73,7 +73,7 @@ biome:
     - species: "deer"
       spawns: 25
       diet: "herbivore"
-      avg-lifespan: 6
+      avg-lifespan: 4
       components:
         - GrowthComponent:
         - VitalComponent:
@@ -85,7 +85,7 @@ biome:
     - species: "panther"
       spawns: 6
       diet: "carnivore"
-      avg-lifespan: 6
+      avg-lifespan: 3
       components:
         - GrowthComponent:
         - VitalComponent:

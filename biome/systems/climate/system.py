@@ -23,7 +23,8 @@ from biome.services.climate_service import ClimateService
 from biome.systems.climate.seasons import SeasonSystem
 from biome.systems.climate.state import ClimateState
 from biome.systems.events.event_bus import BiomeEventBus
-from shared.enums.enums import BiomeType, Season, WeatherEvent
+from biome.systems.managers.entity_manager import EntityProvider
+from shared.enums.enums import BiomeType, Season, WeatherEvent, ComponentType
 from shared.enums.events import BiomeEvent
 from shared.enums.thresholds import ClimateThresholds
 from shared.stores.biome_store import BiomeStore
@@ -38,6 +39,7 @@ class ClimateSystem:
         # TODO: Hacer cambio climático - cada x tiempo, forzar una subida de temperatura general, cada 100 años
         # investigar un poco sobre esto.
         self._biome_type: BiomeType = biome_type
+        self._entity_provider: Optional[EntityProvider] = None
 
         self._initial_state: Dict[str, Any] = {}
         self._base_environmental_factors: Dict[str, Any] = {}
@@ -75,6 +77,7 @@ class ClimateSystem:
                 "fauna_density": self._base_environmental_factors.get("fauna_density", 15),
                 "co2_level": self._base_environmental_factors.get("co2_level", 15),
                 "atm_pressure": self._base_environmental_factors.get("atm_pressure", 15),
+                "current_weather": None,
             }
             state: ClimateState = ClimateState(**self._initial_state)
             return state
@@ -109,6 +112,8 @@ class ClimateSystem:
     def _handle_weather_event(self, weather_event: WeatherEvent):
         self._logger.debug(f"Handling weather event: {weather_event}")
         self._logger.debug(f"State previously: {self._state}")
+
+        self._state.current_weather = weather_event
 
         # TODO: IMPORTANTE. Si el weather event es el mismo que el anterior, reducir en un
         # 0.8 los cambios y que NO se notifique del weather. Si es diferente, NOTIFICAR.
@@ -170,6 +175,53 @@ class ClimateSystem:
             f"{'=' * 60}"
         )
 
+    def environmental_factors_update(self):
+
+        flora_entities = self._entity_provider.get_flora(only_alive=True)
+        fauna_entities = self._entity_provider.get_fauna(only_alive=True)
+
+        total_biomass: float = 0
+        total_max_size: float = 0
+
+        for entity in flora_entities:
+            growth_component = entity.get_component(ComponentType.GROWTH)
+            if growth_component:
+                size_factor = growth_component.current_size / growth_component.max_size
+                total_biomass += size_factor
+                total_max_size += growth_component.max_size
+
+        total_fauna_density: float = 0
+        total_max_fauna_density: float = 0
+
+        for entity in fauna_entities:
+            growth_component = entity.get_component(ComponentType.GROWTH)
+            if growth_component:
+                size_factor = growth_component.current_size / growth_component.max_size
+                total_fauna_density += size_factor
+                total_max_fauna_density += growth_component.max_size
+
+        self._state.biomass_density = total_biomass / total_max_size if total_max_size > 0.0 else 0.0
+        self._logger.info(
+            f"Calculated biomass_density: {self._state.biomass_density:.4f} "
+            f"(total_biomass={total_biomass:.4f}, total_max_size={total_max_size:.4f})"
+        )
+        self._state.fauna_density = total_fauna_density / total_max_fauna_density if total_max_fauna_density > 0.0 else 0.0
+
+        base_co2_emission = total_fauna_density * 2.0
+        photosynthesis_absorption = total_biomass * 3.0
+
+        co2_net_delta = base_co2_emission - photosynthesis_absorption
+        self._state.co2_level = max(300.0, min(600.0, self._state.co2_level + co2_net_delta))
+
+        # Por ahora, a ojo de buen cubero, he googleado un poco:
+        # 0.01°C por cada 1 ppm por encima de 400
+        co2_temp_impact = (self._state.co2_level - 400.0) * 0.01
+
+        self._state.temperature += co2_temp_impact
+
+    def set_entity_provider(self, entity_provider: EntityProvider) -> None:
+        self._entity_provider = entity_provider
+
     def get_state_and_record(self) -> ClimateState:
         self._record_data_callback()
         return self._state
@@ -185,6 +237,18 @@ class ClimateSystem:
 
     def get_seasonal_comfort_range(self) -> Dict[str, Any]:
         return self._seasonal_info.get(self.get_current_season(), {}).get("comfort_range", {})
+
+    def get_current_weather_event(self) -> Optional[WeatherEvent]:
+        return self._state.current_weather
+
+    def get_co2_level(self) -> float:
+        return self._state.co2_level
+
+    def get_biomass_index(self) -> float:
+        return self._state.biomass_density
+
+    def get_atmospheric_pressure(self) -> float:
+        return self._state.atm_pressure
 
     @property
     def temperature(self) -> float:

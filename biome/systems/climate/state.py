@@ -16,6 +16,9 @@
 # =============================================================================
 """
 from dataclasses import dataclass
+from typing import Optional
+
+from shared.enums.enums import WeatherEvent
 
 
 @dataclass
@@ -27,5 +30,4 @@ class ClimateState:
     fauna_density: float
     co2_level: float
     atm_pressure: float
-
-
+    current_weather: Optional[WeatherEvent]
