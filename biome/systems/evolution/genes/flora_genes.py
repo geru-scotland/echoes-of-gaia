@@ -26,6 +26,7 @@ from typing import List, Dict, Any
 from shared.enums.enums import ComponentType
 from shared.evolution.ranges import FLORA_GENE_RANGES
 
+
 class FloraGenes(Genes):
     def __init__(self):
         self.growth_modifier = 0.0
@@ -137,6 +138,7 @@ class FloraGenes(Genes):
         }
         components.append(weather_adaptation_component)
 
+        # TODO: Heterotrophic conversion
 
         return components
 
@@ -147,6 +149,7 @@ class FloraGenes(Genes):
                 current_val = getattr(self, attr)
                 valid_val = max(min_val, min(current_val, max_val))
                 setattr(self, attr, valid_val)
+
 
 def extract_genes_from_flora(flora_entity: Entity) -> FloraGenes:
     genes = FloraGenes()

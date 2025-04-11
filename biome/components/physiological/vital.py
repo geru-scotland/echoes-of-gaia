@@ -87,6 +87,8 @@ class VitalComponent(EntityComponent):
             "vitality": self._vitality,
             "max_vitality": self._max_vitality,
             "health_modifier": self._health_modifier,
+            "somatic_integrity": self._somatic_integrity,
+            "max_somatic_integrity": self._max_somatic_integrity
         }
 
     def increase_accumulated_decay(self, value: float) -> None:

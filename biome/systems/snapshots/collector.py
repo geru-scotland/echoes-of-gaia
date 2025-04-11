@@ -31,7 +31,7 @@ from biome.systems.metrics.analyzers.contributors import ClimateContributor
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.snapshots.data import SnapshotData
-from shared.enums.enums import TerrainType, BiomeType, Season
+from shared.enums.enums import TerrainType, BiomeType, Season, EntityType
 from shared.enums.strings import Loggers
 from shared.types import TerrainData, EntityData, ComponentData, ClimateData, TerrainMap
 from simulation.core.systems.time.time import SimulationTimeInfo
@@ -39,7 +39,8 @@ from utils.loggers import LoggerManager
 
 
 class SnapshotCollector:
-    def __init__(self, biome_type: BiomeType, entity_manager: EntityProvider, climate_data_manager: ClimateDataManager, world_map: WorldMap,
+    def __init__(self, biome_type: BiomeType, entity_manager: EntityProvider, climate_data_manager: ClimateDataManager,
+                 world_map: WorldMap,
                  entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
                  climate_collector: ClimateDataCollector = None):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
@@ -92,6 +93,16 @@ class SnapshotCollector:
     def _collect_climate_data(self) -> ClimateData:
         try:
             climate_averages = self._climate_data_manager.get_current_month_averages()
+            climate_system = self._climate_data_manager.get_climate_system()
+
+            climate_averages["co2_level"] = climate_system.get_co2_level()
+            climate_averages["biomass_index"] = climate_system.get_biomass_index()
+            climate_averages["atmospheric_pressure"] = climate_system.get_atmospheric_pressure()
+
+            current_weather = climate_system.get_current_weather_event()
+            if current_weather:
+                climate_averages["current_weather"] = str(current_weather)
+
             return climate_averages
         except Exception as e:
             self._logger.error(f"Error collecting climate data: {e}")
@@ -118,7 +129,6 @@ class SnapshotCollector:
             self._logger.error(f"Error collecting terrain data: {e}")
             return {"error": str(e)}
 
-
     def _collect_entities_data(self, snapshot: SnapshotData) -> None:
         try:
             flora, fauna = self._entity_manager.get_entities()
@@ -143,6 +153,10 @@ class SnapshotCollector:
                 "components": self._collect_entity_components(entity),
                 "evolution_cycle": entity.get_state_fields().get("general").get("evolution_cycle", 0),
             }
+
+            if entity.get_type() == EntityType.FAUNA:
+                if entity.diet_type:
+                    entity_data["diet_type"] = str(entity.diet_type.value)
 
             return entity_data
         except Exception as e:

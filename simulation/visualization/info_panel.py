@@ -339,6 +339,21 @@ class InfoPanel:
                     }
                     season_str = str(self._current_season)
                     color = season_colors.get(season_str, self._text_color)
+
+                    if "current_weather" in self._climate_averages:
+                        weather = self._climate_averages["current_weather"]
+                        weather_text = weather.replace("_", " ").title()
+
+                        weather_color = (180, 180, 220)
+                        if "rain" in weather.lower() or "storm" in weather.lower():
+                            weather_color = (100, 150, 220)
+                        elif "sun" in weather.lower() or "clear" in weather.lower():
+                            weather_color = (220, 180, 100)
+                        elif "snow" in weather.lower() or "blizzard" in weather.lower():
+                            weather_color = (220, 220, 250)
+
+                        data_items.append(("Weather:", weather_text, weather_color))
+
                     data_items.append(("Season:", season_str.capitalize(), color))
 
                 if self._climate_averages:
@@ -360,6 +375,26 @@ class InfoPanel:
                     if "avg_precipitation" in self._climate_averages:
                         precip = self._climate_averages["avg_precipitation"]
                         data_items.append(("  Precipitation:", f"{precip:.1f}mm", (150, 200, 220)))
+
+                    if "co2_level" in self._climate_averages:
+                        co2 = self._climate_averages["co2_level"]
+                        co2_color = (180, 180, 180)
+                        if co2 > 450:
+                            co2_color = (220, 120, 80)
+                        elif co2 < 380:
+                            co2_color = (100, 180, 100)
+                        data_items.append(("  CO2 Level:", f"{co2:.1f} ppm", co2_color))
+
+                    if "biomass_index" in self._climate_averages:
+                        biomass = self._climate_averages["biomass_index"]
+                        biomass_color = (100, 200, 100)
+                        if biomass < 30:
+                            biomass_color = (200, 120, 80)
+                        data_items.append(("  Biomass Index:", f"{biomass:.4f}%", biomass_color))
+
+                    if "atmospheric_pressure" in self._climate_averages:
+                        pressure = self._climate_averages["atmospheric_pressure"]
+                        data_items.append(("  Atm. Pressure:", f"{pressure:.1f} hPa", (160, 190, 220)))
 
                 if self._metrics:
                     data_items.append(("Population:", "", (180, 200, 220)))
@@ -551,6 +586,7 @@ class InfoPanel:
                                                eco_data_items, x_left + 5, y_next, col_width - 10)
         else:
             y_left = y_next
+
         if self._selected_entity:
             is_dead = False
             if isinstance(self._selected_entity.state_fields, dict) and "general" in self._selected_entity.state_fields:
@@ -595,6 +631,13 @@ class InfoPanel:
                 species_surface = self._font.render(species_text, True, type_color)
                 self._surface.blit(species_surface, (x_right + 15, y_next + 67))
 
+                if self._selected_entity.type == "fauna" and hasattr(self._selected_entity, 'diet_type'):
+                    diet_text = f"Diet: {str(self._selected_entity.diet_type).capitalize()}"
+                    diet_surface = self._font.render(diet_text, True, type_color)
+
+                    diet_x = x_right + 40 - diet_surface.get_width() - 15
+                    self._surface.blit(diet_surface, (diet_x, y_next + 67))
+
                 position_text = f"Position: {self._selected_entity.position}"
                 position_surface = self._font.render(position_text, True, (180, 200, 220))
                 self._surface.blit(position_surface, (x_right + 15, y_next + 92))
@@ -609,9 +652,24 @@ class InfoPanel:
 
                 y_right = y_next + header_height + 5
 
-                fields_by_component = self._selected_entity.state_fields
+                component_order = [
+                    "general",
+                    "vital",
+                    "growth",
+                    "photosynthetic_metabolism",
+                    "autotrophic_nutrition",
+                    "heterotrophic_nutrition",
+                    "weather_adaptation"
+                ]
 
-                for component_name, fields in fields_by_component.items():
+                fields_by_component = self._selected_entity.state_fields
+                ordered_components = []
+
+                for component_name in component_order:
+                    if component_name in fields_by_component:
+                        ordered_components.append((component_name, fields_by_component[component_name]))
+
+                for component_name, fields in ordered_components:
                     if not fields:
                         continue
 
