@@ -89,6 +89,8 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             EventHandler.__init__(self)
             self._logger.info("Biome is ready!")
         except Exception as e:
+            tb = traceback.format_exc()
+            self._logger.exception(f"Error creating biome. Traceback: {tb}")
             self._logger.exception(f"There was an error creating the Biome: {e}")
 
     def _register_events(self):

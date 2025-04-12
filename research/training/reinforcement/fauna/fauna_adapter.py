@@ -20,7 +20,7 @@ from logging import Logger
 from typing import Tuple, Optional, Dict, Set
 
 import numpy as np
-from typing_extensions import Any
+from typing_extensions import Any, List
 
 from biome.biome import Biome
 from biome.entities.entity import Entity
@@ -67,7 +67,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         # self._entity_interaction_system: Optional[EntityInteractionAI] = None
         self._entity_behaviour_system: Optional[PursuitAndFleeBehaviour] = None
         self._local_interaction_simulator: Optional[LocalInteractionSimulator] = None
-        # Resto del código existente...
+        self._available_fauna: Optional[List[FaunaSpecies]] = None
         self._register_events()
 
     def __del__(self):
@@ -106,7 +106,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         temp_config_path = TrainingConfigManager.save_temp_config(random_config)
 
         self._current_biome_type = BiomeType(random_config['biome']['type'])
-        print(random_config)
+        self._available_fauna = random_config['biome']['available_fauna']
+
         settings = Settings(override_configs=temp_config_path)
         SimulationEventBus.clear()
         BiomeEventBus.clear()
@@ -149,9 +150,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
             self._logger.warning(e)
 
     def _select_target_species(self) -> FaunaSpecies:
-        available_species = list(FaunaSpecies)
-        selected_species = random.choice([FaunaSpecies.DEER, FaunaSpecies.PANTHER])
-
+        selected_species = random.choice(self._available_fauna)
         return selected_species
 
     def _wait_for_target_acquisition(self) -> bool:

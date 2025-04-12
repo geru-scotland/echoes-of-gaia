@@ -28,11 +28,14 @@ simulation:
 
 biome:
   climate-model: "climate_model_v1.1"
-  fauna-model: "fauna_model_pursuits"
   map:
     size:
       - 35
       - 35
+    local_fov:
+      size:
+        width: 17
+        height: 17
   type: "tropical"
 
   training_mode: true

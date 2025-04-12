@@ -71,6 +71,8 @@ class SnapshotCollector:
 
         self._collect_climate_analysis_data(snapshot, climate_data)
 
+        # quizá dejar info en _snapshot
+        # o igual mejor, aqui el collect neurosymbolic data y dejar referencia en la clase NSdataservice
         return snapshot
 
     def _collect_climate_analysis_data(self, snapshot: SnapshotData, climate_data: ClimateData) -> None:

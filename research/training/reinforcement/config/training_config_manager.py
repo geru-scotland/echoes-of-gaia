@@ -30,28 +30,48 @@ class TrainingConfigManager:
     def generate_random_config(base_config_file: str) -> Dict[str, Any]:
         filepath = os.path.join(CONFIG_DIR, base_config_file)
         with open(filepath, 'r') as file:
-            print(filepath)
             config = yaml.safe_load(file)
 
-        # random_biome = random.choice(list(BiomeType))
-        # config['biome']['type'] = str(random_biome).lower()
+        biome_config = TrainingConfigManager._load_random_biome_config()
 
-        config['biome']['fauna'] = [
-            {
-                "species": str(FaunaSpecies.DEER).lower(),
-                "spawns": 1,
-                "avg-lifespan": random.randint(1, 7),
-                "components": [
-                    {"GrowthComponent": {}},
-                    {"VitalComponent": {}},
-                    {"WeatherAdaptationComponent": {
-                        "optimal_temperature": random.uniform(5.0, 30.0)
-                    }},
-                    {"MovementComponent": {}},
-                    {"HeterotrophicNutritionComponent": {}}
-                ]
-            }
-        ]
+        if 'biome' in config and 'biome' in biome_config:
+            config['biome']['type'] = biome_config['biome']['type']
+            config['biome']['flora'] = biome_config['biome']['flora']
+            config['biome']['fauna'] = biome_config['biome']['fauna']
+            config['biome']['available_fauna'] = [entry['species'] for entry in biome_config['biome']['fauna']]
+            config['biome']['available_flora'] = [entry['species'] for entry in biome_config['biome']['flora']]
+
+        config = TrainingConfigManager._modify_config_if_needed(config)
+
+        return config
+
+    @staticmethod
+    def _load_random_biome_config() -> Dict[str, Any]:
+        biome_configs_dir = os.path.join(CONFIG_DIR, "biomes")
+
+        if not os.path.exists(biome_configs_dir):
+            raise FileNotFoundError(f"The directory doesn't exist: {biome_configs_dir}")
+
+        yaml_files = [f for f in os.listdir(biome_configs_dir)
+                      if f.endswith('.yaml') and not f.startswith('_')]
+
+        if not yaml_files:
+            raise ValueError(f"There aren't any YAML file with folder: {biome_configs_dir}")
+
+        random_biome_file = random.choice(yaml_files)
+
+        biome_config_path = os.path.join(biome_configs_dir, random_biome_file)
+
+        with open(biome_config_path, 'r') as file:
+            return yaml.safe_load(file)
+
+    @staticmethod
+    def _modify_config_if_needed(config: Dict[str, Any]) -> Dict[str, Any]:
+        # Pongo esto de ejemplo, cambiar cuando quiera más variabilidad.
+        if 'biome' in config and 'fauna' in config['biome']:
+            for fauna in config['biome']['fauna']:
+                if fauna.get('species') == 'deer':
+                    fauna['spawns'] = random.randint(1, 7)
 
         return config
 

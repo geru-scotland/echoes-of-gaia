@@ -201,7 +201,7 @@ class ClimateSystem:
                 total_max_fauna_density += growth_component.max_size
 
         self._state.biomass_density = total_biomass / total_max_size if total_max_size > 0.0 else 0.0
-        self._logger.info(
+        self._logger.debug(
             f"Calculated biomass_density: {self._state.biomass_density:.4f} "
             f"(total_biomass={total_biomass:.4f}, total_max_size={total_max_size:.4f})"
         )

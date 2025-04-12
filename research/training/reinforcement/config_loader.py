@@ -47,7 +47,7 @@ class ConfigLoader:
                     self._agent_config[model_name] = yaml.safe_load(f)
 
         # Y ahora le inyecto el fov, que lo he llevado a biome.yaml
-        biome_config_path: Path = Path(os.path.join(CONFIG_DIR), "biome.yaml")
+        biome_config_path: Path = Path(os.path.join(CONFIG_DIR), "training.yaml")
         with open(biome_config_path, 'r') as f:
             biome_configs = yaml.safe_load(f)
             local_fov: Dict[str, Any] = biome_configs.get("biome", {}).get("map", {}).get("local_fov", {})
