@@ -11,6 +11,11 @@ simulation:
   population-control:
     smart: true
 
+  neurosymbolic:
+    enabled: true
+    lstm_model_path: "research/models/lstm/biome.pth"
+    save_training_data: true
+
   data:
     storage:
       base: "research/experiments"
@@ -33,3 +38,7 @@ simulation:
       filename_prefix: "biome_snapshot"
       pretty_print: true
       include_real_timestamp: true
+
+    dataset:
+      generate: true
+      storage_directory: "dataset"

@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import itertools
 from logging import Logger
 
 from biome.services.climate_service import ClimateService
@@ -38,7 +39,7 @@ class BiomeSnapshotSystem:
     def __init__(self, entity_manager: EntityProvider, world_map: WorldMap,
                  entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
                  config: SnapshotConfig, climate_collector: ClimateDataCollector = None,
-                 biome_type=None, climate_data_manager: ClimateDataManager = None):
+                 biome_type=None, climate_data_manager: ClimateDataManager = None, dataset_generation: bool = False):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._logger.info("Initializing BiomeSnapshotSystem...")
 
@@ -48,27 +49,35 @@ class BiomeSnapshotSystem:
         self._climate_collector: ClimateDataCollector = climate_collector
         self._score_analyzer: BiomeScoreAnalyzer = score_analyzer
         self._config: SnapshotConfig = config
+        self._dataset_generation: bool = dataset_generation
 
         self._climate_data_manager = climate_data_manager
 
         self._collector = SnapshotCollector(
-            biome_type, entity_manager, climate_data_manager, world_map, entity_collector, score_analyzer
+            biome_type, entity_manager, climate_data_manager, world_map, entity_collector, score_analyzer,
+            dataset_generation
         )
-        self._storage = SnapshotStorage(self._config)
+        self._storage = SnapshotStorage(self._config, dataset_generation)
+        self._snapshot_generator: itertools.count[int] = itertools.count(0)
 
         self._logger.info("BiomeSnapshotSystem initialized successfully")
 
-    def collect_snapshot_data(self, simulation_time: int) -> SnapshotData:
-        snapshot = self._collector.collect_snapshot_data(simulation_time)
-        return snapshot
-
     def capture_snapshot(self, simulation_time: int, callback: CallbackType = None) -> None:
         try:
-            snapshot = self.collect_snapshot_data(simulation_time)
-            self._storage.save_snapshot(snapshot, callback)
-            self._logger.debug(f"Snapshot capture initiated for time {simulation_time}")
+            snapshot_id: int = next(self._snapshot_generator)
+            snapshot_data = self._collector.collect_snapshot_data(simulation_time, snapshot_id)
+
+            # TODO: Solo si activo en configs
+            neurosymbolic_data = self._collector.get_neurosymbolic_data()
+
+            if self._dataset_generation and neurosymbolic_data:
+                self._storage.save_neurosymbolic_data(neurosymbolic_data, snapshot_id)
+
+            self._storage.save_snapshot(snapshot_data, callback)
+
+            self._logger.debug(f"Snapshot and neurosymbolic data captured for time {simulation_time}")
         except Exception as e:
-            self._logger.error(f"Failed to capture snapshot: {e}", exc_info=True)
+            self._logger.error(f"Failed to capture snapshot or neurosymbolic data: {e}", exc_info=True)
             if callback:
                 callback(None)
 

@@ -17,7 +17,7 @@
 """
 import time
 from logging import Logger
-from typing import Dict
+from typing import Dict, Any, Optional
 
 import numpy as np
 
@@ -26,14 +26,15 @@ from biome.services.climate_service import ClimateService
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
-from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer
+from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
 from biome.systems.metrics.analyzers.contributors import ClimateContributor
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
+from biome.systems.neurosymbolics.data_service import NeurosymbolicDataService
 from biome.systems.snapshots.data import SnapshotData
-from shared.enums.enums import TerrainType, BiomeType, Season, EntityType
+from shared.enums.enums import TerrainType, BiomeType, Season, EntityType, DietType
 from shared.enums.strings import Loggers
-from shared.types import TerrainData, EntityData, ComponentData, ClimateData, TerrainMap
+from shared.types import TerrainData, EntityData, ComponentData, ClimateData, TerrainMap, MetricsData, BiomeScoreData
 from simulation.core.systems.time.time import SimulationTimeInfo
 from utils.loggers import LoggerManager
 
@@ -42,7 +43,7 @@ class SnapshotCollector:
     def __init__(self, biome_type: BiomeType, entity_manager: EntityProvider, climate_data_manager: ClimateDataManager,
                  world_map: WorldMap,
                  entity_collector: EntityDataCollector, score_analyzer: BiomeScoreAnalyzer,
-                 climate_collector: ClimateDataCollector = None):
+                 climate_collector: ClimateDataCollector = None, dataset_generation: bool = False):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._biome_type: BiomeType = biome_type
         self._entity_manager: EntityProvider = entity_manager
@@ -51,12 +52,14 @@ class SnapshotCollector:
         self._world_map: WorldMap = world_map
         self._climate_collector: ClimateDataCollector = climate_collector
         self._score_analyzer: BiomeScoreAnalyzer = score_analyzer
+        self._dataset_generation: bool = dataset_generation
+        self._neurosymbolic_data: Dict[str, Any] = {}
 
-    def collect_snapshot_data(self, simulation_time: int) -> SnapshotData:
-        snapshot_id = f"{int(time.time())}_{simulation_time}"
+    def collect_snapshot_data(self, simulation_time: int, snapshot_id: int) -> SnapshotData:
+        snapshot_time = f"{int(time.time())}_{simulation_time}"
         time_info = SimulationTimeInfo.from_ticks(simulation_time)
 
-        snapshot = SnapshotData(snapshot_id, time_info)
+        snapshot = SnapshotData(snapshot_time, time_info)
         current_season: Season = ClimateService.get_current_season()
         snapshot.set_biome_info(self._biome_type, current_season)
 
@@ -71,8 +74,9 @@ class SnapshotCollector:
 
         self._collect_climate_analysis_data(snapshot, climate_data)
 
-        # quizá dejar info en _snapshot
-        # o igual mejor, aqui el collect neurosymbolic data y dejar referencia en la clase NSdataservice
+        # TODO: Únicamente si config activa, ojo. Por ahora dejo siempre
+        self._neurosymbolic_data = self._collect_neurosymbolic_data(snapshot, snapshot_id)
+
         return snapshot
 
     def _collect_climate_analysis_data(self, snapshot: SnapshotData, climate_data: ClimateData) -> None:
@@ -195,3 +199,133 @@ class SnapshotCollector:
 
         except Exception as e:
             self._logger.error(f"Error collecting metrics data: {e}")
+
+    def _collect_neurosymbolic_data(self, snapshot: SnapshotData, snapshot_id: int, save_to_files: bool = True) -> Dict[
+        str, Any]:
+        try:
+            biome_statistics: MetricsData = snapshot.metrics_data
+            climate_data: ClimateData = snapshot.climate_data
+            biome_score_data: BiomeScoreData = snapshot.biome_score
+
+            # 1. Esta parte, sólo para datos globales; para LSTM
+            flora, fauna = self._entity_manager.get_entities(only_alive=True)
+
+            herbivore_count = 0
+            carnivore_count = 0
+            omnivore_count = 0
+
+            for entity in fauna:
+                diet_type = entity.diet_type
+                if diet_type == DietType.HERBIVORE:
+                    herbivore_count += 1
+                elif diet_type == DietType.CARNIVORE:
+                    carnivore_count += 1
+                elif diet_type == DietType.OMNIVORE:
+                    omnivore_count += 1
+
+            prey_population = herbivore_count
+            predator_population = carnivore_count + omnivore_count
+
+            predator_prey_ratio = predator_population / max(1, prey_population)
+
+            # TODO: HAY REDUNDANCIA EN
+            lstm_data = {
+                'snapshot_id': snapshot_id,
+                'timestamp': int(time.time()),
+                'simulation_time': self._env.now if hasattr(self, '_env') else 0,
+                'prey_population': prey_population,
+                'predator_population': predator_population,
+                'predator_prey_ratio': predator_prey_ratio,
+                'avg_stress': biome_statistics.get('avg_stress', 0.0),
+                # 'avg_energy': biome_statistics.get('avg_energy', 0.0),
+                'biome_score': biome_score_data.get('score', 0.0),
+                'biodiversity_index': biome_statistics.get('biodiversity_index', 0.0),
+                # 'temperature': climate_data.get('avg_temperature', 20.0) if climate_data else 0.0,
+                # 'humidity': climate_data.get('avg_humidity', 50.0) if climate_data else 0.0,
+                # 'precipitation': climate_data.get('avg_precipitation', 30.0) if climate_data else 0.0,
+                # Datos extras de diversidad por dieta
+                'herbivore_count': herbivore_count,
+                'carnivore_count': carnivore_count,
+                'omnivore_count': omnivore_count,
+                'flora_count': len(flora),
+            }
+
+            # 2. Cojo datos específicos de especies para el grafo
+            species_data = {}
+            for entity in flora:
+                species_name = str(entity.get_species())
+                if species_name not in species_data:
+                    species_data[species_name] = {
+                        'type': 'flora',
+                        'population': 0,
+                        'biomass': 0,
+                        'avg_stress': 0,
+                        'avg_vitality': 0,
+                        'count': 0
+                    }
+
+                entity_data = entity.get_state_fields()
+                stress = entity_data.get('general', {}).get('stress_level', 0)
+                growth_data = entity_data.get('growth', {})
+
+                species_data[species_name]['population'] += 1
+                species_data[species_name]['biomass'] += growth_data.get('current_size', 0)
+                species_data[species_name]['avg_stress'] += stress
+                species_data[species_name]['avg_vitality'] += entity_data.get('vital', {}).get('vitality', 0)
+                species_data[species_name]['count'] += 1
+
+            for entity in fauna:
+                species_name = str(entity.get_species())
+                diet_type = entity.diet_type.value if hasattr(entity, 'diet_type') else 'unknown'
+
+                if species_name not in species_data:
+                    species_data[species_name] = {
+                        'type': 'fauna',
+                        'diet': diet_type,
+                        'population': 0,
+                        'biomass': 0,
+                        'avg_stress': 0,
+                        'avg_energy': 0,
+                        'avg_vitality': 0,
+                        'count': 0
+                    }
+
+                entity_data = entity.get_state_fields()
+                stress = entity_data.get('general', {}).get('stress_level', 0)
+                growth_data = entity_data.get('growth', {})
+
+                species_data[species_name]['population'] += 1
+                species_data[species_name]['biomass'] += growth_data.get('current_size', 0)
+                species_data[species_name]['avg_stress'] += stress
+                species_data[species_name]['avg_vitality'] += entity_data.get('vital', {}).get('vitality', 0)
+                species_data[species_name]['avg_energy'] += entity_data.get('heterotrophic_nutrition', {}).get(
+                    'energy_reserves', 0)
+                species_data[species_name]['count'] += 1
+
+            for species, data in species_data.items():
+                count = max(1, data['count'])
+                if 'avg_stress' in data:
+                    data['avg_stress'] /= count
+                if 'avg_vitality' in data:
+                    data['avg_vitality'] /= count
+                if 'avg_energy' in data:
+                    data['avg_energy'] /= count
+                if 'biomass' in data:
+                    data['biomass'] /= count
+
+            neurosymbolic_data = {
+                'lstm_data': lstm_data,
+                'species_data': species_data
+            }
+
+            data_service = NeurosymbolicDataService.get_instance()
+            data_service.update_data(lstm_data, species_data, save_to_files)
+
+            return neurosymbolic_data
+
+        except Exception as e:
+            self._logger.error(f"Error collecting neurosymbolic data: {e}")
+            return {'error': str(e)}
+
+    def get_neurosymbolic_data(self) -> Optional[Dict[str, Any]]:
+        return self._neurosymbolic_data
