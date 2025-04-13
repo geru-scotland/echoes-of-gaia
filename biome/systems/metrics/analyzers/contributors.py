@@ -208,6 +208,7 @@ class BiodiversityContributor(BaseScoreContributor):
         if not has_data:
             self._logger.warning(f"Missing required data for {self.name} calculation: {missing}")
             return 0.5
+
         num_flora = biome_data["num_flora"]
         num_fauna = biome_data["num_fauna"]
         total = num_flora + num_fauna
@@ -215,22 +216,76 @@ class BiodiversityContributor(BaseScoreContributor):
         if total == 0:
             return 0.0
 
-        flora_species_count = biome_data.get("flora_species_count", 1)
-        fauna_species_count = biome_data.get("fauna_species_count", 1)
+        shannon_biodiversity = biome_data.get("biodiversity_index")
 
-        if "flora_species_count" not in biome_data:
-            flora_species_count = min(5, max(1, num_flora // 3))
-        if "fauna_species_count" not in biome_data:
-            fauna_species_count = min(4, max(1, num_fauna // 2))
+        if shannon_biodiversity is None:
+            flora_species_count = biome_data.get("flora_species_count", 1)
+            fauna_species_count = biome_data.get("fauna_species_count", 1)
 
-        total_species = flora_species_count + fauna_species_count
+            if "flora_species_count" not in biome_data:
+                flora_species_count = min(5, max(1, num_flora // 3))
+            if "fauna_species_count" not in biome_data:
+                fauna_species_count = min(4, max(1, num_fauna // 2))
 
-        biodiversity_score = min(1.0, total_species / 8.0)
+            total_species = flora_species_count + fauna_species_count
 
-        if total_species < 3:
-            biodiversity_score *= 0.7
+            biodiversity_score = min(1.0, total_species / 8.0)
 
-        return biodiversity_score
+            if total_species < 3:
+                biodiversity_score *= 0.7
+        else:
+            biodiversity_score = shannon_biodiversity
+            self._logger.debug(f"Using Shannon-Wiener biodiversity index: {biodiversity_score:.3f}")
+
+        prey_population = biome_data.get("prey_population", 0)
+        predator_population = biome_data.get("predator_population", 0)
+
+        if num_fauna > 0 and prey_population == 0 and predator_population == 0:
+            self._logger.debug("No prey/predator data available, using default calculations")
+            prey_population = num_fauna * 0.7
+            predator_population = num_fauna * 0.3
+
+        if prey_population > 0:
+            pred_prey_ratio = predator_population / prey_population
+        else:
+            # Un poco bruto, pero pongo inf para edge case, si no hay presas y si depredadores, muy desequilibrado
+            pred_prey_ratio = float('inf') if predator_population > 0 else 0.0
+
+        optimal_min_ratio = 0.1
+        optimal_max_ratio = 0.3
+
+        if pred_prey_ratio == float('inf'):
+            predator_prey_balance_score = 0.1
+            self._logger.debug(f"Critical imbalance: only predators present")
+        elif pred_prey_ratio == 0.0 and predator_population == 0 and prey_population > 0:
+            predator_prey_balance_score = 0.4
+            self._logger.debug(f"Imbalance: only prey present")
+        elif pred_prey_ratio < optimal_min_ratio:
+            balance_factor = pred_prey_ratio / optimal_min_ratio
+            predator_prey_balance_score = 0.4 + (balance_factor * 0.6)
+            self._logger.debug(
+                f"Too few predators: ratio {pred_prey_ratio:.3f}, score {predator_prey_balance_score:.2f}")
+        elif pred_prey_ratio > optimal_max_ratio:
+            excess_factor = min(1.0, (pred_prey_ratio - optimal_max_ratio) / 2.0)
+            predator_prey_balance_score = 1.0 - (excess_factor * 0.8)
+            self._logger.debug(
+                f"Too many predators: ratio {pred_prey_ratio:.3f}, score {predator_prey_balance_score:.2f}")
+        else:
+            optimal_mid_ratio = (optimal_min_ratio + optimal_max_ratio) / 2
+            distance_from_mid = abs(pred_prey_ratio - optimal_mid_ratio) / (optimal_max_ratio - optimal_min_ratio)
+            predator_prey_balance_score = 1.0 - (distance_from_mid * 0.2)
+            self._logger.debug(
+                f"Optimal predator-prey ratio: {pred_prey_ratio:.3f}, score {predator_prey_balance_score:.2f}")
+
+        # Nota: Cacharrear y quizá dar algo más de peso al predator_prey_balance_score, que me es más útil por ahora.
+        biodiversity_weight = 0.5
+        balance_weight = 0.5
+        final_score = (biodiversity_score * biodiversity_weight) + (predator_prey_balance_score * balance_weight)
+
+        self._logger.debug(
+            f"Biodiversity score: {biodiversity_score:.2f}, Balance score: {predator_prey_balance_score:.2f}, Final: {final_score:.2f}")
+
+        return final_score
 
 
 class EcosystemHealthContributor(BaseScoreContributor):

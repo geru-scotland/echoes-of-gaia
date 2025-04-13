@@ -40,12 +40,13 @@ class ScoreContributor(Protocol):
     def calculate(self, biome_data: Dict[str, Any]) -> float:
         ...
 
+
 class BiomeQuality(Enum):
-    CRITICAL = "critical"     # 0.0 - 0.2
-    UNSTABLE = "unstable"     # 0.2 - 0.4
-    MODERATE = "moderate"     # 0.4 - 0.6
-    HEALTHY = "healthy"       # 0.6 - 0.8
-    EDEN = "eden"             # 0.8 - 1.0
+    CRITICAL = "critical"  # 0.0 - 0.2
+    UNSTABLE = "unstable"  # 0.2 - 0.4
+    MODERATE = "moderate"  # 0.4 - 0.6
+    HEALTHY = "healthy"  # 0.6 - 0.8
+    EDEN = "eden"  # 0.8 - 1.0
 
     @classmethod
     def from_score(cls, score: float) -> 'BiomeQuality':
@@ -86,11 +87,11 @@ class BiomeScoreAnalyzer:
     def _initialize_contributors(self) -> None:
         # TODO: Establecer weights desde configs, por contributor
         self._contributors = [
-            PopulationBalanceContributor(weight=1.2),
-            ToxicityContributor(weight=0.8),
+            PopulationBalanceContributor(weight=1.1),
+            # ToxicityContributor(weight=0.8),
             ClimateContributor(weight=1.0),
-            BiodiversityContributor(weight=0.9),
-            EcosystemHealthContributor(weight=1.1)
+            BiodiversityContributor(weight=1.2),
+            EcosystemHealthContributor(weight=1.0)
         ]
 
     def calculate_score(self, biome_data: Dict[str, Any],
@@ -102,7 +103,7 @@ class BiomeScoreAnalyzer:
 
         total_weight: float = 0.0
         weighted_score: float = 0.0
-        contributor_scores: Dict[str, int|float] = {}
+        contributor_scores: Dict[str, int | float] = {}
 
         for contributor in self._contributors:
             score = contributor.calculate(data)

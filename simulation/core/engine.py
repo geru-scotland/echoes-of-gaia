@@ -56,6 +56,7 @@ class SimulationEngine:
             self._events_per_era = self._context.config.get("eras", {}).get("events-per-era", 0)
             self._datapoints: bool = self._context.config.get("datapoints", False)
             self._snapshots: bool = self._context.config.get("data", {}).get("snapshots", {}).get("enabled", False)
+            self._dataset_generation: bool = self._context.config.get("data", {}).get("dataset", {})
 
             data_storage: Dict[str, Any] = self._context.config.get("data", {}).get("storage", {})
             trackers: Dict[str, Any] = data_storage.get("trackers", {})
@@ -95,7 +96,8 @@ class SimulationEngine:
             if self._snapshots:
                 self._data_manager = BiomeDataManager(
                     env=self._env,
-                    config=self._context.config
+                    config=self._context.config,
+                    dataset_generation=self._dataset_generation
                 )
 
                 self._data_manager.configure(self._biome_api.get_biome())

@@ -22,7 +22,7 @@ import time
 from enum import Enum
 from logging import Logger
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import msgpack
 import numpy as np
@@ -36,14 +36,15 @@ from utils.loggers import LoggerManager
 
 
 class SnapshotStorage:
-    def __init__(self, config: SnapshotConfig):
+    def __init__(self, config: SnapshotConfig, dataset_generation: bool = False):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._config = config
         self._ensure_storage_directory()
         self._terrain_saved = False
         self._snapshot_filepath = None
         self._snapshot_file_exists = False
-        self._snapshot_counter = 1
+        self._snapshot_counter: int = 1
+        self._dataset_generation: bool = dataset_generation
 
         self._logger.info(f"Snapshot storage initialized with directory: {self._config.storage_directory}")
 
@@ -81,6 +82,53 @@ class SnapshotStorage:
         finally:
             if callback:
                 callback(filepath)
+
+    def save_neurosymbolic_data(self, neurosymbolic_data: Dict[str, Any], snapshot_id: int) -> Optional[Path]:
+        try:
+            if not neurosymbolic_data or 'error' in neurosymbolic_data:
+                self._logger.warning("No valid neurosymbolic data to save")
+                return None
+
+            neurosymbolic_dir = self._config.storage_directory / "neurosymbolic_data"
+            neurosymbolic_dir.mkdir(parents=True, exist_ok=True)
+
+            simulation_id = getattr(self, '_simulation_id', None)
+            if simulation_id is None:
+                if not hasattr(self, '_simulation_id'):
+                    self._simulation_id = f"sim_{time.strftime('%d-%B-%Y__%Hh%Mm%Ss')}"
+                    simulation_id = self._simulation_id
+
+            lstm_filepath = neurosymbolic_dir / f"lstm_data_{simulation_id}.jsonl"
+            graph_filepath = neurosymbolic_dir / f"graph_data_{simulation_id}.jsonl"
+
+            timestamped_lstm_data = {
+                "snapshot_id": snapshot_id,
+                "timestamp": time.time(),
+                "simulation_time": neurosymbolic_data.get("simulation_time", -1),
+                "data": neurosymbolic_data['lstm_data']
+            }
+
+            # Hago rápido pero, TODO: quitar esta chapuza y dejar stream abierto hasta que termine simulación.
+            # Pongo en jsonl por ahora, dict per line, pero prefiero en bloques binarios con msgpack + compresión gzip
+            with open(lstm_filepath, 'a') as f:
+                f.write(json.dumps(timestamped_lstm_data, default=self._json_serializer) + '\n')
+
+            timestamped_graph_data = {
+                "snapshot_id": snapshot_id,
+                "timestamp": time.time(),
+                "simulation_time": neurosymbolic_data.get("simulation_time", -1),
+                "data": neurosymbolic_data
+            }
+
+            with open(graph_filepath, 'a') as f:
+                f.write(json.dumps(timestamped_graph_data, default=self._json_serializer) + '\n')
+
+            self._logger.debug(f"Appended neurosymbolic data to {lstm_filepath} and {graph_filepath}")
+            return lstm_filepath
+
+        except Exception as e:
+            self._logger.error(f"Failed to append neurosymbolic data: {e}")
+            return None
 
     def _save_snapshot_internal(self, snapshot: SnapshotData) -> Path:
         try:

@@ -34,7 +34,7 @@ from utils.paths import SIMULATION_DIR
 
 
 class BiomeDataManager:
-    def __init__(self, env: simpyEnv, config: Config):
+    def __init__(self, env: simpyEnv, config: Config, dataset_generation: bool = False):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._env = env
         self._config = config
@@ -42,6 +42,7 @@ class BiomeDataManager:
         self._snapshot_system = None
         self._data_provider = None
         self._snapshot_process = None
+        self._dataset_generation = dataset_generation
 
         self._logger.debug("BiomeDataManager initialized with config")
 
@@ -74,7 +75,8 @@ class BiomeDataManager:
                 score_analyzer=self._data_provider.get_score_analyzer(),
                 config=config,
                 biome_type=self._data_provider.get_biome_type(),
-                climate_data_manager=self._data_provider.get_climate_data_manager()
+                climate_data_manager=self._data_provider.get_climate_data_manager(),
+                dataset_generation=self._dataset_generation
             )
 
             capture_period = self._get_capture_period(config)
@@ -104,7 +106,8 @@ class BiomeDataManager:
             capture_period=period,
             custom_period=custom_period,
             filename_prefix=snapshot_config.get("filename_prefix", "biome_snapshot"),
-            storage_directory=Path(os.path.join(SIMULATION_DIR, snapshot_config.get("storage_directory", "simulation_records"))),
+            storage_directory=Path(
+                os.path.join(SIMULATION_DIR, snapshot_config.get("storage_directory", "simulation_records"))),
             pretty_print=snapshot_config.get("pretty_print", True),
             include_real_timestamp=snapshot_config.get("include_real_timestamp", True)
         )
