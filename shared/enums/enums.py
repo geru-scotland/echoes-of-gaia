@@ -287,6 +287,7 @@ class SimulationMode(EnumBaseInt):
     TRAINING = auto()
     TRAINING_WITH_RL_MODEL = auto()
     TRAINING_FINISHED = auto()
+    UNTIL_EXTINCTION = auto()
 
 
 class Direction(Enum):

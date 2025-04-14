@@ -41,4 +41,3 @@ simulation:
 
     dataset:
       generate: true
-      storage_directory: "dataset"

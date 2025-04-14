@@ -60,11 +60,12 @@ class NeurosymbolicDataService:
             return None
 
         # Hardcodeo por ahora. Features relevantes para la LSTM
+        # Note: Ya he preparado config en módulo research, preparar bien soporte para inferencia
         features = [
-            'prey_population', 'predator_population', 'predator_prey_ratio',
-            'avg_stress', 'avg_energy', 'ecosystem_score', 'biodiversity_index',
-            'herbivore_pop', 'carnivore_pop', 'primary_producer_pop',
-            'temperature', 'humidity', 'precipitation'
+            'snapshot_id', 'timestamp'
+                           'prey_population', 'predator_population', 'predator_prey_ratio',
+            'avg_stress', 'biome_score', 'biodiversity_index',
+            'herbivore_pop', 'carnivore_pop', 'flora_pop',
         ]
 
         # Preparo la matriz de features: (seq_len, num_features)
