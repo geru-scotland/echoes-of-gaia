@@ -59,12 +59,12 @@ class LSTMModelManager:
 
     def _init_model(self) -> None:
         model_config = self._config["model"]
-        self._model = BiomeGRU(
+        self._model = BiomeLSTM(
             input_size=len(self.config["data"]['features']),
             hidden_size=model_config["hidden_size"],
             num_layers=model_config["num_layers"],
             output_size=len(self.config['data']["targets"]),
-            dropout=model_config.get("dropout", 0.0)
+            dropout=model_config.get("dropout", 0.2)
         ).to(self._device)
 
         self._logger.info(f"Initialized model: {self._model}")
@@ -548,7 +548,7 @@ class LSTMModelManager:
 
         features = self._config["data"]["features"]
         targets = self._config["data"]["targets"]
-        desired_columns = features + targets
+        desired_columns = set(features + targets)
 
         existing_columns = [col for col in desired_columns if col in df.columns]
         df_selected = df[existing_columns]

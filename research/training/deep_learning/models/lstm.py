@@ -38,6 +38,20 @@ class BiomeLSTM(nn.Module):
         self.layer_norm = nn.LayerNorm(hidden_size)
 
         self.fc = nn.Linear(hidden_size, output_size)
+        self.init_weights()
+
+    def init_weights(self):
+        for name, param in self.lstm.named_parameters():
+            if 'weight_ih' in name:
+                nn.init.xavier_uniform_(param.data)
+            elif 'weight_hh' in name:
+                nn.init.orthogonal_(param.data)
+            elif 'bias' in name:
+                nn.init.constant_(param.data, 0)
+
+        nn.init.xavier_uniform_(self.fc.weight)
+        if self.fc.bias is not None:
+            nn.init.constant_(self.fc.bias, 0)
 
     def forward(self, x: torch.Tensor, hidden: Optional[Tuple[torch.Tensor, torch.Tensor]] = None) -> Tuple[
         torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
@@ -50,6 +64,7 @@ class BiomeLSTM(nn.Module):
             hidden = (h0, c0)
 
         out, hidden = self.lstm(x, hidden)
+        out = self.layer_norm(out)
         # out shape: (batch_size, sequence_length, hidden_size)
 
         # Decodifico el hidden state del último paso, es el único que realmente me importa.
@@ -76,6 +91,19 @@ class BiomeGRU(nn.Module):
 
         self.layer_norm = nn.LayerNorm(hidden_size)
         self.fc = nn.Linear(hidden_size, output_size)
+
+    def init_weights(self):
+        for name, param in self.gru.named_parameters():
+            if 'weight_ih' in name:
+                nn.init.xavier_uniform_(param.data)
+            elif 'weight_hh' in name:
+                nn.init.orthogonal_(param.data)
+            elif 'bias' in name:
+                nn.init.constant_(param.data, 0)
+
+        nn.init.xavier_uniform_(self.fc.weight)
+        if self.fc.bias is not None:
+            nn.init.constant_(self.fc.bias, 0)
 
     def forward(self, x: torch.Tensor, hidden: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         # x shape: (batch_size, sequence_length, input_size)

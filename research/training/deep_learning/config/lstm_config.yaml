@@ -1,13 +1,13 @@
 model:
-  hidden_size: 32
-  num_layers: 1
-  dropout: 0
+  hidden_size: 256
+  num_layers: 2
+  dropout: 0.4
 
 training:
-  batch_size: 32
+  batch_size: 64
   learning_rate: 0.001
-  weight_decay: 0.0001
-  num_epochs: 500
+  weight_decay: 0.0002
+  num_epochs: 150
   sequence_length: 10
   validation_split: 0.2
   use_progress_bar: true
@@ -16,16 +16,9 @@ data:
   features:
     - prey_population
     - predator_population
-    - predator_prey_ratio
-    - herbivore_count
-    - carnivore_count
     - flora_count
-    - total_fauna
-    - total_entities
 
-    - avg_stress
     - biodiversity_index
-    - biome_score
     - ecosystem_stability
     - environmental_pressure
 
@@ -34,7 +27,6 @@ data:
     - precipitation
     - co2_level
     - biomass_density
-    - atmospheric_pressure
 
   targets:
     - prey_population
