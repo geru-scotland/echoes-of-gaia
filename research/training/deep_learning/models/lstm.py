@@ -38,6 +38,7 @@ class BiomeLSTM(nn.Module):
         self.layer_norm = nn.LayerNorm(hidden_size)
 
         self.fc = nn.Linear(hidden_size, output_size)
+        self.init_weights()
 
     def init_weights(self):
         for name, param in self.lstm.named_parameters():
