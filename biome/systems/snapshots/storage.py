@@ -98,20 +98,20 @@ class SnapshotStorage:
                     self._simulation_id = f"sim_{time.strftime('%d-%B-%Y__%Hh%Mm%Ss')}"
                     simulation_id = self._simulation_id
 
-            lstm_filepath = neurosymbolic_dir / f"lstm_data_{simulation_id}.jsonl"
+            neural_filepath = neurosymbolic_dir / f"neural_data_{simulation_id}.jsonl"
             graph_filepath = neurosymbolic_dir / f"graph_data_{simulation_id}.jsonl"
 
-            timestamped_lstm_data = {
+            timestamped_neural_data = {
                 "snapshot_id": snapshot_id,
                 "timestamp": time.time(),
                 "simulation_time": neurosymbolic_data.get("simulation_time", -1),
-                "data": neurosymbolic_data['lstm_data']
+                "data": neurosymbolic_data['neural_data']
             }
 
             # Hago rápido pero, TODO: quitar esta chapuza y dejar stream abierto hasta que termine simulación.
             # Pongo en jsonl por ahora, dict per line, pero prefiero en bloques binarios con msgpack + compresión gzip
-            with open(lstm_filepath, 'a') as f:
-                f.write(json.dumps(timestamped_lstm_data, default=self._json_serializer) + '\n')
+            with open(neural_filepath, 'a') as f:
+                f.write(json.dumps(timestamped_neural_data, default=self._json_serializer) + '\n')
 
             timestamped_graph_data = {
                 "snapshot_id": snapshot_id,
@@ -123,8 +123,8 @@ class SnapshotStorage:
             with open(graph_filepath, 'a') as f:
                 f.write(json.dumps(timestamped_graph_data, default=self._json_serializer) + '\n')
 
-            self._logger.debug(f"Appended neurosymbolic data to {lstm_filepath} and {graph_filepath}")
-            return lstm_filepath
+            self._logger.debug(f"Appended neurosymbolic data to {neural_filepath} and {graph_filepath}")
+            return neural_filepath
 
         except Exception as e:
             self._logger.error(f"Failed to append neurosymbolic data: {e}")

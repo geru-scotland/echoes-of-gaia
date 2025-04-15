@@ -21,7 +21,7 @@ from typing import Dict, Any
 
 from config.settings import Settings
 from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
-from shared.enums.enums import SimulationMode
+from shared.enums.enums import SimulationMode, DietType
 from simulation.api.simulation_api import SimulationAPI
 from utils.paths import DATASET_GENERATED_CONFIGS_DIR
 
@@ -32,7 +32,20 @@ def check_fauna_extinction(simulation) -> bool:
 
     fauna = entity_provider.get_fauna(only_alive=True)
 
-    return len(fauna) == 0
+    if len(fauna) == 0:
+        return True
+
+    remaining_species = set()
+    for entity in fauna:
+        remaining_species.add(entity.get_species())
+
+    if len(remaining_species) == 1:
+        sample_entity = fauna[0]
+
+        if hasattr(sample_entity, 'diet_type') and sample_entity.diet_type == DietType.CARNIVORE:
+            return True
+
+    return False
 
 
 def run_simulation_with_extinction_check(config_file: str, config: Dict[str, Any],
@@ -71,9 +84,6 @@ def main():
     args = parser.parse_args()
 
     for i in range(args.sims):
-        print(f"\n{'=' * 50}")
-        print(f"Starting simulation {i + 1} of {args.sims}")
-        print(f"{'=' * 50}")
 
         random_config = TrainingConfigManager.generate_random_config(args.base_config)
         timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -88,7 +98,6 @@ def main():
 
         try:
             run_simulation_with_extinction_check(temp_config_path, random_config, args.check_interval)
-            print(f"Simulation {i + 1} completed successfully")
         except Exception as e:
             print(f"Error in simulation {i + 1}: {str(e)}")
 

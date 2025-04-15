@@ -153,7 +153,7 @@ class ForagingBehaviour:
         self._logger.debug(f"Consuming prey: +{nutritive_value} nutrition")
 
         hunt_success = random.random()
-        if hunt_success < 0.2:
+        if hunt_success < 0.05:
             vital_component = prey.get_component(ComponentType.VITAL)
             if vital_component:
                 vital_component.vitality = 0

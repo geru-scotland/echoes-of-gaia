@@ -366,8 +366,8 @@ class WorldMapManager:
         return [flora for flora in self._world_map.get_entities()
                 if flora.get_type() == type]
 
-    def get_entity_by_id(self, id: int) -> Entity:
-        return self._entity_registry[id]
+    def get_entity_by_id(self, id: int) -> Optional[Entity]:
+        return self._entity_registry.get(id, None)
 
     def is_valid_position(self, position: Position, entity_id: Optional[int] = None) -> bool:
         return self._is_valid_position(position, entity_id)

@@ -909,6 +909,33 @@
         "SNOW"
       ]
     },
+    "taiga_forest_edge": {
+      "IN": [
+        "GRASS"
+      ],
+      "NEARBY": [
+        "MOUNTAIN",
+        "SNOW"
+      ]
+    },
+    "taiga_wetland": {
+      "IN": [
+        "WATER_SHALLOW"
+      ],
+      "NEARBY": [
+        "GRASS",
+        "SNOW"
+      ]
+    },
+    "taiga_undergrowth": {
+      "IN": [
+        "GRASS",
+        "MOUNTAIN"
+      ],
+      "NEARBY": [
+        "SNOW"
+      ]
+    },
     "grassland": {
       "IN": [
         "GRASS"
@@ -1245,7 +1272,8 @@
     "pine_tree": {
       "habitat": [
         "coniferous_forest",
-        "rocky_taiga"
+        "rocky_taiga",
+        "taiga_forest_edge"
       ],
       "components": {
         "WeatherAdaptationComponent": {
@@ -1267,7 +1295,8 @@
     },
     "arctic_moss": {
       "habitat": [
-        "taiga_clearing"
+        "taiga_wetland",
+        "taiga_undergrowth"
       ],
       "components": {
         "WeatherAdaptationComponent": {
@@ -1294,7 +1323,9 @@
     },
     "spruce_tree": {
       "habitat": [
-        "coniferous_forest"
+        "coniferous_forest",
+        "taiga_forest_edge",
+        "taiga_clearing"
       ],
       "components": {
         "WeatherAdaptationComponent": {
@@ -1321,8 +1352,9 @@
     },
     "winterberry": {
       "habitat": [
-        "taiga_clearing",
-        "coniferous_forest"
+        "coniferous_forest",
+        "taiga_forest_edge",
+        "taiga_wetland"
       ],
       "components": {
         "WeatherAdaptationComponent": {
@@ -1636,7 +1668,7 @@
       }
     },
     "toucan": {
-      "diet": "omnivore",
+      "diet": "herbivore",
       "habitat": [
         "rainforest_canopy"
       ],
@@ -1841,7 +1873,9 @@
     "wolf": {
       "diet": "carnivore",
       "habitat": [
-        "coniferous_forest"
+        "coniferous_forest",
+        "taiga_forest_edge",
+        "rocky_taiga"
       ],
       "components": {
         "WeatherAdaptationComponent": {
@@ -1867,6 +1901,7 @@
     "moose": {
       "diet": "herbivore",
       "habitat": [
+        "taiga_wetland",
         "taiga_clearing"
       ],
       "components": {
@@ -1898,8 +1933,8 @@
     "lynx": {
       "diet": "carnivore",
       "habitat": [
-        "coniferous_forest",
-        "taiga_clearing"
+        "taiga_undergrowth",
+        "rocky_taiga"
       ],
       "components": {
         "WeatherAdaptationComponent": {
@@ -1925,8 +1960,9 @@
     "snowshoe_hare": {
       "diet": "herbivore",
       "habitat": [
-        "taiga_clearing",
-        "coniferous_forest"
+        "taiga_undergrowth",
+        "taiga_forest_edge",
+        "taiga_clearing"
       ],
       "components": {
         "WeatherAdaptationComponent": {
@@ -2090,7 +2126,7 @@
       }
     },
     "arctic_fox": {
-      "diet": "omnivore",
+      "diet": "carnivore",
       "habitat": [
         "permafrost_plains"
       ],

@@ -51,7 +51,20 @@ class ClimateDataManager:
         self._climate_history.add_daily_data(climate_data, self._evolution_cycle, self._env.now)
 
     def get_data(self, evolution_cycle: int) -> DataFrame:
-        return self._climate_history.get_data_by_evolution_cycle(evolution_cycle)
+        data = self._climate_history.get_data_by_evolution_cycle(evolution_cycle)
+
+        if data.empty:
+            self._logger.debug(f"No climate data found for evolution cycle {evolution_cycle}, using current data")
+
+            current_averages = self.get_current_month_averages()
+            import pandas as pd
+            return pd.DataFrame({
+                'temperature_ema': [current_averages.get('avg_temperature', 20.0)],
+                'humidity_ema': [current_averages.get('avg_humidity', 50.0)],
+                'precipitation_ema': [current_averages.get('avg_precipitation', 30.0)]
+            })
+
+        return data
 
     def get_climate_history_service(self):
         return self._climate_history

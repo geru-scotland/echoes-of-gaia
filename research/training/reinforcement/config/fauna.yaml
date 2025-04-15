@@ -19,7 +19,7 @@ model:
     max_grad_norm: 1.0
     verbose: 1
     tensorboard_log: "./tensorboard_log/dqn/"
-  timesteps: 20000
+  timesteps: 200000
 environment:
   env_class: "FaunaEnvironment"
   observation_space:

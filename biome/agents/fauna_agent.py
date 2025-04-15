@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import traceback
 from typing import Dict, Any, Optional
 
 import numpy as np
@@ -105,6 +106,8 @@ class FaunaAgentAI(Agent[Observation, FaunaAction]):
                     self._logger.debug(f"Post position {fauna_entity.get_position()}")
 
             except Exception as e:
+                tb = traceback.format_exc()
+                self._logger.exception(f"Error excuting action for fauna. Traceback: {tb}")
                 self._logger.warning(
                     f"Error executing action for fauna entity {entity_id}): {e}")
 

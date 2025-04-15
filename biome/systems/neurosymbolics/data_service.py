@@ -38,23 +38,23 @@ class NeurosymbolicDataService:
     def __init__(self, history_length: int = 10):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._history_length = history_length
-        self._lstm_data_history: deque = deque(maxlen=history_length)
+        self._neural_data_history: deque = deque(maxlen=history_length)
         self._species_data_history: deque = deque(maxlen=history_length)
         self._last_update_time = 0
         self._save_to_files = True
 
     def update_data(self, lstm_data: Dict[str, Any], species_data: Dict[str, Dict[str, Any]],
                     save_to_files: bool = True) -> None:
-        self._lstm_data_history.append(lstm_data)
+        self._neural_data_history.append(lstm_data)
         self._species_data_history.append(species_data)
         self._last_update_time = time.time()
         self._save_to_files = save_to_files
 
-        self._logger.debug(f"Neurosymbolic data updated. History size: {len(self._lstm_data_history)}")
+        self._logger.debug(f"Neurosymbolic data updated. History size: {len(self._neural_data_history)}")
 
-    def get_lstm_sequence(self, sequence_length: int = None) -> np.ndarray:
-        seq_len = sequence_length or len(self._lstm_data_history)
-        seq_len = min(seq_len, len(self._lstm_data_history))
+    def get_neural_sequence(self, sequence_length: int = None) -> np.ndarray:
+        seq_len = sequence_length or len(self._neural_data_history)
+        seq_len = min(seq_len, len(self._neural_data_history))
 
         if seq_len == 0:
             return None
@@ -71,7 +71,7 @@ class NeurosymbolicDataService:
         # Preparo la matriz de features: (seq_len, num_features)
         sequence = []
         for i in range(-seq_len, 0):
-            data_point = self._lstm_data_history[i]
+            data_point = self._neural_data_history[i]
             features_vector = [data_point.get(feature, 0) for feature in features]
             sequence.append(features_vector)
 
@@ -82,7 +82,7 @@ class NeurosymbolicDataService:
             return {}
 
         return {
-            'lstm_data': self._lstm_data_history[-1] if self._lstm_data_history else {},
+            'neural_data': self._neural_data_history[-1] if self._neural_data_history else {},
             'species_data': self._species_data_history[-1]
         }
 
