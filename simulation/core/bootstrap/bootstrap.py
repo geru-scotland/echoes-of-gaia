@@ -15,6 +15,7 @@
 #                                                                        #
 ##########################################################################
 """
+import traceback
 from typing import Dict, Any
 
 from shared.stores.biome_store import BiomeStore
@@ -37,12 +38,12 @@ class Bootstrap:
         self._build_context()
 
     def _setup_builders(self):
-         self._builders[Strings.BIOME_BUILDER] = BiomeBuilder(self._settings.biome_settings)
-         self._builders[Strings.SIMULATION_BUILDER] = SimulationBuilder(self._settings.simulation_settings)
+        self._builders[Strings.BIOME_BUILDER] = BiomeBuilder(self._settings.biome_settings)
+        self._builders[Strings.SIMULATION_BUILDER] = SimulationBuilder(self._settings.simulation_settings)
 
     def _build(self):
-         self._builders[Strings.BIOME_BUILDER].build()
-         self._builders[Strings.SIMULATION_BUILDER].build()
+        self._builders[Strings.BIOME_BUILDER].build()
+        self._builders[Strings.SIMULATION_BUILDER].build()
 
     def _build_context(self):
         try:
@@ -53,6 +54,8 @@ class Bootstrap:
             if self._context is None:
                 raise BootstrapError("[CRITICAL] Null context, aborting bootstrap.")
         except (BootstrapError, MapGenerationError, TypeError) as e:
+            tb = traceback.format_exc()
+            self._logger.exception(f"Error creating Context. Traceback: {tb}")
             self._logger.critical(f"[CRITICAL] Error while building the context: {e}")
             # sys.exit(1)
 

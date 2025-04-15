@@ -76,8 +76,12 @@ class TrainingConfigManager:
         return config
 
     @staticmethod
-    def save_temp_config(config: Dict[str, Any]) -> str:
-        temp_path = os.path.join(os.path.dirname(__file__), 'temp_training_config.yaml')
+    def save_temp_config(config: Dict[str, Any], custom_name: str = None, output_path: str = None) -> str:
+        if output_path and custom_name:
+            temp_path = os.path.join(output_path, custom_name)
+        else:
+            temp_path = os.path.join(os.path.dirname(__file__), 'temp_training_config.yaml')
+
         with open(temp_path, 'w') as file:
             yaml.dump(config, file)
         return temp_path

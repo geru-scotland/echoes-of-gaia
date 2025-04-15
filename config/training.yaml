@@ -2,7 +2,8 @@ simulation:
   datapoints: false
 
   eras:
-    events-per-era: 5000
+    amount: 10
+    events-per-era: 10
 
   cleanup:
     remove_dead_entities: true
@@ -25,9 +26,12 @@ simulation:
       pretty_print: true
       include_real_timestamp: true
 
+    dataset:
+      generate: true
 
 biome:
   climate-model: "climate_model_v1.1"
+  fauna-model: "fauna_model_200k_updated_cnn_fov17"
   map:
     size:
       - 35
@@ -36,6 +40,7 @@ biome:
       size:
         width: 17
         height: 17
+
   type: "tropical"
 
   training_mode: true

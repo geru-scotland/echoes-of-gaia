@@ -92,6 +92,7 @@ Desktop.ini
 # Temp files
 tmp/
 temp/
+generated_configs/
 
 __pycache__/
 
@@ -105,3 +106,4 @@ patch.diff
 
 *.tsv
 temp_training_config.yaml
+

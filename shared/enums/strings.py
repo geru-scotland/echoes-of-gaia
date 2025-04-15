@@ -25,6 +25,7 @@ class Strings(EnumBaseStr):
     BIOME_CONTEXT = "biome_ctx"
     SIMULATION_CONTEXT = "simulation_ctx"
 
+
 class Loggers(EnumBaseStr):
     RENDER = "render"
     GAME = "game"
@@ -41,3 +42,4 @@ class Loggers(EnumBaseStr):
     CLIMATE_AGENT = "climate_agent"
     EVOLUTION_AGENT = "evolution_agent"
     FAUNA_AGENT = "fauna_agent"
+    DEEP_LEARNING = "deep_learning"
