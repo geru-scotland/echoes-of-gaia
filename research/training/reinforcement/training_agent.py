@@ -33,6 +33,61 @@ from research.training.reinforcement.fauna.cnn_feature_extractor import create_c
 from shared.enums.enums import Agents, LocalFovConfig
 from utils.loggers import LoggerManager
 from shared.enums.strings import Loggers
+from torch.utils.tensorboard import SummaryWriter
+from stable_baselines3.common.callbacks import BaseCallback
+
+import torch
+from torch.utils.tensorboard import SummaryWriter
+from stable_baselines3.common.callbacks import BaseCallback
+
+
+class TensorboardActivationsCallback(BaseCallback):
+    def __init__(self, log_freq=100, verbose=0):
+        super().__init__(verbose)
+        self.log_freq = log_freq
+        self.activations = None
+
+    def _hook_fn(self, module, input, output):
+        self.activations = output.detach()
+
+    def _on_training_start(self) -> None:
+        features_extractor = None
+        if hasattr(self.model, "policy"):
+            features_extractor = getattr(self.model.policy, "features_extractor", None)
+        if features_extractor is None and hasattr(self.model, "q_net"):
+            features_extractor = getattr(self.model.q_net, "features_extractor", None)
+
+        if features_extractor is None:
+            self.logger.warning("There is no feature extarctor, hook won't be injected")
+        else:
+            if hasattr(features_extractor, "cnn"):
+                self.hook_handle = features_extractor.cnn[0].register_forward_hook(self._hook_fn)
+                self.logger.info("Hook properlty registered in features_extractor.cnn[0]")
+            else:
+                self.logger.warning("Feature extractor does not posses a cnn attribute, check the architecture.")
+
+    def _on_step(self) -> bool:
+        if self.activations is not None and self.n_calls % self.log_freq == 0:
+            log_dir = "./tensorboard_log/dqn/"
+            if hasattr(self.logger, "writer") and self.logger.writer is not None:
+                writer = self.logger.writer
+            else:
+                writer = SummaryWriter(log_dir=log_dir)
+            self.logger.info(f"Registering in the global_step {self.num_timesteps}")
+            # Selecciono la primera muestra del batch (shape: (channels, H, W))
+            activations_img = self.activations[0]
+            # Norm.
+            activations_img = (activations_img - activations_img.min()) / \
+                              (activations_img.max() - activations_img.min() + 1e-5)
+            # (N, C, H, W): cada canal se trata como una imagen en escala de grises
+            writer.add_images("Activations/conv1", activations_img.unsqueeze(1), global_step=self.num_timesteps)
+            writer.flush()
+        return True
+
+    def _on_training_end(self) -> None:
+        if hasattr(self, "hook_handle"):
+            self.hook_handle.remove()
+            self.logger.info("Hook removed.")
 
 
 class SaveEmbeddingsCallback(BaseCallback):
