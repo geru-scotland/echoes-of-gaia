@@ -78,7 +78,7 @@ class HeterotrophicNutritionComponentManager(BaseComponentManager[HeterotrophicN
                     energy_stress_factors[critical_energy_mask] = 1.0 * np.exp(
                         4.0 * (1.0 - energy_ratios[critical_energy_mask] / 0.1))
 
-                energy_penalties = hunger_rates * 0.5 + thirst_rates * 0.5
+                energy_penalties = hunger_rates * 0.3 + thirst_rates * 0.3
 
                 for i, component in enumerate(active_components):
                     old_hunger = component.hunger_level

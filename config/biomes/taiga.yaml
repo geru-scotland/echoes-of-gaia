@@ -3,38 +3,32 @@ biome:
 
   flora:
     - species: "pine_tree"
-      spawns: 35
-      avg-lifespan: 40
-
-    - species: "arctic_moss"
       spawns: 25
+      avg-lifespan: 15
+    - species: "arctic_moss"
+      spawns: 28
       avg-lifespan: 8
-
     - species: "spruce_tree"
-      spawns: 30
-      avg-lifespan: 35
-
-    - species: "winterberry"
-      spawns: 20
+      spawns: 22
       avg-lifespan: 10
+    - species: "winterberry"
+      spawns: 18
+      avg-lifespan: 6
 
   fauna:
     - species: "wolf"
       spawns: 4
       diet: "carnivore"
       avg-lifespan: 9
-
     - species: "moose"
-      spawns: 5
+      spawns: 13
       diet: "herbivore"
       avg-lifespan: 10
-
     - species: "lynx"
       spawns: 3
       diet: "carnivore"
       avg-lifespan: 8
-
     - species: "snowshoe_hare"
-      spawns: 15
+      spawns: 17
       diet: "herbivore"
       avg-lifespan: 4

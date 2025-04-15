@@ -176,48 +176,58 @@ class ClimateSystem:
         )
 
     def environmental_factors_update(self):
-
         flora_entities = self._entity_provider.get_flora(only_alive=True)
         fauna_entities = self._entity_provider.get_fauna(only_alive=True)
 
-        total_biomass: float = 0
-        total_max_size: float = 0
+        total_biomass = 0.0
+        total_max_size = 0.0
 
         for entity in flora_entities:
             growth_component = entity.get_component(ComponentType.GROWTH)
-            if growth_component:
-                size_factor = growth_component.current_size / growth_component.max_size
+            if growth_component and growth_component.max_size > 0:
+                curr_size = min(growth_component.current_size, growth_component.max_size)
+                size_factor = curr_size / growth_component.max_size
                 total_biomass += size_factor
-                total_max_size += growth_component.max_size
+                total_max_size += 1.0
 
-        total_fauna_density: float = 0
-        total_max_fauna_density: float = 0
+        self._state.biomass_density = (total_biomass / len(flora_entities)) if flora_entities else 0.0
+
+        total_fauna_density = 0.0
+        total_fauna_entities = 0
 
         for entity in fauna_entities:
             growth_component = entity.get_component(ComponentType.GROWTH)
-            if growth_component:
-                size_factor = growth_component.current_size / growth_component.max_size
+            if growth_component and growth_component.max_size > 0:
+                curr_size = min(growth_component.current_size, growth_component.max_size)
+                size_factor = curr_size / growth_component.max_size
                 total_fauna_density += size_factor
-                total_max_fauna_density += growth_component.max_size
+                total_fauna_entities += 1
 
-        self._state.biomass_density = total_biomass / total_max_size if total_max_size > 0.0 else 0.0
-        self._logger.debug(
-            f"Calculated biomass_density: {self._state.biomass_density:.4f} "
-            f"(total_biomass={total_biomass:.4f}, total_max_size={total_max_size:.4f})"
-        )
-        self._state.fauna_density = total_fauna_density / total_max_fauna_density if total_max_fauna_density > 0.0 else 0.0
-
-        base_co2_emission = total_fauna_density * 2.0
-        photosynthesis_absorption = total_biomass * 3.0
+        self._state.fauna_density = (total_fauna_density / total_fauna_entities) if total_fauna_entities > 0 else 0.0
+        base_co2_emission = total_fauna_density * 0.1
+        photosynthesis_absorption = total_biomass * 0.07
 
         co2_net_delta = base_co2_emission - photosynthesis_absorption
-        self._state.co2_level = max(300.0, min(600.0, self._state.co2_level + co2_net_delta))
 
-        # Por ahora, a ojo de buen cubero, he googleado un poco:
-        # 0.01°C por cada 1 ppm por encima de 400
+        new_co2 = self._state.co2_level + co2_net_delta
+        self._state.co2_level = max(0.0, min(600.0, new_co2))
         co2_temp_impact = (self._state.co2_level - 400.0) * 0.01
-
         self._state.temperature += co2_temp_impact
+
+        self._logger.debug(
+            f"Calculated biomass_density: {self._state.biomass_density:.4f} "
+            f"(total_biomass={total_biomass:.4f}, total_entities={len(flora_entities)})"
+        )
+        self._logger.debug(
+            f"Calculated fauna_density: {self._state.fauna_density:.4f} "
+        )
+        self._logger.debug(
+            f"CO2 level updated to: {self._state.co2_level:.4f} "
+            f"with CO2 net delta: {co2_net_delta:.4f}"
+        )
+        self._logger.debug(
+            f"Temperature updated to: {self._state.temperature:.4f} (CO2 impact: {co2_temp_impact:.4f})"
+        )
 
     def set_entity_provider(self, entity_provider: EntityProvider) -> None:
         self._entity_provider = entity_provider

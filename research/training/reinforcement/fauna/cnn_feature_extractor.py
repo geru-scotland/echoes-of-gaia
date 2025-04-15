@@ -55,7 +55,8 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
         h, w = local_map_space.shape
 
-        # TODO: Max pooling, mirar a ver.
+        # TODO: Probar a poner una capa convolucional más. Jugar con los pasos y el padding
+        # NOTA: Ojo, si agrego más pooling, que no se me pase el modificar h_pooled y w_pooled!
         self.cnn = nn.Sequential(
             nn.Conv2d(terrain_embedding_dim + 7, 32, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(32),

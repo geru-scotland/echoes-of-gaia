@@ -101,6 +101,9 @@ tensorboard_logs/
 tensorboard_log/
 research/experiments/simulations
 research/training/models
+research/training/runs
+research/data
+
 
 patch.diff
 

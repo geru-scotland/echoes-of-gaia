@@ -225,3 +225,8 @@ class Entity(EventHandler, StateHandler, ABC):
         if self._components[ComponentType.MOVEMENT]:
             return self._components[ComponentType.MOVEMENT]
         return None
+
+    @property
+    def age(self) -> float:
+        if self._components and self._components[ComponentType.VITAL]:
+            return self._components[ComponentType.VITAL].age

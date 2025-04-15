@@ -16,6 +16,7 @@
 # =============================================================================
 """
 import time
+import traceback
 from logging import Logger
 from typing import Dict, Any, Optional
 
@@ -204,7 +205,7 @@ class SnapshotCollector:
         str, Any]:
         try:
             biome_statistics: MetricsData = snapshot.metrics_data
-            climate_data: ClimateData = snapshot.climate_data
+            climate_averages: ClimateData = snapshot.climate_averages
             biome_score_data: BiomeScoreData = snapshot.biome_score
 
             # 1. Esta parte, sólo para datos globales; para LSTM
@@ -214,8 +215,14 @@ class SnapshotCollector:
             carnivore_count = 0
             omnivore_count = 0
 
+            species_health = {}
+            species_count = {}
+            species_stress = {}
+
             for entity in fauna:
                 diet_type = entity.diet_type
+                species_name = str(entity.get_species())
+
                 if diet_type == DietType.HERBIVORE:
                     herbivore_count += 1
                 elif diet_type == DietType.CARNIVORE:
@@ -223,13 +230,52 @@ class SnapshotCollector:
                 elif diet_type == DietType.OMNIVORE:
                     omnivore_count += 1
 
+                if species_name not in species_count:
+                    species_count[species_name] = 0
+                    species_health[species_name] = 0
+                    species_stress[species_name] = 0
+
+                species_count[species_name] += 1
+
+                vital_data = entity.get_state_fields().get('vital', {})
+                vitality = vital_data.get('vitality', 0)
+                stress = entity.get_state_fields().get('general', {}).get('stress_level', 0)
+
+                species_health[species_name] += vitality
+                species_stress[species_name] += stress
+
+            for species in species_count:
+                if species_count[species] > 0:
+                    species_health[species] /= species_count[species]
+                    species_stress[species] /= species_count[species]
+
+            flora_species_count = {}
+
+            for entity in flora:
+                species_name = str(entity.get_species())
+                if species_name not in flora_species_count:
+                    flora_species_count[species_name] = 0
+                flora_species_count[species_name] += 1
+
             prey_population = herbivore_count
             predator_population = carnivore_count + omnivore_count
-
             predator_prey_ratio = predator_population / max(1, prey_population)
 
-            # TODO: HAY REDUNDANCIA EN
-            lstm_data = {
+            total_fauna = herbivore_count + carnivore_count + omnivore_count
+            total_entities = total_fauna + len(flora)
+
+            biodiversity = biome_statistics.get('biodiversity_index', 0.0)
+            biome_score = biome_score_data.get('score', 0.0)
+
+            # Ojo, que me había liado aquí, si bio es 1 y biomescore 10,
+            # el ecosystem stability será 1.
+            ecosystem_stability = (biodiversity + (biome_score / 10.0)) / 2.0
+
+            avg_stress = biome_statistics.get('avg_stress', 0.0)
+            climate_factor = abs(climate_averages.get('avg_temperature', 20.0) - 22.0) / 50.0
+            environmental_pressure = (avg_stress + climate_factor) / 2.0
+
+            neural_features = {
                 'snapshot_id': snapshot_id,
                 'timestamp': int(time.time()),
                 'simulation_time': self._env.now if hasattr(self, '_env') else 0,
@@ -237,17 +283,21 @@ class SnapshotCollector:
                 'predator_population': predator_population,
                 'predator_prey_ratio': predator_prey_ratio,
                 'avg_stress': biome_statistics.get('avg_stress', 0.0),
-                # 'avg_energy': biome_statistics.get('avg_energy', 0.0),
                 'biome_score': biome_score_data.get('score', 0.0),
                 'biodiversity_index': biome_statistics.get('biodiversity_index', 0.0),
-                # 'temperature': climate_data.get('avg_temperature', 20.0) if climate_data else 0.0,
-                # 'humidity': climate_data.get('avg_humidity', 50.0) if climate_data else 0.0,
-                # 'precipitation': climate_data.get('avg_precipitation', 30.0) if climate_data else 0.0,
-                # Datos extras de diversidad por dieta
                 'herbivore_count': herbivore_count,
                 'carnivore_count': carnivore_count,
-                'omnivore_count': omnivore_count,
                 'flora_count': len(flora),
+                'temperature': climate_averages.get('avg_temperature', 20.0) if climate_averages else 20.0,
+                'humidity': climate_averages.get('avg_humidity', 50.0) if climate_averages else 50.0,
+                'precipitation': climate_averages.get('avg_precipitation', 30.0) if climate_averages else 30.0,
+                'co2_level': climate_averages.get('co2_level', 400.0),
+                'biomass_density': climate_averages.get('biomass_index', 0.0),
+                'atmospheric_pressure': climate_averages.get('atmospheric_pressure', 1012.0),
+                'ecosystem_stability': ecosystem_stability,
+                'environmental_pressure': environmental_pressure,
+                'total_fauna': total_fauna,
+                'total_entities': total_entities,
             }
 
             # 2. Cojo datos específicos de especies para el grafo
@@ -313,17 +363,27 @@ class SnapshotCollector:
                 if 'biomass' in data:
                     data['biomass'] /= count
 
+            detailed_data = {
+                'species_counts': species_count,
+                'species_health': species_health,
+                'species_stress': species_stress,
+                'flora_species_counts': flora_species_count,
+            }
+
             neurosymbolic_data = {
-                'lstm_data': lstm_data,
+                'neural_data': neural_features,
+                'detailed_data': detailed_data,
                 'species_data': species_data
             }
 
             data_service = NeurosymbolicDataService.get_instance()
-            data_service.update_data(lstm_data, species_data, save_to_files)
+            data_service.update_data(neural_features, species_data, save_to_files)
 
             return neurosymbolic_data
 
         except Exception as e:
+            tb = traceback.format_exc()
+            self._logger.exception(f"Error Traceback: {tb}")
             self._logger.error(f"Error collecting neurosymbolic data: {e}")
             return {'error': str(e)}
 

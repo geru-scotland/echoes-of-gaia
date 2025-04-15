@@ -24,6 +24,11 @@ import subprocess
 import random
 
 
+def print_simulation_header(sim_number):
+    header = f" SIMULATION {sim_number} ".center(60, "=")
+    print(f"\n{header}\n")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run multiple simulations sequentially")
     parser.add_argument("--sims", type=int, default=5, help="Number of simulations to run")
@@ -35,9 +40,7 @@ def main():
     exec_script_path = os.path.join(script_dir, "exec_simulation.py")
 
     for i in range(args.sims):
-        print(f"\n{'=' * 60}")
-        print(f"STARTING SIMULATION {i + 1} OF {args.sims}")
-        print(f"{'=' * 60}\n")
+        print_simulation_header(i + 1)
 
         cmd = [sys.executable, exec_script_path]
 
@@ -50,20 +53,17 @@ def main():
 
             process.wait()
 
-            if process.returncode != 0:
-                print(f"Simulation {i + 1} ended with errors (code: {process.returncode})")
-            else:
-                print(f"Simulation {i + 1} completed successfully")
-
         except Exception as e:
             print(f"Error running simulation {i + 1}: {str(e)}")
 
         if i < args.sims - 1:
-            wait_time = args.wait + random.randint(-2, 2)
-            print(f"\nWaiting {wait_time} seconds before the next simulation...")
+            wait_time = args.wait
+            print(f"\nWaiting {wait_time} seconds before the next simulation...\n")
             time.sleep(wait_time)
 
-    print("\nAll simulations have been completed.")
+    print("\n" + "=" * 60)
+    print(" ALL SIMULATIONS HAVE BEEN COMPLETED ".center(60, "="))
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":
