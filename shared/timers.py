@@ -47,6 +47,9 @@ class Timers:
         class Fauna(EnumBaseInt):
             FAUNA_UPDATE = 1
 
+        class Equilibrium(EnumBaseInt):
+            BIOMA_BALANCE = 150
+
     class Components:
         class Physiological(EnumBaseInt):
             AGING = 2

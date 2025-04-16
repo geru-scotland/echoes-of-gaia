@@ -23,6 +23,7 @@ import simpy
 
 from biome.agents.base import Agent
 from biome.agents.climate_agent import ClimateAgentAI
+from biome.agents.equilibrium_agent import EquilibriumAgentAI
 from biome.agents.evolution_agent import EvolutionAgentAI
 from biome.agents.fauna_agent import FaunaAgentAI
 from biome.environment import Environment
@@ -97,6 +98,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         BiomeEventBus.register(BiomeEvent.CREATE_ENTITY, self._map_manager.add_entity)
         BiomeEventBus.register(BiomeEvent.REMOVE_ENTITY, self._map_manager.remove_entity)
         BiomeEventBus.register(BiomeEvent.ENTITY_DEATH, self._map_manager.handle_entity_death)
+        BiomeEventBus.register(BiomeEvent.NEUROSYMBOLIC_SERVICE_READY, self._run_equilibrium_agent)
 
     def _initialize_agents(self, mode: SimulationMode) -> Dict[AgentType, Agent]:
         agents: Dict[AgentType, Agent] = {}
@@ -135,6 +137,9 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             FaunaSpecies,
             evolution_tracker, crossover_tracker
         )
+
+        equilibrium_agent: EquilibriumAgentAI = EquilibriumAgentAI()
+        agents.update({AgentType.EQUILIBRIUM_AGENT, equilibrium_agent})
 
         return agents
 
@@ -218,6 +223,13 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
                 tb = traceback.format_exc()
                 self._logger.exception(f"An exception ocurred running  agent: {e}. Traceback: {tb}")
                 sys.exit(1)
+
+    def _run_equilibrium_agent(self) -> None:
+        equilibrium_agent: EquilibriumAgentAI = self._agents.get(AgentType.EQUILIBRIUM_AGENT, None)
+        if equilibrium_agent:
+            observation: Observation = equilibrium_agent.perceive()
+            action = equilibrium_agent.decide(observation)
+            equilibrium_agent.act(action)
 
     def _run_climate_environmental_factors_update(self, delay: int):
         yield self._env.timeout(delay)

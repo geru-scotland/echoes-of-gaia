@@ -38,15 +38,16 @@ from utils.loggers import LoggerManager
 from utils.paths import BASE_DIR
 
 
-class LSTMModelManager:
+class NeuralModelManager:
     def __init__(self, config_path: Optional[str] = None):
         self._logger: logging.Logger = LoggerManager.get_logger(Loggers.DEEP_LEARNING)
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._model = None
         self._config = None
         self._data_path = None
+        self._normalization_stats = {}
 
-        config_path = config_path if config_path else "config/lstm_config.yaml"
+        config_path = config_path if config_path else "config/neural_config.yaml"
         self._config = self._load_config(config_path)
 
     def _load_config(self, config_path: str) -> Dict[str, Any]:
@@ -58,32 +59,44 @@ class LSTMModelManager:
             raise
 
     def _init_model(self) -> None:
-        model_config = self._config["model"]
+        hyperparameters = self._config["hyperparameters"]
         self._model = BiomeLSTM(
             input_size=len(self.config["data"]['features']),
-            hidden_size=model_config["hidden_size"],
-            num_layers=model_config["num_layers"],
+            hidden_size=hyperparameters["hidden_size"],
+            num_layers=hyperparameters["num_layers"],
             output_size=len(self.config['data']["targets"]),
-            dropout=model_config.get("dropout", 0.2)
+            dropout=hyperparameters.get("dropout", 0.2)
         ).to(self._device)
 
         self._logger.info(f"Initialized model: {self._model}")
 
-    def load_model(self, model_path: Optional[str] = None) -> None:
+    def load_model(self, model_path: Optional[str] = None) -> bool:
         if model_path is None:
-            model_path = self._config["paths"]["model_save_path"]
+            model_path = self._config["paths"]["inference_model"]
 
         if not os.path.exists(model_path):
             self._logger.warning(f"Model file not found at {model_path}")
             return False
 
         try:
-            if self._model is None:
-                self._init_model()
+            saved_dict = torch.load(model_path, map_location=self._device)
 
-            self._model.load_state_dict(torch.load(model_path, map_location=self._device))
+            if self._model is None:
+                config = saved_dict.get('config', {})
+                self._model = BiomeLSTM(
+                    input_size=config.get('input_size', len(self._config["data"]["features"])),
+                    hidden_size=config.get('hidden_size', self._config["model"]["hidden_size"]),
+                    num_layers=config.get('num_layers', self._config["model"]["num_layers"]),
+                    output_size=config.get('output_size', len(self._config["data"]["targets"])),
+                    dropout=self._config["model"].get("dropout", 0.2)
+                ).to(self._device)
+
+            self._model.load_state_dict(saved_dict['model_state_dict'])
             self._model.eval()
-            self._logger.info(f"Model loaded from {model_path}")
+
+            self._normalization_stats = saved_dict.get('normalization_params', None)
+
+            self._logger.info(f"Model and parameters loaded from {model_path}")
             return True
         except Exception as e:
             self._logger.error(f"Error loading model: {e}")
@@ -96,8 +109,18 @@ class LSTMModelManager:
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
 
         try:
-            torch.save(self._model.state_dict(), model_path)
-            self._logger.info(f"Model saved to {model_path}")
+            model_dict: Dict[str, Any] = {
+                'model_state_dict': self._model.state_dict,
+                'normalization_stats': self._normalization_stats,
+                'config': {
+                    'input_size': len(self._config["data"]["features"]),
+                    'output_size': len(self._config["data"]["targets"]),
+                    'hidden_size': self._config["hyperparameters"]["hidden_size"],
+                    'num_layers': self._config["hyperparameters"]["num_layers"]
+                }
+            }
+            torch.save(model_dict, model_path)
+            self._logger.info(f"Model, normalization stats and configs saved to {model_path}")
         except Exception as e:
             self._logger.error(f"Error saving model: {e}")
 
@@ -146,7 +169,7 @@ class LSTMModelManager:
             self._logger.error(f"Error loading data: {e}")
             return [], []
 
-    def train(self, validation_data: Optional[List[Dict]] = None) -> Dict[str, List[float]]:
+    def train(self) -> Dict[str, List[float]]:
         if self._model is None:
             self._init_model()
 
@@ -156,18 +179,20 @@ class LSTMModelManager:
             self._logger.error("No data available for training")
             return {"train_loss": [], "val_loss": [], "train_mse": [], "val_mse": [], "train_r2": [], "val_r2": []}
 
-        train_config = self._config["training"]
         data_config = self._config["data"]
+        hyperparameters = self._config["hyperparameters"]
 
         train_dataset = SimulationDataset(
             data=data,
-            sequence_length=train_config["sequence_length"],
+            sequence_length=data_config["sequence_length"],
             features=data_config["features"],
             targets=data_config["targets"],
             simulation_boundaries=simulation_boundaries
         )
 
-        val_size = train_config["validation_split"] if train_config["validation_split"] > 0 else 0.2
+        self._normalization_stats = train_dataset.get_normalization_stats()
+
+        val_size = data_config["validation_split"] if data_config["validation_split"] > 0 else 0.2
 
         split_index = int(len(train_dataset) * (1 - val_size))
 
@@ -183,7 +208,7 @@ class LSTMModelManager:
 
         train_loader = DataLoader(
             train_subset,
-            batch_size=train_config["batch_size"],
+            batch_size=hyperparameters["batch_size"],
             shuffle=False
         )
 
@@ -191,19 +216,19 @@ class LSTMModelManager:
         if val_subset:
             val_loader = DataLoader(
                 val_subset,
-                batch_size=train_config["batch_size"],
+                batch_size=hyperparameters["batch_size"],
                 shuffle=False
             )
 
         mse_criterion = nn.MSELoss()
         optimizer = optim.AdamW(
             self._model.parameters(),
-            lr=train_config["learning_rate"],
-            weight_decay=train_config["weight_decay"]
+            lr=hyperparameters["learning_rate"],
+            weight_decay=hyperparameters["weight_decay"]
         )
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer,
-            T_max=train_config["num_epochs"],
+            T_max=hyperparameters["num_epochs"],
             eta_min=1e-6
         )
 
@@ -222,7 +247,7 @@ class LSTMModelManager:
 
         use_tqdm = self._config.get("training", {}).get("use_progress_bar", True)
 
-        for epoch in range(train_config["num_epochs"]):
+        for epoch in range(hyperparameters["num_epochs"]):
             start_time = time.time()
 
             self._model.train()
@@ -233,14 +258,14 @@ class LSTMModelManager:
             if use_tqdm:
                 train_iterator = tqdm(
                     train_loader,
-                    desc=f"Epoch {epoch + 1}/{train_config['num_epochs']} [Train]",
+                    desc=f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} [Train]",
                     leave=False,
                     ncols=100,
                     unit="batch"
                 )
             else:
                 train_iterator = train_loader
-                self._logger.info(f"Epoch {epoch + 1}/{train_config['num_epochs']} - Training...")
+                self._logger.info(f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - Training...")
 
             batch_count = 0
             log_interval = max(1, len(train_loader) // 10)
@@ -287,14 +312,14 @@ class LSTMModelManager:
                 if use_tqdm:
                     val_iterator = tqdm(
                         val_loader,
-                        desc=f"Epoch {epoch + 1}/{train_config['num_epochs']} [Valid]",
+                        desc=f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} [Valid]",
                         leave=False,
                         ncols=100,
                         unit="batch"
                     )
                 else:
                     val_iterator = val_loader
-                    self._logger.info(f"Epoch {epoch + 1}/{train_config['num_epochs']} - Validating...")
+                    self._logger.info(f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - Validating...")
 
                 batch_count = 0
                 log_interval = max(1, len(val_loader) // 5)
@@ -331,7 +356,7 @@ class LSTMModelManager:
                 epoch_time = time.time() - start_time
 
                 self._logger.info(
-                    f"Epoch {epoch + 1}/{train_config['num_epochs']} - "
+                    f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - "
                     f"Time: {epoch_time:.1f}s - "
                     f"Train Loss: {avg_train_loss:.4f} - "
                     f"Val Loss: {avg_val_loss:.4f} - "
@@ -343,7 +368,7 @@ class LSTMModelManager:
             else:
                 epoch_time = time.time() - start_time
                 self._logger.info(
-                    f"Epoch {epoch + 1}/{train_config['num_epochs']} - "
+                    f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - "
                     f"Time: {epoch_time:.1f}s - "
                     f"Train Loss: {avg_train_loss:.4f} - "
                     f"Train MSE: {train_mse:.4f} - "
@@ -362,8 +387,8 @@ class LSTMModelManager:
 
             import time
             timestamp = time.strftime("%Y%m%d-%H%M%S")
-            model_config = self._config["model"]
-            plot_base_name = f"lstm_training_{timestamp}_h{model_config['hidden_size']}_l{model_config['num_layers']}"
+            hyperparameters = self._config["hyperparameters"]
+            plot_base_name = f"lstm_training_{timestamp}_h{hyperparameters['hidden_size']}_l{hyperparameters['num_layers']}"
 
             self._visualize_metrics(history, plot_base_name, plots_dir)
             self.analyze_correlation(data)
@@ -381,14 +406,14 @@ class LSTMModelManager:
         data_config = self._config["data"]
         train_config = self._config["training"]
 
-        if isinstance(sequence, list) and isinstance(sequence[0], dict):
-            features_data = []
-            for item in sequence:
-                features_values = [float(item.get(feature, 0.0)) for feature in data_config["features"]]
-                features_data.append(features_values)
-            sequence_array = np.array(features_data)
-        else:
-            sequence_array = sequence
+        # if isinstance(sequence, list) and isinstance(sequence[0], dict):
+        #     features_data = []
+        #     for item in sequence:
+        #         features_values = [float(item.get(feature, 0.0)) for feature in data_config["features"]]
+        #         features_data.append(features_values)
+        #     sequence_array = np.array(features_data)
+        # else:
+        sequence_array = sequence
 
         if len(sequence_array) < train_config["sequence_length"]:
             raise ValueError(
@@ -402,7 +427,22 @@ class LSTMModelManager:
         with torch.no_grad():
             prediction, _ = self._model(sequence_tensor)
 
-        return prediction.cpu().numpy()
+        prediction_on_cpu = prediction.cpu().numpy()
+
+        if self._normalization_stats:
+            return self._denormalize_predictions(prediction_on_cpu, self._normalization_stats.get("targets", {}))
+
+        return prediction_on_cpu
+
+    def _denormalize_predictions(self, predictions, target_stats):
+        means = target_stats['means']
+        stds = target_stats['stds']
+
+        predictions_np = predictions.copy()
+
+        denormalized = predictions_np * stds + means
+
+        return denormalized
 
     def _visualize_metrics(self, history: Dict[str, List[float]], plot_base_name: str, plots_dir: str):
         import matplotlib.pyplot as plt
@@ -422,9 +462,9 @@ class LSTMModelManager:
         if len(metrics) == 1:
             axes = [axes]
 
-        model_config = self._config["model"]
+        hyperparameters = self._config["hyperparameters"]
         fig.suptitle(
-            f"LSTM Model Training Metrics (h={model_config['hidden_size']}, layers={model_config['num_layers']})",
+            f"LSTM Model Training Metrics (h={hyperparameters['hidden_size']}, layers={hyperparameters['num_layers']})",
             fontsize=16)
 
         palette = sns.color_palette("viridis", 2)

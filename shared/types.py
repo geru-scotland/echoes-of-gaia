@@ -69,3 +69,10 @@ CallbackType: TypeAlias = Optional[Callable[[Optional[Path]], None]]
 Observation: TypeAlias = Union[Dict[str, Any]]
 Target: TypeAlias = Tuple[FaunaSpecies, EntityType, int]
 DecodedAction: TypeAlias = Union[FaunaAction, Direction]
+
+# Neurosymbolic
+
+PredictionResult: TypeAlias = Dict[str, Any]
+SymbolicResult: TypeAlias = Dict[str, Any]
+IntegratedResult: TypeAlias = Dict[str, Any]
+InterventionAction: TypeAlias = Dict[str, Any]

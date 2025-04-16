@@ -205,7 +205,7 @@ class ClimateSystem:
 
         self._state.fauna_density = (total_fauna_density / total_fauna_entities) if total_fauna_entities > 0 else 0.0
         base_co2_emission = total_fauna_density * 0.1
-        photosynthesis_absorption = total_biomass * 0.07
+        photosynthesis_absorption = total_biomass * 0.07  # TODO: Iepa, se me ha olvidado tener en cuenta eficiencas etc. Importante.
 
         co2_net_delta = base_co2_emission - photosynthesis_absorption
 

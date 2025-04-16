@@ -36,6 +36,12 @@ class SimulationDataset(Dataset):
         self._simulation_boundaries = simulation_boundaries
         self._sequences = []
         self._targets_data = []
+        self._feature_stats = {}
+        self._target_stats = {}
+
+        self.augment_climate = True
+        self.climate_features_idx = [5, 6, 7, 8, 9]
+        self.noise_std = 0.05
 
         if isinstance(data, list) and isinstance(data[0], dict):
             self._features_data, self._targets_data_raw = self._preprocess_dict_data(data)
@@ -95,6 +101,9 @@ class SimulationDataset(Dataset):
         if self._transform:
             sequence = self._transform(sequence)
 
+        # if self.augment_climate and self._transform is None:
+        #     sequence = self._add_climate_noise(sequence)
+
         return torch.tensor(sequence, dtype=torch.float32), torch.tensor(target, dtype=torch.float32)
 
     def _normalize_data(self):
@@ -121,3 +130,16 @@ class SimulationDataset(Dataset):
         }
 
         self._targets_data_raw = (self._targets_data_raw - target_means) / target_stds
+
+    def _add_climate_noise(self, sequence):
+        noisy_seq = sequence.copy()
+        for t in range(sequence.shape[0]):
+            noise = np.random.normal(0, self.noise_std, size=len(self.climate_features_idx))
+            noisy_seq[t, self.climate_features_idx] += noise
+        return noisy_seq
+
+    def get_normalization_stats(self):
+        return {
+            'features': self._feature_stats,
+            'targets': self._target_stats
+        }
