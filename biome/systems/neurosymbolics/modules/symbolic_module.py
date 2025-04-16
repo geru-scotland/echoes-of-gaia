@@ -15,39 +15,40 @@
 #                                                                              #
 # =============================================================================
 """
+from logging import Logger
+from typing import Protocol, Dict, Any
 
-import os
-import sys
-import logging
-import json
-import argparse
-from pathlib import Path
-from typing import List, Dict, Any
-
-from research.training.deep_learning.model_manager import NeuralModelManager
 from shared.enums.strings import Loggers
+from shared.types import Observation, SymbolicResult
 from utils.loggers import LoggerManager
-from utils.paths import BASE_DIR
 
 
-def main():
-    logger: logging.Logger = LoggerManager.get_logger(Loggers.DEEP_LEARNING)
-    parser = argparse.ArgumentParser(description='Train LSTM model for neurosymbolic system')
-    parser.add_argument('--config', type=str, help='Path to config file')
-    args = parser.parse_args()
+class SymbolicModuleInterface(Protocol):
+    def infer(self, observation: Observation) -> SymbolicResult:
+        ...
 
-    config_path = args.config
-
-    trainer = NeuralModelManager(config_path)
-
-    logger.info("Starting training")
-    history = trainer.train()
-
-    logger.info("Training completed")
-    logger.info(f"Final training loss: {history['train_loss'][-1]:.4f}")
-    if 'val_loss' in history and history['val_loss']:
-        logger.info(f"Final validation loss: {history['val_loss'][-1]:.4f}")
+    def update_rules(self, new_rules: Dict[str, Any]) -> None:
+        ...
 
 
-if __name__ == "__main__":
-    main()
+class RuleBasedSymbolicModule:
+    def __init__(self, rules_config: Dict[str, Any]):
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
+        self.rules = rules_config
+        self._logger.info(f"Symbolic module ready")
+
+    def infer(self, symbolic_data: Observation) -> SymbolicResult:
+        result = {}
+        latest_data = self.data_service.get_latest_graph_data()
+
+        if "species_data" in latest_data:
+            for species, data in latest_data["species_data"].items():
+                if data.get("population", 0) < 5:
+                    result[f"{species}_status"] = "endangered"
+                elif data.get("avg_stress", 0) > 75:
+                    result[f"{species}_status"] = "stressed"
+
+        return result
+
+    def update_rules(self, new_rules: Dict[str, Any]) -> None:
+        self.rules.update(new_rules)

@@ -34,6 +34,10 @@ DATASET_GENERATED_CONFIGS_DIR = os.path.join(DATASET_DIR, 'generated_configs')
 TRAINING_DIR = os.path.join(RESEARCH_DIR, 'training')
 MODELS_DIR = os.path.join(TRAINING_DIR, 'models')
 
+NEUROSYBOLIC_DATA_DIR = os.path.join(RESEARCH_DIR, 'data', 'neurosymbolic')
+DEEP_LEARNING_DIR = os.path.join(TRAINING_DIR, 'deep_learning')
+DEEP_LEARNING_CONFIG_DIR = os.path.join(DEEP_LEARNING_DIR, 'config')
+
 REINFORCEMENT_DIR = os.path.join(TRAINING_DIR, 'reinforcement')
 REINFORCEMENT_CONFIG_DIR = os.path.join(REINFORCEMENT_DIR, 'config')
 

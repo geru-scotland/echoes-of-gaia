@@ -9,7 +9,7 @@ simulation:
     remove_dead_entities: true
 
   population-control:
-    smart: true
+    smart: false
 
   data:
     visualization:
@@ -27,7 +27,7 @@ simulation:
       include_real_timestamp: true
 
     dataset:
-      generate: true<
+      generate: false
 
 biome:
   climate-model: "climate_model_v1.1"

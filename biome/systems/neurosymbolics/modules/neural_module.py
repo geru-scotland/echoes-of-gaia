@@ -15,39 +15,40 @@
 #                                                                              #
 # =============================================================================
 """
+from logging import Logger
+from typing import Protocol, Dict, Any
 
-import os
-import sys
-import logging
-import json
-import argparse
-from pathlib import Path
-from typing import List, Dict, Any
+import numpy as np
 
 from research.training.deep_learning.model_manager import NeuralModelManager
 from shared.enums.strings import Loggers
+from shared.types import Observation, PredictionResult
 from utils.loggers import LoggerManager
-from utils.paths import BASE_DIR
 
 
-def main():
-    logger: logging.Logger = LoggerManager.get_logger(Loggers.DEEP_LEARNING)
-    parser = argparse.ArgumentParser(description='Train LSTM model for neurosymbolic system')
-    parser.add_argument('--config', type=str, help='Path to config file')
-    args = parser.parse_args()
+class NeuralModuleInterface(Protocol):
+    def predict(self, observation: Observation) -> PredictionResult:
+        ...
 
-    config_path = args.config
-
-    trainer = NeuralModelManager(config_path)
-
-    logger.info("Starting training")
-    history = trainer.train()
-
-    logger.info("Training completed")
-    logger.info(f"Final training loss: {history['train_loss'][-1]:.4f}")
-    if 'val_loss' in history and history['val_loss']:
-        logger.info(f"Final validation loss: {history['val_loss'][-1]:.4f}")
+    def update(self, feedback: Dict[str, Any]) -> None:
+        ...
 
 
-if __name__ == "__main__":
-    main()
+class NeuralModule:
+    def __init__(self, model_path: str, data_service):
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
+        self.model_manager = NeuralModelManager()
+        self.data_service = data_service
+        self._logger.info(f"Neural module ready")
+
+    def predict(self, neural_data: Observation) -> PredictionResult:
+        sequence: np.ndarray = neural_data
+        if sequence is None or len(sequence.shape[0]) < 10:
+            return {"error": "Insufficient data for prediction"}
+
+        prediction = self.model_manager.predict(sequence)
+
+        return self._format_prediction(prediction)
+
+    def _format_prediction(self, raw_prediction) -> PredictionResult:
+        pass

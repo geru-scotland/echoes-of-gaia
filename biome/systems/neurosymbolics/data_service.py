@@ -15,15 +15,20 @@
 #                                                                              #
 # =============================================================================
 """
-
+import os
 from typing import Dict, List, Any, Optional
 import time
 from collections import deque
 import numpy as np
 from logging import Logger
 
+import yaml
+
+from biome.systems.events.event_bus import BiomeEventBus
+from shared.enums.events import BiomeEvent
 from utils.loggers import LoggerManager
 from shared.enums.strings import Loggers
+from utils.paths import DEEP_LEARNING_CONFIG_DIR
 
 
 class NeurosymbolicDataService:
@@ -42,6 +47,16 @@ class NeurosymbolicDataService:
         self._species_data_history: deque = deque(maxlen=history_length)
         self._last_update_time = 0
         self._save_to_files = True
+        self._config: Dict[str, Any] = self._load_config()
+
+    def _load_config(self) -> Dict[str, Any]:
+        config: Dict[str, Any] = {}
+        config_file: str = os.path.join(DEEP_LEARNING_CONFIG_DIR, 'neural_config.yaml')
+
+        with open(config_file, 'r') as file:
+            config = yaml.safe_load(file)
+
+        return config
 
     def update_data(self, lstm_data: Dict[str, Any], species_data: Dict[str, Dict[str, Any]],
                     save_to_files: bool = True) -> None:
@@ -50,10 +65,15 @@ class NeurosymbolicDataService:
         self._last_update_time = time.time()
         self._save_to_files = save_to_files
 
+        seq_length: int = self._config.get("data", {}).get("sequence_length")
+
+        if 0 < seq_length <= len(self._neural_data_history):
+            BiomeEventBus.trigger(BiomeEvent.NEUROSYMBOLIC_SERVICE_READY)
+
         self._logger.debug(f"Neurosymbolic data updated. History size: {len(self._neural_data_history)}")
 
     def get_neural_sequence(self, sequence_length: int = None) -> np.ndarray:
-        seq_len = sequence_length or len(self._neural_data_history)
+        seq_len = sequence_length or self._config["hyperparameters"]["sequence_length"]
         seq_len = min(seq_len, len(self._neural_data_history))
 
         if seq_len == 0:
@@ -61,12 +81,7 @@ class NeurosymbolicDataService:
 
         # Hardcodeo por ahora. Features relevantes para la LSTM
         # Note: Ya he preparado config en módulo research, preparar bien soporte para inferencia
-        features = [
-            'snapshot_id', 'timestamp'
-                           'prey_population', 'predator_population', 'predator_prey_ratio',
-            'avg_stress', 'biome_score', 'biodiversity_index',
-            'herbivore_pop', 'carnivore_pop', 'flora_pop',
-        ]
+        features = self._config.get("data", {}).get("features")
 
         # Preparo la matriz de features: (seq_len, num_features)
         sequence = []
@@ -91,3 +106,10 @@ class NeurosymbolicDataService:
 
     def should_save_to_files(self) -> bool:
         return self._save_to_files
+
+    def sequence_length(self) -> int:
+        return self._config.get("hyperparameters", {}).get("sequence_length", 10)
+
+    def clear_sequence_history(self) -> None:
+        self._neural_data_history.clear()
+        self._species_data_history.clear()

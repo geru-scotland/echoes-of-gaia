@@ -75,7 +75,6 @@ class SnapshotCollector:
 
         self._collect_climate_analysis_data(snapshot, climate_data)
 
-        # TODO: Únicamente si config activa, ojo. Por ahora dejo siempre
         self._neurosymbolic_data = self._collect_neurosymbolic_data(snapshot, snapshot_id)
 
         return snapshot

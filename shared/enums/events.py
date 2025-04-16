@@ -58,3 +58,4 @@ class BiomeEvent(EnumBaseStr):
     SEASON_CHANGE = "season_change"
     DISASTER = "disaster"
     CLIMATE_DATA_COLLECTED = "climate_data_collected"
+    NEUROSYMBOLIC_SERVICE_READY = "neurosymbolic_service_ready"

@@ -153,16 +153,19 @@ class ReinforcementLearningAgent:
                 raise ValueError(f"Unsupported algorithm: {self._config['model']['algorithm']}")
 
             policy_kwargs = create_custom_cnn_policy()
-            callback = SaveEmbeddingsCallback()
+
+            tensorboard_callback = TensorboardActivationsCallback(log_freq=100)
+            save_embeddings_callback = SaveEmbeddingsCallback()
+
+            callback = [tensorboard_callback, save_embeddings_callback]
             sb3_model = algorithm_class(
                 policy=self._config["model"]["policy"],
-                policy_kwargs=policy_kwargs,
                 env=self._environment,
                 **self._config["model"]["hyperparams"]
             )
 
             total_timesteps = self._config["model"]["timesteps"]
-            sb3_model.learn(total_timesteps=total_timesteps, callback=callback)
+            sb3_model.learn(total_timesteps=total_timesteps)
 
             output_path = self._config["output_path"]
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
