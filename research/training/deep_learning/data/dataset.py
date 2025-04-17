@@ -15,10 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+import random
+
 import torch
 from torch.utils.data import Dataset
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Tuple, Optional, Union, Any
+
+import numpy as np
+import torch
+from torch.utils.data import Dataset
 
 
 class SimulationDataset(Dataset):
@@ -28,118 +34,91 @@ class SimulationDataset(Dataset):
                  features: List[str],
                  targets: List[str],
                  simulation_boundaries: Optional[List[int]] = None,
-                 transform=None):
+                 transform=None,
+                 stride: Optional[int] = None):
         self._sequence_length = sequence_length
+        self._stride = stride if stride is not None else 1
         self._features = features
         self._targets = targets
         self._transform = transform
-        self._simulation_boundaries = simulation_boundaries
+        self._simulation_boundaries = simulation_boundaries or []
+
         self._sequences = []
         self._targets_data = []
         self._feature_stats = {}
         self._target_stats = {}
 
-        self.augment_climate = True
-        self.climate_features_idx = [5, 6, 7, 8, 9]
-        self.noise_std = 0.05
-
         if isinstance(data, list) and isinstance(data[0], dict):
             self._features_data, self._targets_data_raw = self._preprocess_dict_data(data)
         else:
-            self._features_data = data
-            self._targets_data_raw = data
+            self._features_data = np.array(data, dtype=float)
+            self._targets_data_raw = np.array(data, dtype=float)
 
         self._normalize_data()
         self._create_sequences()
 
     def _preprocess_dict_data(self, data: List[Dict]) -> Tuple[np.ndarray, np.ndarray]:
-        features_data = []
-        targets_data = []
-
-        for item in data:
-            features_values = [float(item.get(feature, 0.0)) for feature in self._features]
-            features_data.append(features_values)
-
-            target_values = [float(item.get(target, 0.0)) for target in self._targets]
-            targets_data.append(target_values)
-
-        return np.array(features_data), np.array(targets_data)
+        features_list, targets_list = [], []
+        for record in data:
+            features_list.append([float(record.get(f, 0.0)) for f in self._features])
+            targets_list.append([float(record.get(t, 0.0)) for t in self._targets])
+        return np.array(features_list), np.array(targets_list)
 
     def _create_sequences(self):
+
         if not self._simulation_boundaries:
             sim_ranges = [(0, len(self._features_data))]
         else:
             sim_ranges = []
-            for i in range(len(self._simulation_boundaries)):
-                start = self._simulation_boundaries[i - 1] if i > 0 else 0
-                end = self._simulation_boundaries[i] if i < len(self._simulation_boundaries) else len(
-                    self._features_data)
-                sim_ranges.append((start, end))
+            for i, boundary in enumerate(self._simulation_boundaries):
+                start_idx = self._simulation_boundaries[i - 1] if i > 0 else 0
+                end_idx = boundary
+                sim_ranges.append((start_idx, end_idx))
+            sim_ranges.append((self._simulation_boundaries[-1], len(self._features_data)))
 
-        for start, end in sim_ranges:
-            sim_features = self._features_data[start:end]
-            sim_targets = self._targets_data_raw[start:end]
+        for start_idx, end_idx in sim_ranges:
+            segment_features = self._features_data[start_idx:end_idx]
+            segment_targets = self._targets_data_raw[start_idx:end_idx]
+            segment_length = len(segment_features)
 
-            if len(sim_features) > self._sequence_length:
-                for i in range(len(sim_features) - self._sequence_length - 1):
-                    seq_features = sim_features[i:i + self._sequence_length]
+            max_start = segment_length - self._sequence_length
+            if max_start <= 0:
+                continue
 
-                    target_idx = i + self._sequence_length
-                    if target_idx < len(sim_targets):
-                        target_values = sim_targets[target_idx]
+            for window_start in range(0, max_start + 1, self._stride):
+                window_end = window_start + self._sequence_length
+                seq_features = segment_features[window_start:window_end]
 
-                        self._sequences.append(seq_features)
-                        self._targets_data.append(target_values)
+                target_index = window_end
+                if target_index < segment_length:
+                    target_values = segment_targets[target_index]
+                    self._sequences.append(seq_features)
+                    self._targets_data.append(target_values)
 
     def __len__(self) -> int:
         return len(self._sequences)
 
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, idx: int):
         sequence = self._sequences[idx]
         target = self._targets_data[idx]
-
         if self._transform:
             sequence = self._transform(sequence)
-
-        # if self.augment_climate and self._transform is None:
-        #     sequence = self._add_climate_noise(sequence)
-
         return torch.tensor(sequence, dtype=torch.float32), torch.tensor(target, dtype=torch.float32)
 
     def _normalize_data(self):
-        feature_means = np.mean(self._features_data, axis=0)
-        feature_stds = np.std(self._features_data, axis=0)
+        fmins = np.min(self._features_data, axis=0)
+        fmaxs = np.max(self._features_data, axis=0)
+        frange = fmaxs - fmins
+        frange[frange == 0] = 1.0
+        self._feature_stats = {'mins': fmins, 'maxs': fmaxs}
+        self._features_data = (self._features_data - fmins) / frange
 
-        feature_stds[feature_stds == 0] = 1.0
+        tmins = np.min(self._targets_data_raw, axis=0)
+        tmaxs = np.max(self._targets_data_raw, axis=0)
+        trange = tmaxs - tmins
+        trange[trange == 0] = 1.0
+        self._target_stats = {'mins': tmins, 'maxs': tmaxs}
+        self._targets_data_raw = (self._targets_data_raw - tmins) / trange
 
-        self._feature_stats = {
-            'means': feature_means,
-            'stds': feature_stds
-        }
-
-        self._features_data = (self._features_data - feature_means) / feature_stds
-
-        target_means = np.mean(self._targets_data_raw, axis=0)
-        target_stds = np.std(self._targets_data_raw, axis=0)
-
-        target_stds[target_stds == 0] = 1.0
-
-        self._target_stats = {
-            'means': target_means,
-            'stds': target_stds
-        }
-
-        self._targets_data_raw = (self._targets_data_raw - target_means) / target_stds
-
-    def _add_climate_noise(self, sequence):
-        noisy_seq = sequence.copy()
-        for t in range(sequence.shape[0]):
-            noise = np.random.normal(0, self.noise_std, size=len(self.climate_features_idx))
-            noisy_seq[t, self.climate_features_idx] += noise
-        return noisy_seq
-
-    def get_normalization_stats(self):
-        return {
-            'features': self._feature_stats,
-            'targets': self._target_stats
-        }
+    def get_normalization_stats(self) -> Dict[str, Any]:
+        return {'features': self._feature_stats, 'targets': self._target_stats}

@@ -21,6 +21,7 @@ from typing import Protocol, Dict, Any
 import numpy as np
 
 from research.training.deep_learning.model_manager import NeuralModelManager
+from shared.enums.enums import NeuralMode
 from shared.enums.strings import Loggers
 from shared.types import Observation, PredictionResult
 from utils.loggers import LoggerManager
@@ -35,15 +36,15 @@ class NeuralModuleInterface(Protocol):
 
 
 class NeuralModule:
-    def __init__(self, model_path: str, data_service):
+    def __init__(self, model_path: str = None):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self.model_manager = NeuralModelManager()
-        self.data_service = data_service
+        self._logger.info(f"Initalising Neural module...")
+        self.model_manager = NeuralModelManager(mode=NeuralMode.INFERENCE)
         self._logger.info(f"Neural module ready")
 
     def predict(self, neural_data: Observation) -> PredictionResult:
         sequence: np.ndarray = neural_data
-        if sequence is None or len(sequence.shape[0]) < 10:
+        if sequence is None or sequence.shape[0] < 5:
             return {"error": "Insufficient data for prediction"}
 
         prediction = self.model_manager.predict(sequence)

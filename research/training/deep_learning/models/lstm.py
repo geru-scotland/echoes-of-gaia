@@ -21,7 +21,8 @@ from typing import Dict, Any, Tuple, Optional, List
 
 
 class BiomeLSTM(nn.Module):
-    def __init__(self, input_size: int, hidden_size: int, num_layers: int, output_size: int, dropout: float = 0.2):
+    def __init__(self, input_size: int, hidden_size: int, num_layers: int, output_size: int, dropout: float = 0.2,
+                 num_heads: int = 4):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
@@ -35,6 +36,7 @@ class BiomeLSTM(nn.Module):
             dropout=dropout if num_layers > 1 else 0
         )
 
+        self.attention = nn.MultiheadAttention(embed_dim=hidden_size, num_heads=num_heads, batch_first=True)
         self.layer_norm = nn.LayerNorm(hidden_size)
 
         self.fc = nn.Linear(hidden_size, output_size)
@@ -63,13 +65,19 @@ class BiomeLSTM(nn.Module):
             c0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(x.device)
             hidden = (h0, c0)
 
-        out, hidden = self.lstm(x, hidden)
-        out = self.layer_norm(out)
-        # out shape: (batch_size, sequence_length, hidden_size)
+        lstm_out, hidden = self.lstm(x, hidden)
+        # lstm_out shape: (batch_size, sequence_length, hidden_size)
 
-        # Decodifico el hidden state del último paso, es el único que realmente me importa.
-        out = self.fc(out[:, -1, :])
-        # out shape: (batch_size, output_size)
+        # Aplico atención, ojo, query, key, value son iguales
+        attn_output, _ = self.attention(lstm_out, lstm_out, lstm_out)
+        # attn_output shape: (batch_size, sequence_length, hidden_size)
+
+        out = self.layer_norm(attn_output)
+
+        # Hago pooling tomo la media sobre la dimensión temporal de seq
+        out = out.mean(dim=1)
+
+        out = self.fc(out)
 
         return out, hidden
 

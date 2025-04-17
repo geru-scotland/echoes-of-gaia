@@ -160,12 +160,13 @@ class ReinforcementLearningAgent:
             callback = [tensorboard_callback, save_embeddings_callback]
             sb3_model = algorithm_class(
                 policy=self._config["model"]["policy"],
+                policy_kwargs=policy_kwargs,
                 env=self._environment,
                 **self._config["model"]["hyperparams"]
             )
 
             total_timesteps = self._config["model"]["timesteps"]
-            sb3_model.learn(total_timesteps=total_timesteps)
+            sb3_model.learn(total_timesteps=total_timesteps, callback=callback)
 
             output_path = self._config["output_path"]
             os.makedirs(os.path.dirname(output_path), exist_ok=True)

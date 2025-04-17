@@ -33,13 +33,14 @@ from typing import Dict, Any, List, Optional, Tuple, Union
 
 from research.training.deep_learning.models.lstm import BiomeLSTM, BiomeGRU
 from research.training.deep_learning.data.dataset import SimulationDataset
+from shared.enums.enums import NeuralMode
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
-from utils.paths import BASE_DIR
+from utils.paths import BASE_DIR, DEEP_LEARNING_CONFIG_DIR, NEURAL_MODELS
 
 
 class NeuralModelManager:
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None, mode: NeuralMode = NeuralMode.TRAINING):
         self._logger: logging.Logger = LoggerManager.get_logger(Loggers.DEEP_LEARNING)
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._model = None
@@ -47,8 +48,12 @@ class NeuralModelManager:
         self._data_path = None
         self._normalization_stats = {}
 
-        config_path = config_path if config_path else "config/neural_config.yaml"
+        base_config_path: str = os.path.join(DEEP_LEARNING_CONFIG_DIR, 'neural_config.yaml')
+        config_path = config_path if config_path else base_config_path
         self._config = self._load_config(config_path)
+        self._logger.info(f"Initialising Neural model manager with config: {config_path}")
+        if mode == NeuralMode.INFERENCE:
+            self.load_model()
 
     def _load_config(self, config_path: str) -> Dict[str, Any]:
         try:
@@ -72,29 +77,28 @@ class NeuralModelManager:
 
     def load_model(self, model_path: Optional[str] = None) -> bool:
         if model_path is None:
-            model_path = self._config["paths"]["inference_model"]
+            model_path = os.path.join(NEURAL_MODELS, self._config["paths"]["inference_model"])
 
         if not os.path.exists(model_path):
             self._logger.warning(f"Model file not found at {model_path}")
             return False
-
+        self._logger.info(f"Loading Neural model: {model_path}")
         try:
-            saved_dict = torch.load(model_path, map_location=self._device)
-
+            saved_dict = torch.load(model_path, map_location=self._device, weights_only=False)
+            print(saved_dict.keys() if isinstance(saved_dict, dict) else type(saved_dict))
             if self._model is None:
                 config = saved_dict.get('config', {})
                 self._model = BiomeLSTM(
-                    input_size=config.get('input_size', len(self._config["data"]["features"])),
-                    hidden_size=config.get('hidden_size', self._config["model"]["hidden_size"]),
-                    num_layers=config.get('num_layers', self._config["model"]["num_layers"]),
-                    output_size=config.get('output_size', len(self._config["data"]["targets"])),
-                    dropout=self._config["model"].get("dropout", 0.2)
+                    input_size=config.get('input_size', config["input_size"]),
+                    hidden_size=config.get('hidden_size', config["hidden_size"]),
+                    num_layers=config.get('num_layers', config["num_layers"]),
+                    output_size=config.get('output_size', config["output_size"]),
                 ).to(self._device)
 
             self._model.load_state_dict(saved_dict['model_state_dict'])
             self._model.eval()
 
-            self._normalization_stats = saved_dict.get('normalization_params', None)
+            self._normalization_stats = saved_dict.get('normalization_stats', None)
 
             self._logger.info(f"Model and parameters loaded from {model_path}")
             return True
@@ -110,7 +114,7 @@ class NeuralModelManager:
 
         try:
             model_dict: Dict[str, Any] = {
-                'model_state_dict': self._model.state_dict,
+                'model_state_dict': self._model.state_dict(),
                 'normalization_stats': self._normalization_stats,
                 'config': {
                     'input_size': len(self._config["data"]["features"]),
@@ -226,9 +230,9 @@ class NeuralModelManager:
             lr=hyperparameters["learning_rate"],
             weight_decay=hyperparameters["weight_decay"]
         )
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer,
-            T_max=hyperparameters["num_epochs"],
+            T_0=10,
             eta_min=1e-6
         )
 
@@ -354,7 +358,76 @@ class NeuralModelManager:
                 history["val_r2"].append(val_r2)
 
                 epoch_time = time.time() - start_time
+                batches = []
+                for i, (inputs, targets) in enumerate(val_loader):
+                    batches.append((inputs, targets))
+                    if i >= 2:
+                        break
 
+                if batches:
+                    import random
+                    batch_idx = random.randint(0, len(batches) - 1)
+                    sample_inputs, sample_targets = batches[batch_idx]
+                    sample_inputs = sample_inputs.to(self._device)
+                else:
+                    sample_inputs, sample_targets = next(iter(val_loader))
+                    sample_inputs = sample_inputs.to(self._device)
+
+                with torch.no_grad():
+                    sample_outputs, _ = self._model(sample_inputs)
+
+                sample_inputs_np = sample_inputs.cpu().numpy()
+                sample_targets_np = sample_targets.cpu().numpy()
+                sample_outputs_np = sample_outputs.cpu().numpy()
+
+                target_mins = np.array(self._normalization_stats["targets"]["mins"])
+                target_maxs = np.array(self._normalization_stats["targets"]["maxs"])
+                target_ranges = target_maxs - target_mins
+
+                feature_mins = np.array(self._normalization_stats["features"]["mins"])
+                feature_maxs = np.array(self._normalization_stats["features"]["maxs"])
+                feature_ranges = feature_maxs - feature_mins
+
+                sample_targets_clipped = np.clip(sample_targets_np, 0, 1)
+                sample_outputs_clipped = np.clip(sample_outputs_np, 0, 1)
+
+                denorm_targets = sample_targets_clipped * target_ranges + target_mins
+                denorm_outputs = sample_outputs_clipped * target_ranges + target_mins
+
+                self._logger.info("=== Ejemplos de validación ===")
+                for i in range(min(3, len(denorm_targets))):
+                    self._logger.info(f"Ejemplo {i + 1}:")
+
+                    for j, target_name in enumerate(self._config["data"]["targets"]):
+                        self._logger.info(f"  {target_name}:")
+                        self._logger.info(f"    Real: {denorm_targets[i, j]:.2f}")
+                        self._logger.info(f"    Predicción: {denorm_outputs[i, j]:.2f}")
+                        self._logger.info(f"    Error absoluto: {abs(denorm_targets[i, j] - denorm_outputs[i, j]):.2f}")
+                        error_percent = abs(denorm_targets[i, j] - denorm_outputs[i, j]) / (
+                                denorm_targets[i, j] + 1e-8) * 100
+                        self._logger.info(f"    Error porcentual: {error_percent:.1f}%")
+
+                self._logger.info("=== Secuencias completas de entrada para estos ejemplos ===")
+                for i in range(min(3, len(sample_inputs_np))):
+                    self._logger.info(f"Ejemplo {i + 1} - Secuencia completa:")
+
+                    denorm_sequence = np.zeros_like(sample_inputs_np[i])
+                    for j, feature_name in enumerate(self._config["data"]["features"]):
+                        for t in range(sample_inputs_np[i].shape[0]):
+                            denorm_sequence[t, j] = sample_inputs_np[i, t, j] * feature_ranges[j] + feature_mins[j]
+
+                    for t in range(denorm_sequence.shape[0]):
+                        step_features = []
+                        for j, feature_name in enumerate(self._config["data"]["features"]):
+                            step_features.append(f"{feature_name}: {denorm_sequence[t, j]:.2f}")
+
+                        self._logger.info(f"  Paso {t + 1}: {', '.join(step_features)}")
+
+                    last_step_features = []
+                    for j, feature_name in enumerate(self._config["data"]["features"]):
+                        last_step_features.append(f"{feature_name}: {denorm_sequence[-1, j]:.2f}")
+
+                    self._logger.info(f"  Último estado: {', '.join(last_step_features)}")
                 self._logger.info(
                     f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - "
                     f"Time: {epoch_time:.1f}s - "
@@ -395,6 +468,15 @@ class NeuralModelManager:
 
         return history
 
+    def _normalize_sequence(self, sequence_array, feature_stats):
+        mins = np.array(feature_stats['mins'])
+        maxs = np.array(feature_stats['maxs'])
+        ranges = maxs - mins
+        ranges[ranges == 0] = 1.0
+
+        normalized = (sequence_array - mins) / ranges
+        return np.clip(normalized, 0.0, 1.0)
+
     def predict(self, sequence: Union[List[Dict], np.ndarray]) -> np.ndarray:
         if self._model is None:
             loaded = self.load_model()
@@ -404,7 +486,7 @@ class NeuralModelManager:
         self._model.eval()
 
         data_config = self._config["data"]
-        train_config = self._config["training"]
+        train_config = self._config["data"]
 
         # if isinstance(sequence, list) and isinstance(sequence[0], dict):
         #     features_data = []
@@ -422,25 +504,40 @@ class NeuralModelManager:
         if len(sequence_array) > train_config["sequence_length"]:
             sequence_array = sequence_array[-train_config["sequence_length"]:]
 
+        if self._normalization_stats.get("features"):
+            sequence_array = self._normalize_sequence(
+                sequence_array,
+                self._normalization_stats["features"]
+            )
         sequence_tensor = torch.tensor(sequence_array, dtype=torch.float32).unsqueeze(0).to(self._device)
 
         with torch.no_grad():
             prediction, _ = self._model(sequence_tensor)
 
         prediction_on_cpu = prediction.cpu().numpy()
-
+        denormalized_preds = self._denormalize_predictions(prediction_on_cpu,
+                                                           self._normalization_stats.get("targets", {}))
         if self._normalization_stats:
-            return self._denormalize_predictions(prediction_on_cpu, self._normalization_stats.get("targets", {}))
+            return denormalized_preds
 
         return prediction_on_cpu
 
     def _denormalize_predictions(self, predictions, target_stats):
-        means = target_stats['means']
-        stds = target_stats['stds']
+        self._logger.info(f"Desnormalizando predicciones de forma {predictions.shape}")
 
-        predictions_np = predictions.copy()
+        mins = np.array(target_stats['mins'])
+        maxs = np.array(target_stats['maxs'])
+        ranges = maxs - mins
 
-        denormalized = predictions_np * stds + means
+        self._logger.info(f"Mins: {mins}")
+        self._logger.info(f"Maxs: {maxs}")
+
+        predictions_clipped = np.clip(predictions, 0, 1)
+        self._logger.info(f"Valores normalizados (clipped): {predictions_clipped[0]}")
+
+        denormalized = predictions_clipped * ranges + mins
+
+        self._logger.info(f"Valores desnormalizados: {denormalized[0]}")
 
         return denormalized
 
@@ -449,7 +546,7 @@ class NeuralModelManager:
         import seaborn as sns
         import numpy as np
 
-        sns.set(style="whitegrid")
+        sns.set_theme(style="whitegrid")
 
         metrics = [
             {"name": "Loss", "train": "train_loss", "val": "val_loss", "title": "Model Loss"},
