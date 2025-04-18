@@ -34,8 +34,7 @@ import yaml
 import logging
 from typing import Dict, Any, List, Optional, Tuple, Union
 
-from research.training.deep_learning.models.lstm import BiomeLSTM, BiomeGRU, BiomeLSTMWithMultiheadAttention, \
-    TransformerForecast
+from research.training.deep_learning.models.transformer import MultiStepForecastTransformer
 from research.training.deep_learning.data.dataset import SimulationDataset
 from shared.enums.enums import NeuralMode
 from shared.enums.strings import Loggers
@@ -69,7 +68,7 @@ class NeuralModelManager:
 
     def _init_model(self) -> None:
         hyperparameters = self._config["hyperparameters"]
-        self._model = TransformerForecast(
+        self._model = MultiStepForecastTransformer(
             input_size=len(self.config["data"]['features']),
             hidden_size=hyperparameters["hidden_size"],
             num_layers=hyperparameters["num_layers"],
@@ -93,7 +92,7 @@ class NeuralModelManager:
             if self._model is None:
                 config = saved_dict.get('config', {})
                 target_horizon = config.get('target_horizon', 1)
-                self._model = TransformerForecast(
+                self._model = MultiStepForecastTransformer(
                     input_size=config.get('input_size', config["input_size"]),
                     hidden_size=config.get('hidden_size', config["hidden_size"]),
                     num_layers=config.get('num_layers', config["num_layers"]),
@@ -247,7 +246,7 @@ class NeuralModelManager:
             optimizer,
             max_lr=hyperparameters["learning_rate"],
             total_steps=total_steps,
-            pct_start=0.3,
+            pct_start=0.3,  # hasta el 30% sube, luego empieza decay ya
             div_factor=25,  # LR inicial = max_lr/25
             final_div_factor=10000  # LR final = max_lr/10000
         )

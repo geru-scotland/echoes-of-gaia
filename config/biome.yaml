@@ -59,9 +59,9 @@ biome:
         - HeterotrophicNutritionComponent:
 
     - species: "panther"
-      spawns: 3
+      spawns: 6
       diet: "carnivore"
-      avg-lifespan: 4
+      avg-lifespan: 3
       components:
         - GrowthComponent:
         - VitalComponent:

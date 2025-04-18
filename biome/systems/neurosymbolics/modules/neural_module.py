@@ -46,9 +46,9 @@ class NeuralModule:
         sequence: np.ndarray = neural_data
         if sequence is None or sequence.shape[0] < 5:
             return {"error": "Insufficient data for prediction"}
-
+        self._logger.debug(f"Showing latest 5 observations from sequence: {sequence[5:]}")
         prediction = self.model_manager.predict(sequence)
-
+        self._logger.info(f"Prediction (type: {type(prediction)}): {prediction}")
         return self._format_prediction(prediction)
 
     def _format_prediction(self, raw_prediction) -> PredictionResult:

@@ -1,14 +1,16 @@
 hyperparameters:
-  batch_size: 32
+  batch_size: 64
   hidden_size: 128
-  num_layers: 3
-  dropout: 0.5
-  learning_rate: 0.0001
-  weight_decay: 0.01
+  num_layers: 2
+  dropout: 0.3
+  learning_rate: 0.001
+  weight_decay: 0.0001
   num_epochs: 100
+  max_seq_len: 50
 
 data:
-  sequence_length: 10
+  sequence_length: 25
+  target_horizon: 5
   validation_split: 0.3
   use_progress_bar: true
 
@@ -16,7 +18,6 @@ data:
     - prey_population
     - predator_population
     - flora_count
-    - predator_prey_ratio
     - delta_prey_population
     - delta_predator_population
     - delta_flora_count
@@ -45,4 +46,4 @@ paths:
   data_path: "research/data/neurosymbolic/neural"
   model_save_path: "research/models/neural/biome.pth"
   plots_dir: "research/plots/lstm"
-  inference_model: "biome.pth"
+  inference_model: "biome_transformer_100epoch.pth"
