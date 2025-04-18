@@ -38,6 +38,9 @@ NEUROSYBOLIC_DATA_DIR = os.path.join(RESEARCH_DIR, 'data', 'neurosymbolic')
 DEEP_LEARNING_DIR = os.path.join(TRAINING_DIR, 'deep_learning')
 DEEP_LEARNING_CONFIG_DIR = os.path.join(DEEP_LEARNING_DIR, 'config')
 
+RESEARCH_MODELS = os.path.join(RESEARCH_DIR, 'models')
+NEURAL_MODELS = os.path.join(RESEARCH_MODELS, 'neural')
+
 REINFORCEMENT_DIR = os.path.join(TRAINING_DIR, 'reinforcement')
 REINFORCEMENT_CONFIG_DIR = os.path.join(REINFORCEMENT_DIR, 'config')
 

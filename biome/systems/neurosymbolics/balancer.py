@@ -16,7 +16,7 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import Dict, Type
+from typing import Dict, Type, Optional
 
 from biome.systems.neurosymbolics.data_service import NeurosymbolicDataService
 from biome.systems.neurosymbolics.integrations.base_strategy import IntegrationStrategy
@@ -42,17 +42,17 @@ class NeuroSymbolicBalancer:
     def get_observation(self, data_service: NeurosymbolicDataService) -> Observation:
         return {
             'neural_data': data_service.get_neural_sequence(),
-            'symbolic_data': data_service.get_latest_graph_data()
+            'symbolic_data': data_service.get_latest_data()
         }
 
-    def process(self, observation: Observation) -> IntegratedResult:
+    def process(self, observation: Observation) -> Optional[IntegratedResult]:
         neural_result = self.neural_module.predict(observation.get("neural_data", {}))
-        symbolic_result = self.symbolic_module.infer(observation.get("symbolic_data", {}))
+        # symbolic_result = self.symbolic_module.infer(observation.get("symbolic_data", {}))
+        #
+        # integrated_result = self.integration_strategy.integrate(
+        #     neural_result,
+        #     symbolic_result,
+        #     self.confidence_weights
+        # )
 
-        integrated_result = self.integration_strategy.integrate(
-            neural_result,
-            symbolic_result,
-            self.confidence_weights
-        )
-
-        return integrated_result
+        return neural_result

@@ -17,11 +17,14 @@
 """
 import json
 import os
+import traceback
 from pathlib import Path
 
+import random
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader
 from sklearn.metrics import r2_score
 import time
@@ -31,15 +34,16 @@ import yaml
 import logging
 from typing import Dict, Any, List, Optional, Tuple, Union
 
-from research.training.deep_learning.models.lstm import BiomeLSTM, BiomeGRU
+from research.training.deep_learning.models.transformer import MultiStepForecastTransformer
 from research.training.deep_learning.data.dataset import SimulationDataset
+from shared.enums.enums import NeuralMode
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
-from utils.paths import BASE_DIR
+from utils.paths import BASE_DIR, DEEP_LEARNING_CONFIG_DIR, NEURAL_MODELS
 
 
 class NeuralModelManager:
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None, mode: NeuralMode = NeuralMode.TRAINING):
         self._logger: logging.Logger = LoggerManager.get_logger(Loggers.DEEP_LEARNING)
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._model = None
@@ -47,8 +51,12 @@ class NeuralModelManager:
         self._data_path = None
         self._normalization_stats = {}
 
-        config_path = config_path if config_path else "config/neural_config.yaml"
+        base_config_path: str = os.path.join(DEEP_LEARNING_CONFIG_DIR, 'neural_config.yaml')
+        config_path = config_path if config_path else base_config_path
         self._config = self._load_config(config_path)
+        self._logger.info(f"Initialising Neural model manager with config: {config_path}")
+        if mode == NeuralMode.INFERENCE:
+            self.load_model()
 
     def _load_config(self, config_path: str) -> Dict[str, Any]:
         try:
@@ -60,45 +68,48 @@ class NeuralModelManager:
 
     def _init_model(self) -> None:
         hyperparameters = self._config["hyperparameters"]
-        self._model = BiomeLSTM(
+        self._model = MultiStepForecastTransformer(
             input_size=len(self.config["data"]['features']),
             hidden_size=hyperparameters["hidden_size"],
             num_layers=hyperparameters["num_layers"],
             output_size=len(self.config['data']["targets"]),
-            dropout=hyperparameters.get("dropout", 0.2)
+            dropout=hyperparameters.get("dropout", 0.2),
+            target_horizon=self.config["data"]["target_horizon"]
         ).to(self._device)
 
         self._logger.info(f"Initialized model: {self._model}")
 
     def load_model(self, model_path: Optional[str] = None) -> bool:
         if model_path is None:
-            model_path = self._config["paths"]["inference_model"]
+            model_path = os.path.join(NEURAL_MODELS, self._config["paths"]["inference_model"])
 
         if not os.path.exists(model_path):
             self._logger.warning(f"Model file not found at {model_path}")
             return False
-
+        self._logger.info(f"Loading Neural model: {model_path}")
         try:
-            saved_dict = torch.load(model_path, map_location=self._device)
-
+            saved_dict = torch.load(model_path, map_location=self._device, weights_only=False)
             if self._model is None:
                 config = saved_dict.get('config', {})
-                self._model = BiomeLSTM(
-                    input_size=config.get('input_size', len(self._config["data"]["features"])),
-                    hidden_size=config.get('hidden_size', self._config["model"]["hidden_size"]),
-                    num_layers=config.get('num_layers', self._config["model"]["num_layers"]),
-                    output_size=config.get('output_size', len(self._config["data"]["targets"])),
-                    dropout=self._config["model"].get("dropout", 0.2)
+                target_horizon = config.get('target_horizon', 1)
+                self._model = MultiStepForecastTransformer(
+                    input_size=config.get('input_size', config["input_size"]),
+                    hidden_size=config.get('hidden_size', config["hidden_size"]),
+                    num_layers=config.get('num_layers', config["num_layers"]),
+                    output_size=config.get('output_size', config["output_size"]),
+                    target_horizon=target_horizon
                 ).to(self._device)
 
             self._model.load_state_dict(saved_dict['model_state_dict'])
             self._model.eval()
 
-            self._normalization_stats = saved_dict.get('normalization_params', None)
+            self._normalization_stats = saved_dict.get('normalization_stats', None)
 
             self._logger.info(f"Model and parameters loaded from {model_path}")
             return True
         except Exception as e:
+            tb = traceback.format_exc()
+            self._logger.exception(f"Error loading model. Traceback: {tb}")
             self._logger.error(f"Error loading model: {e}")
             return False
 
@@ -110,13 +121,14 @@ class NeuralModelManager:
 
         try:
             model_dict: Dict[str, Any] = {
-                'model_state_dict': self._model.state_dict,
+                'model_state_dict': self._model.state_dict(),
                 'normalization_stats': self._normalization_stats,
                 'config': {
                     'input_size': len(self._config["data"]["features"]),
                     'output_size': len(self._config["data"]["targets"]),
                     'hidden_size': self._config["hyperparameters"]["hidden_size"],
-                    'num_layers': self._config["hyperparameters"]["num_layers"]
+                    'num_layers': self._config["hyperparameters"]["num_layers"],
+                    'target_horizon': self._config["data"].get("target_horizon", 1)
                 }
             }
             torch.save(model_dict, model_path)
@@ -181,13 +193,15 @@ class NeuralModelManager:
 
         data_config = self._config["data"]
         hyperparameters = self._config["hyperparameters"]
+        target_horizon = data_config.get("target_horizon", 1)
 
         train_dataset = SimulationDataset(
             data=data,
             sequence_length=data_config["sequence_length"],
             features=data_config["features"],
             targets=data_config["targets"],
-            simulation_boundaries=simulation_boundaries
+            simulation_boundaries=simulation_boundaries,
+            target_horizon=target_horizon
         )
 
         self._normalization_stats = train_dataset.get_normalization_stats()
@@ -226,10 +240,15 @@ class NeuralModelManager:
             lr=hyperparameters["learning_rate"],
             weight_decay=hyperparameters["weight_decay"]
         )
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+
+        total_steps = len(train_loader) * hyperparameters["num_epochs"]
+        scheduler = OneCycleLR(
             optimizer,
-            T_max=hyperparameters["num_epochs"],
-            eta_min=1e-6
+            max_lr=hyperparameters["learning_rate"],
+            total_steps=total_steps,
+            pct_start=0.3,  # hasta el 30% sube, luego empieza decay ya
+            div_factor=25,  # LR inicial = max_lr/25
+            final_div_factor=10000  # LR final = max_lr/10000
         )
 
         history = {
@@ -272,15 +291,18 @@ class NeuralModelManager:
 
             for inputs, targets in train_iterator:
                 inputs = inputs.to(self._device)
-                targets = targets.to(self._device)
+                targets = targets.to(
+                    self._device)
 
-                outputs, _ = self._model(inputs)
+                outputs = self._model(inputs)
+
                 loss = mse_criterion(outputs, targets)
 
                 optimizer.zero_grad()
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(self._model.parameters(), 1.0)
                 optimizer.step()
-
+                scheduler.step()
                 train_loss += loss.item()
 
                 all_train_targets.append(targets.cpu().detach().numpy())
@@ -295,9 +317,13 @@ class NeuralModelManager:
             all_train_targets = np.vstack(all_train_targets)
             all_train_outputs = np.vstack(all_train_outputs)
 
-            avg_train_loss = train_loss / len(train_loader)
+            if len(all_train_targets.shape) == 3:
+                all_train_targets = all_train_targets.reshape(-1, all_train_targets.shape[-1])
+                all_train_outputs = all_train_outputs.reshape(-1, all_train_outputs.shape[-1])
+
             train_mse = np.mean((all_train_outputs - all_train_targets) ** 2)
             train_r2 = r2_score(all_train_targets, all_train_outputs)
+            avg_train_loss = train_loss / len(train_loader)
 
             history["train_loss"].append(avg_train_loss)
             history["train_mse"].append(train_mse)
@@ -329,7 +355,7 @@ class NeuralModelManager:
                         inputs = inputs.to(self._device)
                         targets = targets.to(self._device)
 
-                        outputs, _ = self._model(inputs)
+                        outputs = self._model(inputs)
                         loss = mse_criterion(outputs, targets)
                         val_loss += loss.item()
 
@@ -345,16 +371,88 @@ class NeuralModelManager:
                 all_val_targets = np.vstack(all_val_targets)
                 all_val_outputs = np.vstack(all_val_outputs)
 
-                avg_val_loss = val_loss / len(val_loader)
+                if len(all_val_targets.shape) == 3:
+                    all_val_targets = all_val_targets.reshape(-1, all_val_targets.shape[-1])
+                    all_val_outputs = all_val_outputs.reshape(-1, all_val_outputs.shape[-1])
+
                 val_mse = np.mean((all_val_outputs - all_val_targets) ** 2)
                 val_r2 = r2_score(all_val_targets, all_val_outputs)
+
+                avg_val_loss = val_loss / len(val_loader)
 
                 history["val_loss"].append(avg_val_loss)
                 history["val_mse"].append(val_mse)
                 history["val_r2"].append(val_r2)
 
                 epoch_time = time.time() - start_time
+                batches = []
+                for i, (inputs, targets) in enumerate(val_loader):
+                    batches.append((inputs, targets))
+                    if i >= 2:
+                        break
 
+                if batches:
+                    batch_idx = random.randint(0, len(batches) - 1)
+                    sample_inputs, sample_targets = batches[batch_idx]
+                    sample_inputs = sample_inputs.to(self._device)
+                else:
+                    sample_inputs, sample_targets = next(iter(val_loader))
+                    sample_inputs = sample_inputs.to(self._device)
+
+                with torch.no_grad():
+                    sample_outputs = self._model(sample_inputs)
+
+                if epoch % 5 == 0:
+                    sample_inputs, sample_targets = next(iter(val_loader))
+                    sample_inputs = sample_inputs.to(self._device)
+                    sample_targets = sample_targets.to(self._device)
+
+                    with torch.no_grad():
+                        sample_outputs = self._model(sample_inputs)
+
+                    sample_targets_np = sample_targets.cpu().numpy()
+                    sample_outputs_np = sample_outputs.cpu().numpy()
+
+                    if self._normalization_stats and 'targets' in self._normalization_stats:
+                        target_stats = self._normalization_stats['targets']
+
+                        self._logger.info(f"Estadísticas de normalización: {target_stats}")
+
+                        tmins = target_stats.get('mins', 0)
+                        tmaxs = target_stats.get('maxs', 1)
+                        trange = tmaxs - tmins
+
+                        denorm_targets = np.zeros_like(sample_targets_np)
+                        denorm_outputs = np.zeros_like(sample_outputs_np)
+
+                        for step in range(sample_targets_np.shape[1]):
+                            denorm_targets[:, step, :] = sample_targets_np[:, step, :] * trange + tmins
+                            denorm_outputs[:, step, :] = sample_outputs_np[:, step, :] * trange + tmins
+                    else:
+                        self._logger.warning("Couldn't find any normalization stats")
+                        denorm_targets = sample_targets_np
+                        denorm_outputs = sample_outputs_np
+
+                    example_idx = random.randrange(sample_targets.size(0))
+                    self._logger.info(f"\n===== Ejemplo de predicción DESNORMALIZADA (Época {epoch + 1}) =====")
+
+                    for step in range(denorm_targets.shape[1]):
+                        step_error = np.abs(denorm_outputs[example_idx, step] - denorm_targets[example_idx, step])
+                        step_mse = np.mean(step_error ** 2)
+
+                        targets_str = ", ".join([f"{val:.2f}" for val in denorm_targets[example_idx, step]])
+                        outputs_str = ", ".join([f"{val:.2f}" for val in denorm_outputs[example_idx, step]])
+                        error_str = ", ".join([f"{val:.2f}" for val in step_error])
+
+                        self._logger.info(f"Paso {step + 1}:")
+                        self._logger.info(f"  Target real: [{targets_str}]")
+                        self._logger.info(f"  Predicción: [{outputs_str}]")
+                        self._logger.info(f"  Error Abs: [{error_str}]")
+                        self._logger.info(f"  MSE: {step_mse:.4f}")
+
+                    total_mse = np.mean((denorm_outputs[example_idx] - denorm_targets[example_idx]) ** 2)
+                    self._logger.info(f"MSE Total para todos los pasos: {total_mse:.4f}")
+                    self._logger.info("=" * 50)
                 self._logger.info(
                     f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - "
                     f"Time: {epoch_time:.1f}s - "
@@ -377,7 +475,6 @@ class NeuralModelManager:
 
             current_lr = optimizer.param_groups[0]['lr']
             self._logger.info(f"Current LR: {current_lr:.6f}")
-            scheduler.step()
 
         self.save_model()
 
@@ -395,6 +492,15 @@ class NeuralModelManager:
 
         return history
 
+    def _normalize_sequence(self, sequence_array, feature_stats):
+        mins = np.array(feature_stats['mins'])
+        maxs = np.array(feature_stats['maxs'])
+        ranges = maxs - mins
+        ranges[ranges == 0] = 1.0
+
+        normalized = (sequence_array - mins) / ranges
+        return np.clip(normalized, 0.0, 1.0)
+
     def predict(self, sequence: Union[List[Dict], np.ndarray]) -> np.ndarray:
         if self._model is None:
             loaded = self.load_model()
@@ -403,16 +509,8 @@ class NeuralModelManager:
 
         self._model.eval()
 
-        data_config = self._config["data"]
-        train_config = self._config["training"]
+        train_config = self._config["data"]
 
-        # if isinstance(sequence, list) and isinstance(sequence[0], dict):
-        #     features_data = []
-        #     for item in sequence:
-        #         features_values = [float(item.get(feature, 0.0)) for feature in data_config["features"]]
-        #         features_data.append(features_values)
-        #     sequence_array = np.array(features_data)
-        # else:
         sequence_array = sequence
 
         if len(sequence_array) < train_config["sequence_length"]:
@@ -422,34 +520,47 @@ class NeuralModelManager:
         if len(sequence_array) > train_config["sequence_length"]:
             sequence_array = sequence_array[-train_config["sequence_length"]:]
 
+        if self._normalization_stats.get("features"):
+            sequence_array = self._normalize_sequence(
+                sequence_array,
+                self._normalization_stats["features"]
+            )
         sequence_tensor = torch.tensor(sequence_array, dtype=torch.float32).unsqueeze(0).to(self._device)
 
         with torch.no_grad():
-            prediction, _ = self._model(sequence_tensor)
+            prediction = self._model(sequence_tensor)
 
-        prediction_on_cpu = prediction.cpu().numpy()
+        #  [batch_size, target_horizon, output_size]
+        prediction = prediction.cpu().numpy()
 
-        if self._normalization_stats:
-            return self._denormalize_predictions(prediction_on_cpu, self._normalization_stats.get("targets", {}))
+        if self._normalization_stats and 'targets' in self._normalization_stats:
+            denormalized = self._denormalize_predictions(prediction, self._normalization_stats['targets'])
+            return denormalized
 
-        return prediction_on_cpu
+        return prediction
 
     def _denormalize_predictions(self, predictions, target_stats):
-        means = target_stats['means']
-        stds = target_stats['stds']
+        mins = target_stats.get('mins', 0)
+        maxs = target_stats.get('maxs', 1)
+        rng = maxs - mins
 
-        predictions_np = predictions.copy()
+        original_shape = predictions.shape
 
-        denormalized = predictions_np * stds + means
+        if len(original_shape) == 3:
+            batch_size, horizon, num_features = original_shape
+            reshaped = predictions.reshape(-1, num_features)
+            denormalized = reshaped * rng + mins
+            return denormalized.reshape(batch_size, horizon, num_features)
 
-        return denormalized
+        else:
+            return predictions * rng + mins
 
     def _visualize_metrics(self, history: Dict[str, List[float]], plot_base_name: str, plots_dir: str):
         import matplotlib.pyplot as plt
         import seaborn as sns
         import numpy as np
 
-        sns.set(style="whitegrid")
+        sns.set_theme(style="whitegrid")
 
         metrics = [
             {"name": "Loss", "train": "train_loss", "val": "val_loss", "title": "Model Loss"},

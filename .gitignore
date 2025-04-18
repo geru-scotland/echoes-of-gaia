@@ -103,10 +103,12 @@ research/experiments/simulations
 research/training/models
 research/training/runs
 research/data
-
+research/plots
+research/training/deep_learning/data_backup
 
 patch.diff
 
 *.tsv
+*.pth
 temp_training_config.yaml
 

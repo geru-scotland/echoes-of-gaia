@@ -45,6 +45,8 @@ class EquilibriumAgentAI(Agent):
 
     def decide(self, observation: TState) -> TAction:
         self._logger.info(f"Equilibrium agent is deceding...")
+        neural_result = self._neurosymbolic_balancer.process(observation)
+        self._data_service.clear_sequence_history()
 
     def act(self, action: TAction) -> None:
         # Lo llamo action por seguir y ser consistente, pero realmente es la

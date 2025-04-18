@@ -294,6 +294,11 @@ class SimulationMode(EnumBaseInt):
     UNTIL_EXTINCTION = auto()
 
 
+class NeuralMode(EnumBaseInt):
+    TRAINING = auto()
+    INFERENCE = auto()
+
+
 class Direction(Enum):
     NORTH = (-1, 0)
     SOUTH = (1, 0)

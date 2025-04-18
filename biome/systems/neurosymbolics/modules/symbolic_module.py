@@ -32,23 +32,18 @@ class SymbolicModuleInterface(Protocol):
 
 
 class RuleBasedSymbolicModule:
-    def __init__(self, rules_config: Dict[str, Any]):
+    def __init__(self):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
-        self.rules = rules_config
         self._logger.info(f"Symbolic module ready")
 
     def infer(self, symbolic_data: Observation) -> SymbolicResult:
         result = {}
-        latest_data = self.data_service.get_latest_graph_data()
 
-        if "species_data" in latest_data:
-            for species, data in latest_data["species_data"].items():
+        if "species_data" in symbolic_data:
+            for species, data in symbolic_data["species_data"].items():
                 if data.get("population", 0) < 5:
                     result[f"{species}_status"] = "endangered"
                 elif data.get("avg_stress", 0) > 75:
                     result[f"{species}_status"] = "stressed"
 
         return result
-
-    def update_rules(self, new_rules: Dict[str, Any]) -> None:
-        self.rules.update(new_rules)

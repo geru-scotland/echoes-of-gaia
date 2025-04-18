@@ -206,6 +206,7 @@ class SnapshotCollector:
             biome_statistics: MetricsData = snapshot.metrics_data
             climate_averages: ClimateData = snapshot.climate_averages
             biome_score_data: BiomeScoreData = snapshot.biome_score
+            previous_snapshot = NeurosymbolicDataService.get_instance().get_latest_data().get('neural_data', None)
 
             # 1. Esta parte, sólo para datos globales; para LSTM
             flora, fauna = self._entity_manager.get_entities(only_alive=True)
@@ -274,6 +275,15 @@ class SnapshotCollector:
             climate_factor = abs(climate_averages.get('avg_temperature', 20.0) - 22.0) / 50.0
             environmental_pressure = (avg_stress + climate_factor) / 2.0
 
+            if previous_snapshot:
+                delta_prey = prey_population - previous_snapshot.get('prey_population', prey_population)
+                delta_predator = predator_population - previous_snapshot.get('predator_population', predator_population)
+                delta_flora = len(flora) - previous_snapshot.get('flora_count', len(flora))
+            else:
+                delta_prey = 0
+                delta_predator = 0
+                delta_flora = 0
+
             neural_features = {
                 'snapshot_id': snapshot_id,
                 'timestamp': int(time.time()),
@@ -281,6 +291,9 @@ class SnapshotCollector:
                 'prey_population': prey_population,
                 'predator_population': predator_population,
                 'predator_prey_ratio': predator_prey_ratio,
+                'delta_prey_population': delta_prey,
+                'delta_predator_population': delta_predator,
+                'delta_flora_count': delta_flora,
                 'avg_stress': biome_statistics.get('avg_stress', 0.0),
                 'biome_score': biome_score_data.get('score', 0.0),
                 'biodiversity_index': biome_statistics.get('biodiversity_index', 0.0),

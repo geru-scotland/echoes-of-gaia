@@ -33,7 +33,7 @@ simulation:
     snapshots:
       enabled: true
       period_type: "CUSTOM"
-      custom_period: 1
+      custom_period: 10 # cada 5 días realmente
       storage_directory: "simulation_records"
       filename_prefix: "biome_snapshot"
       pretty_print: true

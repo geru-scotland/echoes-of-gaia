@@ -40,7 +40,7 @@ class NeurosymbolicDataService:
             cls._instance = NeurosymbolicDataService()
         return cls._instance
 
-    def __init__(self, history_length: int = 10):
+    def __init__(self, history_length: int = 100):
         self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
         self._history_length = history_length
         self._neural_data_history: deque = deque(maxlen=history_length)
@@ -67,13 +67,14 @@ class NeurosymbolicDataService:
 
         seq_length: int = self._config.get("data", {}).get("sequence_length")
 
+        self._logger.info(f"Neural data history length: {len(self._neural_data_history)} / {seq_length} (seq length)")
         if 0 < seq_length <= len(self._neural_data_history):
             BiomeEventBus.trigger(BiomeEvent.NEUROSYMBOLIC_SERVICE_READY)
 
         self._logger.debug(f"Neurosymbolic data updated. History size: {len(self._neural_data_history)}")
 
     def get_neural_sequence(self, sequence_length: int = None) -> np.ndarray:
-        seq_len = sequence_length or self._config["hyperparameters"]["sequence_length"]
+        seq_len = sequence_length or self._config["data"]["sequence_length"]
         seq_len = min(seq_len, len(self._neural_data_history))
 
         if seq_len == 0:
@@ -89,10 +90,9 @@ class NeurosymbolicDataService:
             data_point = self._neural_data_history[i]
             features_vector = [data_point.get(feature, 0) for feature in features]
             sequence.append(features_vector)
-
         return np.array(sequence)
 
-    def get_latest_graph_data(self) -> Dict[str, Any]:
+    def get_latest_data(self) -> Dict[str, Any]:
         if not self._species_data_history:
             return {}
 

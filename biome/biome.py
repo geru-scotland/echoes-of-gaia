@@ -139,7 +139,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         )
 
         equilibrium_agent: EquilibriumAgentAI = EquilibriumAgentAI()
-        agents.update({AgentType.EQUILIBRIUM_AGENT, equilibrium_agent})
+        agents.update({AgentType.EQUILIBRIUM_AGENT: equilibrium_agent})
 
         return agents
 
