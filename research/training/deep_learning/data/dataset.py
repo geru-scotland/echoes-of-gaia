@@ -35,14 +35,15 @@ class SimulationDataset(Dataset):
                  targets: List[str],
                  simulation_boundaries: Optional[List[int]] = None,
                  transform=None,
-                 stride: Optional[int] = None):
+                 stride: Optional[int] = None,
+                 target_horizon: int = 1):
         self._sequence_length = sequence_length
         self._stride = stride if stride is not None else 1
         self._features = features
         self._targets = targets
         self._transform = transform
         self._simulation_boundaries = simulation_boundaries or []
-
+        self._target_horizon = target_horizon
         self._sequences = []
         self._targets_data = []
         self._feature_stats = {}
@@ -65,60 +66,62 @@ class SimulationDataset(Dataset):
         return np.array(features_list), np.array(targets_list)
 
     def _create_sequences(self):
+        self._sequences.clear()
+        self._targets_data.clear()
 
         if not self._simulation_boundaries:
             sim_ranges = [(0, len(self._features_data))]
         else:
             sim_ranges = []
-            for i, boundary in enumerate(self._simulation_boundaries):
-                start_idx = self._simulation_boundaries[i - 1] if i > 0 else 0
-                end_idx = boundary
-                sim_ranges.append((start_idx, end_idx))
-            sim_ranges.append((self._simulation_boundaries[-1], len(self._features_data)))
+            for i in range(len(self._simulation_boundaries)):
+                start = self._simulation_boundaries[i - 1] if i > 0 else 0
+                end = self._simulation_boundaries[i]
+                sim_ranges.append((start, end))
 
-        for start_idx, end_idx in sim_ranges:
-            segment_features = self._features_data[start_idx:end_idx]
-            segment_targets = self._targets_data_raw[start_idx:end_idx]
-            segment_length = len(segment_features)
+        for start, end in sim_ranges:
+            sim_features = self._features_data[start:end]
+            sim_targets = self._targets_data_norm[start:end]
 
-            max_start = segment_length - self._sequence_length
-            if max_start <= 0:
-                continue
+            if len(sim_features) > self._sequence_length + self._target_horizon:
+                for i in range(len(sim_features) - self._sequence_length - self._target_horizon):
+                    seq_features = sim_features[i:i + self._sequence_length]
 
-            for window_start in range(0, max_start + 1, self._stride):
-                window_end = window_start + self._sequence_length
-                seq_features = segment_features[window_start:window_end]
+                    # Múltiples targets consecutivos, ddetermino con horizon
+                    target_values = np.zeros((self._target_horizon, len(self._targets)))
+                    for step in range(self._target_horizon):
+                        target_idx = i + self._sequence_length + step
+                        target_values[step] = sim_targets[target_idx]
 
-                target_index = window_end
-                if target_index < segment_length:
-                    target_values = segment_targets[target_index]
                     self._sequences.append(seq_features)
                     self._targets_data.append(target_values)
 
     def __len__(self) -> int:
         return len(self._sequences)
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         sequence = self._sequences[idx]
         target = self._targets_data[idx]
+
         if self._transform:
             sequence = self._transform(sequence)
+
         return torch.tensor(sequence, dtype=torch.float32), torch.tensor(target, dtype=torch.float32)
 
     def _normalize_data(self):
-        fmins = np.min(self._features_data, axis=0)
-        fmaxs = np.max(self._features_data, axis=0)
-        frange = fmaxs - fmins
-        frange[frange == 0] = 1.0
-        self._feature_stats = {'mins': fmins, 'maxs': fmaxs}
-        self._features_data = (self._features_data - fmins) / frange
+        feature_mins = np.min(self._features_data, axis=0)
+        feature_maxs = np.max(self._features_data, axis=0)
+        feature_range = feature_maxs - feature_mins
+        feature_range[feature_range == 0] = 1.0
+        self._feature_stats = {'mins': feature_mins, 'maxs': feature_maxs}
+        self._features_data = (self._features_data - feature_mins) / feature_range
 
-        tmins = np.min(self._targets_data_raw, axis=0)
-        tmaxs = np.max(self._targets_data_raw, axis=0)
-        trange = tmaxs - tmins
-        trange[trange == 0] = 1.0
-        self._target_stats = {'mins': tmins, 'maxs': tmaxs}
-        self._targets_data_raw = (self._targets_data_raw - tmins) / trange
+        target_mins = np.min(self._targets_data_raw, axis=0)
+        target_maxs = np.max(self._targets_data_raw, axis=0)
+        target_range = target_maxs - target_mins
+        target_range[target_range == 0] = 1.0
+        self._target_stats = {'mins': target_mins, 'maxs': target_maxs}
+
+        self._targets_data_norm = (self._targets_data_raw - target_mins) / target_range
 
     def get_normalization_stats(self) -> Dict[str, Any]:
         return {'features': self._feature_stats, 'targets': self._target_stats}
