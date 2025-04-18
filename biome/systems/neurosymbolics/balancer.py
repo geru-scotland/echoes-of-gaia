@@ -47,6 +47,7 @@ class NeuroSymbolicBalancer:
 
     def process(self, observation: Observation) -> Optional[IntegratedResult]:
         neural_result = self.neural_module.predict(observation.get("neural_data", {}))
+        self._logger.info(f"[NeuroSymbolic Balancer] Neural_result: {neural_result}")
         # symbolic_result = self.symbolic_module.infer(observation.get("symbolic_data", {}))
         #
         # integrated_result = self.integration_strategy.integrate(
