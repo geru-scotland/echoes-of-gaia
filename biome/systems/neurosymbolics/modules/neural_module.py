@@ -47,9 +47,24 @@ class NeuralModule:
         if sequence is None or sequence.shape[0] < 5:
             return {"error": "Insufficient data for prediction"}
         self._logger.debug(f"Showing latest 5 observations from sequence: {sequence[5:]}")
-        prediction = self.model_manager.predict(sequence)
-        self._logger.info(f"Prediction (type: {type(prediction)}): {prediction}")
-        return self._format_prediction(prediction)
+
+        prediction_numpy = self.model_manager.predict(sequence)
+        self._logger.debug(
+            f"Prediction (type: {type(prediction_numpy)}, shape: {prediction_numpy.shape}): {prediction_numpy}")
+
+        prediction = np.squeeze(prediction_numpy, axis=0)
+        prediction_avg = list(np.mean(prediction, axis=0))
+
+        self._logger.debug(
+            f"Prediction (type: {type(prediction)}, shape: {prediction.shape}): {prediction}")
+        self._logger.debug(
+            f"Prediction averages): {prediction_avg}")
+
+        return self._format_prediction(prediction_avg)
 
     def _format_prediction(self, raw_prediction) -> PredictionResult:
-        pass
+        return {
+            'prey_population': raw_prediction[0],
+            'predator_population': raw_prediction[1],
+            'flora_count': raw_prediction[2]
+        }
