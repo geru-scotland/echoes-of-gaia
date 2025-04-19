@@ -72,7 +72,7 @@ DecodedAction: TypeAlias = Union[FaunaAction, Direction]
 
 # Neurosymbolic
 
-PredictionResult: TypeAlias = Dict[str, Any]
-SymbolicResult: TypeAlias = Dict[str, Any]
+PredictionFeedback: TypeAlias = Dict[str, Any]
+SymbolicFeedback: TypeAlias = Dict[str, Any]
 IntegratedResult: TypeAlias = Dict[str, Any]
 InterventionAction: TypeAlias = Dict[str, Any]

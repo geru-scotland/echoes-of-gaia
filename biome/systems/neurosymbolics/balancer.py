@@ -18,12 +18,13 @@
 from logging import Logger
 from typing import Dict, Type, Optional
 
+from biome.services.biome_control_service import BiomeControlService
 from biome.systems.neurosymbolics.data_service import NeurosymbolicDataService
 from biome.systems.neurosymbolics.integrations.base_strategy import IntegrationStrategy
 from biome.systems.neurosymbolics.modules.neural_module import NeuralModuleInterface
 from biome.systems.neurosymbolics.modules.symbolic_module import SymbolicModuleInterface
 from shared.enums.strings import Loggers
-from shared.types import Observation, IntegratedResult
+from shared.types import Observation, IntegratedResult, PredictionFeedback, SymbolicFeedback
 from utils.loggers import LoggerManager
 
 
@@ -40,20 +41,24 @@ class NeuroSymbolicBalancer:
         self.confidence_weights: Dict[str, float] = {"neural": 0.6, "symbolic": 0.4}
 
     def get_observation(self, data_service: NeurosymbolicDataService) -> Observation:
+        neural_sequence = data_service.get_neural_sequence()
+        graph_data = data_service.get_graph_data()
+
         return {
-            'neural_data': data_service.get_neural_sequence(),
-            'symbolic_data': data_service.get_latest_data()
+            'neural_data': neural_sequence,
+            'graph_data': graph_data
         }
 
     def process(self, observation: Observation) -> Optional[IntegratedResult]:
-        neural_result = self.neural_module.predict(observation.get("neural_data", {}))
-        self._logger.info(f"[NeuroSymbolic Balancer] Neural_result: {neural_result}")
-        # symbolic_result = self.symbolic_module.infer(observation.get("symbolic_data", {}))
+        neural_feedback: PredictionFeedback = self.neural_module.predict(observation.get("neural_data", {}))
+        symbolic_feedback: SymbolicFeedback = self.symbolic_module.infer(observation.get("graph_data", {}))
+        self._logger.debug(f"[NeuroSymbolic Balancer] Neural feedback: {neural_feedback}")
+        self._logger.debug(f"[NeuroSymbolic Balancer] Symbolic feedback: {symbolic_feedback}")
         #
         # integrated_result = self.integration_strategy.integrate(
-        #     neural_result,
-        #     symbolic_result,
+        #     neural_feedback,
+        #     symbolic_feedback,
         #     self.confidence_weights
         # )
 
-        return neural_result
+        return neural_feedback

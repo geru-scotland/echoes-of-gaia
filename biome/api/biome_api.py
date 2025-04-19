@@ -20,6 +20,8 @@ from typing import Dict, Any
 import simpy
 
 from biome.biome import Biome
+from biome.systems.evolution.registry import EvolutionAgentRegistry
+from biome.systems.managers.worldmap_manager import WorldMapManager
 from shared.enums.enums import SimulationMode
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 
@@ -34,3 +36,9 @@ class BiomeAPI:
 
     def get_biome(self) -> Biome:
         return self._biome
+
+    def get_map_manager(self) -> WorldMapManager:
+        return self._biome.get_worldmap_manager()
+
+    def get_evolution_agent_registry(self) -> EvolutionAgentRegistry:
+        return self._biome.get_evolution_agent_registry()

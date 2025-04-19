@@ -23,12 +23,12 @@ import numpy as np
 from research.training.deep_learning.model_manager import NeuralModelManager
 from shared.enums.enums import NeuralMode
 from shared.enums.strings import Loggers
-from shared.types import Observation, PredictionResult
+from shared.types import Observation, PredictionFeedback
 from utils.loggers import LoggerManager
 
 
 class NeuralModuleInterface(Protocol):
-    def predict(self, observation: Observation) -> PredictionResult:
+    def predict(self, observation: Observation) -> PredictionFeedback:
         ...
 
     def update(self, feedback: Dict[str, Any]) -> None:
@@ -42,7 +42,7 @@ class NeuralModule:
         self.model_manager = NeuralModelManager(mode=NeuralMode.INFERENCE)
         self._logger.info(f"Neural module ready")
 
-    def predict(self, neural_data: Observation) -> PredictionResult:
+    def predict(self, neural_data: Observation) -> PredictionFeedback:
         sequence: np.ndarray = neural_data
         if sequence is None or sequence.shape[0] < 5:
             return {"error": "Insufficient data for prediction"}
@@ -62,7 +62,7 @@ class NeuralModule:
 
         return self._format_prediction(prediction_avg)
 
-    def _format_prediction(self, raw_prediction) -> PredictionResult:
+    def _format_prediction(self, raw_prediction) -> PredictionFeedback:
         return {
             'prey_population': raw_prediction[0],
             'predator_population': raw_prediction[1],

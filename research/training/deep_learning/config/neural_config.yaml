@@ -14,14 +14,33 @@ data:
   validation_split: 0.3
   use_progress_bar: true
 
+  graph_data:
+    species_data:
+    biome_data:
+      - temperature
+      - humidity
+      - precipitation
+      - predator_prey_ratio
+      - prey_population
+      - predator_population
+      - biodiversity_index
+      - ecosystem_stability
+      - environmental_pressure
+      - biome_score
+      - avg_stress
+
   features:
     - prey_population
     - predator_population
     - flora_count
-    - delta_prey_population
-    - delta_predator_population
-    - delta_flora_count
+    #    - delta_prey_population
+    #    - delta_predator_population
+    #    - delta_flora_count
+    - temperature
+    - humidity
+    - precipitation
     - co2_level
+
 
     - biodiversity_index
     - biomass_density
@@ -35,6 +54,8 @@ data:
     - prey_population
     - predator_population
     - flora_count
+    - ecosystem_stability
+    - avg_stress
 
 
 visualization:
@@ -46,4 +67,4 @@ paths:
   data_path: "research/data/neurosymbolic/neural"
   model_save_path: "research/models/neural/biome.pth"
   plots_dir: "research/plots/lstm"
-  inference_model: "biome_transformer_100epoch.pth"
+  inference_model: "transformer_5_targets.pth"

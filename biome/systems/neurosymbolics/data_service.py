@@ -58,9 +58,9 @@ class NeurosymbolicDataService:
 
         return config
 
-    def update_data(self, lstm_data: Dict[str, Any], species_data: Dict[str, Dict[str, Any]],
+    def update_data(self, neural_data: Dict[str, Any], species_data: Dict[str, Dict[str, Any]],
                     save_to_files: bool = True) -> None:
-        self._neural_data_history.append(lstm_data)
+        self._neural_data_history.append(neural_data)
         self._species_data_history.append(species_data)
         self._last_update_time = time.time()
         self._save_to_files = save_to_files
@@ -91,6 +91,21 @@ class NeurosymbolicDataService:
             features_vector = [data_point.get(feature, 0) for feature in features]
             sequence.append(features_vector)
         return np.array(sequence)
+
+    def get_graph_data(self) -> Dict[str, Any]:
+        biome_latest_state: Dict[str, Any] = self._neural_data_history[-1]
+        biome_features: List[str] = self._config.get("data", {}).get("graph_data", {}).get("biome_data", [])
+
+        graph_data: Dict[str, Any] = {
+            'biome_data': {
+                feature: biome_latest_state[feature]
+                for feature in self._config.get("data", {}).get("features", [])
+                if feature in biome_features
+            },
+            'species_data': self._species_data_history[-1]
+        }
+
+        return graph_data
 
     def get_latest_data(self) -> Dict[str, Any]:
         if not self._species_data_history:
