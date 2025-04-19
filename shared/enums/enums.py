@@ -317,3 +317,68 @@ class DietType(Enum):
     HERBIVORE = "herbivore"
     CARNIVORE = "carnivore"
     OMNIVORE = "omnivore"
+
+
+from enum import Enum
+
+
+class SpeciesStatus(str, Enum):
+    ENDANGERED = "endangered"
+    STRESSED = "stressed"
+    OVERPOPULATED = "overpopulated"
+
+
+class SpeciesAction(str, Enum):
+    PROTECTION_NEEDED = "protection_needed"
+    STRESS_REDUCTION_NEEDED = "stress_reduction_needed"
+    POPULATION_CONTROL_NEEDED = "population_control_needed"
+
+
+class PredatorPreyBalance(str, Enum):
+    PREDATOR_DOMINANT = "predator_dominant"
+    PREY_DOMINANT = "prey_dominant"
+
+
+class EcosystemRisk(str, Enum):
+    PREY_EXTINCTION_RISK = "prey_extinction_risk"
+    OVERPOPULATION_RISK = "overpopulation_risk"
+
+
+class RecommendedAction(str, Enum):
+    REDUCE_PREDATOR_PRESSURE = "reduce_predator_pressure"
+    INCREASE_PREDATOR_PRESSURE = "increase_predator_pressure"
+    INTRODUCE_SPECIES_DIVERSITY = "introduce_species_diversity"
+    ECOSYSTEM_INTERVENTION_NEEDED = "ecosystem_intervention_needed"
+
+
+class BiodiversityStatus(str, Enum):
+    CRITICAL = "critical"
+
+
+class StabilityStatus(str, Enum):
+    UNSTABLE = "unstable"
+    HIGHLY_STABLE = "highly_stable"
+
+
+class InterventionPriority(str, Enum):
+    LOW = "low"
+
+
+class ClimateStatus(str, Enum):
+    EXTREME_COLD = "extreme_cold"
+    EXTREME_HEAT = "extreme_heat"
+
+
+class ClimateAction(str, Enum):
+    INCREASE_TEMPERATURE = "increase_temperature"
+    REDUCE_TEMPERATURE = "reduce_temperature"
+
+
+class MoistureStatus(str, Enum):
+    EXTREME_DRY = "extreme_dry"
+    EXTREME_WET = "extreme_wet"
+
+
+class MoistureAction(str, Enum):
+    INCREASE_HUMIDITY = "increase_humidity"
+    REDUCE_PRECIPITATION = "reduce_precipitation"

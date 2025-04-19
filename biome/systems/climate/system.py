@@ -181,6 +181,9 @@ class ClimateSystem:
 
         total_biomass = 0.0
         total_max_size = 0.0
+        total_photosynthesis = 0.0
+        total_respiration = 0.0
+        total_transpiration = 0.0
 
         for entity in flora_entities:
             growth_component = entity.get_component(ComponentType.GROWTH)
@@ -190,11 +193,34 @@ class ClimateSystem:
                 total_biomass += size_factor
                 total_max_size += 1.0
 
-        self._state.biomass_density = (total_biomass / len(flora_entities)) if flora_entities else 0.0
+            photosynthetic_component = entity.get_component(ComponentType.PHOTOSYNTHETIC_METABOLISM)
+            if photosynthetic_component:
+                photo_efficiency = photosynthetic_component.photosynthesis_efficiency
+                metabolic_activity = photosynthetic_component.metabolic_activity
+
+                if growth_component:
+                    size_factor = growth_component.current_size / growth_component.max_size
+                    total_photosynthesis += photo_efficiency * metabolic_activity * size_factor * 0.5  # solo cuando hay luz, 50% del dia pongo a ojo de buen cubero
+
+                total_respiration += photosynthetic_component.respiration_rate * size_factor * metabolic_activity * 0.5  # lo mismo, 50% SIN luz, no hay fotosíntesis
+
+                temperature_factor = max(0.0, min(1.0, self._state.temperature / 30.0))
+                transpiration_rate = photo_efficiency * metabolic_activity * temperature_factor * 0.1
+                if hasattr(photosynthetic_component, 'stress_handler'):
+                    stress_ratio = (photosynthetic_component.stress_handler.stress_level
+                                    / photosynthetic_component.stress_handler.max_stress)
+                    transpiration_rate *= (1.0 - stress_ratio * 0.7)
+                if growth_component:
+                    transpiration_rate *= size_factor
+                total_transpiration += transpiration_rate
+
+        self._state.biomass_density = (
+            total_biomass / len(flora_entities)
+            if flora_entities else 0.0
+        )
 
         total_fauna_density = 0.0
         total_fauna_entities = 0
-
         for entity in fauna_entities:
             growth_component = entity.get_component(ComponentType.GROWTH)
             if growth_component and growth_component.max_size > 0:
@@ -203,30 +229,51 @@ class ClimateSystem:
                 total_fauna_density += size_factor
                 total_fauna_entities += 1
 
-        self._state.fauna_density = (total_fauna_density / total_fauna_entities) if total_fauna_entities > 0 else 0.0
-        base_co2_emission = total_fauna_density * 0.1
-        photosynthesis_absorption = total_biomass * 0.07  # TODO: Iepa, se me ha olvidado tener en cuenta eficiencas etc. Importante.
+        # densidad media, no suma! pero tengo que revisar esto bien.
+        self._state.fauna_density = (
+            total_fauna_density / total_fauna_entities
+            if total_fauna_entities else 0.0
+        )
+        total_fauna_size = total_fauna_density
 
-        co2_net_delta = base_co2_emission - photosynthesis_absorption
+        CO2_EMISSION_PER_FAUNA = 0.8
+        CO2_ABSORPTION_PER_BIOMASS = 7.0
+
+        # fauna_co2_flux = total_fauna_size * CO2_EMISSION_PER_FAUNA
+        fauna_co2_flux = self._state.fauna_density * CO2_EMISSION_PER_FAUNA
+        flora_co2_flux = self._state.biomass_density * CO2_ABSORPTION_PER_BIOMASS
+        co2_net_delta = fauna_co2_flux - flora_co2_flux
 
         new_co2 = self._state.co2_level + co2_net_delta
         self._state.co2_level = max(0.0, min(600.0, new_co2))
-        co2_temp_impact = (self._state.co2_level - 400.0) * 0.01
-        self._state.temperature += co2_temp_impact
+
+        co2_temperature_impact = (self._state.co2_level - 400.0) * 0.01
+        self._state.temperature += co2_temperature_impact
+
+        humidity_delta = total_transpiration * 3.0
+        new_humidity = self._state.humidity + humidity_delta
+        self._state.humidity = max(0.0, min(100.0, new_humidity))
 
         self._logger.debug(
             f"Calculated biomass_density: {self._state.biomass_density:.4f} "
             f"(total_biomass={total_biomass:.4f}, total_entities={len(flora_entities)})"
         )
         self._logger.debug(
-            f"Calculated fauna_density: {self._state.fauna_density:.4f} "
+            f"Calculated fauna_density: {self._state.fauna_density:.4f}, "
+            f"sum_fauna_size={total_fauna_size:.4f}, total_entities={len(fauna_entities)}"
         )
         self._logger.debug(
             f"CO2 level updated to: {self._state.co2_level:.4f} "
-            f"with CO2 net delta: {co2_net_delta:.4f}"
+            f"with CO2 net delta: {co2_net_delta:.4f} "
+            f"(Fauna flux:+{fauna_co2_flux:.2f}, Flora flux:-{flora_co2_flux:.2f})"
         )
         self._logger.debug(
-            f"Temperature updated to: {self._state.temperature:.4f} (CO2 impact: {co2_temp_impact:.4f})"
+            f"Humidity updated to: {self._state.humidity:.2f}% "
+            f"(Transpiration:+{humidity_delta:.2f})"
+        )
+        self._logger.debug(
+            f"Temperature updated to: {self._state.temperature:.4f} "
+            f"(CO2 impact:{co2_temperature_impact:.4f})"
         )
 
     def set_entity_provider(self, entity_provider: EntityProvider) -> None:

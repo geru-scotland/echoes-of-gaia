@@ -25,6 +25,7 @@ import simpy
 
 from biome.api.biome_api import BiomeAPI
 from biome.biome import Biome
+from biome.services.biome_control_service import BiomeControlService
 from biome.systems.managers.biome_data_manager import BiomeDataManager
 from config.settings import Settings
 from shared.enums.enums import SimulationMode
@@ -90,6 +91,7 @@ class SimulationEngine:
 
             self._logger: Logger = LoggerManager.get_logger(Loggers.SIMULATION)
             self._biome_api = BiomeAPI(biome_context, self._env, self._simulation_mode, options)
+            BiomeControlService.get_instance().initialize(self._biome_api)
 
             if self._datapoints:
                 self._context.influxdb.start()

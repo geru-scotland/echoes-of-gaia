@@ -18,13 +18,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Dict
 
-from shared.types import PredictionResult, SymbolicResult, IntegratedResult
+from shared.types import PredictionFeedback, SymbolicFeedback, IntegratedResult
 
 
 class IntegrationStrategy(ABC):
     @abstractmethod
     def integrate(self,
-                  neural_result: PredictionResult,
-                  symbolic_result: SymbolicResult,
+                  neural_result: PredictionFeedback,
+                  symbolic_result: SymbolicFeedback,
                   confidence_weights: Optional[Dict[str, float]] = None) -> IntegratedResult:
         raise NotImplementedError

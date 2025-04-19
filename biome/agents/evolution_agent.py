@@ -387,6 +387,11 @@ class EvolutionAgentAI(Agent, EventHandler):
     def get_evolution_cycle_time(self) -> int:
         return self._evolution_cycle_time
 
+    def get_current_generation(self) -> int:
+        return self._current_evolution_cycle
+
+    def adjust_evolution_cycle(self, adjustment_factor: float) -> None:
+        self._evolution_cycle_time *= adjustment_factor
     @property
     def entity_type(self) -> EntityType:
         return self._entity_type

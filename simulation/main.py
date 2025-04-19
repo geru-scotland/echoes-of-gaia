@@ -20,6 +20,7 @@ from logging import Logger
 from threading import Thread
 
 from config.settings import Settings
+from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
 from shared.enums.enums import SimulationMode
 from shared.enums.strings import Loggers
 from simulation.api.simulation_api import SimulationAPI
@@ -29,12 +30,16 @@ from exceptions.general import global_exception_handler
 
 sys.excepthook = global_exception_handler
 
-settings: Settings = Settings()
+random_config = TrainingConfigManager.generate_random_config("training.yaml")
+temp_config_path = TrainingConfigManager.save_temp_config(random_config)
+settings: Settings = Settings(override_configs=temp_config_path)
+
 LoggerManager.initialize(settings.log_level)
 # TODO: Pasar a config esto
 HEADLESS: bool = True
 
-simulation = SimulationAPI(settings, SimulationMode.UNTIL_EXTINCTION)
+# TODO: Pasar esto también a configs
+simulation = SimulationAPI(settings, SimulationMode.NORMAL)
 
 logger: Logger = LoggerManager.get_logger(Loggers.RESEARCH)
 
