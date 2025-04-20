@@ -44,7 +44,7 @@ class RuleBasedSymbolicModule:
         self._logger.info(f"Symbolic module ready")
 
     def infer(self, observation: Observation) -> SymbolicFeedback:
-        result = {}
+        result = {"context": {}}
 
         species_data = observation.get("species_data", {})
         biome_data = observation.get("biome_data", {})
@@ -61,7 +61,7 @@ class RuleBasedSymbolicModule:
 
     def _analyze_species_status(self, species_data, result):
         for species, data in species_data.items():
-            if data.get("population", 0) < 5:
+            if data.get("population", 0) < 7:
                 result[f"{species}_status"] = SpeciesStatus.ENDANGERED
                 result[f"{species}_action"] = SpeciesAction.PROTECTION_NEEDED
 
@@ -73,14 +73,15 @@ class RuleBasedSymbolicModule:
                 result[f"{species}_status"] = SpeciesStatus.OVERPOPULATED
                 result[f"{species}_action"] = SpeciesAction.POPULATION_CONTROL_NEEDED
 
-    def _analyze_predator_prey_dynamics(self, neural_data, result):
-        predator_prey_ratio = neural_data.get("predator_prey_ratio", 0)
+    def _analyze_predator_prey_dynamics(self, biome_data, result):
+        predator_prey_ratio = biome_data.get("predator_prey_ratio", 0)
 
-        if predator_prey_ratio > 0.5:
+        result["predator_prey_balance"] = PredatorPreyBalance.PREDATOR_DOMINANT
+        if predator_prey_ratio > 0.3:  # NOTA: TENIAS .05 al principio
             result["predator_prey_balance"] = PredatorPreyBalance.PREDATOR_DOMINANT
             result["ecosystem_risk"] = EcosystemRisk.PREY_EXTINCTION_RISK
             result["recommended_action"] = RecommendedAction.REDUCE_PREDATOR_PRESSURE
-        elif predator_prey_ratio < 0.1 and neural_data.get("prey_population", 0) > 15:
+        elif predator_prey_ratio < 0.1 and biome_data.get("prey_population", 0) > 15:
             result["predator_prey_balance"] = PredatorPreyBalance.PREY_DOMINANT
             result["ecosystem_risk"] = EcosystemRisk.OVERPOPULATION_RISK
             result["recommended_action"] = RecommendedAction.INCREASE_PREDATOR_PRESSURE

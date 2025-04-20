@@ -97,6 +97,7 @@ class BiomeBuilder(Builder):
             fauna: EntityDefinitions = config.get("fauna", {})
             climate_model: str = config.get("climate-model", {})
             fauna_model = config.get('fauna-model', '')
+            fauna_ia = config.get('fauna_ia', True)
             map_configurator: MapConfigurator = MapConfigurator()
             map_configurator.configure(self._settings, config=config)
             self._context = BiomeContextData(biome_type=config.get("type"),
@@ -104,6 +105,7 @@ class BiomeBuilder(Builder):
                                              config=config, logger_name=Loggers.BIOME,
                                              flora_definitions=flora, fauna_definitions=fauna,
                                              climate_model=climate_model,
-                                             fauna_model=fauna_model)
+                                             fauna_model=fauna_model,
+                                             fauna_ia=fauna_ia)
         except Exception as e:
             self._logger.exception(f"There was a problem building the context from the Biome: {e}")

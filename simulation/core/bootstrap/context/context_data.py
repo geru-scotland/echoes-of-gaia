@@ -39,6 +39,7 @@ class BiomeContextData(ContextData):
     fauna_definitions: EntityDefinitions
     climate_model: str
     fauna_model: str
+    fauna_ia: bool
 
 
 @dataclass

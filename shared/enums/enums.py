@@ -18,7 +18,7 @@
 from enum import auto, Enum
 from typing import TypedDict, NamedTuple, List, Optional, Dict, Literal, Any
 
-from shared.enums.base import EnumBaseStr, EnumBaseInt
+from shared.enums.base import EnumBaseStr, EnumBaseInt, EnumBaseFloat
 
 
 class BiomeType(EnumBaseStr):
@@ -326,6 +326,7 @@ class SpeciesStatus(str, Enum):
     ENDANGERED = "endangered"
     STRESSED = "stressed"
     OVERPOPULATED = "overpopulated"
+    KEYSTONE = "keystone"
 
 
 class SpeciesAction(str, Enum):
@@ -342,6 +343,9 @@ class PredatorPreyBalance(str, Enum):
 class EcosystemRisk(str, Enum):
     PREY_EXTINCTION_RISK = "prey_extinction_risk"
     OVERPOPULATION_RISK = "overpopulation_risk"
+    FRAGMENTATION = "fragmentation"
+    CASCADE_FAILURE = "casacade_failure"
+    TOP_PREDATOR_VULNERABILITY = "top_predator_vulnerability"
 
 
 class RecommendedAction(str, Enum):
@@ -349,6 +353,7 @@ class RecommendedAction(str, Enum):
     INCREASE_PREDATOR_PRESSURE = "increase_predator_pressure"
     INTRODUCE_SPECIES_DIVERSITY = "introduce_species_diversity"
     ECOSYSTEM_INTERVENTION_NEEDED = "ecosystem_intervention_needed"
+    INCREASE_BIODIVERSITY = "increase_biodiversity"
 
 
 class BiodiversityStatus(str, Enum):
@@ -358,10 +363,14 @@ class BiodiversityStatus(str, Enum):
 class StabilityStatus(str, Enum):
     UNSTABLE = "unstable"
     HIGHLY_STABLE = "highly_stable"
+    VULNERABLE = "vulnerable"
+    STABLE = "stable"
+    RESILIENT = "resilient"
 
 
 class InterventionPriority(str, Enum):
     LOW = "low"
+    HIGH = "high"
 
 
 class ClimateStatus(str, Enum):
@@ -382,3 +391,87 @@ class MoistureStatus(str, Enum):
 class MoistureAction(str, Enum):
     INCREASE_HUMIDITY = "increase_humidity"
     REDUCE_PRECIPITATION = "reduce_precipitation"
+
+
+class StabilityStatusValue(EnumBaseFloat):
+    HIGHLY_STABLE = 0.9
+    STABLE = 0.7
+    MODERATELY_STABLE = 0.5
+    UNSTABLE = 0.3
+    CRITICAL = 0.1
+    VULNERABLE = 0.3
+
+
+class EcosystemRiskValue(EnumBaseFloat):
+    NONE = 0.9
+    LOW = 0.7
+    MODERATE = 0.5
+    HIGH = 0.3
+    PREY_EXTINCTION_RISK = 0.2
+    PREDATOR_EXTINCTION_RISK = 0.2
+    OVERPOPULATION_RISK = 0.4
+    FRAGMENTATION = 0.4
+    CASCADE_FAILURE = 0.5
+    TOP_PREDATOR_VULNERABILITY = 0.4
+
+
+class EvolutionFactor(EnumBaseFloat):
+    ACCELERATE_EXTREME = 0.5
+    ACCELERATE_SIGNIFICANT = 0.7
+    ACCELERATE_MODERATE = 0.8
+    NORMAL = 1.0
+    SLOW_MODERATE = 1.2
+    SLOW_SIGNIFICANT = 1.3
+    SLOW_EXTREME = 1.5
+
+
+class PopulationThreshold(EnumBaseFloat):
+    FLORA_CRITICAL = 8.0
+    FLORA_SPAWN = 10.0
+    PREY_CRITICAL = 3.0
+    PREDATOR_CRITICAL = 3.0
+    PREY_ABUNDANT = 15.0
+
+
+class BiomassThreshold(EnumBaseFloat):
+    CRITICAL = 0.3
+    LOW = 0.5
+    NORMAL = 0.7
+    HIGH = 0.9
+
+
+class PopulationRatio(EnumBaseFloat):
+    PREDATOR_DOMINANT = 0.6
+    BALANCED = 0.3
+    PREY_DOMINANT = 0.1
+
+
+class PopulationTrend(EnumBaseFloat):
+    SIGNIFICANT_DECLINE = -0.15
+    MODERATE_DECLINE = -0.05
+    STABLE = 0.0
+    MODERATE_INCREASE = 0.05
+    SIGNIFICANT_INCREASE = 0.1
+
+
+class SpawnCount(EnumBaseFloat):
+    MINIMAL = 1.0
+    LOW = 2.0
+    MEDIUM = 4.0
+    HIGH = 6.0
+    MAXIMUM = 10.0
+
+
+class AmplificationFactor(EnumBaseFloat):
+    NONE = 1.0
+    MODERATE = 1.2
+    SIGNIFICANT = 1.5
+
+
+class StressThreshold(EnumBaseFloat):
+    SIGNIFICANT_INCREASE = 10.0
+
+
+class Interventions(EnumBaseStr):
+    SPAWN_ENTITIES = "spawn_entities"
+    ADJUST_EVOLUTION_CYCLE = "adjust_evolution_cycle"

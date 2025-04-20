@@ -199,7 +199,8 @@ class EvolutionAgentAI(Agent, EventHandler):
 
         avg_lifespan: float = np.average(np.array([e.lifespan for e in entities]))
         population_size: float = len(entities)
-        base_k_best = max(3, min(10, int(population_size * random.uniform(0.15, 0.25))))
+        # base_k_best = max(3, min(10, int(population_size * random.uniform(0.15, 0.25))))
+        base_k_best = max(3, min(10, int(population_size * 0.2)))
 
         base_lifespan = self._species_base_lifespan
         multiplier = 1 + ((avg_lifespan - base_lifespan) / base_lifespan) * 0.1
@@ -391,7 +392,21 @@ class EvolutionAgentAI(Agent, EventHandler):
         return self._current_evolution_cycle
 
     def adjust_evolution_cycle(self, adjustment_factor: float) -> None:
-        self._evolution_cycle_time *= adjustment_factor
+        min_cycle_time = self._species_base_lifespan * 0.10
+        max_cycle_time = self._species_base_lifespan * 0.8
+
+        new_cycle_time = self._evolution_cycle_time * adjustment_factor
+
+        new_cycle_time = max(min_cycle_time, min(new_cycle_time, max_cycle_time))
+
+        self._logger.info(
+            f"Adjusting evolution cycle for {self._species} from {self._evolution_cycle_time} to {new_cycle_time}")
+        self._evolution_cycle_time = new_cycle_time
+
     @property
     def entity_type(self) -> EntityType:
         return self._entity_type
+
+    @property
+    def base_species_lifespan(self) -> float:
+        return self._species_base_lifespan

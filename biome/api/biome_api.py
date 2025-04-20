@@ -21,6 +21,7 @@ import simpy
 
 from biome.biome import Biome
 from biome.systems.evolution.registry import EvolutionAgentRegistry
+from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from shared.enums.enums import SimulationMode
 from simulation.core.bootstrap.context.context_data import BiomeContextData
@@ -42,3 +43,6 @@ class BiomeAPI:
 
     def get_evolution_agent_registry(self) -> EvolutionAgentRegistry:
         return self._biome.get_evolution_agent_registry()
+
+    def get_entity_provider(self) -> EntityProvider:
+        return self._biome.get_entity_provider()
