@@ -108,7 +108,8 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
         self._env.process(self._run_agent(AgentType.CLIMATE_AGENT, Timers.Agents.Climate.CLIMATE_UPDATE))
         local_fov_config: Dict[str, Any] = self._context.config.get("map", {}).get("local_fov", {})
 
-        if mode in (SimulationMode.NORMAL, SimulationMode.TRAINING_WITH_RL_MODEL, SimulationMode.UNTIL_EXTINCTION):
+        if self._context.config.get("fauna_ia") and mode in (
+                SimulationMode.NORMAL, SimulationMode.TRAINING_WITH_RL_MODEL, SimulationMode.UNTIL_EXTINCTION):
             fauna_agent: FaunaAgentAI = FaunaAgentAI(
                 self._context.fauna_model,
                 self._entity_provider,

@@ -66,5 +66,7 @@ class NeuralModule:
         return {
             'prey_population': raw_prediction[0],
             'predator_population': raw_prediction[1],
-            'flora_count': raw_prediction[2]
+            'flora_count': raw_prediction[2],
+            'ecosystem_stability': raw_prediction[3],
+            'avg_stress': raw_prediction[4]
         }

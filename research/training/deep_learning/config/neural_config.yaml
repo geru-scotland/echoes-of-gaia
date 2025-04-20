@@ -9,7 +9,7 @@ hyperparameters:
   max_seq_len: 50
 
 data:
-  sequence_length: 25
+  sequence_length: 15
   target_horizon: 5
   validation_split: 0.3
   use_progress_bar: true
@@ -33,9 +33,9 @@ data:
     - prey_population
     - predator_population
     - flora_count
-    #    - delta_prey_population
-    #    - delta_predator_population
-    #    - delta_flora_count
+    - delta_prey_population
+    - delta_predator_population
+    - delta_flora_count
     - temperature
     - humidity
     - precipitation
@@ -67,4 +67,4 @@ paths:
   data_path: "research/data/neurosymbolic/neural"
   model_save_path: "research/models/neural/biome.pth"
   plots_dir: "research/plots/lstm"
-  inference_model: "transformer_5_targets.pth"
+  inference_model: "biome_correlated_seq15.pth"

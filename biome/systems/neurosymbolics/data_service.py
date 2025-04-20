@@ -67,7 +67,7 @@ class NeurosymbolicDataService:
 
         seq_length: int = self._config.get("data", {}).get("sequence_length")
 
-        self._logger.info(f"Neural data history length: {len(self._neural_data_history)} / {seq_length} (seq length)")
+        self._logger.info(f"Neural data history length: {len(self._neural_data_history)} / {seq_length}")
         if 0 < seq_length <= len(self._neural_data_history):
             BiomeEventBus.trigger(BiomeEvent.NEUROSYMBOLIC_SERVICE_READY)
 

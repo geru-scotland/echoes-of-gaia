@@ -120,7 +120,7 @@ class WorldMapManager:
         result_callback(self._is_valid_position(new_position, entity_id))
 
     def add_entity(self, entity_class, entity_species_enum, species_name: str, lifespan: float,
-                   custom_components: List[Dict] = None, evolution_cycle: int = 0):
+                   custom_components: List[Dict] = None, evolution_cycle: int = 0, control_service: bool = False):
         try:
             entity = self._spawn_system.spawn(
                 entity_class=entity_class,
@@ -144,8 +144,9 @@ class WorldMapManager:
                                                generation=evolution_cycle)
 
             if entity:
-                self._logger.debug(
-                    f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")
+                if control_service:
+                    self._logger.info(
+                        f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")
                 return entity
             else:
                 self._logger.warning(f"Entity coudln't be created {entity_class.__name__}, species: {species_name}")

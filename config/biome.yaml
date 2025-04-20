@@ -13,6 +13,8 @@ biome:
   type: "tropical"
 
   training_mode: true
+  fauna_ia: true
+
   flora:
     - species: "oak_tree"
       spawns: 35
