@@ -3,7 +3,7 @@ simulation:
 
   eras:
     amount: 10
-    events-per-era: 1500
+    events-per-era: 500
 
   cleanup:
     remove_dead_entities: true
@@ -44,6 +44,7 @@ biome:
   type: "tropical"
 
   training_mode: true
+  fauna_ia: true
 
   flora:
     - species: "oak_tree"
