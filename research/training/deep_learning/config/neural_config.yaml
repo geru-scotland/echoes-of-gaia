@@ -1,17 +1,17 @@
 hyperparameters:
   batch_size: 64
-  hidden_size: 128
-  num_layers: 2
-  dropout: 0.3
+  hidden_size: 256
+  num_layers: 4
+  dropout: 0.4
   learning_rate: 0.001
   weight_decay: 0.0001
-  num_epochs: 100
+  num_epochs: 250
   max_seq_len: 50
 
 data:
   sequence_length: 15
   target_horizon: 5
-  validation_split: 0.3
+  validation_split: 0.2
   use_progress_bar: true
 
   graph_data:
@@ -33,9 +33,6 @@ data:
     - prey_population
     - predator_population
     - flora_count
-    - delta_prey_population
-    - delta_predator_population
-    - delta_flora_count
     - temperature
     - humidity
     - precipitation
@@ -67,4 +64,4 @@ paths:
   data_path: "research/data/neurosymbolic/neural"
   model_save_path: "research/models/neural/biome.pth"
   plots_dir: "research/plots/lstm"
-  inference_model: "biome_correlated_seq15.pth"
+  inference_model: "transformer_EMA005_256H4Lseq15hori5bs64head8dr04.pth"

@@ -97,6 +97,7 @@ generated_configs/
 __pycache__/
 
 simulation/simulation_records/
+simulation/graphs/
 tensorboard_logs/
 tensorboard_log/
 research/experiments/simulations
