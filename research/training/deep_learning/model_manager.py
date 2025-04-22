@@ -26,7 +26,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, explained_variance_score
 import time
 from tqdm.auto import tqdm
 import numpy as np
@@ -34,6 +34,7 @@ import yaml
 import logging
 from typing import Dict, Any, List, Optional, Tuple, Union
 
+from research.training.deep_learning.models.lstm import BiomeLSTM
 from research.training.deep_learning.models.transformer import MultiStepForecastTransformer
 from research.training.deep_learning.data.dataset import SimulationDataset
 from research.training.deep_learning.preprocess.ema import EMAProcessor
@@ -233,7 +234,8 @@ class NeuralModelManager:
             targets=data_config["targets"],
             simulation_boundaries=train_sim_boundaries,
             target_horizon=target_horizon,
-            normalization_method="minmax"
+            normalization_method="minmax",
+            use_deltas=True
         )
 
         normalization_stats = train_dataset.get_normalization_stats()
@@ -248,7 +250,8 @@ class NeuralModelManager:
             targets=data_config["targets"],
             simulation_boundaries=val_sim_boundaries,
             target_horizon=target_horizon,
-            normalization_stats=normalization_stats
+            normalization_stats=normalization_stats,
+            use_deltas=True
         )
 
         self._logger.info(f"=== DATA WINDOW CONFIGURATION ===")
@@ -319,8 +322,14 @@ class NeuralModelManager:
             "train_mae": [],
             "val_mae": [],
             "train_accuracy": [],
-            "val_accuracy": []
+            "val_accuracy": [],
+            "train_exp_var": [], "val_exp_var": [],
+            "train_nrmse": [], "val_nrmse": []
         }
+        target_stats = normalization_stats.get("targets", {})
+        tmins = np.array(target_stats.get("mins", 0))
+        tmaxs = np.array(target_stats.get("maxs", 1))
+        trange = tmaxs - tmins
 
         from sklearn.metrics import r2_score
         import time
@@ -384,10 +393,39 @@ class NeuralModelManager:
                 all_train_outputs = all_train_outputs.reshape(-1, all_train_outputs.shape[-1])
 
             avg_train_loss = train_loss / len(train_loader)
-            train_mse = np.mean((all_train_outputs - all_train_targets) ** 2)
-            train_mae = np.mean(np.abs(all_train_outputs - all_train_targets))
-            train_r2 = r2_score(all_train_targets, all_train_outputs)
-            train_accuracy = self._calculate_accuracy(all_train_outputs, all_train_targets)
+            if train_dataset._use_deltas:
+                delta_train_mse = np.mean((all_train_outputs - all_train_targets) ** 2)
+                delta_train_mae = np.mean(np.abs(all_train_outputs - all_train_targets))
+
+                denorm_train_targets = all_train_targets * trange + tmins
+                denorm_train_outputs = all_train_outputs * trange + tmins
+
+                T = denorm_train_targets.reshape(-1, denorm_train_targets.shape[-1])
+                P = denorm_train_outputs.reshape(-1, denorm_train_outputs.shape[-1])
+                train_r2_per_dim = [r2_score(T[:, i], P[:, i]) for i in range(T.shape[1])]
+                train_r2 = float(np.mean(train_r2_per_dim))
+                self._logger.info(f"Train R² por dimensión: {train_r2_per_dim}")
+
+                train_exp_var = explained_variance_score(denorm_train_targets, denorm_train_outputs)
+                train_nrmse = np.sqrt(delta_train_mse) / (np.std(denorm_train_targets) + 1e-8)
+
+                history["train_exp_var"].append(train_exp_var)
+                history["train_nrmse"].append(train_nrmse)
+
+                delta_train_accuracy = self._calculate_accuracy(all_train_outputs, all_train_targets)
+
+                self._logger.info(
+                    f"Train Delta Metrics - MSE: {delta_train_mse:.4f}, MAE: {delta_train_mae:.4f}, R²: {train_r2:.4f}")
+
+                train_mse = delta_train_mse
+                train_mae = delta_train_mae
+                train_accuracy = delta_train_accuracy
+
+            else:
+                train_mse = np.mean((all_train_outputs - all_train_targets) ** 2)
+                train_mae = np.mean(np.abs(all_train_outputs - all_train_targets))
+                train_r2 = r2_score(all_train_targets, all_train_outputs)
+                train_accuracy = self._calculate_accuracy(all_train_outputs, all_train_targets)
 
             history["train_loss"].append(avg_train_loss)
             history["train_mse"].append(train_mse)
@@ -442,10 +480,37 @@ class NeuralModelManager:
                     all_val_targets = all_val_targets.reshape(-1, all_val_targets.shape[-1])
                     all_val_outputs = all_val_outputs.reshape(-1, all_val_outputs.shape[-1])
 
-                val_mse = np.mean((all_val_outputs - all_val_targets) ** 2)
-                val_mae = np.mean(np.abs(all_val_outputs - all_val_targets))
-                val_r2 = r2_score(all_val_targets, all_val_outputs)
-                val_accuracy = self._calculate_accuracy(all_val_outputs, all_val_targets)
+                if val_dataset._use_deltas:
+                    delta_val_mse = np.mean((all_val_outputs - all_val_targets) ** 2)
+                    delta_val_mae = np.mean(np.abs(all_val_outputs - all_val_targets))
+
+                    denorm_val_targets = all_val_targets * trange + tmins
+                    denorm_val_outputs = all_val_outputs * trange + tmins
+
+                    val_r2_per_dim = [
+                        r2_score(denorm_val_targets[:, i], denorm_val_outputs[:, i])
+                        for i in range(denorm_val_targets.shape[1])
+                    ]
+                    val_r2 = float(np.mean(val_r2_per_dim))
+                    val_exp_var = explained_variance_score(denorm_val_targets, denorm_val_outputs)
+                    val_nrmse = np.sqrt(delta_val_mse) / (np.max(denorm_val_targets) - np.min(denorm_val_targets))
+
+                    history["val_exp_var"].append(val_exp_var)
+                    history["val_nrmse"].append(val_nrmse)
+
+                    delta_val_accuracy = self._calculate_accuracy(all_val_outputs, all_val_targets)
+
+                    self._logger.info(
+                        f"Val Delta Metrics - MSE: {delta_val_mse:.4f}, MAE: {delta_val_mae:.4f}, R²: {val_r2:.4f}")
+
+                    val_mse = delta_val_mse
+                    val_mae = delta_val_mae
+                    val_accuracy = delta_val_accuracy
+                else:
+                    val_mse = np.mean((all_val_outputs - all_val_targets) ** 2)
+                    val_mae = np.mean(np.abs(all_val_outputs - all_val_targets))
+                    val_r2 = r2_score(all_val_targets, all_val_outputs)
+                    val_accuracy = self._calculate_accuracy(all_val_outputs, all_val_targets)
 
                 avg_val_loss = val_loss / len(val_loader)
 
@@ -479,6 +544,7 @@ class NeuralModelManager:
 
                     sample_targets_np = sample_targets.cpu().numpy()
                     sample_outputs_np = sample_outputs.cpu().numpy()
+                    sample_inputs_np = sample_inputs.cpu().numpy()
 
                     if self._normalization_stats and 'targets' in self._normalization_stats:
                         target_stats = self._normalization_stats['targets']
@@ -488,6 +554,12 @@ class NeuralModelManager:
                         tmins = target_stats.get('mins', 0)
                         tmaxs = target_stats.get('maxs', 1)
                         trange = tmaxs - tmins
+
+                        if val_dataset._use_deltas:
+                            sample_outputs_np = val_dataset.convert_deltas_to_absolutes(sample_outputs_np,
+                                                                                        sample_inputs_np)
+                            sample_targets_np = val_dataset.convert_deltas_to_absolutes(sample_targets_np,
+                                                                                        sample_inputs_np)
 
                         denorm_targets = np.zeros_like(sample_targets_np)
                         denorm_outputs = np.zeros_like(sample_outputs_np)
@@ -499,6 +571,8 @@ class NeuralModelManager:
                         self._logger.warning("Couldn't find any normalization stats")
                         denorm_targets = sample_targets_np
                         denorm_outputs = sample_outputs_np
+                        val_exp_var = explained_variance_score(all_val_targets, all_val_outputs)
+                        val_nrmse = np.sqrt(val_mse) / (np.max(all_val_targets) - np.min(all_val_targets) + 1e-10)
 
                     example_idx = random.randrange(sample_targets.size(0))
                     self._logger.info(f"\n===== Ejemplo de predicción DESNORMALIZADA (Época {epoch + 1}) =====")
@@ -537,6 +611,10 @@ class NeuralModelManager:
                     f"Train Accuracy: {train_accuracy:.2%} - "
                     f"Val Accuracy: {val_accuracy:.2%}"
                 )
+                self._logger.info(
+                    f"Train ExpVar: {train_exp_var:.4f} - Val ExpVar: {val_exp_var:.4f} - "
+                    f"Train NRMSE: {train_nrmse:.4f} - Val NRMSE: {val_nrmse:.4f}"
+                )
 
             else:
                 epoch_time = time.time() - start_time
@@ -569,11 +647,16 @@ class NeuralModelManager:
 
         return history
 
-    def _calculate_accuracy(self, predictions, targets, tolerance=0.1):
+    def _calculate_accuracy(self, predictions, targets, absolute_tolerance=0.1, relative_tolerance=0.1):
         epsilon = 1e-10
-        relative_error = np.abs(predictions - targets) / (np.abs(targets) + epsilon)
-        within_tolerance = np.mean(relative_error <= tolerance)
-        return within_tolerance
+
+        absolute_error = np.abs(predictions - targets)
+
+        relative_error = absolute_error / (np.abs(targets) + epsilon)
+
+        within_tolerance = (absolute_error <= absolute_tolerance) | (relative_error <= relative_tolerance)
+
+        return np.mean(within_tolerance)
 
     def _normalize_sequence(self, sequence_array, feature_stats, method='minmax'):
         if method == 'minmax':
