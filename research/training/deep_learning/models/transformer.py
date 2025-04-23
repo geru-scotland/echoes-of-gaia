@@ -26,7 +26,7 @@ class MultiStepForecastTransformer(nn.Module):
                  num_layers: int,
                  output_size: int,
                  target_horizon: int,
-                 num_heads: int = 8,
+                 num_heads: int = 2,
                  dropout: float = 0.2,
                  max_seq_len: int = 30,
                  pool_k: int = 3

@@ -40,11 +40,10 @@ class SimulationDataset(Dataset):
                  normalize: bool = True,
                  normalization_stats: Optional[Dict[str, Any]] = None,
                  normalization_method: str = 'minmax',
-                 smoothing_window: int = 35,
-                 use_deltas: bool = True):
+                 smoothing_window: int = 35):
 
         self._sequence_length = sequence_length
-        self._stride = sequence_length // 4
+        self._stride = sequence_length // 2
         self._features = features
         self._targets = targets
         self._transform = transform
@@ -57,8 +56,6 @@ class SimulationDataset(Dataset):
         self._normalization_method = normalization_method
         self._apply_smoothing = True
         self._smoothing_window = smoothing_window if smoothing_window else 15
-        self._use_deltas = use_deltas
-        self._last_values = None
 
         if isinstance(data, list) and isinstance(data[0], dict):
             self._features_data, self._targets_data_raw = self._preprocess_dict_data(data)
@@ -113,63 +110,10 @@ class SimulationDataset(Dataset):
         features_array = np.array(features_list)
         targets_array = np.array(targets_list)
 
-        self._original_targets = targets_array.copy()
-
-        if self._use_deltas:
-            delta_targets = np.zeros_like(targets_array)
-            delta_targets[1:] = targets_array[1:] - targets_array[:-1]
-            targets_array = delta_targets
-
         if self._apply_smoothing:
             features_array = self._apply_ema(features_array)
-            if not self._use_deltas:
-                targets_array = self._apply_ema(targets_array)
 
         return features_array, targets_array
-
-    def convert_deltas_to_absolutes(self, deltas: np.ndarray, sequence_data: np.ndarray = None) -> np.ndarray:
-
-        if not self._use_deltas:
-            return deltas
-
-        result = deltas.copy()
-
-        if self._normalization_method == 'minmax' and hasattr(self, '_target_stats'):
-            target_mins = self._target_stats['mins']
-            target_maxs = self._target_stats['maxs']
-            target_range = target_maxs - target_mins
-
-            denorm_deltas = deltas * target_range
-
-            if sequence_data is not None:
-                batch_size = deltas.shape[0]
-                for i in range(batch_size):
-                    last_values = self._get_last_values_for_targets(sequence_data[i])
-
-                    current_values = last_values.copy()
-                    for step in range(result.shape[1] if len(result.shape) > 2 else 1):
-                        if len(result.shape) > 2:
-                            current_values += denorm_deltas[i, step]
-                            result[i, step] = (current_values - target_mins) / target_range
-                        else:
-                            current_values += denorm_deltas[i]
-                            result[i] = (current_values - target_mins) / target_range
-
-        return result
-
-    def _get_last_values_for_targets(self, sequence):
-
-        target_indices = []
-        for target in self._targets:
-            if target in self._features:
-                target_indices.append(self._features.index(target))
-            else:
-                target_indices.append(-1)
-
-        last_step = sequence[-1]
-        last_values = np.array([last_step[i] if i >= 0 else 0 for i in target_indices])
-
-        return last_values
 
     def _create_sequences(self):
         self._sequences.clear()

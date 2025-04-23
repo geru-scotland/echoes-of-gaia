@@ -1,8 +1,8 @@
 hyperparameters:
-  batch_size: 64
-  hidden_size: 256
-  num_layers: 4
-  dropout: 0.4
+  batch_size: 32
+  hidden_size: 128
+  num_layers: 2
+  dropout: 0.3
   learning_rate: 0.001
   weight_decay: 0.0001
   num_epochs: 250
@@ -10,8 +10,8 @@ hyperparameters:
 
 data:
   sequence_length: 15
-  target_horizon: 5
-  validation_split: 0.2
+  target_horizon: 10
+  validation_split: 0.3
   use_progress_bar: true
 
   graph_data:
@@ -64,4 +64,4 @@ paths:
   data_path: "research/data/neurosymbolic/neural"
   model_save_path: "research/models/neural/biome.pth"
   plots_dir: "research/plots/lstm"
-  inference_model: "transformer_EMA005_256H4Lseq15hori5bs64head8dr04.pth"
+  inference_model: "biome.pth"

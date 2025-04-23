@@ -73,7 +73,7 @@ class NeuralModelManager:
 
     def _init_model(self) -> None:
         hyperparameters = self._config["hyperparameters"]
-        self._model = MultiStepForecastTransformer(
+        self._model = BiomeLSTM(
             input_size=len(self.config["data"]['features']),
             hidden_size=hyperparameters["hidden_size"],
             num_layers=hyperparameters["num_layers"],
@@ -97,7 +97,7 @@ class NeuralModelManager:
             if self._model is None:
                 config = saved_dict.get('config', {})
                 target_horizon = config.get('target_horizon', 1)
-                self._model = MultiStepForecastTransformer(
+                self._model = BiomeLSTM(
                     input_size=config.get('input_size', config["input_size"]),
                     hidden_size=config.get('hidden_size', config["hidden_size"]),
                     num_layers=config.get('num_layers', config["num_layers"]),
@@ -234,8 +234,7 @@ class NeuralModelManager:
             targets=data_config["targets"],
             simulation_boundaries=train_sim_boundaries,
             target_horizon=target_horizon,
-            normalization_method="minmax",
-            use_deltas=True
+            normalization_method="minmax"
         )
 
         normalization_stats = train_dataset.get_normalization_stats()
@@ -250,8 +249,7 @@ class NeuralModelManager:
             targets=data_config["targets"],
             simulation_boundaries=val_sim_boundaries,
             target_horizon=target_horizon,
-            normalization_stats=normalization_stats,
-            use_deltas=True
+            normalization_stats=normalization_stats
         )
 
         self._logger.info(f"=== DATA WINDOW CONFIGURATION ===")
@@ -292,10 +290,14 @@ class NeuralModelManager:
             shuffle=False
         )
 
-        # Me quedo con Huber al final, probé también SmoothL1.
-        # a parte de combinar MSE + MAE ponderadas etc.
-        huber_loss = nn.HuberLoss(delta=1.0, reduction='mean')
+        baseline_metrics = self._precompute_baseline_metrics(val_loader, data_config, target_horizon)
+        self._logger.info("=== BASELINE METRICS (CALCULATED ONCE) ===")
+        self._logger.info(f"Baseline MSE: {baseline_metrics['mse']:.6f}")
+        self._logger.info(f"Baseline MAE: {baseline_metrics['mae']:.6f}")
+        self._logger.info(f"Baseline R²: {baseline_metrics['r2']:.6f}")
 
+        huber_loss = nn.HuberLoss(delta=1.0, reduction='mean')
+        mae_loss = nn.L1Loss(reduction='mean')
         optimizer = optim.AdamW(
             self._model.parameters(),
             lr=hyperparameters["learning_rate"],
@@ -313,25 +315,20 @@ class NeuralModelManager:
         )
 
         history = {
-            "train_loss": [],
-            "val_loss": [],
-            "train_mse": [],
-            "val_mse": [],
-            "train_r2": [],
-            "val_r2": [],
-            "train_mae": [],
-            "val_mae": [],
-            "train_accuracy": [],
-            "val_accuracy": [],
+            "train_loss": [], "val_loss": [],
+            "train_mse": [], "val_mse": [],
+            "train_rmse": [], "val_rmse": [],
+            "train_r2": [], "val_r2": [],
             "train_exp_var": [], "val_exp_var": [],
-            "train_nrmse": [], "val_nrmse": []
+            "train_mae": [], "val_mae": [],
+            "baseline_mse": [], "baseline_mae": [], "baseline_r2": []
         }
-        target_stats = normalization_stats.get("targets", {})
-        tmins = np.array(target_stats.get("mins", 0))
-        tmaxs = np.array(target_stats.get("maxs", 1))
-        trange = tmaxs - tmins
 
-        from sklearn.metrics import r2_score
+        history["baseline_mse"].append(baseline_metrics['mse'])
+        history["baseline_mae"].append(baseline_metrics['mae'])
+        history["baseline_r2"].append(baseline_metrics['r2'])
+
+        from sklearn.metrics import r2_score, explained_variance_score
         import time
         from tqdm.auto import tqdm
 
@@ -362,12 +359,10 @@ class NeuralModelManager:
 
             for inputs, targets in train_iterator:
                 inputs = inputs.to(self._device)
-                targets = targets.to(
-                    self._device)
+                targets = targets.to(self._device)
 
-                outputs = self._model(inputs)
-
-                loss = huber_loss(outputs, targets)
+                outputs, _ = self._model(inputs)
+                loss = 0.7 * huber_loss(outputs, targets) + 0.3 * mae_loss(outputs, targets)
 
                 train_loss += loss.item()
                 optimizer.zero_grad()
@@ -393,50 +388,24 @@ class NeuralModelManager:
                 all_train_outputs = all_train_outputs.reshape(-1, all_train_outputs.shape[-1])
 
             avg_train_loss = train_loss / len(train_loader)
-            if train_dataset._use_deltas:
-                delta_train_mse = np.mean((all_train_outputs - all_train_targets) ** 2)
-                delta_train_mae = np.mean(np.abs(all_train_outputs - all_train_targets))
-
-                denorm_train_targets = all_train_targets * trange + tmins
-                denorm_train_outputs = all_train_outputs * trange + tmins
-
-                T = denorm_train_targets.reshape(-1, denorm_train_targets.shape[-1])
-                P = denorm_train_outputs.reshape(-1, denorm_train_outputs.shape[-1])
-                train_r2_per_dim = [r2_score(T[:, i], P[:, i]) for i in range(T.shape[1])]
-                train_r2 = float(np.mean(train_r2_per_dim))
-                self._logger.info(f"Train R² por dimensión: {train_r2_per_dim}")
-
-                train_exp_var = explained_variance_score(denorm_train_targets, denorm_train_outputs)
-                train_nrmse = np.sqrt(delta_train_mse) / (np.std(denorm_train_targets) + 1e-8)
-
-                history["train_exp_var"].append(train_exp_var)
-                history["train_nrmse"].append(train_nrmse)
-
-                delta_train_accuracy = self._calculate_accuracy(all_train_outputs, all_train_targets)
-
-                self._logger.info(
-                    f"Train Delta Metrics - MSE: {delta_train_mse:.4f}, MAE: {delta_train_mae:.4f}, R²: {train_r2:.4f}")
-
-                train_mse = delta_train_mse
-                train_mae = delta_train_mae
-                train_accuracy = delta_train_accuracy
-
-            else:
-                train_mse = np.mean((all_train_outputs - all_train_targets) ** 2)
-                train_mae = np.mean(np.abs(all_train_outputs - all_train_targets))
-                train_r2 = r2_score(all_train_targets, all_train_outputs)
-                train_accuracy = self._calculate_accuracy(all_train_outputs, all_train_targets)
+            train_mse = np.mean((all_train_outputs - all_train_targets) ** 2)
+            train_mae = np.mean(np.abs(all_train_outputs - all_train_targets))
+            train_r2 = r2_score(all_train_targets, all_train_outputs)
+            train_rmse = np.sqrt(train_mse)
+            train_exp_var = explained_variance_score(all_train_targets, all_train_outputs)
 
             history["train_loss"].append(avg_train_loss)
             history["train_mse"].append(train_mse)
-            history["train_mae"].append(train_mae)
+            history["train_rmse"].append(train_rmse)
+            history["train_exp_var"].append(train_exp_var)
             history["train_r2"].append(train_r2)
-            history["train_accuracy"].append(train_accuracy)
+            history["train_mae"].append(train_mae)
 
             if val_loader:
                 self._model.eval()
                 all_val_targets = []
                 all_val_outputs = []
+                all_val_inputs = []  # Added for baseline
 
                 if use_tqdm:
                     val_iterator = tqdm(
@@ -459,10 +428,13 @@ class NeuralModelManager:
                         inputs = inputs.to(self._device)
                         targets = targets.to(self._device)
 
-                        outputs = self._model(inputs)
-                        hubber_val = huber_loss(outputs, targets)
+                        all_val_inputs.append(inputs.cpu().numpy())
 
-                        val_loss += hubber_val.item()
+                        outputs, _ = self._model(inputs)
+                        val_huber = huber_loss(outputs, targets)
+                        val_mae = mae_loss(outputs, targets)
+                        val_loss_total = 0.7 * val_huber + 0.3 * val_mae
+                        val_loss += val_loss_total.item()
 
                         all_val_targets.append(targets.cpu().numpy())
                         all_val_outputs.append(outputs.cpu().numpy())
@@ -475,50 +447,42 @@ class NeuralModelManager:
 
                 all_val_targets = np.vstack(all_val_targets)
                 all_val_outputs = np.vstack(all_val_outputs)
+                all_val_inputs = np.vstack(all_val_inputs)
 
                 if len(all_val_targets.shape) == 3:
-                    all_val_targets = all_val_targets.reshape(-1, all_val_targets.shape[-1])
-                    all_val_outputs = all_val_outputs.reshape(-1, all_val_outputs.shape[-1])
-
-                if val_dataset._use_deltas:
-                    delta_val_mse = np.mean((all_val_outputs - all_val_targets) ** 2)
-                    delta_val_mae = np.mean(np.abs(all_val_outputs - all_val_targets))
-
-                    denorm_val_targets = all_val_targets * trange + tmins
-                    denorm_val_outputs = all_val_outputs * trange + tmins
-
-                    val_r2_per_dim = [
-                        r2_score(denorm_val_targets[:, i], denorm_val_outputs[:, i])
-                        for i in range(denorm_val_targets.shape[1])
-                    ]
-                    val_r2 = float(np.mean(val_r2_per_dim))
-                    val_exp_var = explained_variance_score(denorm_val_targets, denorm_val_outputs)
-                    val_nrmse = np.sqrt(delta_val_mse) / (np.max(denorm_val_targets) - np.min(denorm_val_targets))
-
-                    history["val_exp_var"].append(val_exp_var)
-                    history["val_nrmse"].append(val_nrmse)
-
-                    delta_val_accuracy = self._calculate_accuracy(all_val_outputs, all_val_targets)
-
-                    self._logger.info(
-                        f"Val Delta Metrics - MSE: {delta_val_mse:.4f}, MAE: {delta_val_mae:.4f}, R²: {val_r2:.4f}")
-
-                    val_mse = delta_val_mse
-                    val_mae = delta_val_mae
-                    val_accuracy = delta_val_accuracy
+                    all_val_targets_flat = all_val_targets.reshape(-1, all_val_targets.shape[-1])
+                    all_val_outputs_flat = all_val_outputs.reshape(-1, all_val_outputs.shape[-1])
                 else:
-                    val_mse = np.mean((all_val_outputs - all_val_targets) ** 2)
-                    val_mae = np.mean(np.abs(all_val_outputs - all_val_targets))
-                    val_r2 = r2_score(all_val_targets, all_val_outputs)
-                    val_accuracy = self._calculate_accuracy(all_val_outputs, all_val_targets)
+                    all_val_targets_flat = all_val_targets
+                    all_val_outputs_flat = all_val_outputs
+
+                val_mse = np.mean((all_val_outputs_flat - all_val_targets_flat) ** 2)
+                val_mae = np.mean(np.abs(all_val_outputs_flat - all_val_targets_flat))
+                val_r2 = r2_score(all_val_targets_flat, all_val_outputs_flat)
+                val_rmse = np.sqrt(val_mse)
+                val_exp_var = explained_variance_score(all_val_targets_flat, all_val_outputs_flat)
+
+                baseline_mse = baseline_metrics['mse']
+                baseline_mae = baseline_metrics['mae']
+                baseline_r2 = baseline_metrics['r2']
+
+                if epoch > 0:
+                    history["baseline_mse"].append(baseline_mse)
+                    history["baseline_mae"].append(baseline_mae)
+                    history["baseline_r2"].append(baseline_r2)
+
+                mse_diff = baseline_mse - val_mse
+                mae_diff = baseline_mae - val_mae
+                r2_diff = val_r2 - baseline_r2
+
+                history["val_loss"].append(val_loss / len(val_loader))
+                history["val_mse"].append(val_mse)
+                history["val_rmse"].append(val_rmse)
+                history["val_exp_var"].append(val_exp_var)
+                history["val_r2"].append(val_r2)
+                history["val_mae"].append(val_mae)
 
                 avg_val_loss = val_loss / len(val_loader)
-
-                history["val_loss"].append(avg_val_loss)
-                history["val_mse"].append(val_mse)
-                history["val_mae"].append(val_mae)
-                history["val_r2"].append(val_r2)
-                history["val_accuracy"].append(val_accuracy)
 
                 epoch_time = time.time() - start_time
                 batches = []
@@ -534,98 +498,124 @@ class NeuralModelManager:
                     sample_inputs, sample_targets = next(iter(val_loader))
                     sample_inputs = sample_inputs.to(self._device)
 
-                if epoch % 5 == 0:
+                if epoch % 5 == 0 or epoch == hyperparameters["num_epochs"] - 1:
                     sample_inputs, sample_targets = next(iter(val_loader))
                     sample_inputs = sample_inputs.to(self._device)
                     sample_targets = sample_targets.to(self._device)
 
                     with torch.no_grad():
-                        sample_outputs = self._model(sample_inputs)
+                        sample_outputs, _ = self._model(sample_inputs)
 
                     sample_targets_np = sample_targets.cpu().numpy()
                     sample_outputs_np = sample_outputs.cpu().numpy()
+
                     sample_inputs_np = sample_inputs.cpu().numpy()
+                    sample_last_input = sample_inputs_np[:, -1, :]
+                    sample_baseline = np.repeat(sample_last_input[:, None, :], sample_targets_np.shape[1], axis=1)
+                    target_indices = [data_config["features"].index(t) for t in data_config["targets"] if
+                                      t in data_config["features"]]
+                    if target_indices:
+                        sample_baseline = sample_baseline[:, :, target_indices]
 
                     if self._normalization_stats and 'targets' in self._normalization_stats:
                         target_stats = self._normalization_stats['targets']
 
-                        self._logger.info(f"Estadísticas de normalización: {target_stats}")
+                        self._logger.info(f"Normalization statistics: {target_stats}")
 
                         tmins = target_stats.get('mins', 0)
                         tmaxs = target_stats.get('maxs', 1)
                         trange = tmaxs - tmins
 
-                        if val_dataset._use_deltas:
-                            sample_outputs_np = val_dataset.convert_deltas_to_absolutes(sample_outputs_np,
-                                                                                        sample_inputs_np)
-                            sample_targets_np = val_dataset.convert_deltas_to_absolutes(sample_targets_np,
-                                                                                        sample_inputs_np)
-
                         denorm_targets = np.zeros_like(sample_targets_np)
                         denorm_outputs = np.zeros_like(sample_outputs_np)
+                        denorm_baseline = np.zeros_like(sample_baseline)
 
                         for step in range(sample_targets_np.shape[1]):
                             denorm_targets[:, step, :] = sample_targets_np[:, step, :] * trange + tmins
                             denorm_outputs[:, step, :] = sample_outputs_np[:, step, :] * trange + tmins
+                            denorm_baseline[:, step, :] = sample_baseline[:, step, :] * trange + tmins
                     else:
                         self._logger.warning("Couldn't find any normalization stats")
                         denorm_targets = sample_targets_np
                         denorm_outputs = sample_outputs_np
-                        val_exp_var = explained_variance_score(all_val_targets, all_val_outputs)
-                        val_nrmse = np.sqrt(val_mse) / (np.max(all_val_targets) - np.min(all_val_targets) + 1e-10)
+                        denorm_baseline = sample_baseline
 
                     example_idx = random.randrange(sample_targets.size(0))
-                    self._logger.info(f"\n===== Ejemplo de predicción DESNORMALIZADA (Época {epoch + 1}) =====")
+                    self._logger.info(f"\n===== DENORMALIZED Prediction Example (Epoch {epoch + 1}) =====")
+
+                    model_total_mse = 0
+                    baseline_total_mse = 0
 
                     for step in range(denorm_targets.shape[1]):
-                        step_error = np.abs(denorm_outputs[example_idx, step] - denorm_targets[example_idx, step])
-                        step_mse = np.mean(step_error ** 2)
+                        model_step_error = np.abs(denorm_outputs[example_idx, step] - denorm_targets[example_idx, step])
+                        baseline_step_error = np.abs(
+                            denorm_baseline[example_idx, step] - denorm_targets[example_idx, step])
+
+                        model_step_mse = np.mean(model_step_error ** 2)
+                        baseline_step_mse = np.mean(baseline_step_error ** 2)
+
+                        model_total_mse += model_step_mse
+                        baseline_total_mse += baseline_step_mse
 
                         targets_str = ", ".join([f"{val:.2f}" for val in denorm_targets[example_idx, step]])
                         outputs_str = ", ".join([f"{val:.2f}" for val in denorm_outputs[example_idx, step]])
-                        error_str = ", ".join([f"{val:.2f}" for val in step_error])
+                        baseline_str = ", ".join([f"{val:.2f}" for val in denorm_baseline[example_idx, step]])
+                        model_error_str = ", ".join([f"{val:.2f}" for val in model_step_error])
+                        baseline_error_str = ", ".join([f"{val:.2f}" for val in baseline_step_error])
 
-                        self._logger.info(f"Paso {step + 1}:")
-                        self._logger.info(f"  Target real: [{targets_str}]")
-                        self._logger.info(f"  Predicción: [{outputs_str}]")
-                        self._logger.info(f"  Error Abs: [{error_str}]")
-                        self._logger.info(f"  MSE: {step_mse:.4f}")
-                        step_mae = np.mean(np.abs(step_error))
-                        self._logger.info(f"  MAE: {step_mae:.4f}")
+                        self._logger.info(f"Step {step + 1}:")
+                        self._logger.info(f"  Real target: [{targets_str}]")
+                        self._logger.info(f"  Model prediction: [{outputs_str}]")
+                        self._logger.info(f"  Baseline prediction: [{baseline_str}]")
+                        self._logger.info(f"  Model Abs Error: [{model_error_str}]")
+                        self._logger.info(f"  Baseline Abs Error: [{baseline_error_str}]")
+                        self._logger.info(f"  Model MSE: {model_step_mse:.4f}")
+                        self._logger.info(f"  Baseline MSE: {baseline_step_mse:.4f}")
+                        model_step_mae = np.mean(np.abs(model_step_error))
+                        baseline_step_mae = np.mean(np.abs(baseline_step_error))
+                        self._logger.info(f"  Model MAE: {model_step_mae:.4f}")
+                        self._logger.info(f"  Baseline MAE: {baseline_step_mae:.4f}")
 
-                    total_mse = np.mean((denorm_outputs[example_idx] - denorm_targets[example_idx]) ** 2)
-                    self._logger.info(f"MSE Total para todos los pasos: {total_mse:.4f}")
+                    model_total_mse /= denorm_targets.shape[1]
+                    baseline_total_mse /= denorm_targets.shape[1]
+                    self._logger.info(f"Model Total MSE for all steps: {model_total_mse:.4f}")
+                    self._logger.info(f"Baseline Total MSE for all steps: {baseline_total_mse:.4f}")
+                    improvement = ((baseline_total_mse - model_total_mse) / baseline_total_mse) * 100
+                    self._logger.info(f"Improvement over baseline: {improvement:.2f}%")
                     self._logger.info("=" * 50)
 
                 self._logger.info(
                     f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - "
                     f"Time: {epoch_time:.1f}s - "
-                    f"Train Loss (Huber): {avg_train_loss:.4f} - "
-                    f"Val Loss (Huber): {avg_val_loss:.4f} - "
-                    f"Train MSE: {train_mse:.4f} - "
-                    f"Val MSE: {val_mse:.4f} - "
-                    f"Train MAE: {train_mae:.4f} - "
-                    f"Val MAE: {val_mae:.4f} - "
-                    f"Train R²: {train_r2:.4f} - "
-                    f"Val R²: {val_r2:.4f} - "
-                    f"Train Accuracy: {train_accuracy:.2%} - "
-                    f"Val Accuracy: {val_accuracy:.2%}"
+                    f"Train Loss: {avg_train_loss:.4f} - "
+                    f"Val Loss: {avg_val_loss:.4f} - "
+                    f"============ MODEL VS BASELINE COMPARISON ============"
                 )
                 self._logger.info(
-                    f"Train ExpVar: {train_exp_var:.4f} - Val ExpVar: {val_exp_var:.4f} - "
-                    f"Train NRMSE: {train_nrmse:.4f} - Val NRMSE: {val_nrmse:.4f}"
+                    f"MSE  => Model: {val_mse:.4f} | Baseline: {baseline_mse:.4f} | "
+                    f"Difference: {mse_diff:.4f} | "
+                    f"Improvement: {(mse_diff / baseline_mse * 100) if baseline_mse > 0 else 0:.2f}%"
                 )
+                self._logger.info(
+                    f"MAE  => Model: {val_mae:.4f} | Baseline: {baseline_mae:.4f} | "
+                    f"Difference: {mae_diff:.4f} | "
+                    f"Improvement: {(mae_diff / baseline_mae * 100) if baseline_mae > 0 else 0:.2f}%"
+                )
+                self._logger.info(
+                    f"R²   => Model: {val_r2:.4f} | Baseline: {baseline_r2:.4f} | "
+                    f"Difference: {r2_diff:.4f}"
+                )
+                self._logger.info("=" * 70)
 
             else:
                 epoch_time = time.time() - start_time
                 self._logger.info(
                     f"Epoch {epoch + 1}/{hyperparameters['num_epochs']} - "
                     f"Time: {epoch_time:.1f}s - "
-                    f"Train Loss (Huber): {avg_train_loss:.4f} - "
+                    f"Train Loss: {avg_train_loss:.4f} - "
                     f"Train MSE: {train_mse:.4f} - "
                     f"Train MAE: {train_mae:.4f} - "
                     f"Train R²: {train_r2:.4f} - "
-                    f"Train Accuracy: {train_accuracy:.2%}"
                 )
 
             current_lr = optimizer.param_groups[0]['lr']
@@ -642,21 +632,125 @@ class NeuralModelManager:
             hyperparameters = self._config["hyperparameters"]
             plot_base_name = f"lstm_training_{timestamp}_h{hyperparameters['hidden_size']}_l{hyperparameters['num_layers']}"
 
+            if "baseline_mse" in history and history["baseline_mse"] and "val_mse" in history and history["val_mse"]:
+                final_model_mse = history["val_mse"][-1]
+                final_baseline_mse = history["baseline_mse"][-1]
+                final_improvement = ((final_baseline_mse - final_model_mse) / final_baseline_mse) * 100
+
+                self._logger.info("\n" + "=" * 30 + " FINAL SUMMARY " + "=" * 30)
+                self._logger.info(f"Final model MSE: {final_model_mse:.6f}")
+                self._logger.info(f"Final baseline MSE: {final_baseline_mse:.6f}")
+                self._logger.info(f"Percentage improvement: {final_improvement:.2f}%")
+
+                if final_improvement > 0:
+                    self._logger.info("✅ MODEL OUTPERFORMS BASELINE")
+                else:
+                    self._logger.info("❌ MODEL DOES NOT OUTPERFORM BASELINE")
+                self._logger.info("=" * 72)
+
+            self._visualize_baseline_comparison(history, f"{plot_base_name}_vs_baseline", plots_dir)
+
             self._visualize_metrics(history, plot_base_name, plots_dir)
-            # self.analyze_correlation(data)
 
         return history
 
-    def _calculate_accuracy(self, predictions, targets, absolute_tolerance=0.1, relative_tolerance=0.1):
+    def _precompute_baseline_metrics(self, val_loader, data_config, target_horizon):
+        from sklearn.metrics import r2_score
+
+        self._logger.info("Calculating baseline metrics...")
+        all_val_targets = []
+        all_val_inputs = []
+
+        for inputs, targets in val_loader:
+            all_val_targets.append(targets.cpu().numpy())
+            all_val_inputs.append(inputs.cpu().numpy())
+
+        all_val_targets = np.vstack(all_val_targets)
+        all_val_inputs = np.vstack(all_val_inputs)
+
+        if len(all_val_targets.shape) == 3:
+            all_val_targets_flat = all_val_targets.reshape(-1, all_val_targets.shape[-1])
+
+            all_val_inputs_last = all_val_inputs[:, -1, :]
+            baseline_preds = np.repeat(all_val_inputs_last[:, None, :], all_val_targets.shape[1], axis=1)
+
+            target_indices = [data_config["features"].index(t) for t in data_config["targets"]
+                              if t in data_config["features"]]
+            if target_indices:
+                baseline_preds = baseline_preds[:, :, target_indices]
+
+            baseline_preds_flat = baseline_preds.reshape(-1, baseline_preds.shape[-1])
+        else:
+            all_val_targets_flat = all_val_targets
+            target_feature_idx = [data_config["features"].index(t) for t in data_config["targets"]]
+            baseline_preds = all_val_inputs[:, -1, target_feature_idx]
+            baseline_preds = np.repeat(baseline_preds, target_horizon, axis=1)
+            baseline_preds_flat = baseline_preds
+
+        baseline_mse = np.mean((baseline_preds_flat - all_val_targets_flat) ** 2)
+        baseline_mae = np.mean(np.abs(baseline_preds_flat - all_val_targets_flat))
+
+        if hasattr(self,
+                   '_normalization_stats') and self._normalization_stats and 'targets' in self._normalization_stats:
+            def denormalize(data, stats):
+                return data * (stats['maxs'] - stats['mins']) + stats['mins']
+
+            baseline_preds_denorm = denormalize(baseline_preds_flat, self._normalization_stats['targets'])
+            targets_denorm = denormalize(all_val_targets_flat, self._normalization_stats['targets'])
+            baseline_r2 = r2_score(targets_denorm, baseline_preds_denorm)
+        else:
+            baseline_r2 = r2_score(all_val_targets_flat, baseline_preds_flat)
+
+        self._logger.info(f"Baseline MSE: {baseline_mse:.6f}")
+        self._logger.info(f"Baseline MAE: {baseline_mae:.6f}")
+        self._logger.info(f"Baseline R²: {baseline_r2:.6f}")
+
+        return {
+            'mse': baseline_mse,
+            'mae': baseline_mae,
+            'r2': baseline_r2,
+            'predictions': baseline_preds_flat,
+            'targets': all_val_targets_flat
+        }
+
+    def _visualize_baseline_comparison(self, history, base_name, plots_dir):
+        try:
+            import matplotlib.pyplot as plt
+            import numpy as np
+
+            if 'val_mse' in history and 'baseline_mse' in history:
+                plt.figure(figsize=(10, 6))
+                epochs = range(1, len(history['val_mse']) + 1)
+                plt.plot(epochs, history['val_mse'], 'b-', label='Modelo')
+                plt.plot(epochs, history['baseline_mse'], 'r--', label='Baseline')
+                plt.title('Comparación MSE: Modelo vs Baseline')
+                plt.xlabel('Épocas')
+                plt.ylabel('MSE')
+                plt.legend()
+                plt.grid(True)
+                plt.savefig(os.path.join(plots_dir, f"{base_name}_mse_comparison.png"))
+                plt.close()
+
+                improvement = [(b - m) / b * 100 if b > 0 else 0
+                               for m, b in zip(history['val_mse'], history['baseline_mse'])]
+                plt.figure(figsize=(10, 6))
+                plt.plot(epochs, improvement, 'g-')
+                plt.axhline(y=0, color='r', linestyle='--')
+                plt.title('Mejora porcentual sobre el baseline')
+                plt.xlabel('Épocas')
+                plt.ylabel('Mejora (%)')
+                plt.grid(True)
+                plt.savefig(os.path.join(plots_dir, f"{base_name}_improvement.png"))
+                plt.close()
+
+        except Exception as e:
+            self._logger.error(f"Error al visualizar comparación con baseline: {e}")
+
+    def _calculate_accuracy(self, predictions, targets, tolerance=0.1):
         epsilon = 1e-10
-
-        absolute_error = np.abs(predictions - targets)
-
-        relative_error = absolute_error / (np.abs(targets) + epsilon)
-
-        within_tolerance = (absolute_error <= absolute_tolerance) | (relative_error <= relative_tolerance)
-
-        return np.mean(within_tolerance)
+        relative_error = np.abs(predictions - targets) / (np.abs(targets) + epsilon)
+        within_tolerance = np.mean(relative_error <= tolerance)
+        return within_tolerance
 
     def _normalize_sequence(self, sequence_array, feature_stats, method='minmax'):
         if method == 'minmax':
@@ -766,9 +860,18 @@ class NeuralModelManager:
             {"name": "R²", "train": "train_r2", "val": "val_r2", "title": "R² Score"}
         ]
 
-        fig, axes = plt.subplots(len(metrics), 1, figsize=(12, 5 * len(metrics)))
+        available_metrics = []
+        for metric in metrics:
+            if metric["train"] in history and len(history[metric["train"]]) > 0:
+                available_metrics.append(metric)
 
-        if len(metrics) == 1:
+        if not available_metrics:
+            self._logger.warning("No metrics available to visualize")
+            return
+
+        fig, axes = plt.subplots(len(available_metrics), 1, figsize=(12, 5 * len(available_metrics)))
+
+        if len(available_metrics) == 1:
             axes = [axes]
 
         hyperparameters = self._config["hyperparameters"]
@@ -778,17 +881,22 @@ class NeuralModelManager:
 
         palette = sns.color_palette("viridis", 2)
 
-        epochs = range(1, len(history['train_loss']) + 1)
+        for i, metric in enumerate(available_metrics):
+            train_key = metric["train"]
+            train_values = history.get(train_key, [])
 
-        for i, metric in enumerate(metrics):
+            if not train_values:
+                self._logger.warning(f"No data for {train_key}, skipping plot")
+                continue
+
+            epochs = range(1, len(train_values) + 1)
             ax = axes[i]
-
-            train_values = history[metric["train"]]
-            val_key = metric["val"]
-            val_values = history.get(val_key, [])
 
             ax.plot(epochs, train_values, 'o-', color=palette[0],
                     label=f'Training {metric["name"]}', linewidth=2, markersize=5)
+
+            val_key = metric["val"]
+            val_values = history.get(val_key, [])
 
             if val_values:
                 ax.plot(epochs, val_values, 'o-', color=palette[1],
@@ -805,10 +913,10 @@ class NeuralModelManager:
                         val_trend = np.polyfit(epochs, val_values, 3)
                         val_trend_fn = np.poly1d(val_trend)
                         ax.plot(x_smooth, val_trend_fn(x_smooth), '--', color=palette[1], alpha=0.5)
-                except:
-                    pass
+                except Exception as e:
+                    self._logger.warning(f"Could not fit trend line: {e}")
 
-            if metric["name"] == "R²":
+            if metric["name"] == "R²" and train_values:
                 best_train = max(train_values)
                 best_train_epoch = train_values.index(best_train) + 1
                 ax.annotate(f'Max: {best_train:.4f}',
@@ -825,7 +933,7 @@ class NeuralModelManager:
                                 xytext=(best_val_epoch, best_val * 0.9 if best_val > 0 else best_val * 1.1),
                                 arrowprops=dict(arrowstyle='->', color='gray', alpha=0.7),
                                 fontsize=10, color=palette[1])
-            else:
+            elif train_values:
                 min_train = min(train_values)
                 min_train_epoch = train_values.index(min_train) + 1
                 ax.annotate(f'Min: {min_train:.4f}',
@@ -855,14 +963,21 @@ class NeuralModelManager:
         plt.savefig(all_metrics_path, dpi=300, bbox_inches='tight')
         self._logger.info(f"All metrics plot saved to: {all_metrics_path}")
 
-        for i, metric in enumerate(metrics):
-            plt.figure(figsize=(10, 6))
-            train_values = history[metric["train"]]
-            val_key = metric["val"]
-            val_values = history.get(val_key, [])
+        for metric in available_metrics:
+            train_key = metric["train"]
+            train_values = history.get(train_key, [])
 
+            if not train_values:
+                continue
+
+            epochs = range(1, len(train_values) + 1)
+
+            plt.figure(figsize=(10, 6))
             plt.plot(epochs, train_values, 'o-', color=palette[0],
                      label=f'Training {metric["name"]}', linewidth=2, markersize=5)
+
+            val_key = metric["val"]
+            val_values = history.get(val_key, [])
 
             if val_values:
                 plt.plot(epochs, val_values, 'o-', color=palette[1],
