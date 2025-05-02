@@ -112,7 +112,6 @@ class SimulationDataset(Dataset):
 
         if self._apply_smoothing:
             features_array = self._apply_ema(features_array)
-            targets_array = self._apply_ema(targets_array)
 
         return features_array, targets_array
 
