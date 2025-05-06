@@ -78,6 +78,6 @@ class SimulationTime:
         event_number = self.get_event_number_in_era(event_count)
         elapsed_seconds = time.time() - self._start_time
         # TODO: Si training mode, log debug si no, info
-        self._logger.debug(
+        self._logger.info(
             f"Simulated events: {event_count}, Era: {era}, Event in Era: {event_number}"
             f" in {elapsed_seconds:.2f} seconds")

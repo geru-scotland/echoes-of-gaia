@@ -213,7 +213,7 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
                 for comp in active_components
             ])
 
-            low_stress_mask = normalized_stresses <= 0.2
+            low_stress_mask = normalized_stresses <= 0.3
             high_stress_mask = ~low_stress_mask
 
             new_aging_rates = np.zeros_like(normalized_stresses)

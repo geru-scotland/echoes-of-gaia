@@ -2,9 +2,9 @@ hyperparameters:
   batch_size: 32
   hidden_size: 128
   num_layers: 2
-  dropout: 0.3
+  dropout: 0.4
   learning_rate: 0.001
-  weight_decay: 0.0001
+  weight_decay: 0.001
   num_epochs: 250
   max_seq_len: 50
 
@@ -64,4 +64,4 @@ paths:
   data_path: "research/data/neurosymbolic/neural"
   model_save_path: "research/models/neural/biome.pth"
   plots_dir: "research/plots/lstm"
-  inference_model: "biome.pth"
+  inference_model: "lstm_baselines_38pct.pth"

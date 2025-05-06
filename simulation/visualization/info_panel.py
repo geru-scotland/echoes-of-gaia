@@ -95,7 +95,6 @@ class InfoPanel:
     def _format_field_value(self, field: str, value: Any) -> str:
         time_related_fields = {
             "age", "birth_tick", "biological_age", "lifespan_in_ticks", "lifespan",
-            "death_tick"
         }
 
         if field in time_related_fields and isinstance(value, (int, float)):
@@ -161,7 +160,8 @@ class InfoPanel:
         if not data_items:
             return y
 
-        item_height = 28
+        is_left_column = x < self._width // 2
+        item_height = 24 if is_left_column else 28
         section_height = len(data_items) * item_height + 10
 
         section_rect = pygame.Rect(x - 5, y, width + 10, section_height)
@@ -771,14 +771,14 @@ class InfoPanel:
     def _render_attribute_section(self, surface, fields, x, y, col_width):
         if not fields:
             return y
-
+        fields_to_display = {k: v for k, v in fields.items() if k.lower() != "death_tick"}
         field_height = 26
 
         sorted_fields = []
         bar_fields = []
         normal_fields = []
 
-        for field, value in fields.items():
+        for field, value in fields_to_display.items():
             if field.lower() in ["vitality", "energy_reserves"]:
                 bar_fields.append((field, value))
             else:

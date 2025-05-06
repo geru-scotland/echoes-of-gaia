@@ -54,7 +54,7 @@ class SimulationDataset(Dataset):
         self._feature_stats = {}
         self._target_stats = {}
         self._normalization_method = normalization_method
-        self._apply_smoothing = True
+        self._apply_smoothing = False
         self._smoothing_window = smoothing_window if smoothing_window else 15
 
         if isinstance(data, list) and isinstance(data[0], dict):

@@ -341,7 +341,7 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
 
         if self._current_position == new_position and self._is_new_position(self._current_position):
             if self._target.thirst_level > 0.2 and self._target.hunger_level > 0.2:
-                reward += 0.4
+                reward += 0.2
 
             self._visited_positions.add(self._current_position)
             self._logger.debug("Position is new. Exploration bonus applied: +0.4")
@@ -383,6 +383,9 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
                 if not other_pos:
                     continue
 
+                # TODO: Probar a sólo dar reward en función de la distancia, punto. No evento ni acción,
+                # si soy presa, a más distancia esté del depredador (con máximo del radius), mejor.
+                # si soy depredador, a menor distancia de presa, pues mejor.
                 moving_away = self._local_interaction_simulator.is_moving_away_from(my_pos, other_pos, direction)
                 distance = self._local_interaction_simulator.calculate_manhattan_distance(my_pos, other_pos)
 

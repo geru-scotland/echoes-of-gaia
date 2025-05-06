@@ -31,7 +31,7 @@ def print_simulation_header(sim_number):
 
 def main():
     parser = argparse.ArgumentParser(description="Run multiple simulations sequentially")
-    parser.add_argument("--sims", type=int, default=5, help="Number of simulations to run")
+    parser.add_argument("--sims", type=int, default=300, help="Number of simulations to run")
     parser.add_argument("--wait", type=int, default=5, help="Wait time between simulations (seconds)")
     parser.add_argument("--config", type=str, default="training.yaml", help="Base configuration file")
     args = parser.parse_args()

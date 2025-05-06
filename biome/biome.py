@@ -88,7 +88,7 @@ class Biome(Environment, BiomeDataProvider, EventHandler):
             self._env.process(self._run_climate_environmental_factors_update(Timers.Calendar.DAY))
 
             EventHandler.__init__(self)
-            self._logger.info("Biome is ready!")
+            self._logger.info(f"Biome {self._context.biome_type} is ready!")
         except Exception as e:
             tb = traceback.format_exc()
             self._logger.exception(f"Error creating biome. Traceback: {tb}")

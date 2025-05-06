@@ -35,7 +35,7 @@ biome:
 
   fauna:
     - species: "deer"
-      spawns: 25
+      spawns: 45
       diet: "herbivore"
       avg-lifespan: 4
       components:
@@ -47,7 +47,7 @@ biome:
         - HeterotrophicNutritionComponent:
 
     - species: "panther"
-      spawns: 6
+      spawns: 3
       diet: "carnivore"
       avg-lifespan: 3
       components:
@@ -57,4 +57,3 @@ biome:
             optimal_temperature: 28.0
         - MovementComponent:
         - HeterotrophicNutritionComponent:
-

@@ -251,7 +251,7 @@ class ClimateSystem:
         co2_temperature_impact = max(-0.1, min(0.1, co2_temperature_impact))
         self._state.temperature += co2_temperature_impact
 
-        humidity_delta = total_transpiration * 3.0
+        humidity_delta = max(-0.1, min(0.1, total_transpiration * 3.0))
         new_humidity = self._state.humidity + humidity_delta
         self._state.humidity = max(0.0, min(100.0, new_humidity))
 
