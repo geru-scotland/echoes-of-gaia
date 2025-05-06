@@ -21,9 +21,9 @@ from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
 from simpy import Environment as simpyEnv
 
-from shared.enums.enums import FloraSpecies, ComponentType
+from shared.enums.enums import FloraSpecies, ComponentType, WeatherEvent
 from shared.enums.events import ComponentEvent
-from shared.enums.reasons import DormancyReason
+from shared.enums.reasons import DormancyReason, StressReason
 from shared.types import HabitatList
 
 
@@ -94,6 +94,31 @@ class Flora(Entity):
         vital_component = self.get_component(ComponentType.VITAL)
         if vital_component:
             vital_component.heal_integrity(healing_amount)
+
+    def handle_weather_event(self, weather_event: WeatherEvent, temperature: float) -> None:
+        if not self.is_alive():
+            return
+
+        photo_component = self.get_component(ComponentType.PHOTOSYNTHETIC_METABOLISM)
+        vital_component = self.get_component(ComponentType.VITAL)
+
+        if weather_event == WeatherEvent.RAIN or weather_event == WeatherEvent.THUNDERSTORM:
+            if photo_component:
+                photo_component.water_modifier = min(1.0, photo_component.water_modifier + 0.2)
+                self._logger.debug(f"Rain increased water modifier to {photo_component.water_modifier:.2f}")
+
+        elif weather_event == WeatherEvent.DROUGHT:
+            if photo_component:
+                photo_component.water_modifier = max(0.1, photo_component.water_modifier - 0.15)
+                self._logger.debug(f"Drought decreased water modifier to {photo_component.water_modifier:.2f}")
+
+        if temperature > 35.0 and vital_component:
+            vital_component.stress_handler.modify_stress(0.1, StressReason.TEMPERATURE_EXTREME)
+            self._logger.debug(f"High temperature caused stress increase")
+
+        elif temperature < 0.0 and vital_component:
+            vital_component.stress_handler.modify_stress(0.15, StressReason.TEMPERATURE_EXTREME)
+            self._logger.debug(f"Low temperature caused stress increase")
 
     @property
     def somatic_integrity(self) -> float:

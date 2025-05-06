@@ -321,10 +321,11 @@ class NeuralModelManager:
             "train_r2": [], "val_r2": [],
             "train_exp_var": [], "val_exp_var": [],
             "train_mae": [], "val_mae": [],
-            "baseline_mse": [], "baseline_mae": [], "baseline_r2": []
+            "baseline_mse": [], "baseline_mae": [], "baseline_r2": [], "baseline_rmse": []
         }
 
         history["baseline_mse"].append(baseline_metrics['mse'])
+        history["baseline_rmse"].append(np.sqrt(baseline_metrics['mse']))
         history["baseline_mae"].append(baseline_metrics['mae'])
         history["baseline_r2"].append(baseline_metrics['r2'])
 
@@ -589,12 +590,18 @@ class NeuralModelManager:
                     f"Time: {epoch_time:.1f}s - "
                     f"Train Loss: {avg_train_loss:.4f} - "
                     f"Val Loss: {avg_val_loss:.4f} - "
+                    f"Val RMSE: {val_rmse:.4f} - "
                     f"============ MODEL VS BASELINE COMPARISON ============"
                 )
                 self._logger.info(
                     f"MSE  => Model: {val_mse:.4f} | Baseline: {baseline_mse:.4f} | "
                     f"Difference: {mse_diff:.4f} | "
                     f"Improvement: {(mse_diff / baseline_mse * 100) if baseline_mse > 0 else 0:.2f}%"
+                )
+                self._logger.info(
+                    f"RMSE => Model: {val_rmse:.4f} | Baseline: {np.sqrt(baseline_mse):.4f} | "
+                    f"Difference: {(np.sqrt(baseline_mse) - val_rmse):.4f} | "
+                    f"Improvement: {((np.sqrt(baseline_mse) - val_rmse) / np.sqrt(baseline_mse) * 100) if baseline_mse > 0 else 0:.2f}%"
                 )
                 self._logger.info(
                     f"MAE  => Model: {val_mae:.4f} | Baseline: {baseline_mae:.4f} | "
@@ -716,41 +723,355 @@ class NeuralModelManager:
     def _visualize_baseline_comparison(self, history, base_name, plots_dir):
         try:
             import matplotlib.pyplot as plt
+            import matplotlib.ticker as mtick
             import numpy as np
+            from matplotlib.gridspec import GridSpec
+            import matplotlib.colors as mcolors
 
-            if 'val_mse' in history and 'baseline_mse' in history:
-                plt.figure(figsize=(10, 6))
-                epochs = range(1, len(history['val_mse']) + 1)
-                plt.plot(epochs, history['val_mse'], 'b-', label='Modelo')
-                plt.plot(epochs, history['baseline_mse'], 'r--', label='Baseline')
-                plt.title('Comparación MSE: Modelo vs Baseline')
-                plt.xlabel('Épocas')
-                plt.ylabel('MSE')
-                plt.legend()
-                plt.grid(True)
-                plt.savefig(os.path.join(plots_dir, f"{base_name}_mse_comparison.png"))
-                plt.close()
+            plt.style.use('seaborn-v0_8-whitegrid')
 
-                improvement = [(b - m) / b * 100 if b > 0 else 0
-                               for m, b in zip(history['val_mse'], history['baseline_mse'])]
-                plt.figure(figsize=(10, 6))
-                plt.plot(epochs, improvement, 'g-')
-                plt.axhline(y=0, color='r', linestyle='--')
-                plt.title('Mejora porcentual sobre el baseline')
-                plt.xlabel('Épocas')
-                plt.ylabel('Mejora (%)')
-                plt.grid(True)
-                plt.savefig(os.path.join(plots_dir, f"{base_name}_improvement.png"))
-                plt.close()
+            colors = {
+                'model': '#1f77b4',
+                'baseline': '#d62728',
+                'improvement': '#2ca02c',
+                'model_rmse': '#ff7f0e',
+                'model_mae': '#9467bd',
+                'model_r2': '#8c564b',
+                'model_filling': (0.12, 0.47, 0.71, 0.2),
+                'baseline_filling': (0.84, 0.15, 0.16, 0.2),
+                'grid': '#cccccc',
+                'background': '#f9f9f9'
+            }
+
+            plt.rcParams['font.family'] = 'sans-serif'
+            plt.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sans']
+            plt.rcParams['font.size'] = 11
+            plt.rcParams['axes.titlesize'] = 14
+            plt.rcParams['axes.labelsize'] = 12
+
+            has_mse = 'val_mse' in history and 'baseline_mse' in history and len(history['val_mse']) > 0
+            has_rmse = 'val_rmse' in history and len(history['val_rmse']) > 0
+            has_mae = 'val_mae' in history and 'baseline_mae' in history and len(history['val_mae']) > 0
+            has_r2 = 'val_r2' in history and 'baseline_r2' in history and len(history['val_r2']) > 0
+
+            if not (has_mse or has_rmse or has_mae or has_r2):
+                self._logger.warning("No sufficient metrics data for visualization")
+                return
+
+            epochs = range(1, len(history['val_mse']) + 1) if has_mse else []
+
+            fig = plt.figure(figsize=(14, 10), facecolor=colors['background'])
+            gs = GridSpec(2, 2, figure=fig, wspace=0.25, hspace=0.3)
+
+            if has_mse:
+                ax1 = fig.add_subplot(gs[0, 0])
+                model_line, = ax1.plot(epochs, history['val_mse'],
+                                       color=colors['model'], linewidth=2.5, marker='o',
+                                       markersize=4, label='Model MSE')
+
+                baseline_value = history['baseline_mse'][0]
+                baseline_line = ax1.axhline(y=baseline_value, color=colors['baseline'],
+                                            linestyle='--', linewidth=2, label='Baseline MSE')
+
+                if all(m <= baseline_value for m in history['val_mse']):
+                    ax1.fill_between(epochs, history['val_mse'], baseline_value,
+                                     color=colors['model_filling'])
+
+                final_mse = history['val_mse'][-1]
+                ax1.annotate(f'Final: {final_mse:.4f}',
+                             xy=(epochs[-1], final_mse),
+                             xytext=(epochs[-1] - 2, final_mse * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=9, fontweight='bold')
+
+                ax1.annotate(f'Baseline: {baseline_value:.4f}',
+                             xy=(epochs[-1], baseline_value),
+                             xytext=(epochs[-1] - 2, baseline_value * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=9, fontweight='bold')
+
+                ax1.set_title('Mean Squared Error (MSE)', fontweight='bold')
+                ax1.set_xlabel('Epochs')
+                ax1.set_ylabel('MSE')
+                ax1.legend(loc='upper right')
+                ax1.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                ax1.set_facecolor('white')
+
+            if has_rmse:
+                ax2 = fig.add_subplot(gs[0, 1])
+                ax2.plot(epochs, history['val_rmse'], color=colors['model_rmse'],
+                         linewidth=2.5, marker='o', markersize=4, label='Model RMSE')
+
+                if 'baseline_mse' in history:
+                    baseline_rmse = [np.sqrt(mse) for mse in history['baseline_mse']]
+                    ax2.axhline(y=baseline_rmse[0], color=colors['baseline'],
+                                linestyle='--', linewidth=2, label='Baseline RMSE')
+
+                    if all(m <= baseline_rmse[0] for m in history['val_rmse']):
+                        ax2.fill_between(epochs, history['val_rmse'], baseline_rmse[0],
+                                         color=colors['model_filling'])
+
+                    final_rmse = history['val_rmse'][-1]
+                    ax2.annotate(f'Final: {final_rmse:.4f}',
+                                 xy=(epochs[-1], final_rmse),
+                                 xytext=(epochs[-1] - 2, final_rmse * 1.1),
+                                 arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                                 fontsize=9, fontweight='bold')
+
+                    ax2.annotate(f'Baseline: {baseline_rmse[0]:.4f}',
+                                 xy=(epochs[-1], baseline_rmse[0]),
+                                 xytext=(epochs[-1] - 2, baseline_rmse[0] * 1.1),
+                                 arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                                 fontsize=9, fontweight='bold')
+
+                ax2.set_title('Root Mean Squared Error (RMSE)', fontweight='bold')
+                ax2.set_xlabel('Epochs')
+                ax2.set_ylabel('RMSE')
+                ax2.legend(loc='upper right')
+                ax2.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                ax2.set_facecolor('white')
+
+            if has_mae:
+                ax3 = fig.add_subplot(gs[1, 0])
+                ax3.plot(epochs, history['val_mae'], color=colors['model_mae'],
+                         linewidth=2.5, marker='o', markersize=4, label='Model MAE')
+
+                baseline_mae = history['baseline_mae'][0]
+                ax3.axhline(y=baseline_mae, color=colors['baseline'],
+                            linestyle='--', linewidth=2, label='Baseline MAE')
+
+                if all(m <= baseline_mae for m in history['val_mae']):
+                    ax3.fill_between(epochs, history['val_mae'], baseline_mae,
+                                     color=colors['model_filling'])
+
+                final_mae = history['val_mae'][-1]
+                ax3.annotate(f'Final: {final_mae:.4f}',
+                             xy=(epochs[-1], final_mae),
+                             xytext=(epochs[-1] - 2, final_mae * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=9, fontweight='bold')
+
+                ax3.annotate(f'Baseline: {baseline_mae:.4f}',
+                             xy=(epochs[-1], baseline_mae),
+                             xytext=(epochs[-1] - 2, baseline_mae * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=9, fontweight='bold')
+
+                ax3.set_title('Mean Absolute Error (MAE)', fontweight='bold')
+                ax3.set_xlabel('Epochs')
+                ax3.set_ylabel('MAE')
+                ax3.legend(loc='upper right')
+                ax3.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                ax3.set_facecolor('white')
+
+            if has_r2:
+                ax4 = fig.add_subplot(gs[1, 1])
+                ax4.plot(epochs, history['val_r2'], color=colors['model_r2'],
+                         linewidth=2.5, marker='o', markersize=4, label='Model R²')
+
+                baseline_r2 = history['baseline_r2'][0]
+                ax4.axhline(y=baseline_r2, color=colors['baseline'],
+                            linestyle='--', linewidth=2, label='Baseline R²')
+
+                if all(r >= baseline_r2 for r in history['val_r2']):
+                    ax4.fill_between(epochs, history['val_r2'], baseline_r2,
+                                     color=colors['model_filling'])
+
+                final_r2 = history['val_r2'][-1]
+                ax4.annotate(f'Final: {final_r2:.4f}',
+                             xy=(epochs[-1], final_r2),
+                             xytext=(epochs[-1] - 2, final_r2 * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=9, fontweight='bold')
+
+                ax4.annotate(f'Baseline: {baseline_r2:.4f}',
+                             xy=(epochs[-1], baseline_r2),
+                             xytext=(epochs[-1] - 2, baseline_r2 * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=9, fontweight='bold')
+
+                ax4.set_title('Coefficient of Determination (R²)', fontweight='bold')
+                ax4.set_xlabel('Epochs')
+                ax4.set_ylabel('R²')
+                ax4.legend(loc='lower right')
+                ax4.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                ax4.set_facecolor('white')
+
+            fig.suptitle('Model Performance vs. Baseline', fontsize=16, fontweight='bold', y=0.98)
+
+            hyperparameters = self._config["hyperparameters"]
+            fig.text(0.5, 0.01,
+                     f"Model: LSTM (hidden={hyperparameters.get('hidden_size', 'N/A')}, "
+                     f"layers={hyperparameters.get('num_layers', 'N/A')}, "
+                     f"lr={hyperparameters.get('learning_rate', 'N/A')})",
+                     ha='center', fontsize=10)
+
+            fig.savefig(os.path.join(plots_dir, f"{base_name}_metrics_comparison.png"),
+                        dpi=300, bbox_inches='tight')
+            plt.close(fig)
+
+            if has_mse:
+                fig2 = plt.figure(figsize=(14, 8), facecolor=colors['background'])
+                gs2 = GridSpec(2, 2, figure=fig2, wspace=0.25, hspace=0.3)
+
+                baseline_mse = history['baseline_mse'][0]
+                improvement = [(baseline_mse - mse) / baseline_mse * 100 if baseline_mse > 0 else 0
+                               for mse in history['val_mse']]
+
+                ax5 = fig2.add_subplot(gs2[0, 0])
+                ax5.plot(epochs, improvement, color=colors['improvement'],
+                         linewidth=2.5, marker='o', markersize=4)
+                ax5.axhline(y=0, color='black', linestyle='-', linewidth=1)
+
+                ax5.fill_between(epochs, improvement, 0,
+                                 where=[i > 0 for i in improvement],
+                                 color=(0.12, 0.47, 0.71, 0.3),
+                                 interpolate=True, label='Positive Improvement')
+
+                ax5.fill_between(epochs, improvement, 0,
+                                 where=[i <= 0 for i in improvement],
+                                 color=(0.84, 0.15, 0.16, 0.3),
+                                 interpolate=True, label='Negative Impact')
+
+                final_improvement = improvement[-1]
+                ax5.annotate(f'Final: {final_improvement:.2f}%',
+                             xy=(epochs[-1], final_improvement),
+                             xytext=(epochs[-1] - 3, final_improvement + 5),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=10, fontweight='bold')
+
+                ax5.set_title('MSE Percentage Improvement Over Baseline', fontweight='bold')
+                ax5.set_xlabel('Epochs')
+                ax5.set_ylabel('Improvement (%)')
+                ax5.yaxis.set_major_formatter(mtick.PercentFormatter())
+                ax5.legend(loc='best')
+                ax5.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                ax5.set_facecolor('white')
+
+                error_reduction = [baseline_mse - mse for mse in history['val_mse']]
+
+                ax6 = fig2.add_subplot(gs2[0, 1])
+                ax6.plot(epochs, error_reduction, color='#8c564b',
+                         linewidth=2.5, marker='o', markersize=4)
+                ax6.axhline(y=0, color='black', linestyle='-', linewidth=1)
+
+                ax6.fill_between(epochs, error_reduction, 0,
+                                 where=[e > 0 for e in error_reduction],
+                                 color=(0.12, 0.47, 0.71, 0.3),
+                                 interpolate=True)
+
+                ax6.fill_between(epochs, error_reduction, 0,
+                                 where=[e <= 0 for e in error_reduction],
+                                 color=(0.84, 0.15, 0.16, 0.3),
+                                 interpolate=True)
+
+                final_reduction = error_reduction[-1]
+                ax6.annotate(f'Final: {final_reduction:.4f}',
+                             xy=(epochs[-1], final_reduction),
+                             xytext=(epochs[-1] - 3, final_reduction * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=10, fontweight='bold')
+
+                ax6.set_title('Absolute MSE Reduction vs Baseline', fontweight='bold')
+                ax6.set_xlabel('Epochs')
+                ax6.set_ylabel('MSE Reduction')
+                ax6.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                ax6.set_facecolor('white')
+
+                relative_error = [mse / history['val_mse'][0] for mse in history['val_mse']]
+
+                ax7 = fig2.add_subplot(gs2[1, 0])
+                ax7.plot(epochs, relative_error, color='#17becf',
+                         linewidth=2.5, marker='o', markersize=4)
+                ax7.axhline(y=1, color='black', linestyle='-', linewidth=1)
+
+                ax7.fill_between(epochs, relative_error, 1,
+                                 where=[r < 1 for r in relative_error],
+                                 color=(0.12, 0.47, 0.71, 0.3),
+                                 interpolate=True)
+
+                ax7.fill_between(epochs, relative_error, 1,
+                                 where=[r >= 1 for r in relative_error],
+                                 color=(0.84, 0.15, 0.16, 0.3),
+                                 interpolate=True)
+
+                final_relative = relative_error[-1]
+                ax7.annotate(f'Final: {final_relative:.2f}x',
+                             xy=(epochs[-1], final_relative),
+                             xytext=(epochs[-1] - 3, final_relative * 1.1),
+                             arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                             fontsize=10, fontweight='bold')
+
+                ax7.set_title('Convergence Rate (Relative to Initial Error)', fontweight='bold')
+                ax7.set_xlabel('Epochs')
+                ax7.set_ylabel('Relative Error')
+                ax7.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                ax7.set_facecolor('white')
+
+                if has_mae and has_r2:
+                    mse_norm = [(baseline_mse - mse) / baseline_mse if baseline_mse > 0 else 0
+                                for mse in history['val_mse']]
+
+                    baseline_mae = history['baseline_mae'][0]
+                    mae_norm = [(baseline_mae - mae) / baseline_mae if baseline_mae > 0 else 0
+                                for mae in history['val_mae']]
+
+                    baseline_r2 = history['baseline_r2'][0]
+                    r2_norm = [(r2 - baseline_r2) / (1 - baseline_r2) if baseline_r2 < 1 else 0
+                               for r2 in history['val_r2']]
+
+                    combined_index = [0.4 * mse + 0.3 * mae + 0.3 * r2
+                                      for mse, mae, r2 in zip(mse_norm, mae_norm, r2_norm)]
+
+                    ax8 = fig2.add_subplot(gs2[1, 1])
+                    ax8.plot(epochs, combined_index, color='#7f7f7f',
+                             linewidth=2.5, marker='o', markersize=4)
+                    ax8.axhline(y=0, color='black', linestyle='-', linewidth=1)
+
+                    ax8.fill_between(epochs, combined_index, 0,
+                                     where=[c > 0 for c in combined_index],
+                                     color=(0.12, 0.47, 0.71, 0.3),
+                                     interpolate=True)
+
+                    ax8.fill_between(epochs, combined_index, 0,
+                                     where=[c <= 0 for c in combined_index],
+                                     color=(0.84, 0.15, 0.16, 0.3),
+                                     interpolate=True)
+
+                    final_combined = combined_index[-1]
+                    ax8.annotate(f'Final: {final_combined:.4f}',
+                                 xy=(epochs[-1], final_combined),
+                                 xytext=(epochs[-1] - 3, final_combined * 1.1),
+                                 arrowprops=dict(arrowstyle='->', color='black', linewidth=1),
+                                 fontsize=10, fontweight='bold')
+
+                    ax8.set_title('Combined Performance Index', fontweight='bold')
+                    ax8.set_xlabel('Epochs')
+                    ax8.set_ylabel('Performance Index')
+                    ax8.grid(True, linestyle='--', alpha=0.7, color=colors['grid'])
+                    ax8.set_facecolor('white')
+
+                    ax8.text(0.5, -0.22,
+                             "Combined Index = 0.4×MSE_improvement + 0.3×MAE_improvement + 0.3×R²_improvement",
+                             transform=ax8.transAxes, ha='center',
+                             fontsize=8, style='italic')
+
+                fig2.suptitle('Model Improvement Analysis', fontsize=16, fontweight='bold', y=0.98)
+
+                fig2.text(0.5, 0.01,
+                          f"Baseline MSE: {baseline_mse:.6f} | "
+                          f"Final Model MSE: {history['val_mse'][-1]:.6f} | "
+                          f"Improvement: {final_improvement:.2f}%",
+                          ha='center', fontsize=10)
+
+                fig2.savefig(os.path.join(plots_dir, f"{base_name}_improvement_analysis.png"),
+                             dpi=300, bbox_inches='tight')
+                plt.close(fig2)
 
         except Exception as e:
-            self._logger.error(f"Error al visualizar comparación con baseline: {e}")
-
-    def _calculate_accuracy(self, predictions, targets, tolerance=0.1):
-        epsilon = 1e-10
-        relative_error = np.abs(predictions - targets) / (np.abs(targets) + epsilon)
-        within_tolerance = np.mean(relative_error <= tolerance)
-        return within_tolerance
+            self._logger.error(f"Error visualizing baseline comparison: {e}")
+            import traceback
+            self._logger.error(traceback.format_exc())
 
     def _normalize_sequence(self, sequence_array, feature_stats, method='minmax'):
         if method == 'minmax':
@@ -803,7 +1124,7 @@ class NeuralModelManager:
         sequence_tensor = torch.tensor(sequence_array, dtype=torch.float32).unsqueeze(0).to(self._device)
 
         with torch.no_grad():
-            prediction = self._model(sequence_tensor)
+            prediction, _ = self._model(sequence_tensor)
 
         #  [batch_size, target_horizon, output_size]
         prediction = prediction.cpu().numpy()

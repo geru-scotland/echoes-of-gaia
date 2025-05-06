@@ -3,7 +3,7 @@ simulation:
 
   eras:
     amount: 10
-    events-per-era: 500
+    events-per-era: 50
 
   cleanup:
     remove_dead_entities: true
@@ -20,28 +20,28 @@ simulation:
     snapshots:
       enabled: true
       period_type: "CUSTOM"
-      custom_period: 10 # cada 5 días realmente
+      custom_period: 4 # cada 5 días realmente
       storage_directory: "simulation_records"
       filename_prefix: "biome_snapshot"
       pretty_print: true
       include_real_timestamp: true
 
     dataset:
-      generate: false
+      generate: true
 
 biome:
   climate-model: "climate_model_v1.1"
   fauna-model: "fauna_model_200k_updated_cnn_fov17"
   map:
     size:
-      - 35
-      - 35
+      - 60
+      - 60
     local_fov:
       size:
         width: 17
         height: 17
 
-  type: "tropical"
+  type: "tundra"
 
   training_mode: true
   fauna_ia: true

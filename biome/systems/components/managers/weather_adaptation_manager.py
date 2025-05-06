@@ -90,6 +90,8 @@ class WeatherAdaptationComponentManager:
 
             stress_deltas[partial_resistance_mask] = stress_deltas_partial
 
+        # TODO: Iepa iepa, con las prisas se me coló esto. VECTORIZAR.
+        # Y además, que has utilizado miembros privados... corregir esta chapuza @property
         for i, component in enumerate(active_components):
             if stress_deltas[i] > 0.001:
                 component._stress_handler.modify_stress(stress_deltas[i], StressReason.TEMPERATURE_EXTREME)

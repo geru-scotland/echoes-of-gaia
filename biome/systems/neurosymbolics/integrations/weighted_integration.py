@@ -96,9 +96,9 @@ class NaiveWeightedIntegrationStrategy(IntegrationStrategy):
             if intervention:
                 integrated_result["interventions"].append(intervention)
 
-        # if "graph_metrics" in symbolic_result:
-        #     self._analyze_graph_insights(neural_result, symbolic_result,
-        #                                  context, integrated_result)
+        if "graph_metrics" in symbolic_result:
+            self._analyze_graph_insights(neural_result, symbolic_result,
+                                         context, integrated_result)
 
         return integrated_result
 

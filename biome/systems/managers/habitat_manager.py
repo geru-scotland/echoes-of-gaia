@@ -139,15 +139,20 @@ class HabitatManager:
             self._logger.debug(f"Position {position} didn't have any original habitats (might be water etc).")
             return
 
+        position_array = np.array(position)
+
         for habitat in original_habitats:
             if habitat in self._habitat_cache:
                 positions = self._habitat_cache[habitat]
 
-                position_exists = any(np.array_equal(position, pos) for pos in positions)
+                if positions.shape[0] > 0:
+                    position_exists = np.any(np.all(positions == position_array, axis=1))
+                else:
+                    position_exists = False
 
                 if not position_exists:
-                    new_positions = np.vstack([positions, np.array([position])]) if positions.shape[
-                                                                                        0] > 0 else np.array([position])
+                    new_positions = np.vstack([positions, position_array]) if positions.shape[0] > 0 else np.array(
+                        [position])
                     self._habitat_cache[habitat] = new_positions
                     self._logger.debug(f"Restored position {position} to its original habitat {habitat}")
 
