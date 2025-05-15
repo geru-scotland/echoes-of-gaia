@@ -161,6 +161,8 @@ class SpawnSystem:
                 lifespan = spawn_definition.get("avg-lifespan", random.randint(1, 20))
                 custom_components = spawn_definition.get("components", [])
 
+                self._logger.info(f"Spawning {amount} {species_name}...")
+
                 if amount < 1 or amount > 350:
                     raise ValueError(f"Invalid spawn amount: {amount}. Must be between 1 and 150.")
                 if lifespan <= 0:

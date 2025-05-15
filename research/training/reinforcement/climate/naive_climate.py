@@ -33,7 +33,7 @@ from utils.loggers import LoggerManager
 
 @EnvironmentRegistry.register(Agents.Reinforcement.NAIVE_CLIMATE)
 class NaiveClimateEnvironment(gym.Env):
-    def __init__(self):
+    def __init__(self, local_fov_config=None):
         super().__init__()
 
         self._logger: Logger = LoggerManager.get_logger(Loggers.REINFORCEMENT)

@@ -175,6 +175,12 @@ class InfoPanel:
 
         for i, (label, value, color) in enumerate(data_items):
             is_category = value == ""
+            in_evolution_trends_section = False
+
+            if label in [f"{i}:" for i in range(4)]:
+                in_evolution_trends_section = True
+            elif not label.startswith("  ") and label != "":
+                in_evolution_trends_section = False
 
             if is_category:
                 row_bg_color = (30, 45, 65)
@@ -197,7 +203,12 @@ class InfoPanel:
 
                 if value:
                     max_value_width = width - label_surface.get_width() - 25
-                    value_surface = self._font.render(value, True, color)
+
+                    if in_evolution_trends_section:
+                        trend_font = pygame.font.SysFont(None, self._font_size - 5)
+                        value_surface = trend_font.render(value, True, color)
+                    else:
+                        value_surface = self._font.render(value, True, color)
 
                     if value_surface.get_width() > max_value_width:
                         smaller_font = pygame.font.SysFont(None, self._font_size - 2)

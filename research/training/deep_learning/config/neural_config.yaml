@@ -64,4 +64,4 @@ paths:
   data_path: "research/data/neurosymbolic/neural"
   model_save_path: "research/models/neural/biome.pth"
   plots_dir: "research/plots/lstm"
-  inference_model: "lstm_baselines_38pct.pth"
+  inference_model: "lstm_baselines_39pct.pth"

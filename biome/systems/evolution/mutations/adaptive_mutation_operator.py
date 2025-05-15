@@ -22,21 +22,15 @@ from logging import Logger
 from deap import tools
 
 from biome.systems.evolution.genetic_converter import GeneticConverter
-from shared.enums.enums import EntityType
+from shared.enums.enums import EntityType, MutationType
 from shared.enums.strings import Loggers
 from shared.evolution.ranges import FLORA_GENE_RANGES, FAUNA_GENE_RANGES
-
 
 import random
 
 from utils.loggers import LoggerManager
 
 from enum import Enum, auto
-
-
-class MutationType(Enum):
-    ADAPTIVE = auto()
-    GAUSSIAN = auto()
 
 
 class AdaptiveMutationOperator:
@@ -65,7 +59,7 @@ class AdaptiveMutationOperator:
         ratio = min(1.0, avg_lifespan / scale)
         self.max_change_percent = max_percent
 
-        self.sigma_factor = 0.03 + (ratio * 0.05)  # Entre 0.03 y 0.08
+        self.sigma_factor = 0.01 + (ratio * 0.03)  # Entre 0.01 y 0.03
 
     def __call__(self, individual, indpb=None):
         indpb = indpb if indpb is not None else self.indpb
@@ -152,7 +146,7 @@ class AdaptiveMutationOperator:
             mutated_val = max(min_val, min(mutated_val, max_val))
             setattr(genes, attr_name, mutated_val)
 
-            self._logger.debug(
+            self._logger.info(
                 f"Mutation'{attr_name}': orig={original_val:.3f}, "
                 f"change={mutation:.3f} (σ={sigma:.3f}), "
                 f"new={mutated_val:.3f}, range=[{min_val}, {max_val}]"

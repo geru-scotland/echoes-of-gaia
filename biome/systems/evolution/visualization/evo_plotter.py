@@ -56,22 +56,43 @@ class EvolutionPlotter:
             ax = axes[i]
             records = self.tracker.species_data[species][trait]
 
-            generations = [r.generation for r in records]
-            values = [r.value for r in records]
+            gen_data = {}
+            for record in records:
+                gen = record.generation
+                if gen not in gen_data:
+                    gen_data[gen] = []
+                gen_data[gen].append(record.value)
 
-            ax.plot(generations, values, 'o-', label=trait,
-                    color=self.color_palette(i % 10))
+            generations = sorted(gen_data.keys())
+            means = [np.mean(gen_data[g]) for g in generations]
+            errors = [np.std(gen_data[g]) for g in generations]
+
+            all_values = [v for values in gen_data.values() for v in values]
+            min_val, max_val = min(all_values), max(all_values)
+
+            ax.errorbar(generations, means, yerr=errors, fmt='o-',
+                        label=f"{trait} [{min_val:.2f}-{max_val:.2f}]",
+                        color=self.color_palette(i % 10), capsize=3)
 
             if len(generations) > 1:
-                z = np.polyfit(generations, values, 1)
+                z = np.polyfit(generations, means, 1)
                 p = np.poly1d(z)
                 ax.plot(generations, p(generations), '--',
                         color=self.color_palette(i % 10), alpha=0.7,
                         label=f"Trend: {z[0]:.4f}x + {z[1]:.2f}")
 
-            ax.set_ylabel(trait)
+                trend_str = "↑" if z[0] > 0 else "↓" if z[0] < 0 else "→"
+                text_x = generations[-1] + (generations[-1] - generations[0]) * 0.05
+                ax.text(text_x, means[-1], f"{trend_str} {abs(z[0]):.4f}/gen",
+                        va='center', color=self.color_palette(i % 10), fontweight='bold')
+
+            avg_std = np.mean(errors)
+            ax.text(0.02, 0.95, f"Avg. variability: {avg_std:.4f}", transform=ax.transAxes,
+                    fontsize=8, va='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
+
+            ax.set_ylabel(trait.replace('_', ' ').title())
             ax.grid(True, linestyle='--', alpha=0.7)
-            ax.legend()
+            ax.legend(loc='upper right')
 
         axes[-1].set_xlabel("Generation")
 
@@ -231,6 +252,7 @@ class EvolutionPlotter:
         fig = plt.figure(figsize=figsize)
         grid = plt.GridSpec(3, 3, figure=fig, wspace=0.3, hspace=0.3)
 
+        # ===== MAIN TRAIT TRENDS SECTION (MODIFIED) =====
         ax1 = fig.add_subplot(grid[0, 0:2])
 
         trait_completeness = {}
@@ -244,19 +266,35 @@ class EvolutionPlotter:
 
         for i, trait in enumerate(top_traits):
             records = self.tracker.species_data[species][trait]
-            generations = [r.generation for r in records]
-            values = [r.value for r in records]
 
-            min_val, max_val = min(values), max(values)
+            gen_data = {}
+            for record in records:
+                gen = record.generation
+                if gen not in gen_data:
+                    gen_data[gen] = []
+                gen_data[gen].append(record.value)
+
+            generations = sorted(gen_data.keys())
+            means = [np.mean(gen_data[g]) for g in generations]
+
+            all_values = [v for values in gen_data.values() for v in values]
+            min_val, max_val = min(all_values), max(all_values)
             range_val = max_val - min_val if max_val > min_val else 1.0
-            norm_values = [(v - min_val) / range_val for v in values]
 
-            ax1.plot(generations, norm_values, 'o-',
+            norm_means = [(v - min_val) / range_val for v in means]
+
+            ax1.plot(generations, norm_means, 'o-',
                      label=f"{trait} [{min_val:.2f}-{max_val:.2f}]",
-                     color=self.color_palette(i % 10))
+                     color=self.color_palette(i % 10), linewidth=2, markersize=5)
+
+            errors = [np.std(gen_data[g]) / range_val for g in generations]
+            ax1.fill_between(generations,
+                             [max(0, m - e) for m, e in zip(norm_means, errors)],
+                             [min(1, m + e) for m, e in zip(norm_means, errors)],
+                             color=self.color_palette(i % 10), alpha=0.15)
 
             if len(generations) > 1:
-                z = np.polyfit(generations, norm_values, 1)
+                z = np.polyfit(generations, norm_means, 1)
                 p = np.poly1d(z)
                 ax1.plot(generations, p(generations), '--',
                          color=self.color_palette(i % 10), alpha=0.7)
@@ -266,6 +304,7 @@ class EvolutionPlotter:
         ax1.set_ylabel("Normalized value")
         ax1.grid(True, linestyle='--', alpha=0.7)
         ax1.legend(loc='upper left', fontsize=8)
+        # ===== END OF MODIFIED SECTION =====
 
         ax2 = fig.add_subplot(grid[0, 2])
         ax2.axis('off')
@@ -362,10 +401,25 @@ class EvolutionPlotter:
             common_gens = sorted(gens1 & gens2)
 
             if common_gens:
-                values1 = [next(r.value for r in records1 if r.generation == g)
-                           for g in common_gens]
-                values2 = [next(r.value for r in records2 if r.generation == g)
-                           for g in common_gens]
+                gen_data1 = {}
+                gen_data2 = {}
+
+                for r in records1:
+                    gen = r.generation
+                    if gen in common_gens:
+                        if gen not in gen_data1:
+                            gen_data1[gen] = []
+                        gen_data1[gen].append(r.value)
+
+                for r in records2:
+                    gen = r.generation
+                    if gen in common_gens:
+                        if gen not in gen_data2:
+                            gen_data2[gen] = []
+                        gen_data2[gen].append(r.value)
+
+                values1 = [np.mean(gen_data1[g]) for g in common_gens]
+                values2 = [np.mean(gen_data2[g]) for g in common_gens]
 
                 scatter = ax5.scatter(values1, values2, c=common_gens,
                                       cmap='viridis', s=100, alpha=0.7)
@@ -390,8 +444,8 @@ class EvolutionPlotter:
                 cbar.set_label('Generation')
 
                 ax5.set_title(f"Coevolution of {trait1} and {trait2}")
-                ax5.set_xlabel(trait1)
-                ax5.set_ylabel(trait2)
+                ax5.set_xlabel(trait1.replace('_', ' '))
+                ax5.set_ylabel(trait2.replace('_', ' '))
                 ax5.grid(True, linestyle='--', alpha=0.7)
 
                 if len(common_gens) > 2:
