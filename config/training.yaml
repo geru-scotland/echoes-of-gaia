@@ -9,13 +9,21 @@ simulation:
     remove_dead_entities: true
 
   population-control:
-    smart: false
+    smart: true
 
   data:
+    storage:
+      base: "research/experiments"
+      simulations: "simulations"
+      trackers:
+        evolution: "evolution"
+        genetic_crossover: "genetic-crossover"
+        trends: "trends"
+
     visualization:
-      smart-trends: false
-      evolution: false
-      crossover: false
+      smart-trends: true
+      evolution: true
+      crossover: true
 
     snapshots:
       enabled: true
@@ -34,16 +42,16 @@ biome:
   fauna-model: "fauna_model_200k_updated_cnn_fov17"
   map:
     size:
-      - 60
-      - 60
+      - 65
+      - 65
     local_fov:
       size:
         width: 17
         height: 17
 
-  type: "tundra"
+  type: "tropical"
 
-  training_mode: true
+  training_mode: false
   fauna_ia: true
 
   flora:

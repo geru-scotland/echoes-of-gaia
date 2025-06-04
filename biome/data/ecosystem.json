@@ -1030,9 +1030,9 @@
       ],
       "components": {
         "WeatherAdaptationComponent": {
-          "optimal_temperature": 21.0,
-          "heat_resistance": 0.1,
-          "cold_resistance": 0.2
+          "optimal_temperature": 14.0,
+          "heat_resistance": 0.0,
+          "cold_resistance": 0.0
         },
         "VitalComponent": {}
       }
@@ -1044,8 +1044,8 @@
       "components": {
         "WeatherAdaptationComponent": {
           "optimal_temperature": 10.0,
-          "heat_resistance": 0.4,
-          "cold_resistance": 0.6
+          "heat_resistance": 0.05,
+          "cold_resistance": 0.05
         },
         "VitalComponent": {}
       }
@@ -1057,8 +1057,8 @@
       "components": {
         "WeatherAdaptationComponent": {
           "optimal_temperature": 10.0,
-          "heat_resistance": 0.2,
-          "cold_resistance": 0.7
+          "heat_resistance": 0.05,
+          "cold_resistance": 0.1
         },
         "VitalComponent": {}
       }
@@ -1599,9 +1599,9 @@
       ],
       "components": {
         "WeatherAdaptationComponent": {
-          "optimal_temperature": 25.0,
+          "optimal_temperature": 18.0,
           "cold_resistance": 0.2,
-          "heat_resistance": 0.4
+          "heat_resistance": 0.1
         },
         "VitalComponent": {},
         "GrowthComponent": {

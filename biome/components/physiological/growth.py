@@ -31,17 +31,16 @@ class GrowthComponent(EntityComponent):
     def __init__(self, env: simpyEnv, event_notifier: EventNotifier, lifespan: float = 15.0,
                  growth_stage: int = 0, total_stages: int = 4, current_size: float = 0.05, max_size: float = 3.0,
                  growth_modifier: float = 1.0, growth_efficiency: float = 0.85):
-
         super().__init__(env, ComponentType.GROWTH, event_notifier, lifespan)
 
         self._lifespan_in_ticks: float = lifespan * float(Timers.Calendar.YEAR)
         self._growth_stage: int = growth_stage
         self._initial_size = current_size
         self._total_stages: int = total_stages
-        self._current_size: float = round(current_size, 3)
+        self._current_size: float = 0.05
         self._max_size: float = round(max_size, 3)
 
-        self._growth_modifier: float = growth_modifier # Este lo cambio SOLO por evolución
+        self._growth_modifier: float = growth_modifier  # Este lo cambio SOLO por evolución
         # Y este, es el que modifico por estrés, clima,
         # enfermedades... es cómo de bien convierte recursos
         self._growth_efficiency: float = round(growth_efficiency, 3)
@@ -76,8 +75,8 @@ class GrowthComponent(EntityComponent):
             self._logger.debug(message)
 
         self._logger.debug(f" [Tick: {self._env.now} Growth: Stage={self._growth_stage}/{self._total_stages}, "
-                      f"Size={self._current_size}/{self._max_size}, "
-                      f"Efficiency={self._growth_efficiency}")
+                           f"Size={self._current_size}/{self._max_size}, "
+                           f"Efficiency={self._growth_efficiency}")
 
     def get_state(self) -> Dict[str, Any]:
         return {

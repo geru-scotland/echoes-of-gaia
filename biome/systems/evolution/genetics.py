@@ -71,12 +71,14 @@ class GeneticAlgorithmModel:
         self.toolbox.register("population_flora", tools.initRepeat, list, self.toolbox.individual_flora)
         self.toolbox.register("population_fauna", tools.initRepeat, list, self.toolbox.individual_fauna)
 
-        self.toolbox.register("mate", tools.cxBlend, alpha=0.5)
+        self.toolbox.register("mate", tools.cxBlend, alpha=0.4)
 
         # Para que sea adaptativo, al final registro el operador mutate en cada evolve.
-        self.toolbox.register("select", tools.selTournament, tournsize=2) # lo he cambiado de 3 a 2 para ver si la convergencia es más lenta
+        self.toolbox.register("select", tools.selTournament,
+                              tournsize=2)  # lo he cambiado de 3 a 2 para ver si la convergencia es más lenta
 
-    def evolve_population(self, entities: EntityList, climate_data: ClimateData, current_evo_cycle: int, generation_count=1, k_best=5):
+    def evolve_population(self, entities: EntityList, climate_data: ClimateData, current_evo_cycle: int,
+                          generation_count=1, k_best=5):
         if not entities:
             return []
 
@@ -88,7 +90,7 @@ class GeneticAlgorithmModel:
             population.append(GeneticConverter.genes_to_individual(current_genes, entity_type))
 
         average_lifespan = np.average(np.array([e.lifespan for e in entities]))
-        mutation_adaptive_operator = AdaptiveMutationOperator(indpb=0.2)
+        mutation_adaptive_operator = AdaptiveMutationOperator(indpb=0.15)
         mutation_adaptive_operator.adapt(entity_type, average_lifespan, MutationType.GAUSSIAN)
 
         self.toolbox.register("mutate", mutation_adaptive_operator)
@@ -104,12 +106,13 @@ class GeneticAlgorithmModel:
         stats.register("min", np.min)
         stats.register("max", np.max)
 
+        hof = tools.HallOfFame(k_best)
         algorithms.eaSimple(population, self.toolbox,
-                            cxpb=0.4, mutpb=0.2,
+                            cxpb=0.65, mutpb=0.3,
                             ngen=generation_count,
-                            stats=stats, verbose=False)
+                            stats=stats, verbose=False, halloffame=hof)
 
-        top_individuals = tools.selBest(population, k=k_best)
+        top_individuals = list(hof)
 
         if self._genetic_tracker:
             original_genes = []

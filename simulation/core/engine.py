@@ -18,6 +18,7 @@
 import itertools
 import sys
 import time
+import traceback
 from logging import Logger
 from typing import Optional, cast, Tuple, Dict, Any
 
@@ -64,11 +65,11 @@ class SimulationEngine:
             trackers: Dict[str, Any] = data_storage.get("trackers", {})
 
             sim_paths: Dict[str, Any] = {
-                "base": data_storage.get("base", {}),
-                "simulations": data_storage.get("simulations", {}),
-                "evolution": trackers.get("evolution", {}),
-                "genetic_crossover": trackers.get("genetic_crossover", {}),
-                "trends": trackers.get("trends", {}),
+                "base": data_storage.get("base", ""),
+                "simulations": data_storage.get("simulations", ""),
+                "evolution": trackers.get("evolution", ""),
+                "genetic_crossover": trackers.get("genetic_crossover", ""),
+                "trends": trackers.get("trends", ""),
             }
 
             options: Dict[str, bool] = {
@@ -111,6 +112,8 @@ class SimulationEngine:
         except Exception as e:
             self._logger = LoggerManager.get_logger(Loggers.BOOTSTRAP)
             self._logger.exception(f"[Simulation Engine] There was an error bootstraping: {e}")
+            tb = traceback.format_exc()
+            self._logger.error("Error: %s", tb)
 
     def _boot_and_get_contexts(self, settings: Settings) -> Tuple[BiomeContextData, SimulationContextData]:
         bootstrap: Bootstrap = Bootstrap(settings)

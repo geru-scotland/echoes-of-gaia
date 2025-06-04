@@ -60,16 +60,6 @@ class ClimateTrainAdapter(EnvironmentAdapter):
         self._update_biological_factors()
         self._climate_system.update(weather_event)
 
-
-    def compute_simulated_humidity(self):
-        pass
-
-    def compute_simulated_precipitation(self):
-        pass
-
-    def compute_simulated_co2(self):
-        pass
-
     def compute_reward(self, action) -> float:
         comfort_range = self._climate_system.get_seasonal_comfort_range()
         current_temp = self._state.temperature

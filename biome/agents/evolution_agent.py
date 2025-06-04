@@ -115,10 +115,10 @@ class EvolutionAgentAI(Agent, EventHandler):
         for species, entities_list in entities_by_species.items():
 
             k_best = self._compute_k_best(entities)
-
+            self._logger.info(f"K-BEST for species {self._species}: {k_best}")
             evolved_genes = self._genetic_model.evolve_population(
                 entities_list, climate_data, self._current_evolution_cycle,
-                generation_count=10, k_best=k_best,
+                generation_count=5, k_best=k_best,
             )
 
             for genes in evolved_genes:
@@ -134,8 +134,8 @@ class EvolutionAgentAI(Agent, EventHandler):
         self._current_evolution_cycle = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
 
-        self._logger.debug(f"EVOLUTION CYCLE: {self._current_evolution_cycle}")
-        self._logger.debug(
+        self._logger.info(f"EVOLUTION CYCLE: {self._current_evolution_cycle}")
+        self._logger.info(
             f"Evolution agent is going to create: {len(action["evolved_genes"])} entities: {self._species}")
         for species, genes in action["evolved_genes"]:
             if species == self._species:
@@ -392,7 +392,7 @@ class EvolutionAgentAI(Agent, EventHandler):
         return self._current_evolution_cycle
 
     def adjust_evolution_cycle(self, adjustment_factor: float) -> None:
-        min_cycle_time = self._species_base_lifespan * 0.10
+        min_cycle_time = self._species_base_lifespan * 0.05
         max_cycle_time = self._species_base_lifespan * 0.8
 
         new_cycle_time = self._evolution_cycle_time * adjustment_factor
@@ -400,7 +400,7 @@ class EvolutionAgentAI(Agent, EventHandler):
         new_cycle_time = max(min_cycle_time, min(new_cycle_time, max_cycle_time))
 
         self._logger.info(
-            f"Adjusting evolution cycle for {self._species} from {self._evolution_cycle_time} to {new_cycle_time}")
+            f"Adjusting evolution cycle for {self._species} (factor: {adjustment_factor}) from {self._evolution_cycle_time} to {new_cycle_time}")
         self._evolution_cycle_time = new_cycle_time
 
     @property

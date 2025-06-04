@@ -70,8 +70,8 @@ class Flora(Entity):
     def get_nutritive_value(self) -> float:
         autotrophic_component = self.get_component(ComponentType.AUTOTROPHIC_NUTRITION)
         if autotrophic_component:
-            return autotrophic_component.current_nutritive_value
-        return 0.5
+            return autotrophic_component.current_nutritive_value, autotrophic_component.current_toxicity
+        return 0.5, 0.1
 
     def dump_components(self) -> None:
         if not self._components:

@@ -96,11 +96,33 @@ class ForagingBehaviour:
             return False
 
         for flora in flora_entities:
-            # Toxicidad, implementar
-            nutritive_value = flora.get_nutritive_value()
+            nutritive_value, toxicity = flora.get_nutritive_value()
             flora.apply_damage(5.0, self._target.get_id())
             self._target.consume_vegetal(nutritive_value)
             self._logger.debug(f"Consuming plant: +{nutritive_value} nutrition")
+
+            if toxicity > 0:
+                if toxicity > 0:
+                    growth_component = self._target.get_component(ComponentType.GROWTH)
+
+                    if growth_component:
+                        # Uso relación inversa: entidades más pequeñas reciben más daño.
+                        # TODO: resistencias a toxicidad, tipos de toxicidad...etc.
+                        size_factor = 1.0 / max(growth_component.current_size, 1.0)
+
+                        # factor base de daño para toxicidad máxima (entidad tamaño 1, con tox 1)
+                        # TODO: Revisar esto, temporalmente a ojo de buen cubero.
+                        base_damage = 20.0
+
+                        damage = base_damage * toxicity * size_factor
+
+                        self._target.apply_damage(damage, flora.get_id())
+                        self._logger.debug(
+                            f"Flora toxicity ({toxicity:.2f}) caused {damage:.2f} damage to {self._target.get_species()} of size {growth_component.current_size:.1f}")
+                    else:
+                        damage = 10.0 * toxicity
+                        self._target.apply_damage(damage, flora.get_id())
+                        self._logger.debug(f"Flora toxicity ({toxicity:.2f}) caused {damage:.2f} damage")
 
             # TODO: Hacer esto bien, flora.die()  o algo asi y que tenga esto
             if random.random() < 0.1:

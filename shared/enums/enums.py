@@ -416,13 +416,13 @@ class EcosystemRiskValue(EnumBaseFloat):
 
 
 class EvolutionFactor(EnumBaseFloat):
-    ACCELERATE_EXTREME = 0.5
-    ACCELERATE_SIGNIFICANT = 0.7
-    ACCELERATE_MODERATE = 0.8
-    NORMAL = 1.0
-    SLOW_MODERATE = 1.2
-    SLOW_SIGNIFICANT = 1.3
-    SLOW_EXTREME = 1.5
+    ACCELERATE_EXTREME = 0.9850
+    ACCELERATE_SIGNIFICANT = 0.9900
+    ACCELERATE_MODERATE = 0.9950
+    NORMAL = 1.0000
+    SLOW_MODERATE = 1.0050
+    SLOW_SIGNIFICANT = 1.0100
+    SLOW_EXTREME = 1.0150
 
 
 class PopulationThreshold(EnumBaseFloat):
