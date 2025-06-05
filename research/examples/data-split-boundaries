@@ -1,0 +1,332 @@
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,929 - deep_learning - INFO - [LSTMModelManager] Loading data from /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,930 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h41m07s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,937 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h40m18s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,939 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h44m45s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,945 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h26m44s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,948 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h59m48s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,955 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h50m49s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,957 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h19m48s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,958 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h04m11s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,959 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h35m47s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,964 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h37m29s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,965 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h24m25s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,968 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h48m24s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,971 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h16m45s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,974 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h19m47s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,975 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h33m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,978 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h10m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,980 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h21m22s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,981 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h53m50s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,991 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h08m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,992 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h29m44s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,993 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h06m23s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,996 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h00m34s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:38:59,998 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h46m11s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,002 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h50m20s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,004 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h45m49s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,009 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h33m20s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,010 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h47m26s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,011 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h31m48s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,017 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h29m42s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,018 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h57m44s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,025 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h17m34s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,029 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h33m03s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,032 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h46m24s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,033 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h15m28s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,038 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h09m51s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,044 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h37m56s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,046 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h32m25s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,050 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h20m48s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,052 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h18m35s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,055 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h37m45s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,060 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h41m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,061 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h31m00s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,063 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h30m07s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,070 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h36m39s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,070 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h21m20s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,074 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h07m25s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,077 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h10m17s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,081 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h55m04s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,083 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h56m27s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,099 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h57m45s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,101 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h35m52s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,102 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h23m51s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,104 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h34m16s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,110 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h33m41s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,112 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h14m41s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,117 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h25m27s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,121 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h29m27s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,123 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h48m50s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,124 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h30m41s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,125 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h10m54s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,128 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h04m19s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,129 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h39m33s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,135 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h12m43s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,143 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h43m56s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,145 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h22m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,148 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h09m06s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,148 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h55m01s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,151 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h37m59s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,151 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h09m42s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,159 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h25m42s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,160 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h01m03s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,166 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h54m33s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,171 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h29m04s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,172 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h13m02s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,178 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h20m37s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,180 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h40m39s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,183 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h44m54s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,186 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h53m52s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,189 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h40m15s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,190 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h10m01s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,193 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h07m55s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,197 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h36m14s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,201 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h24m46s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,204 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h14m20s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,207 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h52m49s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,208 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h52m39s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,209 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h54m02s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,213 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h39m14s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,216 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h20m11s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,217 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h44m19s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,220 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_16-April-2025__00h23m19s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,228 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h26m17s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,229 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h19m51s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,231 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h37m34s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,234 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h43m54s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,234 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h46m33s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,239 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h32m13s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,240 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h43m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,241 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h57m07s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,245 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h55m53s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,254 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h38m01s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,258 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h05m20s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,262 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h59m48s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,268 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h49m56s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,270 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h08m55s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,277 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h06m04s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,279 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h53m02s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,280 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h03m23s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,285 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h29m14s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,288 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h45m47s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,289 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h17m14s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,292 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h22m04s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,296 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h19m25s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,301 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h55m12s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,305 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h52m53s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,306 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h22m42s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,307 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h51m40s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,309 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h24m17s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,309 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h38m32s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,311 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h13m38s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,313 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h44m21s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,319 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h52m17s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,320 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__07h51m50s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,324 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h50m55s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,325 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h39m42s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,329 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h17m03s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,331 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h33m27s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,333 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h04m19s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,337 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h07m25s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,338 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h50m04s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,340 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h36m00s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,341 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__08h30m37s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,342 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h35m08s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,345 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h58m26s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,356 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h27m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,357 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h23m15s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,363 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__11h27m53s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,365 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h32m40s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,366 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h49m18s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,367 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h09m44s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,367 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__23h31m40s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,368 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h44m30s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,370 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h52m51s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,375 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__09h26m56s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,376 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h32m01s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,377 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__10h52m44s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,379 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__20h44m44s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,380 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h46m04s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,383 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__12h21m30s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,386 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__22h26m07s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,394 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h42m15s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,396 - deep_learning - INFO - Processing file: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/data/neurosymbolic/neural/neural_data_sim_15-April-2025__21h13m31s.jsonl
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,397 - deep_learning - INFO - Loaded 35288 data points from 152 simulations
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,398 - deep_learning - INFO - Total data length: 35288
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,398 - deep_learning - INFO - Split index: 24701
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,398 - deep_learning - INFO - Train data length: 24701
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Validation data length: 10587
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 439 -> train (original: 439)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 578 -> train (original: 578)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 1047 -> train (original: 1047)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 1226 -> train (original: 1226)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 1635 -> train (original: 1635)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 1774 -> train (original: 1774)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 1813 -> train (original: 1813)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 1892 -> train (original: 1892)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 2271 -> train (original: 2271)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 2330 -> train (original: 2330)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 2619 -> train (original: 2619)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 2808 -> train (original: 2808)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 3067 -> train (original: 3067)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 3156 -> train (original: 3156)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 3345 -> train (original: 3345)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 3514 -> train (original: 3514)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 3593 -> train (original: 3593)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 4382 -> train (original: 4382)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 4461 -> train (original: 4461)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 4470 -> train (original: 4470)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 4709 -> train (original: 4709)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 4848 -> train (original: 4848)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 5147 -> train (original: 5147)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 5336 -> train (original: 5336)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 5745 -> train (original: 5745)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 5754 -> train (original: 5754)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 5843 -> train (original: 5843)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 6292 -> train (original: 6292)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 6381 -> train (original: 6381)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 6940 -> train (original: 6940)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 7289 -> train (original: 7289)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 7468 -> train (original: 7468)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 7567 -> train (original: 7567)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 7916 -> train (original: 7916)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,399 - deep_learning - INFO - Boundary 8345 -> train (original: 8345)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 8524 -> train (original: 8524)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 8803 -> train (original: 8803)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 8982 -> train (original: 8982)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 9211 -> train (original: 9211)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 9560 -> train (original: 9560)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 9629 -> train (original: 9629)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 9808 -> train (original: 9808)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 10317 -> train (original: 10317)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 10346 -> train (original: 10346)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 10655 -> train (original: 10655)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 10824 -> train (original: 10824)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 11103 -> train (original: 11103)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 11312 -> train (original: 11312)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 12601 -> train (original: 12601)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 12690 -> train (original: 12690)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 12779 -> train (original: 12779)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 12898 -> train (original: 12898)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 13357 -> train (original: 13357)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 13516 -> train (original: 13516)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 13905 -> train (original: 13905)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 14224 -> train (original: 14224)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 14313 -> train (original: 14313)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 14392 -> train (original: 14392)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 14481 -> train (original: 14481)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 14710 -> train (original: 14710)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 14739 -> train (original: 14739)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 15198 -> train (original: 15198)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 15897 -> train (original: 15897)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 15986 -> train (original: 15986)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 16185 -> train (original: 16185)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 16204 -> train (original: 16204)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 16413 -> train (original: 16413)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 16432 -> train (original: 16432)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 17071 -> train (original: 17071)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 17140 -> train (original: 17140)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 17619 -> train (original: 17619)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 18008 -> train (original: 18008)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,400 - deep_learning - INFO - Boundary 18077 -> train (original: 18077)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 18536 -> train (original: 18536)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 18725 -> train (original: 18725)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 18954 -> train (original: 18954)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 19213 -> train (original: 19213)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 19432 -> train (original: 19432)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 19471 -> train (original: 19471)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 19700 -> train (original: 19700)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 19999 -> train (original: 19999)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 20328 -> train (original: 20328)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 20587 -> train (original: 20587)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 20786 -> train (original: 20786)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 20875 -> train (original: 20875)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 20964 -> train (original: 20964)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 21263 -> train (original: 21263)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 21512 -> train (original: 21512)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 21601 -> train (original: 21601)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 21780 -> train (original: 21780)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 22489 -> train (original: 22489)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 22548 -> train (original: 22548)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 22677 -> train (original: 22677)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 22836 -> train (original: 22836)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 22855 -> train (original: 22855)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 23224 -> train (original: 23224)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 23343 -> train (original: 23343)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 23392 -> train (original: 23392)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 23691 -> train (original: 23691)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 24360 -> train (original: 24360)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 24659 -> train (original: 24659)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 24938 -> validation (adjusted: 237)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 25427 -> validation (adjusted: 726)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 25546 -> validation (adjusted: 845)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 26145 -> validation (adjusted: 1444)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 26234 -> validation (adjusted: 1533)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 26313 -> validation (adjusted: 1612)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 26672 -> validation (adjusted: 1971)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 26951 -> validation (adjusted: 2250)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,401 - deep_learning - INFO - Boundary 26980 -> validation (adjusted: 2279)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 27239 -> validation (adjusted: 2538)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 27488 -> validation (adjusted: 2787)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 27887 -> validation (adjusted: 3186)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 28226 -> validation (adjusted: 3525)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 28265 -> validation (adjusted: 3564)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 28344 -> validation (adjusted: 3643)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 28433 -> validation (adjusted: 3732)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 28482 -> validation (adjusted: 3781)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 28551 -> validation (adjusted: 3850)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 28730 -> validation (adjusted: 4029)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 29239 -> validation (adjusted: 4538)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 29318 -> validation (adjusted: 4617)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 29587 -> validation (adjusted: 4886)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 29646 -> validation (adjusted: 4945)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30015 -> validation (adjusted: 5314)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30174 -> validation (adjusted: 5473)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30313 -> validation (adjusted: 5612)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30602 -> validation (adjusted: 5901)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30681 -> validation (adjusted: 5980)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30770 -> validation (adjusted: 6069)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30859 -> validation (adjusted: 6158)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 30928 -> validation (adjusted: 6227)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 31157 -> validation (adjusted: 6456)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32086 -> validation (adjusted: 7385)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32205 -> validation (adjusted: 7504)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32674 -> validation (adjusted: 7973)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32823 -> validation (adjusted: 8122)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32852 -> validation (adjusted: 8151)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32911 -> validation (adjusted: 8210)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32950 -> validation (adjusted: 8249)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 32999 -> validation (adjusted: 8298)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 33108 -> validation (adjusted: 8407)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 33497 -> validation (adjusted: 8796)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 33596 -> validation (adjusted: 8895)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 33705 -> validation (adjusted: 9004)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 33794 -> validation (adjusted: 9093)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 33853 -> validation (adjusted: 9152)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,402 - deep_learning - INFO - Boundary 34082 -> validation (adjusted: 9381)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,403 - deep_learning - INFO - Boundary 34391 -> validation (adjusted: 9690)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,403 - deep_learning - INFO - Boundary 35090 -> validation (adjusted: 10389)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,403 - deep_learning - INFO - Boundary 35209 -> validation (adjusted: 10508)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,403 - deep_learning - INFO - Boundary 35288 -> validation (adjusted: 10587)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,403 - deep_learning - INFO - Train simulation boundaries: [439, 578, 1047, 1226, 1635, 1774, 1813, 1892, 2271, 2330, 2619, 2808, 3067, 3156, 3345, 3514, 3593, 4382, 4461, 4470, 4709, 4848, 5147, 5336, 5745, 5754, 5843, 6292, 6381, 6940, 7289, 7468, 7567, 7916, 8345, 8524, 8803, 8982, 9211, 9560, 9629, 9808, 10317, 10346, 10655, 10824, 11103, 11312, 12601, 12690, 12779, 12898, 13357, 13516, 13905, 14224, 14313, 14392, 14481, 14710, 14739, 15198, 15897, 15986, 16185, 16204, 16413, 16432, 17071, 17140, 17619, 18008, 18077, 18536, 18725, 18954, 19213, 19432, 19471, 19700, 19999, 20328, 20587, 20786, 20875, 20964, 21263, 21512, 21601, 21780, 22489, 22548, 22677, 22836, 22855, 23224, 23343, 23392, 23691, 24360, 24659]
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,403 - deep_learning - INFO - Validation simulation boundaries: [237, 726, 845, 1444, 1533, 1612, 1971, 2250, 2279, 2538, 2787, 3186, 3525, 3564, 3643, 3732, 3781, 3850, 4029, 4538, 4617, 4886, 4945, 5314, 5473, 5612, 5901, 5980, 6069, 6158, 6227, 6456, 7385, 7504, 7973, 8122, 8151, 8210, 8249, 8298, 8407, 8796, 8895, 9004, 9093, 9152, 9381, 9690, 10389, 10508, 10587]
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - === DATA WINDOW CONFIGURATION ===
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Sequence length (input window): 15
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Target horizon (prediction steps): 10
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Feature count: 13
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Target count: 5
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Features: ['prey_population', 'predator_population', 'flora_count', 'temperature', 'humidity', 'precipitation', 'co2_level', 'biodiversity_index', 'biomass_density', 'ecosystem_stability', 'biome_score', 'environmental_pressure', 'avg_stress']
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Targets: ['prey_population', 'predator_population', 'flora_count', 'ecosystem_stability', 'avg_stress']
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Stride: 1
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Total dataset points: 35288
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Total training points: 24701
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Total validation points: 10587
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Total training windows: 3217
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Total validation windows: 1354
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Training simulation boundaries: [439, 578, 1047, 1226, 1635, 1774, 1813, 1892, 2271, 2330, 2619, 2808, 3067, 3156, 3345, 3514, 3593, 4382, 4461, 4470, 4709, 4848, 5147, 5336, 5745, 5754, 5843, 6292, 6381, 6940, 7289, 7468, 7567, 7916, 8345, 8524, 8803, 8982, 9211, 9560, 9629, 9808, 10317, 10346, 10655, 10824, 11103, 11312, 12601, 12690, 12779, 12898, 13357, 13516, 13905, 14224, 14313, 14392, 14481, 14710, 14739, 15198, 15897, 15986, 16185, 16204, 16413, 16432, 17071, 17140, 17619, 18008, 18077, 18536, 18725, 18954, 19213, 19432, 19471, 19700, 19999, 20328, 20587, 20786, 20875, 20964, 21263, 21512, 21601, 21780, 22489, 22548, 22677, 22836, 22855, 23224, 23343, 23392, 23691, 24360, 24659]
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Validation simulation boundaries: [237, 726, 845, 1444, 1533, 1612, 1971, 2250, 2279, 2538, 2787, 3186, 3525, 3564, 3643, 3732, 3781, 3850, 4029, 4538, 4617, 4886, 4945, 5314, 5473, 5612, 5901, 5980, 6069, 6158, 6227, 6456, 7385, 7504, 7973, 8122, 8151, 8210, 8249, 8298, 8407, 8796, 8895, 9004, 9093, 9152, 9381, 9690, 10389, 10508, 10587]
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - === DATASET SPLIT ===
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Total dataset size: 3217
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Validation split ratio: 0.3
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Training subset: 0 to 2250 (size: 2251)
+[DEEP_LEARNING][Main thread] 2025-06-06 00:39:00,638 - deep_learning - INFO - Validation subset: 2251 to 3216 (size: 966)
