@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Loads and manages compressed simulation snapshot data.
+
+Handles MessagePack and JSON snapshot files with navigation support;
+loads common terrain data and merges with snapshot information.
+Provides timeline navigation through snapshot sequences - manages
+current position and enables temporal data exploration.
+"""
+
 import gzip
 import json
 import logging

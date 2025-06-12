@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Coordinates render engine lifecycle and event handling integration.
+
+Manages render engine initialization with event handler setup;
+provides unified interface for render system startup operations.
+Encapsulates engine access for external components.
+"""
+
 from config.settings import RenderSettings
 from simulation.render.engine import RenderEngine
 from simulation.render.event_handler import RenderEventHandler

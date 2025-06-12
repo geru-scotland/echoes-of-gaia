@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Renders entities with visual effects and selection management.
+
+Displays flora, fauna and human entities with type-specific styling;
+handles entity selection highlighting with glow effects.
+Provides position-based entity queries and visual state indicators -
+supports layered rendering for proper entity display ordering.
+"""
+
 import logging
 from typing import Dict, List, Tuple, Optional, Set
 

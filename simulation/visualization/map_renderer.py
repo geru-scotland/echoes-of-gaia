@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Renders terrain maps with visual styling and interaction support.
+
+Creates visual terrain surfaces with color-coded terrain types;
+handles grid display and modern visual effects with shadows.
+Supports cell-based position queries and terrain information lookup -
+provides optimized surface caching for performance efficiency.
+"""
+
 import logging
 import random
 from typing import Dict, List, Tuple, Optional, Set

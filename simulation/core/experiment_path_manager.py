@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Creates timestamped directory structures for simulation experiments.
+
+Manages output paths for evolution tracking, genetic crossover data,
+and trend analysis files - it also organizes all experimental
+results under unique simulation identifiers with Spanish timestamps.
+Ensures proper directory hierarchy for data persistence.
+"""
+
 import os.path
 from pathlib import Path
 from typing import Dict, Any

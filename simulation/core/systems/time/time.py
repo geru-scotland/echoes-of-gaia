@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Handles simulation time tracking and era management.
+
+Converts raw simulation ticks into meaningful temporal units;
+tracks eras, months and years for proper progression measurement.
+Maps discrete events to calendar structure - provides detailed
+logging of simulation progress with execution time tracking.
+"""
+
 import logging
 import time
 from dataclasses import dataclass

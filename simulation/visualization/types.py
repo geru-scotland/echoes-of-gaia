@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Type definitions for visualization data structures and interfaces.
+
+Defines TypedDict classes for snapshot data, entity information,
+terrain configuration and viewer settings; provides type safety
+for visualization components and ensures consistent data formats
+across the visualization pipeline and snapshot handling.
+"""
+
 from typing import Dict, List, Tuple, Optional, Any, Callable, TypedDict, Union
 
 import pygame

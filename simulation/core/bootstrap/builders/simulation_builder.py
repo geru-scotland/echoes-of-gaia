@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Builds simulation contexts with telemetry configuration.
+
+Constructs simulation context data from settings configuration;
+initializes InfluxDB manager when datapoint collection is enabled.
+Handles simulation-level configuration assembly and error recovery.
+"""
+
 from logging import Logger
 from typing import Optional
 

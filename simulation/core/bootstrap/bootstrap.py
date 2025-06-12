@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Initializes simulation contexts through specialized builders.
+
+Coordinates biome and simulation setup via dedicated builders;
+loads bioma store data and constructs unified contexts.
+Handles bootstrap failures with proper error recovery - ensures
+reliable initialization before simulation execution begins.
+"""
+
 import traceback
 from typing import Dict, Any
 

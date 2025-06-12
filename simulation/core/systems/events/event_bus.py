@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Specialized event bus for simulation-wide communication.
+
+Extends the base EventBus to handle simulation-specific events;
+enables decoupled communication between simulation components.
+Manages event listeners and triggers for biome and system events.
+"""
+
 from typing import Dict, List, Any
 
 from shared.events.event_bus import EventBus

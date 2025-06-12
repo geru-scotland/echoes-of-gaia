@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Main application for interactive biome snapshot visualization.
+
+Integrates map renderer, entity display and information panel;
+handles user interactions with navigation controls and playback.
+Manages snapshot loading and temporal progression - provides
+complete visualization interface for simulation data exploration.
+"""
+
 import logging
 import time
 from pathlib import Path

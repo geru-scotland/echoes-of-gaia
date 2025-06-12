@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Render component system for modular visual elements.
+
+Defines base RenderComponent interface and MapComponent implementation;
+handles tile map visualization with terrain sprite management.
+Provides component-based architecture for render system extensibility.
+"""
+
 from typing import Dict, Any
 
 from biome.systems.maps.procedural_maps import MapGenData

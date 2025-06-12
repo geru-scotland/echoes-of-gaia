@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Constructs biome contexts with procedural map generation.
+
+Configures terrain maps using Perlin noise algorithms;
+loads flora and fauna definitions from biome configurations.
+Assembles complete biome contexts with climate models - handles
+map generation failures with proper error recovery mechanisms.
+"""
+
 import logging
 import random
 from logging import Logger

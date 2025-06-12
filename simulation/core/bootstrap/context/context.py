@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Manages context data storage with type-safe operations.
+
+Provides centralized container for ContextData objects;
+enforces type validation and key-based retrieval patterns.
+Enables organized access to simulation and biome contexts.
+"""
+
 from typing import Any, Dict, Optional
 from logging import Logger
 
