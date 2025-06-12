@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Vital functions management for core entity lifecycle processes.
+
+Controls aging, vitality, and health mechanics for all entities; applies 
+non-linear aging patterns and vitality decay based on stress and energy levels.
+Handles entity death events and cleanup operations - provides comprehensive
+health state tracking throughout entity lifespans.
+"""
+
 from logging import Logger
 
 import numpy as np

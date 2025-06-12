@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Neural module for neurosymbolic system prediction capabilities.
+
+Interfaces with neural model manager for sequence-based predictions;
+handles time series data processing and prediction formatting.
+Converts raw neural outputs to structured feedback with population
+metrics and stability indices - supports inference mode operations.
+"""
+
 from logging import Logger
 from typing import Protocol, Dict, Any
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+AI agent for fauna behavior control through reinforcement learning.
+
+Manages individual fauna movement decisions using local environment maps;
+processes biome observations to generate movement and foraging actions.
+Integrates with training systems and applies learned behaviors - handles
+complex fauna interactions with terrain and resource management.
+"""
+
 import traceback
 from typing import Dict, Any, Optional
 

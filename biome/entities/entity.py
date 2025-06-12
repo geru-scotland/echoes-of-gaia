@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Abstract base class for all biome entities with component system.
+
+Provides core entity functionality with component management;
+handles state tracking, position management and lifecycle events.
+Supports event-driven architecture and weather interactions - enables
+flexible entity behavior through modular component composition.
+"""
+
 from logging import Logger
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Type, Optional

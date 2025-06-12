@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Utility class for genetic algorithm data format conversions.
+
+Handles conversion between gene objects and DEAP individuals;
+normalizes gene values based on predefined attribute ranges.
+Supports flora and fauna genetic representations with automatic validation.
+"""
+
 from typing import List
 
 from deap import creator

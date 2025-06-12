@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Abstract base class for agent implementation with generic types.
+
+Defines standard agent interface with perceive-decide-act cycle;
+supports type-safe state and action handling through generics.
+Enables consistent agent behavior patterns across the biome system.
+"""
+
 from abc import abstractmethod, ABC
 from typing import TypeVar, Generic, Optional
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Storage system for biome snapshots and neurosymbolic data.
+
+Manages serialization and compression of simulation state data;
+handles efficient storage using msgpack and gzip for snapshots.
+Implements separate storage for terrain and regular snapshots - provides
+dataset generation capabilities for machine learning applications.
+"""
+
 import gzip
 import json
 import os

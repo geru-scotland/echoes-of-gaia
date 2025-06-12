@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Neurosymbolic integration balancer for biome intervention decisions.
+
+Combines neural and symbolic module outputs with confidence weighting;
+processes observations and applies evolution-spawning interventions.
+Handles species availability analysis and intervention execution via
+biome control service - supports adaptive biome management strategies.
+"""
+
 import random
 from logging import Logger
 from typing import Dict, Type, Optional, Any, List

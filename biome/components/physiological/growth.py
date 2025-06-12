@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Growth component for entity size and development stage tracking.
+
+Manages entity growth stages and size progression over time;
+handles stress-based efficiency modifications and development thresholds.
+Tracks current size, maximum size and stage advancement - supports
+stress adaptation with growth efficiency calculations.
+"""
+
 from typing import Optional, List, Dict, Any
 
 from simpy import Environment as simpyEnv

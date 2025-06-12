@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Abstract state handler base class for state management operations.
+
+Provides state dictionary management with abstract state computation;
+includes JSON serialization support for state data export.
+Defines standard interface for state computation and persistence.
+"""
+
 from abc import ABC, abstractmethod
 import json
 

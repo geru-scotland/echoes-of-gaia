@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Photosynthetic metabolism management for producer entities in simulations.
+
+Handles energy production through photosynthesis; balances respiration against 
+production based on environmental factors and stress levels. Manages metabolic 
+efficiency adjustments and synchronizes photosynthesis rates - accounts for 
+aging effects and entropy in biological energy systems.
+"""
+
 from logging import Logger
 
 import numpy as np

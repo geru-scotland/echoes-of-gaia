@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Abstract base interface for neurosymbolic integration strategies.
+
+Defines common contract for integrating neural and symbolic outputs;
+requires implementation of weighted integration method.
+Enables different combination approaches through strategy pattern -
+provides foundation for hybrid intelligence result processing.
+"""
+
 from abc import ABC, abstractmethod
 from typing import Optional, Dict
 

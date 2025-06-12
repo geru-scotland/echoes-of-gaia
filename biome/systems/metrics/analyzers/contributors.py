@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Score contributor system for biome health assessment.
+
+Implements domain-specific metrics for biome health evaluation;
+provides weighted scoring of climate, biodiversity and population factors.
+Contains specialized analyzers for toxicity and ecosystem health - supports
+composite score calculation for overall biome quality assessment.
+"""
+
 from abc import ABC, abstractmethod
 from logging import Logger
 from typing import Dict, List, Tuple, Set, Any

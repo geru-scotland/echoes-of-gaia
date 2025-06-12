@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Predator-prey movement system for fauna entities.
+
+Manages pursuit and fleeing behaviors based on diet types; calculates
+optimal movement directions for predators chasing prey and prey escaping.
+Tracks entity states dynamically and modifies movement patterns according
+to target entity properties - implements ecological chase dynamics.
+"""
+
 from logging import Logger
 from typing import Dict, List, Tuple, Optional
 

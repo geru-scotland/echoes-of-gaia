@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Base classes for component system architecture.
+
+Defines Component and EntityComponent abstract base classes;
+handles event notification, dormancy management and host references.
+Provides foundation for modular entity behavior implementation - supports
+lifecycle management and state tracking across component hierarchy.
+"""
+
 import math
 from logging import Logger
 from abc import abstractmethod, ABC

@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Fauna entity implementation with nutrition and movement tracking.
+
+Extends Entity for animal behavior with diet type specialization;
+manages hunger and thirst levels through nutrition components.
+Tracks position history and energy reserves - supports consumption
+mechanics for water, vegetation and prey with varying benefits.
+"""
+
 from typing import Any, Set, Optional
 
 from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent

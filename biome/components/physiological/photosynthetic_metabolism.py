@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Photosynthetic metabolism component for plant energy production.
+
+Manages photosynthesis efficiency and respiration processes;
+handles environmental modifiers like light, temperature and water.
+Tracks energy reserves and metabolic activity - supports stress
+adaptation and dormancy state transitions based on conditions.
+"""
+
 from typing import Optional, Dict, Any
 
 from biome.components.base.component import EntityComponent

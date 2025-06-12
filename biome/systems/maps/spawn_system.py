@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Entity spawning system with component assembly and position allocation.
+
+Creates flora and fauna entities with custom component configurations;
+handles dynamic component instantiation and entity registration.
+Manages initial spawns and evolutionary entity creation - integrates
+with map allocator for habitat-based positioning and entity lifecycle.
+"""
+
 import itertools
 import random
 from logging import Logger

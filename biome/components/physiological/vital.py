@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Vital component for entity health, aging and somatic integrity.
+
+Manages vitality, aging rates and biological age progression;
+handles damage systems, healing mechanisms and stress accumulation.
+Tracks somatic integrity and vitality history - supports death
+events and dormancy threshold calculations with Gompertz decay.
+"""
+
 import math
 from typing import Optional, List, Tuple, Dict, Any
 

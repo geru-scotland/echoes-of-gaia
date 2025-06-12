@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Component-level event notification system for localized event handling.
+
+Manages event listener registration and callback execution;
+provides scoped event distribution within entity components.
+Enables targeted event communication without global broadcasting.
+"""
+
 from typing import Dict, List, Callable, Any
 
 

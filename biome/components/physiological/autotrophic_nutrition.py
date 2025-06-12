@@ -16,6 +16,15 @@
 # =============================================================================
 """
 
+"""
+Autotrophic nutrition component for plant metabolic processes.
+
+Manages nutrient absorption rates and mycorrhizal symbiosis efficiency;
+handles nutritive value dynamics and toxicity level modulation.
+Tracks photosynthesis efficiency impacts on toxicity and monitors
+stress-energy ratios - supports flora metabolic state management.
+"""
+
 import random
 from typing import Dict, Any, Optional
 

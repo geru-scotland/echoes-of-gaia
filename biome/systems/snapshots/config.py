@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Configuration dataclass for biome snapshot system behavior.
+
+Defines snapshot capture frequency, format and storage parameters;
+provides customization for filename patterns and output formatting.
+Includes validation logic for configuration correctness - supports
+flexible configuration of the snapshot system's operation modes.
+"""
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Set, Optional

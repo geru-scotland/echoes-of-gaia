@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Fauna-specific genetic representation for animal entity traits.
+
+Manages heterotrophic nutrition and movement attributes for fauna species;
+provides component conversion for genetic algorithm integration.
+Includes metabolism, hunger and thirst rate parameters - supports
+extraction from existing fauna entities for evolutionary processes.
+"""
+
 from typing import List, Dict, Any
 
 from deap import creator

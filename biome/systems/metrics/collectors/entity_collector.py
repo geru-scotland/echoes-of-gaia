@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Entity data collector for biome statistics and metrics aggregation.
+
+Gathers entity attributes and computes biodiversity-population metrics;
+includes Shannon-Wiener index and climate adaptation calculations.
+Handles evolution trend analysis and predator-prey balance assessment;
+supports comprehensive biome state statistics generation workflows.
+"""
+
 from collections import defaultdict
 from logging import Logger
 from typing import Dict, Any, List

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Neurosymbolic agent for biome equilibrium maintenance.
+
+Combines neural and symbolic modules through weighted integration;
+processes biome observations to generate intervention strategies.
+Maintains biome balance through automated intervention application -
+leverages hybrid AI approaches for complex biome management.
+"""
+
 from logging import Logger
 
 from biome.agents.base import Agent, TAction, TState

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Fuzzy logic controller for adaptive population management.
+
+Monitors population trends and calculates adjustment factors;
+uses skfuzzy to implement membership functions and control rules.
+Predicts future population levels and visualizes evolutionary trends -
+enables dynamic species population control through generation tracking.
+"""
+
 import itertools
 from typing import List, Optional, Dict, Any, Tuple
 

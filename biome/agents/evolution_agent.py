@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Genetic algorithm agent for species evolution and population control.
+
+Manages evolutionary cycles with fitness evaluation and genetic crossover;
+handles smart population control based on survival trends.
+Creates evolved entities with adapted traits - tracks evolution progress
+and adjusts cycle timing based on species lifespan dynamics.
+"""
+
 import itertools
 import random
 from logging import Logger

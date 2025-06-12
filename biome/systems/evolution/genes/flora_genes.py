@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Flora-specific genetic representation for plant entity traits.
+
+Encapsulates photosynthetic and autotrophic attributes for flora species;
+handles conversion between genetic information and component configurations.
+Implements value range validation against predefined constraints - provides
+specialized gene extraction from existing flora entities for evolutionary processes.
+"""
+
 from deap import creator
 
 from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent

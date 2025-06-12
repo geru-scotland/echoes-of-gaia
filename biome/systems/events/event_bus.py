@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Biome-specific event bus singleton for global event distribution.
+
+Extends the base EventBus with biome context specialization;
+provides global event registration and triggering mechanisms.
+Facilitates system-wide communication through event patterns.
+"""
+
 from typing import Dict, List, Any
 
 from shared.events.event_bus import EventBus

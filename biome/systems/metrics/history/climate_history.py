@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Climate history tracking service with time-series data management.
+
+Records and organizes climate measurements over evolutionary cycles;
+computes monthly averages and exponential moving averages (EMAs).
+Provides filtered climate data access by evolution cycle - supports
+current period analytics and historical trend assessment operations.
+"""
+
 from logging import Logger
 from typing import List, Dict, Any, Optional
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Weighted integration strategy for neural and symbolic model outputs.
+
+Combines prediction and rule-based insights with configurable confidence weights;
+analyzes ecosystem health and identifies species requiring intervention.
+Generates biome adjustment recommendations based on multiple indicators - handles
+predator-prey balance assessment and biomass state evaluation with graph metrics.
+"""
+
 import random
 
 from shared.enums.enums import Interventions

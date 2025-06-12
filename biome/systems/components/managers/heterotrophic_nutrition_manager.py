@@ -16,6 +16,15 @@
 # =============================================================================
 """
 
+"""
+Heterotrophic nutrition management for animal-like entities in simulations.
+
+Manages hunger and thirst mechanics for consumer organisms; applies 
+appropriate metabolic penalties and stress modifications based on consumption 
+levels. Handles threshold-based physiological responses - critical conditions 
+trigger energy penalties and stress impacts on entity survival.
+"""
+
 from logging import Logger
 
 import numpy as np

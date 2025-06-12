@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Autotrophic nutrition management for plant-like entities in simulations.
+
+Handles soil nutrient absorption and mycorrhizal activity for entities;
+calculates energy gains based on stress levels and toxicity factors.
+Simulates realistic nutrient dynamics through vectorized operations for
+performance - modifies entity energy reserves accordingly.
+"""
+
 from logging import Logger
 
 import numpy as np

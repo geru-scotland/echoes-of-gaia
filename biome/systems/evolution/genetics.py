@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Genetic algorithm implementation for entity evolution using DEAP.
+
+Manages crossover, mutation and selection operations for entities;
+handles gene extraction and conversion between entities and chromosomes.
+Evolves populations based on fitness evaluation and climate adaptation -
+supports adaptive mutation and tracks genetic lineage through generations.
+"""
+
 import random
 
 import numpy as np

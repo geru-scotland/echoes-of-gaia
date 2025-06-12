@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Procedural map generation system using Perlin noise algorithms.
+
+Implements terrain generation with multi-octave noise and terrain
+classification; handles coordinate normalization and weight distribution.
+Supports vectorized noise computation and terrain type assignment based
+on elevation thresholds - provides flexible map generation pipeline.
+"""
+
 from logging import Logger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field

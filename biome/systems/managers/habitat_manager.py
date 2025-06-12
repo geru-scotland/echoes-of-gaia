@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Terrain-based habitat management system with spatial caching.
+
+Precomputes valid habitable areas using terrain type relationships;
+handles position allocation and restoration for entity placement.
+Uses convolution operations for neighbor terrain detection - maintains
+optimized habitat position caches for fast entity spawning operations.
+"""
+
 from logging import Logger
 from typing import Dict, List, Optional, Tuple
 

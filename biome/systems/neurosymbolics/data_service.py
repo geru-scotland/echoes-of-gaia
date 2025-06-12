@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Singleton data service for neurosymbolic AI module integration.
+
+Manages temporal sequence data for neural network processing;
+provides structured access to biome state and species information.
+Implements event-based readiness notification - handles data preparation
+for both neural models and graph-based symbolic reasoning modules.
+"""
+
 import os
 from typing import Dict, List, Any, Optional
 import time

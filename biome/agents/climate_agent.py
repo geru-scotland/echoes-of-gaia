@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+AI agent for climate system control through reinforcement learning.
+
+Perceives climate state and normalizes environmental parameters;
+uses neural models to decide weather events based on observations.
+Acts on climate system to maintain biome balance - integrates
+machine learning with environmental simulation dynamics.
+"""
+
 from logging import Logger
 
 import numpy as np

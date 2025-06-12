@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Movement component management for entity locomotion capabilities.
+
+Provides infrastructure for tracking and managing movement components;
+maintains registration of entity movement capabilities within the simulation.
+Acts as a foundation for spatial dynamics - enables future implementation
+of position updates and movement-related events across the biome.
+"""
+
 from logging import Logger
 
 from simpy import Environment as simpyEnv
