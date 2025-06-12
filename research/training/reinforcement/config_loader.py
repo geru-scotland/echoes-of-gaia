@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Configuration loader for reinforcement learning training components.
+
+Manages the loading and access of YAML configuration files for agent training;
+implements a singleton pattern to ensure consistent configuration access.
+Handles both agent-specific parameters and global biome settings - provides
+unified access to training hyperparameters and environment configurations.
+"""
+
 import os
 from pathlib import Path
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+CNN-based feature extractor for processing environmental observation spaces.
+
+Implements a neural network architecture for processing multi-channel biome 
+observations; combines terrain, entity, and physiological data through embeddings 
+and convolutional layers. Includes visualization tools for terrain and biome 
+representations - creates compact feature vectors for RL policy networks.
+"""
+
 import random
 
 import gym

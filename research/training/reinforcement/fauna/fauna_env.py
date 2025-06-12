@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Gymnasium environment for training fauna decision-making agents.
+
+Implements a complete simulation environment with multi-layer observation spaces;
+represents entity surroundings as terrain, validity, and entity distribution maps.
+Provides state information about physiological conditions and environmental
+context - supports episodic training with automatic cleanup on termination.
+"""
+
 import atexit
 from logging import Logger
 

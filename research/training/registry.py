@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Environment registry for managing reinforcement learning environments.
+
+Provides a centralized mechanism for registering and accessing training
+environments by agent type or class name. Implements a decorator-based
+registration system for dynamic environment discovery - ensures correct
+environment selection for specific agent types during training.
+"""
+
 from typing import Dict, Callable, Type
 
 from typing_extensions import TypeVar

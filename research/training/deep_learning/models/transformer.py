@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Transformer-based model for multi-step forecasting in biome simulations.
+
+Implements a specialized transformer architecture with position and step 
+embeddings; processes time-series data with self-attention mechanisms for 
+long-range dependency capture. Features pooling strategies and step-specific 
+embeddings - designed for accurate multi-horizon prediction tasks.
+"""
+
 import torch
 from torch import nn
 

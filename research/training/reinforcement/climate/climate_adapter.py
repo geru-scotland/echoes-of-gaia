@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Climate adaptation layer for reinforcement learning training environments.
+
+Bridges the simulation climate system with RL training interfaces; computes
+rewards based on comfort ranges and climatic factor distances. Handles
+normalization of environmental observations and progression of climate states - 
+implements sigmoid-based penalty functions for out-of-range conditions.
+"""
+
 from logging import Logger
 from typing import Dict, Any
 

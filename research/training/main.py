@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Entry point for training reinforcement learning agents in biome simulations.
+
+Initializes the training environment with ecosystem data and instantiates
+appropriate agents based on the selected type. Serves as the primary interface
+for launching agent training sessions - handles environment preparation
+and training process management.
+"""
+
 from research.training.reinforcement.climate.naive_climate import NaiveClimateEnvironment
 from research.training.reinforcement.fauna.fauna_env import FaunaAction
 from research.training.reinforcement.training_agent import ReinforcementLearningAgent

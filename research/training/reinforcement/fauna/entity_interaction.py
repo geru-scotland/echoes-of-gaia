@@ -16,6 +16,15 @@
 # =============================================================================
 """
 
+"""
+Entity interaction system for simulating predator-prey dynamics in biome training.
+
+Manages spatial interactions between fauna entities during training; processes
+attack and defense scenarios based on diet types and proximity. Tracks interaction
+history and calculates movement vectors relative to threats - provides directional
+awareness for entities navigating complex biome environments.
+"""
+
 from typing import Dict, List, Tuple, Set, Optional
 
 from biome.entities.entity import Entity

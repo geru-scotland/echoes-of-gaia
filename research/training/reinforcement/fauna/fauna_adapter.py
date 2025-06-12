@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Fauna simulation adapter for reinforcement learning training environments.
+
+Connects fauna entities with RL training interfaces; manages target acquisition, 
+movement decisions, and behavioral systems. Computes complex rewards based on 
+physiological states and environmental interactions - provides observation 
+generation with field-of-view perception for agent learning.
+"""
+
 import random
 from logging import Logger
 from typing import Tuple, Optional, Dict, Set

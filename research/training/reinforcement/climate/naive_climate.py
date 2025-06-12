@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Gymnasium environment for climate control reinforcement learning.
+
+Implements a basic climate simulation environment with seasonality and biome
+selection; defines observation and action spaces for weather event selection.
+Episodes span a full simulated year - uses climate adapter to manage state
+transitions and reward computation for maintaining optimal conditions.
+"""
+
 from logging import Logger
 
 import gymnasium as gym

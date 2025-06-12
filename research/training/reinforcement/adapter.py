@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Abstract adapter for reinforcement learning environment interactions.
+
+Defines the core interface for environment adapters in the training system;
+standardizes reward computation and observation collection methods. Serves
+as a bridge between simulation and RL frameworks - enables consistent
+environment interaction patterns across different agent types.
+"""
+
 from abc import ABC, abstractmethod
 
 

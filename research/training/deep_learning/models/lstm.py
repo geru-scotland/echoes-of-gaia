@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+LSTM-based neural network models for biome time-series forecasting.
+
+Implements attention-augmented LSTM architecture for environmental prediction;
+includes layer normalization, residual connections, and multi-horizon outputs.
+Supports both BiomeLSTM and BiomeGRU variants - provides specialized weight
+initialization for improved convergence in simulation forecasting tasks.
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
