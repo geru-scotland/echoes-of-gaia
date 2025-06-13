@@ -1,10 +1,14 @@
-<p align="center">
+<div style="text-align: center;">
   <img src="images/main.png" alt="Descripción" width="600" />
-</p>
+  <h3 style="font-size: 3rem; /* ajuste a tu gusto */">
+    ¿Qué es Echoes of GaIA?
+  </h3>
+  <hr style="width: 50%; margin: 8px auto;" />
+</div>
 
-## ¿Qué es Echoes of GaIA?
 
-Echoes of Gaia es un framework híbrido que hace de simulador de biomas artificiales; modela la evolución y dinámica de
+[Echoes of GaIA](https://geru-scotland.github.io/echoes-of-gaia-web) es un framework híbrido que hace de simulador de
+biomas artificiales; modela la evolución y dinámica de
 entornos naturales y lo integra con un sistema multiagente. Por defecto, existen biomas como el tropical, desierto,
 taiga, sabana y tundra, pero esto se puede extender fácilmente. Las especies de flora y fauna evolucionan sus genes
 gracias a variaciones de algoritmos genéticos que perciben las presiones ambientales y climáticas.
