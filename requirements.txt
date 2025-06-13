@@ -14,12 +14,15 @@ filelock==3.17.0
 fonttools==4.56.0
 fsspec==2025.2.0
 grpcio==1.70.0
+gym==0.26.2
+gym-notices==0.0.8
 gymnasium==1.0.0
 h11==0.14.0
 idna==3.10
 influxdb-client==1.48.0
 iniconfig==2.0.0
 Jinja2==3.1.5
+joblib==1.4.2
 kiwisolver==1.4.8
 Markdown==3.7
 markdown-it-py==3.0.0
@@ -63,7 +66,10 @@ pytz==2025.1
 PyYAML==6.0.2
 reactivex==4.0.4
 rich==13.9.4
+scikit-fuzzy==0.5.0
+scikit-learn==1.6.1
 scipy==1.15.2
+seaborn==0.13.2
 setuptools==75.8.0
 simpy==4.1.1
 six==1.17.0
@@ -72,6 +78,7 @@ stable_baselines3==2.5.0
 sympy==1.13.1
 tensorboard==2.19.0
 tensorboard-data-server==0.7.2
+threadpoolctl==3.6.0
 torch==2.6.0
 tqdm==4.67.1
 triton==3.2.0
