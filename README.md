@@ -1,6 +1,9 @@
-<div style="text-align: center;">
+<p align="center">
   <img src="images/main.png" alt="Descripción" width="600" />
-  <h3 style="font-size: 3rem; /* ajuste a tu gusto */">
+</p>
+
+<div style="text-align: center;">
+  <h3 style="font-size: 3rem;">
     ¿Qué es Echoes of GaIA?
   </h3>
   <hr style="width: 50%; margin: 8px auto;" />
