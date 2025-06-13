@@ -1,6 +1,6 @@
-<center>
-<img src="images/main.png" alt="Descripción" width="600" />
-</center> 
+<p align="center">
+  <img src="images/main.png" alt="Descripción" width="600" />
+</p>
 
 ## ¿Qué es Echoes of GaIA?
 
