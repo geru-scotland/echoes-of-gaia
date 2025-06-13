@@ -1,0 +1,43 @@
+simulation:
+  datapoints: false
+
+  eras:
+    amount: 10
+    events-per-era: 5
+
+  cleanup:
+    remove_dead_entities: true
+
+  population-control:
+    smart: true
+
+  neurosymbolic:
+    enabled: true
+    lstm_model_path: "research/models/lstm/biome.pth"
+    save_training_data: true
+
+  data:
+    storage:
+      base: "research/experiments"
+      simulations: "simulations"
+      trackers:
+        evolution: "evolution"
+        genetic_crossover: "genetic-crossover"
+        trends: "trends"
+
+    visualization:
+      smart-trends: false
+      evolution: false
+      crossover: false
+
+    snapshots:
+      enabled: true
+      period_type: "CUSTOM"
+      custom_period: 4
+      storage_directory: "simulation_records"
+      filename_prefix: "biome_snapshot"
+      pretty_print: true
+      include_real_timestamp: true
+
+    dataset:
+      generate: true

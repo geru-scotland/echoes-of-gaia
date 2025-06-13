@@ -1,0 +1,36 @@
+""" 
+# =============================================================================
+#                                                                              #
+#                              ✦ ECHOES OF GAIA ✦                              #
+#                                                                              #
+#    Trabajo Fin de Grado (TFG)                                                #
+#    Facultad de Ingeniería Informática - Donostia                             #
+#    UPV/EHU - Euskal Herriko Unibertsitatea                                   #
+#                                                                              #
+#    Área de Computación e Inteligencia Artificial                             #
+#                                                                              #
+#    Autor:  Aingeru García Blas                                               #
+#    GitHub: https://github.com/geru-scotland                                  #
+#    Repo:   https://github.com/geru-scotland/echoes-of-gaia                   #
+#                                                                              #
+# =============================================================================
+"""
+
+"""
+Data structure for telemetry measurements and fields.
+
+Represents a single telemetry point with measurement name, tags,
+field values, and optional timestamp for temporal indexing.
+Serves as the core data unit for InfluxDB storage operations.
+"""
+
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
+class Datapoint:
+    measurement: str
+    tags: dict
+    fields: dict
+    timestamp: Optional[int] = None

@@ -1,0 +1,67 @@
+hyperparameters:
+  batch_size: 32
+  hidden_size: 128
+  num_layers: 2
+  dropout: 0.4
+  learning_rate: 0.001
+  weight_decay: 0.001
+  num_epochs: 250
+  max_seq_len: 50
+
+data:
+  sequence_length: 15
+  target_horizon: 10
+  validation_split: 0.3
+  use_progress_bar: true
+
+  graph_data:
+    species_data:
+    biome_data:
+      - temperature
+      - humidity
+      - precipitation
+      - predator_prey_ratio
+      - prey_population
+      - predator_population
+      - biodiversity_index
+      - ecosystem_stability
+      - environmental_pressure
+      - biome_score
+      - avg_stress
+
+  features:
+    - prey_population
+    - predator_population
+    - flora_count
+    - temperature
+    - humidity
+    - precipitation
+    - co2_level
+
+
+    - biodiversity_index
+    - biomass_density
+    - ecosystem_stability
+    - biome_score
+
+    - environmental_pressure
+    - avg_stress
+
+  targets:
+    - prey_population
+    - predator_population
+    - flora_count
+    - ecosystem_stability
+    - avg_stress
+
+
+visualization:
+  enabled: true
+  show_plots: true
+  save_plots: true
+
+paths:
+  data_path: "research/data/neurosymbolic/neural"
+  model_save_path: "research/models/neural/biome.pth"
+  plots_dir: "research/plots/lstm"
+  inference_model: "lstm_baselines_39pct.pth"

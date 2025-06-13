@@ -1,0 +1,125 @@
+"""
+##########################################################################
+#                                                                        #
+#                           ✦ ECHOES OF GAIA ✦                           #
+#                                                                        #
+#    Trabajo Fin de Grado (TFG)                                          #
+#    Facultad de Ingeniería Informática - Donostia                       #
+#    UPV/EHU - Euskal Herriko Unibertsitatea                             #
+#                                                                        #
+#    Área de Computación e Inteligencia Artificial                       #
+#                                                                        #
+#    Autor:  Aingeru García Blas                                         #
+#    GitHub: https://github.com/geru-scotland                            #
+#    Repo:   https://github.com/geru-scotland/echoes-of-gaia             #
+#                                                                        #
+##########################################################################
+"""
+
+"""
+Constructs biome contexts with procedural map generation.
+
+Configures terrain maps using Perlin noise algorithms;
+loads flora and fauna definitions from biome configurations.
+Assembles complete biome contexts with climate models - handles
+map generation failures with proper error recovery mechanisms.
+"""
+
+import logging
+import random
+from logging import Logger
+from typing import Any, Dict, Optional, Tuple
+
+import numpy as np
+
+from biome.systems.maps.procedural_maps import (
+    MapGenData,
+    MapGenerator,
+    PerlinNoiseGenerator,
+)
+from config.settings import BiomeSettings, Config
+from exceptions.custom import MapGenerationError
+from shared.enums.constants import MAP_DEFAULT_SIZE
+from shared.enums.enums import BiomeType
+from shared.enums.strings import Loggers
+from shared.stores.biome_store import BiomeStore
+from shared.types import EntityDefinitions, TileMap
+from simulation.core.bootstrap.builders.builder import Builder, ConfiguratorStrategy
+from simulation.core.bootstrap.context.context_data import BiomeContextData
+from utils.loggers import LoggerManager
+from utils.middleware import log_execution_time
+
+
+class MapConfigurator(ConfiguratorStrategy):
+    def __init__(self):
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
+        self._map: Optional[MapGenData] = None
+
+    @log_execution_time("Map Generation")
+    def configure(self, settings: BiomeSettings, **kwargs: Any) -> None:
+        map_size: Tuple[int, int]
+        config: Config = kwargs.get("config")
+
+        try:
+            map_size = config.get("map").get("size")
+        except:
+            map_size = MAP_DEFAULT_SIZE
+
+        biomes = BiomeStore.biomes
+        map_data: Dict[str, Any] = {
+            "size": map_size,
+            "weights": np.array(biomes.get(config.get("type", {}), BiomeType.TROPICAL).get("weights", []))
+        }
+
+        try:
+            self._map = MapGenerator(PerlinNoiseGenerator).generate(map_data=map_data, seed=random.randint(1, 99))
+            self._logger.debug(self._map.tile_map)
+        except MapGenerationError as e:
+            logging.error(f"[ERROR] Map generation failed: {e}")
+            self._map = None
+            raise
+
+    def get_map_gen_data(self) -> MapGenData:
+        return self._map
+
+    def get_tile_map(self) -> TileMap:
+        return self._map.tile_map
+
+
+class BiomeBuilder(Builder):
+    """
+    Cargar settings, inicializar sistemas de eventosGra
+    """
+
+    def __init__(self, settings: BiomeSettings):
+        super().__init__()
+        self._settings = settings
+        self._logger: Logger = LoggerManager.get_logger(Loggers.BIOME)
+        self._logger.info("[Biome Builder] Initialising BiomeBuilder...")
+        self._context_data: Optional[BiomeContextData] = None
+        self._initialise()
+
+    def _initialise(self):
+        pass
+
+    def build(self) -> None:
+        self._logger.info("[Biome Builder] Building biome...")
+        # Logs, settings, maps, init events
+        try:
+            config: Config = self._settings.config.get("biome")
+            flora: EntityDefinitions = config.get("flora", {})
+            fauna: EntityDefinitions = config.get("fauna", {})
+            climate_model: str = config.get("climate-model", {})
+            fauna_model = config.get('fauna-model', '')
+            fauna_ia = config.get('fauna_ia', True)
+            map_configurator: MapConfigurator = MapConfigurator()
+            map_configurator.configure(self._settings, config=config)
+            self._context = BiomeContextData(biome_type=config.get("type"),
+                                             tile_map=map_configurator.get_tile_map(),
+                                             config=config, logger_name=Loggers.BIOME,
+                                             flora_definitions=flora, fauna_definitions=fauna,
+                                             climate_model=climate_model,
+                                             fauna_model=fauna_model,
+                                             fauna_ia=fauna_ia)
+        except Exception as e:
+            self._logger.exception(f"There was a problem building the context from the Biome: {e}")

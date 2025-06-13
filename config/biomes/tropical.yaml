@@ -1,0 +1,59 @@
+biome:
+  type: "tropical"
+
+  flora:
+    - species: "oak_tree"
+      spawns: 20
+      avg-lifespan: 8
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 28.0
+        - AutotrophicNutritionComponent:
+
+    - species: "mushroom"
+      spawns: 10
+      avg-lifespan: 4
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 10.0
+        - AutotrophicNutritionComponent:
+
+    - species: "bramble"
+      spawns: 20
+      avg-lifespan: 5
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 10.0
+        - AutotrophicNutritionComponent:
+
+  fauna:
+    - species: "deer"
+      spawns: 10
+      diet: "herbivore"
+      avg-lifespan: 3
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 26.0
+        - MovementComponent:
+        - HeterotrophicNutritionComponent:
+
+    - species: "panther"
+      spawns: 10
+      diet: "carnivore"
+      avg-lifespan: 3
+      components:
+        - GrowthComponent:
+        - VitalComponent:
+        - WeatherAdaptationComponent:
+            optimal_temperature: 28.0
+        - MovementComponent:
+        - HeterotrophicNutritionComponent:
+

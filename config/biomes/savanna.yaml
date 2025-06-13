@@ -1,0 +1,34 @@
+biome:
+  type: "savanna"
+
+  flora:
+    - species: "acacia_tree"
+      spawns: 22
+      avg-lifespan: 15
+    - species: "savanna_grass"
+      spawns: 35
+      avg-lifespan: 2
+    - species: "baobab_tree"
+      spawns: 10
+      avg-lifespan: 25
+    - species: "aloe_vera"
+      spawns: 18
+      avg-lifespan: 7
+
+  fauna:
+    - species: "lion"
+      spawns: 4
+      diet: "carnivore"
+      avg-lifespan: 12
+    - species: "zebra"
+      spawns: 16
+      diet: "herbivore"
+      avg-lifespan: 9
+    - species: "elephant"
+      spawns: 9
+      diet: "herbivore"
+      avg-lifespan: 25
+    - species: "hyena"
+      spawns: 3
+      diet: "carnivore"
+      avg-lifespan: 8

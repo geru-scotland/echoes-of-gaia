@@ -92,5 +92,23 @@ Desktop.ini
 # Temp files
 tmp/
 temp/
+generated_configs/
 
 __pycache__/
+
+simulation/simulation_records/
+simulation/graphs/
+tensorboard_logs/
+tensorboard_log/
+research/experiments/simulations
+research/training/runs
+research/data
+research/plots
+research/training/deep_learning/data_backup
+
+patch.diff
+
+*.tsv
+*.pth
+temp_training_config.yaml
+simulation/dataset/graphs/

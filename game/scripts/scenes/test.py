@@ -1,8 +1,27 @@
-from enum import Enum
-import pygame
+"""
+##########################################################################
+#                                                                        #
+#                           ✦ ECHOES OF GAIA ✦                           #
+#                                                                        #
+#    Trabajo Fin de Grado (TFG)                                          #
+#    Facultad de Ingeniería Informática - Donostia                       #
+#    UPV/EHU - Euskal Herriko Unibertsitatea                             #
+#                                                                        #
+#    Área de Computación e Inteligencia Artificial                       #
+#                                                                        #
+#    Autor:  Aingeru García Blas                                         #
+#    GitHub: https://github.com/geru-scotland                            #
+#    Repo:   https://github.com/geru-scotland/echoes-of-gaia             #
+#                                                                        #
+##########################################################################
+"""
 import random
-from game.theme.colors import Colors
+from enum import Enum
+
+import pygame
+
 from game.systems.scenes.base_scene import Scene
+from game.theme.colors import Colors
 
 
 class EntitySceneState(Enum):

@@ -1,0 +1,61 @@
+""" 
+# =============================================================================
+#                                                                              #
+#                              ✦ ECHOES OF GAIA ✦                              #
+#                                                                              #
+#    Trabajo Fin de Grado (TFG)                                                #
+#    Facultad de Ingeniería Informática - Donostia                             #
+#    UPV/EHU - Euskal Herriko Unibertsitatea                                   #
+#                                                                              #
+#    Área de Computación e Inteligencia Artificial                             #
+#                                                                              #
+#    Autor:  Aingeru García Blas                                               #
+#    GitHub: https://github.com/geru-scotland                                  #
+#    Repo:   https://github.com/geru-scotland/echoes-of-gaia                   #
+#                                                                              #
+# =============================================================================
+"""
+from shared.enums.base import EnumBaseStr
+
+
+class SimulationEvent(EnumBaseStr):
+    SIMULATION_FINISHED = "on_simulation_finished"
+    SIMULATION_TRAIN_TARGET_ACQUIRED = "on_simulation_target_acquired"
+
+
+class ComponentEvent(EnumBaseStr):
+    UPDATE_STATE = "on_component_update"
+    STAGE_CHANGE = "on_stage_change"
+    SIZE_CHANGE = "on_size_change"
+    MODIFIER_CHANGE = "on_modifier_change"
+    STRESS_CHANGE = "on_stress_change"
+    CLIMATE_RESPONSE = "on_climate_response"
+    FLORA_CONSUMED = "on_flora_consumed"
+    DORMANCY_TOGGLE = "on_dormancy_toggle"
+    DORMANCY_REASONS_CHANGED = "on_dormancy_reasons_changed"
+    DORMANCY_UPDATED = "on_dormancy_updated"
+    STRESS_UPDATED = "on_stress_updated"
+    ENTITY_DEATH = "on_entity_death"
+    WEATHER_UPDATE = "on_weather_update"
+    ENERGY_UPDATED = "on_energy_update"
+    BIOLOGICAL_AGE_UPDATED = "on_biological_age_updated"
+    PHOTOSYNTHESIS_UPDATED = "on_photosyntesis_updated"
+    ENERGY_ABSORPTION = "on_energy_absorption"
+    POSITION_UPDATED = "position_updated"
+    ENERGY_CRITICAL = "on_critical_energy_level"
+    ENERGY_RESTORED = "on_normal_energy_level"
+
+
+class BiomeEvent(EnumBaseStr):
+    CREATE_ENTITY = "create_entity"
+    REMOVE_ENTITY = "remove_entity"
+    ENTITY_DEATH = "entity_death"
+    ENTITY_CREATED = "entity_created"
+    MOVE_ENTITY = "move_entity"
+    VALIDATE_MOVEMENT = "validate_movement"
+    CLIMATE_CHANGE = "climate_change"
+    WEATHER_UPDATE = "on_weather_update"
+    SEASON_CHANGE = "season_change"
+    DISASTER = "disaster"
+    CLIMATE_DATA_COLLECTED = "climate_data_collected"
+    NEUROSYMBOLIC_SERVICE_READY = "neurosymbolic_service_ready"
