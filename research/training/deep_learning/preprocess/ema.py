@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Exponential Moving Average (EMA) processor for time-series smoothing.
+
+Implements state-persistent exponential averaging for temporal sequences;
+maintains internal state between sequence processing for continuous smoothing.
+Provides configurable alpha parameter for balancing between immediate changes
+and historical values - reduces noise while preserving trends in biome data.
+"""
+
 import numpy as np
 
 

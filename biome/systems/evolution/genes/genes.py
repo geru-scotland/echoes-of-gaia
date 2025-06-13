@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Abstract base class for genetic information management.
+
+Defines the interface for gene encoding and component conversion;
+provides common gene extraction functionality for entity components.
+Ensures genetic information integrity through validation mechanisms -
+acts as foundation for specialized flora and fauna gene implementations.
+"""
+
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 

@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Abstract base class for entity attribute management handlers.
+
+Provides common event notification infrastructure and logging setup;
+defines abstract event registration interface for handlers.
+Supports event notifier integration and handler lifecycle management.
+"""
+
 from abc import ABC, abstractmethod
 
 from simpy import Environment as simpyEnv

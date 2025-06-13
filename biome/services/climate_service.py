@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Static climate service for global climate state access.
+
+Provides centralized access to climate state and seasonal information;
+initializes with state references and callback functions.
+Enables system-wide climate queries without direct dependencies.
+"""
+
 from typing import Optional, Callable
 
 from biome.systems.climate.state import ClimateState

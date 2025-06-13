@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Container class for comprehensive biome state capture.
+
+Stores simulation time, entity states and environmental conditions;
+provides structured data organization for snapshot persistence.
+Includes serialization capabilities for JSON format - consolidates
+terrain, entity, climate and metrics data into a unified structure.
+"""
+
 import time
 from typing import Optional, Dict, Any
 

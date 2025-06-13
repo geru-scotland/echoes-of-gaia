@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Main entry point for the simulation snapshot visualization tool.
+
+Provides command-line interface to visualize biome snapshots;
+configures viewer settings and discovers latest snapshot files.
+Maps terrain and entity colors for proper visual representation -
+enables interactive exploration of simulation state data.
+"""
+
 import argparse
 import os
 import sys

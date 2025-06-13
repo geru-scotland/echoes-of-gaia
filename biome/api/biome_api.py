@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+High-level API interface for biome access and management operations.
+
+Encapsulates biome initialization and provides access to subsystems;
+exposes worldmap manager, evolution registry and entity providers.
+Serves as primary interface for external biome interactions.
+"""
+
 from typing import Dict, Any
 
 import simpy

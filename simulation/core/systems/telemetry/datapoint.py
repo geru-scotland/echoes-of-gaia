@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Data structure for telemetry measurements and fields.
+
+Represents a single telemetry point with measurement name, tags,
+field values, and optional timestamp for temporal indexing.
+Serves as the core data unit for InfluxDB storage operations.
+"""
+
 from dataclasses import dataclass
 from typing import Optional
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Interactive navigation controls for snapshot visualization.
+
+Provides button controls for timeline navigation with play functionality;
+includes draggable slider for direct snapshot selection.
+Manages playback state and updates button availability - handles
+user interactions for temporal biome data exploration.
+"""
+
 import logging
 from typing import Tuple, Callable, Dict, Optional
 

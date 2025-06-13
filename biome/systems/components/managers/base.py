@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Base component manager class for entity component lifecycle control.
+
+Provides generic component registration and management infrastructure;
+handles active component filtering and dormancy state queries.
+Supports component ID tracking and generic type parameterization for
+type-safe component collections - enables modular component systems.
+"""
+
 from typing import Dict, List, TypeVar, Generic, Set
 from simpy import Environment as simpyEnv
 

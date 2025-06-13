@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Core world management system with entity and terrain coordination.
+
+Integrates map allocation, entity spawning and spatial relationship systems;
+handles entity movement validation and position tracking functions.
+Manages local map generation for agent observation spaces - coordinates
+entity lifecycle events and provides terrain traversability validation.
+"""
+
 import random
 import sys
 import traceback

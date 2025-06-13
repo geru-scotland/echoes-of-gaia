@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Manages terrain tile extraction and map surface calculation.
+
+Loads tilesheets and terrain configuration data from YAML files;
+extracts sprites for different terrain types with corner-based
+indexing system - calculates complete map surfaces with proper
+tile positioning for render engine visualization.
+"""
+
 from logging import Logger
 
 from typing import Dict, List, Tuple, Optional, Any, TextIO

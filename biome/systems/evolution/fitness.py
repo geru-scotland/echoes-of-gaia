@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Fitness evaluation system for genetic algorithm entity selection.
+
+Calculates fitness scores based on climate adaptation and survival traits;
+implements specialized evaluation for flora and fauna gene expressions.
+Uses environmental data to assess temperature, humidity and precipitation
+adaptation - weighs multiple factors for comprehensive fitness computation.
+"""
+
 import math
 
 from biome.systems.evolution.genes.fauna_genes import FaunaGenes

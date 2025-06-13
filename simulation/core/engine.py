@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Core simulation engine that orchestrates biome simulations.
+
+Manages the entire simulation lifecycle - it bootstraps contexts,
+coordinates timing systems, handles telemetry data collection;
+controls the discrete event simulation using SimPy framework.
+Provides real-time execution control with stepped progression.
+"""
+
 import itertools
 import sys
 import time

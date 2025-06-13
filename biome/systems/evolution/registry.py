@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Evolution agent registry for coordinating species evolution processes.
+
+Maintains references to evolution agents organized by species type;
+manages process registration and inter-agent communication.
+Tracks evolution trends and provides generational analysis capabilities.
+"""
+
 from logging import Logger
 from typing import Any, Dict, Optional, List, Tuple
 

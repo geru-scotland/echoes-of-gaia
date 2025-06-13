@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Energy reserves handler for entity metabolic management.
+
+Manages energy level modifications with source tracking and bounds;
+provides energy update event notifications and reserve monitoring.
+Handles energy accumulation with maximum capacity constraints and
+source attribution - supports energy gain-loss operations.
+"""
+
 from abc import ABC
 
 from biome.components.handlers.base import AttributeHandler

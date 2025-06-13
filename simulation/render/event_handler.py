@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Bridges simulation events with render system operations.
+
+Registers handlers for biome loading and simulation completion events;
+creates map components and integrates them with render engine.
+Manages render lifecycle in response to simulation state changes.
+"""
+
 from logging import Logger
 from typing import Dict, Any
 

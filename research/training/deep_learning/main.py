@@ -16,6 +16,15 @@
 # =============================================================================
 """
 
+"""
+Entry point for deep learning model training in biome simulations.
+
+Provides command-line interface for training neural time-series models; handles
+configuration loading and training session initialization. Serves as the main
+execution script for deep learning pipeline - reports training outcomes
+and validation metrics after completion.
+"""
+
 import os
 import sys
 import logging

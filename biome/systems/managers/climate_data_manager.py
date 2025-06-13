@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Climate data tracking and history management system.
+
+Records and organizes climate metrics across evolution cycles;
+provides data retrieval services for specific time periods.
+Manages daily climate measurement collection - coordinates
+with evolution processes to maintain climate history continuity.
+"""
+
 from logging import Logger
 from typing import List, Dict, Any
 

@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Core world map class for terrain and entity position management.
+
+Stores terrain data and maintains entity position registries;
+provides access to entity collections with filtering options.
+Maps entity coordinates and handles spatial relationships in the biome.
+"""
+
 from typing import List
 
 import numpy as np

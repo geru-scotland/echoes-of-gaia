@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Flora entity implementation with dormancy and photosynthetic systems.
+
+Extends Entity for plant behavior with dormancy state management;
+handles environmental stress and weather adaptation mechanisms.
+Provides nutritive value calculation and integrity tracking - supports
+damage systems and photosynthetic response to climate events.
+"""
+
 from typing import Set, Type, Dict, Optional
 
 from biome.entities.descriptor import EntityDescriptor

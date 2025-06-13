@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+High-level API interface for simulation engine control.
+
+Provides abstraction layer over SimulationEngine for external access;
+handles normal and training mode operations with proper lifecycle.
+Supports stepped execution for reinforcement learning - enables
+biome data retrieval and simulation time tracking.
+"""
+
 from logging import getLogger, Logger
 from typing import Optional, Type
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Growth lifecycle management for biome entity development.
+
+Controls entity growth progression through sigmoid growth patterns;
+updates size attributes based on age, efficiency, and environmental factors.
+Manages growth stage transitions and notifies relevant systems - supports
+non-linear biological development with realistic progression curves.
+"""
+
 from logging import Logger
 
 import numpy as np

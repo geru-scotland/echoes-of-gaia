@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Singleton service for biome entity control and evolution management.
+
+Handles entity spawning with genetic inheritance and lifecycle control;
+manages evolution agent interactions and generation tracking.
+Supports batch entity creation and evolution cycle adjustments - provides
+centralized interface for programmatic biome manipulation operations.
+"""
+
 import random
 import traceback
 from typing import Optional, Any, List, Dict, Tuple

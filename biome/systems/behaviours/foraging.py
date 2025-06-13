@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Foraging behavior system for fauna entity food and water acquisition.
+
+Handles water consumption from terrain sources and food consumption
+based on diet types; includes herbivore-carnivore-omnivore feeding.
+Supports nutritive value calculations, toxicity effects and prey
+selection algorithms - manages hunger-thirst satisfaction mechanics.
+"""
+
 import random
 from logging import Logger
 from typing import Optional, Dict, List

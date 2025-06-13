@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Biome snapshot system for state capture and data persistence.
+
+Orchestrates snapshot collection with entity-climate-metric data;
+handles neurosymbolic data generation and storage coordination.
+Manages snapshot lifecycle with callback support and dataset
+generation modes - provides biome state serialization capabilities.
+"""
+
 import itertools
 from logging import Logger
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Information panel for detailed biome and entity data display.
+
+Renders comprehensive statistics, metrics and entity details;
+supports collapsible sections and time-formatted values.
+Displays biome health scores with color-coded quality indicators -
+handles complex data visualization with structured layout.
+"""
+
 import logging
 from typing import Dict, Optional, Tuple, List, Any
 

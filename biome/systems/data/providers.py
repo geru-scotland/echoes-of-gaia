@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Abstract biome data provider interface for component access.
+
+Defines standardized methods for accessing biome data components;
+includes entity providers, worldmap, collectors and analyzers.
+Provides interface contract for biome type and climate manager
+access - enables consistent data layer abstraction patterns.
+"""
+
 from abc import ABC, abstractmethod
 
 from biome.systems.managers.entity_manager import EntityProvider

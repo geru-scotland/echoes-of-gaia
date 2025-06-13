@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Entity descriptor dataclass for type and species identification.
+
+Stores entity type and species information in structured format;
+provides factory methods for flora and fauna creation.
+Enables consistent entity identification across the biome system.
+"""
+
 from dataclasses import dataclass
 
 from shared.enums.base import EnumBaseStr

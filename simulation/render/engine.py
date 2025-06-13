@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+PyGame-based rendering engine for real-time visualization.
+
+Manages window initialization and component rendering pipeline;
+handles task queues for thread-safe rendering operations.
+Coordinates visual components and input events - provides
+main rendering loop with proper cleanup mechanisms.
+"""
+
 from logging import Logger
 from typing import Dict
 import queue

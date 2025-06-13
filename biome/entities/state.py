@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Entity state container for dynamic attribute management.
+
+Stores entity state values in flexible key-value dictionary format;
+supports state updates and retrieval with default value handling.
+Provides state dumping for persistence and field access operations.
+"""
+
 from dataclasses import dataclass, field
 from typing import Dict, Any
 

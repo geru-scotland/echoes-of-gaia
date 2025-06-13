@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Asynchronous InfluxDB client for simulation telemetry storage.
+
+Manages database connections and queued write operations;
+processes datapoints through dedicated worker thread architecture.
+Handles telemetry persistence with proper resource cleanup - ensures
+reliable data storage for monitoring and analysis purposes.
+"""
+
 from logging import Logger
 from queue import Queue, Empty
 from threading import Thread

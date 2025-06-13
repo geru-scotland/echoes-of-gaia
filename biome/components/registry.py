@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Component class registry for dynamic component instantiation.
+
+Maps component names to their corresponding class implementations;
+provides registration and lookup functions for component system.
+Enables dynamic component creation and modular architecture support.
+"""
+
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.kinematics.movement import MovementComponent
 from biome.components.physiological.growth import GrowthComponent

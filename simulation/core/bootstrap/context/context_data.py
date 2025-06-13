@@ -15,6 +15,15 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Dataclass definitions for biome and simulation context structures.
+
+Defines BiomeContextData with terrain, entities and climate models;
+SimulationContextData includes telemetry and configuration data.
+Provides typed containers for bootstrap context management.
+"""
+
 from abc import ABC
 from dataclasses import dataclass
 from typing import Optional

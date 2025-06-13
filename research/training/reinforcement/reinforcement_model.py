@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Pre-trained reinforcement learning model interface for biome simulations.
+
+Provides a unified interface for loading and executing trained RL models;
+supports multiple algorithm types from Stable Baselines3. Handles model
+loading from disk and prediction operations - enables runtime inference
+with minimal overhead for biome entity decision-making.
+"""
+
 import os
 from logging import Logger
 

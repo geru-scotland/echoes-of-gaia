@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Reinforcement learning agent implementation for biome simulations.
+
+Manages agent training processes using Stable Baselines3 algorithms; handles
+environment initialization, model configuration, and training callbacks.
+Includes specialized callbacks for tracking network activations and saving
+embeddings - coordinates training loops and model persistence.
+"""
+
 import os
 import traceback
 from typing import Type

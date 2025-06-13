@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Biome health assessment system with weighted contributor scoring.
+
+Evaluates overall biome quality using multiple ecological factors;
+calculates normalized scores and quality classifications.
+Integrates specialized contributor modules to assess different aspects -
+provides comprehensive ecosystem health evaluation metrics.
+"""
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum

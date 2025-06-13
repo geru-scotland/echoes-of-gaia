@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Spatial management system for entity position allocation.
+
+Handles entity placement and movement in the terrain grid;
+manages position validation and habitat-based space allocation.
+Tracks entity positions with optimized index map implementation.
+"""
+
 from logging import Logger
 from typing import List, Optional, Tuple
 

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Weather adaptation component for temperature stress management.
+
+Handles entity temperature tolerance and stress response calculations;
+includes cold-heat resistance and optimal temperature parameters.
+Uses Gaussian distribution for stress computation and stress handler
+integration - supports weather event processing and temperature history.
+"""
+
 import math
 from typing import Dict, Any
 

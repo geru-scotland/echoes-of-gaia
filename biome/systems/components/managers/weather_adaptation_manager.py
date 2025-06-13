@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Weather adaptation management for entity response to climate conditions.
+
+Processes environmental weather events and calculates appropriate entity
+responses based on temperature deviations from optimal conditions.
+Applies stress modifications according to entity resistance levels - handles
+hot and cold adaptations through gaussian stress response curves.
+"""
+
 from typing import Any, Dict, List
 
 import numpy as np

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Adaptive mutation operator for genetic algorithm evolution.
+
+Implements multiple mutation strategies with contextual parameter adjustment;
+dynamically adapts mutation magnitude based on entity lifespans.
+Supports gaussian and adaptive mutation modes with range constraints -
+provides fine-grained control over evolutionary exploration rates.
+"""
+
 import math
 import random
 from logging import Logger

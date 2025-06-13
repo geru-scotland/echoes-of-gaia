@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Target management system for reinforcement learning training sessions.
+
+Provides centralized tracking of target entities during training; maintains
+state information about target acquisition and validation criteria. Acts as a
+singleton registry for cross-component target coordination - manages training
+mode flags and episode tracking for fauna-based reinforcement learning.
+"""
+
 from typing import Optional
 
 from shared.enums.enums import EntityType, FaunaSpecies, SimulationMode

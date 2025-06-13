@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Entity data access provider for biome system interactions.
+
+Provides filtered entity collections based on type and lifecycle status;
+connects systems to the entity registry through a consistent interface.
+Abstracts entity access and retrieval logic from world map implementation.
+"""
+
 from typing import Tuple
 
 from biome.entities.entity import Entity

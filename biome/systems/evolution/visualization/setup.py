@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Evolution visualization system setup and entity registration utilities.
+
+Configures evolution tracker with plotter integration for trait analysis;
+provides registration functions for evolved entities and populations.
+Handles correlation matrix generation and visualization coordination;
+supports fitness tracking and generation-based trait monitoring.
+"""
+
 from biome.systems.evolution.genetics import extract_genes_from_entity
 from biome.systems.evolution.visualization.evo_plotter import EvolutionPlotter
 from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker

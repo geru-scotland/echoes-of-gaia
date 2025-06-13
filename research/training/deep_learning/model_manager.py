@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Neural model manager for biome time-series forecasting and analysis.
+
+Provides comprehensive infrastructure for training, evaluating, and deploying
+LSTM and Transformer models for biome simulation predictions. Handles data 
+loading, normalization, training pipelines, and visualization - supports both
+training and inference modes with robust configuration management.
+"""
+
 import json
 import os
 import traceback

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Climate data collection service for environmental metrics tracking.
+
+Gathers current climate system parameters for snapshot and analysis;
+provides structured access to temperature, humidity and precipitation data.
+Implements fallback mechanism for missing climate states - supports
+climate history generation and statistics calculation for ecosystem analysis.
+"""
+
 import time
 from logging import Logger
 from typing import Dict, Any

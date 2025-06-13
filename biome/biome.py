@@ -15,6 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
+
+"""
+Main biome class that orchestrates all biome systems and agents.
+
+Coordinates climate systems, evolution agents and entity management;
+initializes worldmap and handles environmental interactions.
+Manages agent lifecycle and provides data access interfaces - serves
+as central hub for biome simulation operations and state management.
+"""
+
 import sys
 import traceback
 from typing import Dict, Any, Type

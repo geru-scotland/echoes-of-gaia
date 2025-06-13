@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Bridges event system with InfluxDB telemetry storage.
+
+Registers event handlers for biome data collection events;
+routes telemetry datapoints to InfluxDB writer automatically.
+Connects simulation events to persistent data storage layer.
+"""
+
 from simulation.core.systems.events.event_bus import SimulationEventBus
 from shared.events.handler import EventHandler
 from simulation.core.systems.telemetry.datapoint import Datapoint

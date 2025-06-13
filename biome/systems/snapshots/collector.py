@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Collector system for comprehensive biome state aggregation.
+
+Gathers entity, terrain, climate and metrics data into structured snapshots;
+coordinates data extraction from various simulation subsystems.
+Integrates with neurosymbolic data services for AI analysis - provides
+complete point-in-time capture of simulation state for analysis and persistence.
+"""
+
 import time
 import traceback
 from logging import Logger

@@ -15,9 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
 """
-Módulo para analizar tendencias evolutivas en el bioma
+Statistical analyzer for tracking evolutionary trait adaptations.
+
+Records and processes generational genetic data across species;
+identifies significant trends in key adaptive traits over time.
+Calculates normalized evolutionary slopes and prioritizes adaptations -
+generates structured reports on evolutionary direction and magnitude.
 """
+
 from typing import Dict, List, Any
 from collections import defaultdict
 

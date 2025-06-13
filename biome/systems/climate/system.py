@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Core climate system with weather events and seasonal dynamics.
+
+Manages biome environmental factors through weather simulation;
+handles seasonal transitions and entity-based biomass calculations.
+Updates atmospheric conditions based on weather events - triggers
+biome notifications and maintains climate data recording system.
+"""
+
 import random
 from logging import Logger
 from typing import Dict, Any, Optional, Callable

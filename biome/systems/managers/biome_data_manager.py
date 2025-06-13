@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Biome data manager for snapshot coordination and telemetry collection.
+
+Orchestrates snapshot system initialization with configuration support;
+handles scheduled snapshot processes and telemetry data gathering.
+Manages data provider integration and biome statistics collection;
+supports dataset generation modes and callback-based operations.
+"""
+
 import os
 from logging import Logger
 from pathlib import Path

@@ -15,6 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Transform component for entity position and spatial management.
+
+Provides 2D coordinate tracking with getter-setter position methods;
+handles entity spatial state representation and position updates.
+Supports event notifier disabling and state serialization for
+spatial data persistence and coordinate system operations.
+"""
+
 from typing import Tuple, Dict, Any
 
 from simpy import Environment as simpyEnv

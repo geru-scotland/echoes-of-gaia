@@ -15,6 +15,15 @@
 #                                                                              #
 # =============================================================================
 """
+
+"""
+Coordinates InfluxDB operations and event handling lifecycle.
+
+Integrates InfluxDB client with event handlers for complete
+telemetry pipeline management; provides unified interface
+for database initialization and cleanup operations.
+"""
+
 from typing import Dict, Any
 
 from simulation.core.systems.telemetry.event_handler import InfluxEventHandler

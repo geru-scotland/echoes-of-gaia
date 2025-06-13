@@ -15,23 +15,16 @@
 #                                                                              #
 # =============================================================================
 """
+
 """
-##########################################################################
-#                                                                        #
-#                           ✦ ECHOES OF GAIA ✦                           #
-#                                                                        #
-#    Trabajo Fin de Grado (TFG)                                          #
-#    Facultad de Ingeniería Informática - Donostia                       #
-#    UPV/EHU - Euskal Herriko Unibertsitatea                             #
-#                                                                        #
-#    Área de Computación e Inteligencia Artificial                       #
-#                                                                        #
-#    Autor:  Aingeru García Blas                                         #
-#    GitHub: https://github.com/geru-scotland                            #
-#    Repo:   https://github.com/geru-scotland/echoes-of-gaia             #
-#                                                                        #
-##########################################################################
+Entity movement component with direction-based position calculation.
+
+Manages directional movement with energy cost tracking and validation;
+handles position updates through centralized event notification.
+Provides movement capability control and position calculation methods;
+coordinates with validation systems for terrain-aware traversal.
 """
+
 from typing import Dict, Any, Tuple
 
 from simpy import Environment as simpyEnv

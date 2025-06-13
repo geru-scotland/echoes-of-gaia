@@ -16,6 +16,15 @@
 # =============================================================================
 """
 
+"""
+Heterotrophic nutrition component for fauna energy metabolism.
+
+Manages hunger, thirst and energy reserve dynamics for fauna entities;
+handles food and water consumption with metabolism efficiency modifiers.
+Integrates with stress system for metabolic rate adjustments - provides
+comprehensive physiological state tracking for fauna survival processes.
+"""
+
 from typing import Dict, Any
 
 from simpy import Environment as simpyEnv
