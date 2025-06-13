@@ -32,7 +32,7 @@ sobre dinámicas ecológicas complejas y servir como base para proyectos de simu
 5. [Nuevos componentes](#nuevos-componentes)
 6. [Nuevos tipos de biomas, especies y escenarios](#nuevos-tipos-de-biomas-especies-y-escenarios)
 7. [Más configuraciones](#más-configuraciones)
-8. [Soporte para InfluxDB](#soporte-para-influxdb)
+8. [Soporte para InfluxDB](#soporte-para-influxdb-y-grafana)
 9. [Pull requests](#pull-requests)
 10. [Instalación](#instalación)
 
@@ -62,6 +62,12 @@ sobre dinámicas ecológicas complejas y servir como base para proyectos de simu
 | `simulation/main.py`                     | Motor principal - crea mundos con biomas configurables con todos los agentes activos. Básicamente es el corazón del framework.                                                                                       |
 | `simulation/visualization/main.py`       | Visor de snapshots y datapoints, es simplemente una forma básica para poder interpretar las simulaciones. Imagen debajo de ésta tabla.                                                                               |
 | `research/cli.py`                        | CLI para gestionar entrenamientos, experimentos y análisis. Funcional, excepto lanzamiento de trainings.                                                                                                             |## Cómo extender
+
+Ejemplo del visor ([ver imagen original](https://geru-scotland.github.io/echoes-of-gaia-web/images/figures/biome3.png)):
+
+<p align="center">
+  <img src="images/biome.png" alt="Descripción" width="800" />
+</p>
 
 ### Ecosystem.js
 
@@ -119,8 +125,8 @@ Es muy intuitivo, pero a modo de preview:
 
 Los `weights` controlan la generación procedural del terreno:
 `[WATER_DEEP, WATER_MID, WATER_SHALLOW, SHORE, GRASS, MOUNTAIN, SNOW, SAND]`. Con -1 desactivas un tipo de terreno
-completamente. Esto está explicado en la memoria, **tema 2, Modelos computacional de los Biomas**, apartado de *
-*Generación procedural de mapas: algoritmo Perlin noise**
+completamente. Esto está explicado en la memoria, **tema 2, Modelos computacional de los Biomas**, apartado de
+**Generación procedural de mapas: algoritmo Perlin noise**
 
 ### Nuevos agentes
 
@@ -645,7 +651,63 @@ handlers...etc
 | `config/fauna.yaml`      | Configuración de agentes de RL de fauna                                                              |
 | `config/climate.yaml`    | y de clima.                                                                                          |
 
-### Soporte para InfluxDB
+### Soporte para InfluxDB y Grafana
+
+Para desarrollo local, puedes levantar un[ contenedor docker de InfluxDB](https://hub.docker.com/_/influxdb) o
+[instalarlo directamente](https://docs.influxdata.com/influxdb3/core/). Crea un bucket para mediciones y las
+credenciales, las puedes configurar en un `.env`:
+
+```env
+INFLUXDB_URL=http://localhost:8086
+INFLUXDB_TOKEN=mi_token_local
+INFLUXDB_ORG=echoes_of_gaia
+INFLUXDB_BUCKET=echoes_of_gaia
+```
+
+**Nota**: Para entornos de producción, nunca utilizar `.env`, utiliza un sistema de gestión de secretos (Vault, AWS
+Secrets
+Manager, lo que sea, pero no .env).
+
+Si en `config/simulation.yaml`, activas `datapoints`, se hará todo automáticamente:
+
+```yaml
+simulation:
+  datapoints:
+    enabled: true
+```
+
+Después, para visualizar los datos con **Grafana**, instalalo en local y crea un nuevo **data source** (**InfluxDB**),
+luego en en **dashboard** utiliza queries como:
+
+```flux
+from(bucket: "echoes_of_gaia")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r._measurement == "biome_states_20")
+  |> keep(columns: ["_time", "_field", "_value", "state_id"])  
+  |> pivot(
+      rowKey: ["_time"],
+      columnKey: ["_field"],
+      valueColumn: "_value"
+  )
+  |> keep(columns: [
+      "_time", "state_id", "avg_water_modifier", "normalized_score", "num_fauna",
+      "num_flora", "quality", "score", "avg_max_energy_reserve", "avg_max_size",
+      "avg_max_vitality", "avg_metabolic_activity", "avg_photosynthesis_efficiency",
+      "avg_position", "avg_respiration_rate", "avg_temperature_modifier",
+      "avg_tick", "avg_vitality", "avg_age", "avg_aging_rate", "avg_biological_age",
+      "avg_birth_tick", "avg_current_size", "avg_dormancy_threshold",
+      "avg_energy_reserves", "avg_growth_efficiency", "avg_growth_stage",
+      "avg_health", "avg_health_modifier"
+  ])
+  |> group()
+```
+
+Se podrán ver métricas tal que:
+
+<p align="center">
+  <img src="images/grafana1.png" alt="Descripción" width="800" />
+  <img src="images/grafana2.png" alt="Descripción" width="800" />
+</p>
 
 ### Pull requests
 
