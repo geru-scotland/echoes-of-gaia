@@ -25,11 +25,10 @@ for visualization components and ensures consistent data formats
 across the visualization pipeline and snapshot handling.
 """
 
-from typing import Dict, List, Tuple, Optional, Any, Callable, TypedDict, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict, Union
 
 import pygame
-
-from shared.enums.enums import Season, BiomeType, DietType
+from shared.enums.enums import BiomeType, DietType, Season
 
 Point = Tuple[int, int]
 Size = Tuple[int, int]

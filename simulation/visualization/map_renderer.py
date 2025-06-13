@@ -26,13 +26,12 @@ provides optimized surface caching for performance efficiency.
 """
 
 import logging
-import random
-from typing import Dict, List, Tuple, Optional, Set
+from typing import Dict, Optional, Tuple
 
-import pygame
 import numpy as np
+import pygame
 
-from simulation.visualization.types import TerrainMapData, Color, TerrainTypeInfo, Point
+from simulation.visualization.types import Color, Point, TerrainMapData, TerrainTypeInfo
 
 
 class MapRenderer:

@@ -28,19 +28,20 @@ complete visualization interface for simulation data exploration.
 import logging
 import time
 from pathlib import Path
-from typing import Optional, Dict, Tuple, Any
+from typing import Optional, Tuple
 
 import pygame
 
-from simulation.visualization.entity_renderer import EntityRenderer, EntityInfo
+from simulation.visualization.entity_renderer import EntityRenderer
 from simulation.visualization.info_panel import InfoPanel
 from simulation.visualization.map_renderer import MapRenderer
 from simulation.visualization.navigation import Navigation
 from simulation.visualization.snapshot_loader import SnapshotLoader
 from simulation.visualization.types import (
-    SnapshotData, Point, Size, ViewerConfig, Color, TerrainTypeInfo
+    Point,
+    SnapshotData,
+    ViewerConfig,
 )
-
 
 
 class SnapshotViewer:

@@ -16,12 +16,11 @@
 # =============================================================================
 """
 
+import argparse
 import os
+import subprocess
 import sys
 import time
-import argparse
-import subprocess
-import random
 
 
 def print_simulation_header(sim_number):

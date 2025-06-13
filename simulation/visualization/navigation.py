@@ -26,7 +26,7 @@ user interactions for temporal biome data exploration.
 """
 
 import logging
-from typing import Tuple, Callable, Dict, Optional
+from typing import Callable, Optional
 
 import pygame
 

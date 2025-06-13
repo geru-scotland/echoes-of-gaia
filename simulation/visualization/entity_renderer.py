@@ -26,12 +26,12 @@ supports layered rendering for proper entity display ordering.
 """
 
 import logging
-from typing import Dict, List, Tuple, Optional, Set
+from typing import Dict, Optional, Tuple
 
 import pygame
-
 from shared.enums.enums import DietType
-from simulation.visualization.types import EntityData, Color, Point
+
+from simulation.visualization.types import Color, EntityData, Point
 
 
 class EntityInfo:

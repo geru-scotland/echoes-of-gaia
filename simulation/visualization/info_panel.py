@@ -26,12 +26,18 @@ handles complex data visualization with structured layout.
 """
 
 import logging
-from typing import Dict, Optional, Tuple, List, Any
+from typing import Any, Dict, Optional, Tuple
 
 import pygame
 
 from simulation.visualization.entity_renderer import EntityInfo
-from simulation.visualization.types import SnapshotTimeInfo, MetricsData, BiomeScoreData, TerrainTypeInfo, Color
+from simulation.visualization.types import (
+    BiomeScoreData,
+    Color,
+    MetricsData,
+    SnapshotTimeInfo,
+    TerrainTypeInfo,
+)
 
 
 def format_time_value(ticks: float, timers) -> str:

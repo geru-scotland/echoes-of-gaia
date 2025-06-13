@@ -19,7 +19,7 @@ import logging
 import os
 import threading
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 from utils.paths import LOGS_DIR
 
@@ -131,7 +131,9 @@ class ThreadNameFilter(logging.Filter):
 
         return True
 
+
 import logging
+
 
 class LoggerManager:
     _loggers = {}
@@ -143,7 +145,6 @@ class LoggerManager:
             logging.disable(logging.CRITICAL + 1)  # Desactiva completamente los logs
         else:
             LoggerManager._log_level = getattr(logging, log_level.upper(), logging.INFO)
-
 
     @staticmethod
     def get_logger(name: str, log_file: str = None):
