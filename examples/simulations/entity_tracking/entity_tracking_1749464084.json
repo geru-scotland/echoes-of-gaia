@@ -1,0 +1,1340 @@
+{
+  "tracked_entity_id": 122,
+  "total_snapshots": 23,
+  "snapshots": [
+    {
+      "tick": 2,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49963302830433,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949963302830434,
+        "age": 2.0,
+        "biological_age": 2.0,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 100.0,
+        "energy_ratio": 1.0,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.5519,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.0500249629232081,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.253120365401012,
+        "growth_completion": 0.06253120365401012
+      },
+      "climate": {
+        "avg_temperature": 9.0,
+        "avg_humidity": 66.0,
+        "avg_precipitation": 29.0,
+        "co2_level": 388.81409016606625,
+        "biomass_index": 0.17113558496658834,
+        "atmospheric_pressure": 1010,
+        "current_weather": "snow"
+      },
+      "weather_event": "snow"
+    },
+    {
+      "tick": 3,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49963302830433,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949963302830434,
+        "age": 2.0,
+        "biological_age": 2.0,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 100.0,
+        "energy_ratio": 1.0,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.5519,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.0500249629232081,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.253120365401012,
+        "growth_completion": 0.06253120365401012
+      },
+      "climate": {
+        "avg_temperature": 9.0,
+        "avg_humidity": 66.0,
+        "avg_precipitation": 29.0,
+        "co2_level": 388.81409016606625,
+        "biomass_index": 0.17113558496658834,
+        "atmospheric_pressure": 1010,
+        "current_weather": "snow"
+      },
+      "weather_event": "snow"
+    },
+    {
+      "tick": 4,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49801292176,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949801292175999,
+        "age": 4.0,
+        "biological_age": 3.9999999820011998,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.98692176656124,
+        "energy_ratio": 0.9998692176656124,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.59816,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05004994091338945,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.256242614173681,
+        "growth_completion": 0.06256242614173681
+      },
+      "climate": {
+        "avg_temperature": 6.0,
+        "avg_humidity": 64.85,
+        "avg_precipitation": 34.25,
+        "co2_level": 387.6281935307315,
+        "biomass_index": 0.17114938039704422,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 5,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49801292176,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949801292175999,
+        "age": 4.0,
+        "biological_age": 3.9999999820011998,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.98692176656124,
+        "energy_ratio": 0.9998692176656124,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.59816,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05004994091338945,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.256242614173681,
+        "growth_completion": 0.06256242614173681
+      },
+      "climate": {
+        "avg_temperature": 6.0,
+        "avg_humidity": 64.85,
+        "avg_precipitation": 34.25,
+        "co2_level": 387.6281935307315,
+        "biomass_index": 0.17114938039704422,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 6,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49638758292035,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949638758292035,
+        "age": 6.0,
+        "biological_age": 5.999999892014399,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.99395447894271,
+        "energy_ratio": 0.9999395447894271,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.641294,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05007493397863354,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.259366747329191,
+        "growth_completion": 0.06259366747329191
+      },
+      "climate": {
+        "avg_temperature": 4.466666666666667,
+        "avg_humidity": 65.6632119108253,
+        "avg_precipitation": 36.46666666666667,
+        "co2_level": 386.4423103879662,
+        "biomass_index": 0.17116318116544585,
+        "atmospheric_pressure": 1010,
+        "current_weather": "sunny"
+      },
+      "weather_event": "sunny"
+    },
+    {
+      "tick": 7,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49638758292035,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949638758292035,
+        "age": 6.0,
+        "biological_age": 5.999999892014399,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.99395447894271,
+        "energy_ratio": 0.9999395447894271,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.641294,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05007493397863354,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.259366747329191,
+        "growth_completion": 0.06259366747329191
+      },
+      "climate": {
+        "avg_temperature": 4.466666666666667,
+        "avg_humidity": 65.6632119108253,
+        "avg_precipitation": 36.46666666666667,
+        "co2_level": 386.4423103879662,
+        "biomass_index": 0.17116318116544585,
+        "atmospheric_pressure": 1010,
+        "current_weather": "sunny"
+      },
+      "weather_event": "sunny"
+    },
+    {
+      "tick": 8,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49475699482386,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949475699482386,
+        "age": 8.0,
+        "biological_age": 7.999999913518938,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.97783563052178,
+        "energy_ratio": 0.9997783563052178,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.6789646,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05009994212703288,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.2624927658791085,
+        "growth_completion": 0.06262492765879109
+      },
+      "climate": {
+        "avg_temperature": 4.75,
+        "avg_humidity": 64.62240893311898,
+        "avg_precipitation": 37.400000000000006,
+        "co2_level": 385.25644103272185,
+        "biomass_index": 0.17117698727407948,
+        "atmospheric_pressure": 1010,
+        "current_weather": "rain"
+      },
+      "weather_event": "rain"
+    },
+    {
+      "tick": 9,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49475699482386,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949475699482386,
+        "age": 8.0,
+        "biological_age": 7.999999913518938,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.97783563052178,
+        "energy_ratio": 0.9997783563052178,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.6789646,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05009994212703288,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.2624927658791085,
+        "growth_completion": 0.06262492765879109
+      },
+      "climate": {
+        "avg_temperature": 4.75,
+        "avg_humidity": 64.62240893311898,
+        "avg_precipitation": 37.400000000000006,
+        "co2_level": 385.25644103272185,
+        "biomass_index": 0.17117698727407948,
+        "atmospheric_pressure": 1010,
+        "current_weather": "rain"
+      },
+      "weather_event": "rain"
+    },
+    {
+      "tick": 10,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.4931211409849,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.994931211409849,
+        "age": 10.0,
+        "biological_age": 9.999999581472617,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.96246511787406,
+        "energy_ratio": 0.9996246511787406,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.71266814,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.050124965366683066,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.265620670835383,
+        "growth_completion": 0.06265620670835383
+      },
+      "climate": {
+        "avg_temperature": 4.34,
+        "avg_humidity": 66.35792714649519,
+        "avg_precipitation": 40.540000000000006,
+        "co2_level": 384.0705857609332,
+        "biomass_index": 0.17119079872522702,
+        "atmospheric_pressure": 1010,
+        "current_weather": "windy"
+      },
+      "weather_event": "windy"
+    },
+    {
+      "tick": 11,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.4931211409849,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.994931211409849,
+        "age": 10.0,
+        "biological_age": 9.999999581472617,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.96246511787406,
+        "energy_ratio": 0.9996246511787406,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.71266814,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.050124965366683066,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.265620670835383,
+        "growth_completion": 0.06265620670835383
+      },
+      "climate": {
+        "avg_temperature": 4.34,
+        "avg_humidity": 66.35792714649519,
+        "avg_precipitation": 40.540000000000006,
+        "co2_level": 384.0705857609332,
+        "biomass_index": 0.17119079872522702,
+        "atmospheric_pressure": 1010,
+        "current_weather": "windy"
+      },
+      "weather_event": "windy"
+    },
+    {
+      "tick": 12,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49148000373962,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949148000373963,
+        "age": 12.0,
+        "biological_age": 11.999999805084691,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.95730284855392,
+        "energy_ratio": 0.9995730284855392,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.7437013259999999,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05015000370568283,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.268750463210353,
+        "growth_completion": 0.06268750463210353
+      },
+      "climate": {
+        "avg_temperature": 3.9499999999999997,
+        "avg_humidity": 66.63160595541265,
+        "avg_precipitation": 41.96666666666667,
+        "co2_level": 382.8847448695206,
+        "biomass_index": 0.17120461552117616,
+        "atmospheric_pressure": 1010,
+        "current_weather": "clear"
+      },
+      "weather_event": "clear"
+    },
+    {
+      "tick": 13,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.49148000373962,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9949148000373963,
+        "age": 12.0,
+        "biological_age": 11.999999805084691,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.95730284855392,
+        "energy_ratio": 0.9995730284855392,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.7437013259999999,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05015000370568283,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.268750463210353,
+        "growth_completion": 0.06268750463210353
+      },
+      "climate": {
+        "avg_temperature": 3.9499999999999997,
+        "avg_humidity": 66.63160595541265,
+        "avg_precipitation": 41.96666666666667,
+        "co2_level": 382.8847448695206,
+        "biomass_index": 0.17120461552117616,
+        "atmospheric_pressure": 1010,
+        "current_weather": "clear"
+      },
+      "weather_event": "clear"
+    },
+    {
+      "tick": 14,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48983356674239,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948983356674239,
+        "age": 14.0,
+        "biological_age": 13.999999817950636,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.9545687786872,
+        "energy_ratio": 0.999545687786872,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.7711311933999999,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05017505715213384,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.27188214401673,
+        "growth_completion": 0.0627188214401673
+      },
+      "climate": {
+        "avg_temperature": 3.9714285714285715,
+        "avg_humidity": 66.35566224749655,
+        "avg_precipitation": 42.98571428571429,
+        "co2_level": 381.69891865639204,
+        "biomass_index": 0.17121843766421332,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 15,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48983356674239,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948983356674239,
+        "age": 14.0,
+        "biological_age": 13.999999817950636,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.9545687786872,
+        "energy_ratio": 0.999545687786872,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.7711311933999999,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05017505715213384,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.27188214401673,
+        "growth_completion": 0.0627188214401673
+      },
+      "climate": {
+        "avg_temperature": 3.9714285714285715,
+        "avg_humidity": 66.35566224749655,
+        "avg_precipitation": 42.98571428571429,
+        "co2_level": 381.69891865639204,
+        "biomass_index": 0.17121843766421332,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 16,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48818181299653,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948818181299653,
+        "age": 16.0,
+        "biological_age": 15.999999585346355,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.97687011353798,
+        "energy_ratio": 0.9997687011353799,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.79546807406,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05020012571414091,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.275015714267614,
+        "growth_completion": 0.06275015714267614
+      },
+      "climate": {
+        "avg_temperature": 3.8,
+        "avg_humidity": 66.64870446655948,
+        "avg_precipitation": 43.900000000000006,
+        "co2_level": 380.5131074204455,
+        "biomass_index": 0.171232265156625,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 17,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48818181299653,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948818181299653,
+        "age": 16.0,
+        "biological_age": 15.999999585346355,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.97687011353798,
+        "energy_ratio": 0.9997687011353799,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.79546807406,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05020012571414091,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.275015714267614,
+        "growth_completion": 0.06275015714267614
+      },
+      "climate": {
+        "avg_temperature": 3.8,
+        "avg_humidity": 66.64870446655948,
+        "avg_precipitation": 43.900000000000006,
+        "co2_level": 380.5131074204455,
+        "biomass_index": 0.171232265156625,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 18,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48652472492454,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948652472492454,
+        "age": 18.0,
+        "biological_age": 17.999999707627037,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.9870873022762,
+        "energy_ratio": 0.9998708730227619,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.818021266654,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.0502252093998119,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.278151174976488,
+        "growth_completion": 0.06278151174976487
+      },
+      "climate": {
+        "avg_temperature": 3.522222222222222,
+        "avg_humidity": 67.32107063694177,
+        "avg_precipitation": 44.733333333333334,
+        "co2_level": 379.3273114615711,
+        "biomass_index": 0.17124609800070026,
+        "atmospheric_pressure": 1010,
+        "current_weather": "clear"
+      },
+      "weather_event": "clear"
+    },
+    {
+      "tick": 19,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48652472492454,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948652472492454,
+        "age": 18.0,
+        "biological_age": 17.999999707627037,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.9870873022762,
+        "energy_ratio": 0.9998708730227619,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.818021266654,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.0502252093998119,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.278151174976488,
+        "growth_completion": 0.06278151174976487
+      },
+      "climate": {
+        "avg_temperature": 3.522222222222222,
+        "avg_humidity": 67.32107063694177,
+        "avg_precipitation": 44.733333333333334,
+        "co2_level": 379.3273114615711,
+        "biomass_index": 0.17124609800070026,
+        "atmospheric_pressure": 1010,
+        "current_weather": "clear"
+      },
+      "weather_event": "clear"
+    },
+    {
+      "tick": 20,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48486228572186,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948486228572186,
+        "age": 20.0,
+        "biological_age": 19.999999783797342,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 100.0,
+        "energy_ratio": 1.0,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.8379191399886,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.0502503082172577,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.281288527157212,
+        "growth_completion": 0.06281288527157212
+      },
+      "climate": {
+        "avg_temperature": 3.53,
+        "avg_humidity": 67.54896357324759,
+        "avg_precipitation": 45.4,
+        "co2_level": 378.1415310806534,
+        "biomass_index": 0.17125993619872767,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 21,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48486228572186,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948486228572186,
+        "age": 20.0,
+        "biological_age": 19.999999783797342,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 100.0,
+        "energy_ratio": 1.0,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.8379191399886,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.0502503082172577,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.281288527157212,
+        "growth_completion": 0.06281288527157212
+      },
+      "climate": {
+        "avg_temperature": 3.53,
+        "avg_humidity": 67.54896357324759,
+        "avg_precipitation": 45.4,
+        "co2_level": 378.1415310806534,
+        "biomass_index": 0.17125993619872767,
+        "atmospheric_pressure": 1010,
+        "current_weather": "cloudy"
+      },
+      "weather_event": "cloudy"
+    },
+    {
+      "tick": 22,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48319447844356,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948319447844356,
+        "age": 22.0,
+        "biological_age": 21.999999520910276,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.99067608543399,
+        "energy_ratio": 0.9999067608543399,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.8556272259897401,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05027542217459227,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.284427771824033,
+        "growth_completion": 0.06284427771824033
+      },
+      "climate": {
+        "avg_temperature": 3.4181818181818175,
+        "avg_humidity": 68.08996688477053,
+        "avg_precipitation": 46.06363636363636,
+        "co2_level": 376.9557665795734,
+        "biomass_index": 0.17127377975299662,
+        "atmospheric_pressure": 1010,
+        "current_weather": "windy"
+      },
+      "weather_event": "windy"
+    },
+    {
+      "tick": 23,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.48319447844356,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948319447844356,
+        "age": 22.0,
+        "biological_age": 21.999999520910276,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 99.99067608543399,
+        "energy_ratio": 0.9999067608543399,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.8556272259897401,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.05027542217459227,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.284427771824033,
+        "growth_completion": 0.06284427771824033
+      },
+      "climate": {
+        "avg_temperature": 3.4181818181818175,
+        "avg_humidity": 68.08996688477053,
+        "avg_precipitation": 46.06363636363636,
+        "co2_level": 376.9557665795734,
+        "biomass_index": 0.17127377975299662,
+        "atmospheric_pressure": 1010,
+        "current_weather": "windy"
+      },
+      "weather_event": "windy"
+    },
+    {
+      "tick": 24,
+      "entity_id": 122,
+      "entity_type": "flora",
+      "species": "winterberry",
+      "is_alive": true,
+      "vital_metrics": {
+        "vitality": 99.4815212852351,
+        "max_vitality": 100.0,
+        "vitality_ratio": 0.9948152128523511,
+        "age": 24.0,
+        "biological_age": 23.999999650121993,
+        "aging_rate_effective": 1.0,
+        "somatic_integrity": 100.0,
+        "integrity_ratio": 1.0
+      },
+      "metabolic_metrics": {
+        "effective_photosynthesis": 0,
+        "effective_respiration": 0,
+        "net_energy_production": 0,
+        "energy_reserves": 100.0,
+        "energy_ratio": 1.0,
+        "light_availability": 0.7,
+        "temperature_modifier": 1.0,
+        "water_modifier": 0.7,
+        "metabolic_activity": 0.872214503390766,
+        "is_dormant": false
+      },
+      "stress_metrics": {
+        "vital_stress_level": 0,
+        "vital_normalized_stress": 0,
+        "metabolic_stress_level": 0,
+        "metabolic_normalized_stress": 0
+      },
+      "environmental_metrics": {
+        "optimal_temperature": -3.0,
+        "cold_resistance": 0.85,
+        "heat_resistance": 0.3
+      },
+      "growth_metrics": {
+        "growth_stage": 0,
+        "current_size": 0.050300551279932666,
+        "max_size": 0.8,
+        "growth_efficiency": 0.6,
+        "size_percentage": 6.287568909991583,
+        "growth_completion": 0.06287568909991582
+      },
+      "climate": {
+        "avg_temperature": 3.258333333333333,
+        "avg_humidity": 68.10746964437298,
+        "avg_precipitation": 46.25833333333333,
+        "co2_level": 375.7700182612109,
+        "biomass_index": 0.1712876286657974,
+        "atmospheric_pressure": 1010,
+        "current_weather": "clear"
+      },
+      "weather_event": "clear"
+    }
+  ]
+}
