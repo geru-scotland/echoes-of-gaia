@@ -26,7 +26,7 @@ optimized habitat position caches for fast entity spawning operations.
 """
 
 from logging import Logger
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 from numpy import ndarray
@@ -35,7 +35,7 @@ from scipy.ndimage import convolve
 from shared.enums.enums import Habitats, TerrainType
 from shared.enums.strings import Loggers
 from shared.stores.biome_store import BiomeStore
-from shared.types import HabitatCache, TileMap, Position, BiomeStoreData
+from shared.types import BiomeStoreData, HabitatCache, Position, TileMap
 from utils.loggers import LoggerManager
 
 

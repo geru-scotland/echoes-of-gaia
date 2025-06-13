@@ -27,17 +27,15 @@ selection algorithms - manages hunger-thirst satisfaction mechanics.
 
 import random
 from logging import Logger
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
-from biome.entities.flora import Flora
 from biome.systems.managers.worldmap_manager import WorldMapManager
-from shared.enums.enums import ComponentType, EntityType, TerrainType, DietType
+from shared.enums.enums import ComponentType, DietType, EntityType, TerrainType
 from shared.enums.events import ComponentEvent
-from shared.types import Position
-from utils.loggers import LoggerManager
 from shared.enums.strings import Loggers
+from utils.loggers import LoggerManager
 
 
 class ForagingBehaviour:

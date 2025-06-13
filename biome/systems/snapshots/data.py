@@ -26,9 +26,16 @@ terrain, entity, climate and metrics data into a unified structure.
 """
 
 import time
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
-from shared.types import SnapshotID, TerrainData, EntityData, ClimateData, MetricsData, BiomeScoreData
+from shared.types import (
+    BiomeScoreData,
+    ClimateData,
+    EntityData,
+    MetricsData,
+    SnapshotID,
+    TerrainData,
+)
 from simulation.core.systems.time.time import SimulationTimeInfo
 
 

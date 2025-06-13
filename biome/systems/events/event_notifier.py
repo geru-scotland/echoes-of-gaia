@@ -24,7 +24,7 @@ provides scoped event distribution within entity components.
 Enables targeted event communication without global broadcasting.
 """
 
-from typing import Dict, List, Callable, Any
+from typing import Any, Callable, Dict, List
 
 
 class EventNotifier:

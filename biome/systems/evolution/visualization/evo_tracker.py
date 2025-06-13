@@ -15,12 +15,13 @@
 #                                                                              #
 # =============================================================================
 """
-from matplotlib import pyplot as plt
-import numpy as np
-from scipy import stats
-import pandas as pd
-from typing import Dict, List, Set, Tuple, Optional, Any, TypedDict, Union
 from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Set, Tuple
+
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+from scipy import stats
 
 from shared.enums.enums import EvolutionSummary, TraitRecord
 from simulation.core.experiment_path_manager import ExperimentPathManager

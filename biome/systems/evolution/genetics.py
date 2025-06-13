@@ -28,19 +28,22 @@ supports adaptive mutation and tracks genetic lineage through generations.
 import random
 
 import numpy as np
-from deap import base, creator, tools, algorithms
+from deap import algorithms, base, creator, tools
 
 from biome.entities.entity import Entity
-from biome.systems.evolution.mutations.adaptive_mutation_operator import AdaptiveMutationOperator
 from biome.systems.evolution.fitness import compute_fitness
 from biome.systems.evolution.genes.fauna_genes import extract_genes_from_fauna
 from biome.systems.evolution.genes.flora_genes import extract_genes_from_flora
-
 from biome.systems.evolution.genes.genes import Genes
 from biome.systems.evolution.genetic_converter import GeneticConverter
-from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
+from biome.systems.evolution.mutations.adaptive_mutation_operator import (
+    AdaptiveMutationOperator,
+)
+from biome.systems.evolution.visualization.evo_crossover_tracker import (
+    GeneticCrossoverTracker,
+)
 from shared.enums.enums import EntityType, MutationType
-from shared.evolution.ranges import FLORA_GENE_RANGES, FAUNA_GENE_RANGES
+from shared.evolution.ranges import FAUNA_GENE_RANGES, FLORA_GENE_RANGES
 from shared.types import ClimateData, EntityList
 
 

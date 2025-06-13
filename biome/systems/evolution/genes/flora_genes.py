@@ -25,14 +25,17 @@ Implements value range validation against predefined constraints - provides
 specialized gene extraction from existing flora entities for evolutionary processes.
 """
 
-from deap import creator
 
-from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
-from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
+from typing import Any, Dict, List
+
+from biome.components.physiological.autotrophic_nutrition import (
+    AutotrophicNutritionComponent,
+)
+from biome.components.physiological.photosynthetic_metabolism import (
+    PhotosyntheticMetabolismComponent,
+)
 from biome.entities.entity import Entity
 from biome.systems.evolution.genes.genes import Genes, extract_common_genes
-from typing import List, Dict, Any
-
 from shared.enums.enums import ComponentType
 from shared.evolution.ranges import FLORA_GENE_RANGES
 

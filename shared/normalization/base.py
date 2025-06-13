@@ -16,7 +16,7 @@
 # =============================================================================
 """
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, Tuple
+from typing import Generic, Tuple, TypeVar
 
 T = TypeVar('T')
 V = TypeVar('V')

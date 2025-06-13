@@ -24,7 +24,7 @@ initializes with state references and callback functions.
 Enables system-wide climate queries without direct dependencies.
 """
 
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 from biome.systems.climate.state import ClimateState
 from shared.enums.enums import Season

@@ -27,9 +27,9 @@ flexible configuration of the snapshot system's operation modes.
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Set, Optional
+from typing import Optional, Set
 
-from shared.enums.enums import CapturePeriod, CaptureFormat, CaptureType
+from shared.enums.enums import CaptureFormat, CapturePeriod, CaptureType
 from utils.paths import SIMULATION_DIR
 
 

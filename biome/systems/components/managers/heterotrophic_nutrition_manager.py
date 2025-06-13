@@ -30,12 +30,14 @@ from logging import Logger
 import numpy as np
 from simpy import Environment as simpyEnv
 
-from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
+from biome.components.physiological.heterotrophic_nutrition import (
+    HeterotrophicNutritionComponent,
+)
 from biome.systems.components.managers.base import BaseComponentManager
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import StressReason
 from shared.enums.strings import Loggers
-from shared.enums.thresholds import ThirstThresholds, HungerThresholds
+from shared.enums.thresholds import HungerThresholds, ThirstThresholds
 from shared.timers import Timers
 from utils.loggers import LoggerManager
 

@@ -26,18 +26,15 @@ with evolution processes to maintain climate history continuity.
 """
 
 from logging import Logger
-from typing import List, Dict, Any
+from typing import Any, Dict
 
 from pandas import DataFrame
 from simpy import Environment as simpyEnv
 
 from biome.systems.climate.system import ClimateSystem
-from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.history.climate_history import ClimateHistoryService
-from shared.enums.events import BiomeEvent
 from shared.enums.strings import Loggers
-from shared.timers import Timers
 from utils.loggers import LoggerManager
 
 

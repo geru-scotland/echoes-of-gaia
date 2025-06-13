@@ -25,20 +25,20 @@ Tracks somatic integrity and vitality history - supports death
 events and dormancy threshold calculations with Gompertz decay.
 """
 
-import math
-from typing import Optional, List, Tuple, Dict, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
 from simpy import Environment as simpyEnv
+
 from biome.components.base.component import EntityComponent
 from biome.components.handlers.energy_handler import EnergyHandler
 from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.components.registry import ComponentRegistry
-from shared.enums.events import SimulationEvent, ComponentEvent
-from shared.math.biological import BiologicalGrowthPatterns
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
+from shared.enums.events import ComponentEvent, SimulationEvent
+from shared.math.biological import BiologicalGrowthPatterns
 from shared.timers import Timers
 from simulation.core.systems.events.event_bus import SimulationEventBus
 

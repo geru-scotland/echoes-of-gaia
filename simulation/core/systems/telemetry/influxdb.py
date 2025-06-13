@@ -26,9 +26,9 @@ reliable data storage for monitoring and analysis purposes.
 """
 
 from logging import Logger
-from queue import Queue, Empty
+from queue import Empty, Queue
 from threading import Thread
-from typing import Dict, Any
+from typing import Any, Dict
 
 from influxdb_client import InfluxDBClient, Point, WriteApi, WritePrecision
 from influxdb_client.client.write_api import ASYNCHRONOUS

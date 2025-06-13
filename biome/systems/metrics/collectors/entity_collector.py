@@ -27,10 +27,9 @@ supports comprehensive biome state statistics generation workflows.
 
 from collections import defaultdict
 from logging import Logger
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 import numpy as np
-from dotenv.cli import enumerate_env
 
 from biome.systems.evolution.registry import EvolutionAgentRegistry
 from biome.systems.managers.climate_data_manager import ClimateDataManager

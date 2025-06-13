@@ -29,6 +29,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 from simpy import Environment as simpyEnv
+
 from biome.systems.events.event_bus import BiomeEventBus
 from shared.enums.enums import WeatherEvent
 from shared.enums.events import BiomeEvent, ComponentEvent

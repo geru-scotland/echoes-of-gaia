@@ -17,7 +17,8 @@
 """
 import os
 from unittest.mock import patch
-from game.main import init_systems, Game
+
+from game.main import Game, init_systems
 
 # Para evitar cuando lo ponga en GH actions
 # que falle por no disponer de video mode.

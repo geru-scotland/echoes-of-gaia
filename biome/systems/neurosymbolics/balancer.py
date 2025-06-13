@@ -25,18 +25,30 @@ Handles species availability analysis and intervention execution via
 biome control service - supports adaptive biome management strategies.
 """
 
-import random
 from logging import Logger
-from typing import Dict, Type, Optional, Any, List
+from typing import Any, Dict, List, Optional, Type
 
 from biome.services.biome_control_service import BiomeControlService
 from biome.systems.neurosymbolics.data_service import NeurosymbolicDataService
 from biome.systems.neurosymbolics.integrations.base_strategy import IntegrationStrategy
 from biome.systems.neurosymbolics.modules.neural_module import NeuralModuleInterface
-from biome.systems.neurosymbolics.modules.rule_symbolic_module import SymbolicModuleInterface
-from shared.enums.enums import EntityType, FloraSpecies, FaunaSpecies, Interventions, DietType
+from biome.systems.neurosymbolics.modules.rule_symbolic_module import (
+    SymbolicModuleInterface,
+)
+from shared.enums.enums import (
+    DietType,
+    EntityType,
+    FaunaSpecies,
+    FloraSpecies,
+    Interventions,
+)
 from shared.enums.strings import Loggers
-from shared.types import Observation, IntegratedResult, PredictionFeedback, SymbolicFeedback
+from shared.types import (
+    IntegratedResult,
+    Observation,
+    PredictionFeedback,
+    SymbolicFeedback,
+)
 from utils.loggers import LoggerManager
 
 
@@ -94,7 +106,7 @@ class NeuroSymbolicBalancer:
             return
 
         interventions = integrated_result.get("interventions", [])
-        self._logger.info(f"Applying {len(interventions)} interventions to the biome")
+        self._logger.debug(f"Applying {len(interventions)} interventions to the biome")
 
         for intervention in interventions:
             self._apply_intervention(intervention)
@@ -119,7 +131,7 @@ class NeuroSymbolicBalancer:
         intervention_type = intervention.get("type")
         reason = intervention.get("reason", "No reason provided")
 
-        self._logger.info(f"Applying intervention: {intervention_type} - Reason: {reason}")
+        self._logger.debug(f"Applying intervention: {intervention_type} - Reason: {reason}")
 
         try:
             if intervention_type == Interventions.ADJUST_EVOLUTION_CYCLE:
@@ -129,7 +141,7 @@ class NeuroSymbolicBalancer:
                     return
 
                 factor = intervention.get("factor", 1.0)
-                self._logger.warning(f"Adjusting evolution cycle for {species} with factor {factor}")
+                self._logger.debug(f"Adjusting evolution cycle for {species} with factor {factor}")
                 BiomeControlService.get_instance().adjust_evolution_cycle(species, factor)
 
             elif intervention_type == Interventions.SPAWN_ENTITIES:
@@ -172,8 +184,8 @@ class NeuroSymbolicBalancer:
                     return
 
         if entity_class and species_enum:
-            self._logger.info(f"Spawning {count} {species_name} entities" +
-                              (f" with gene cloning" if copy_genes else ""))
+            self._logger.debug(f"Spawning {count} {species_name} entities" +
+                               (f" with gene cloning" if copy_genes else ""))
 
             kwargs = {}
             if entity_type == EntityType.FAUNA and diet_type:

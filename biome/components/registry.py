@@ -26,11 +26,17 @@ Enables dynamic component creation and modular architecture support.
 
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.kinematics.movement import MovementComponent
-from biome.components.physiological.growth import GrowthComponent
-from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
-from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
 from biome.components.kinematics.transform import TransformComponent
-from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
+from biome.components.physiological.autotrophic_nutrition import (
+    AutotrophicNutritionComponent,
+)
+from biome.components.physiological.growth import GrowthComponent
+from biome.components.physiological.heterotrophic_nutrition import (
+    HeterotrophicNutritionComponent,
+)
+from biome.components.physiological.photosynthetic_metabolism import (
+    PhotosyntheticMetabolismComponent,
+)
 from biome.components.physiological.vital import VitalComponent
 
 CLASS_REGISTRY = {

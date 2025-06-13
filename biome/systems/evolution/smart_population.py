@@ -26,11 +26,11 @@ enables dynamic species population control through generation tracking.
 """
 
 import itertools
-from typing import List, Optional, Dict, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
+import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control
-import numpy as np
 
 from shared.enums.events import SimulationEvent
 from shared.events.handler import EventHandler

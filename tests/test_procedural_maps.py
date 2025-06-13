@@ -17,9 +17,14 @@
 """
 import pytest
 
-from shared.stores.biome_store import BiomeStore
-from biome.systems.maps.procedural_maps import MapGenerator, MapGenData, PerlinNoiseGenerator
+from biome.systems.maps.procedural_maps import (
+    MapGenData,
+    MapGenerator,
+    PerlinNoiseGenerator,
+)
 from shared.enums.constants import MAP_DEFAULT_SIZE
+from shared.stores.biome_store import BiomeStore
+
 
 @pytest.fixture
 def bioma_store_load():

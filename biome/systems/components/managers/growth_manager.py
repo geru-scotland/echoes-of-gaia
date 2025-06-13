@@ -28,7 +28,6 @@ non-linear biological development with realistic progression curves.
 from logging import Logger
 
 import numpy as np
-from typing import Dict, List, Set, Optional
 from simpy import Environment as simpyEnv
 
 from biome.components.physiological.growth import GrowthComponent

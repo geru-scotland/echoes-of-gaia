@@ -25,13 +25,13 @@ Provides nutritive value calculation and integrity tracking - supports
 damage systems and photosynthetic response to climate events.
 """
 
-from typing import Set, Type, Dict, Optional
+from typing import Dict, Optional, Set, Type
+
+from simpy import Environment as simpyEnv
 
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
-from simpy import Environment as simpyEnv
-
-from shared.enums.enums import FloraSpecies, ComponentType, WeatherEvent
+from shared.enums.enums import ComponentType, FloraSpecies, WeatherEvent
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import DormancyReason, StressReason
 from shared.types import HabitatList

@@ -30,7 +30,9 @@ from logging import Logger
 import numpy as np
 from simpy import Environment as simpyEnv
 
-from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
+from biome.components.physiological.autotrophic_nutrition import (
+    AutotrophicNutritionComponent,
+)
 from biome.systems.components.managers.base import BaseComponentManager
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import EnergyGainSource

@@ -26,15 +26,13 @@ acts as foundation for specialized flora and fauna gene implementations.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
 from biome.components.physiological.growth import GrowthComponent
 from biome.components.physiological.vital import VitalComponent
 from biome.entities.entity import Entity
-from shared.enums.enums import ComponentType, EntityType
-from shared.enums.strings import Loggers
-from utils.loggers import LoggerManager
+from shared.enums.enums import ComponentType
 
 
 class Genes(ABC):

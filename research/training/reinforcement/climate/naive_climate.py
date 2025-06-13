@@ -34,8 +34,8 @@ from gymnasium.spaces import Discrete
 from gymnasium.utils import seeding
 
 from research.training.registry import EnvironmentRegistry
-from shared.enums.enums import Agents, BiomeType, WeatherEvent, Season
 from research.training.reinforcement.climate.climate_adapter import ClimateTrainAdapter
+from shared.enums.enums import Agents, BiomeType, Season, WeatherEvent
 from shared.enums.strings import Loggers
 from shared.timers import Timers
 from utils.loggers import LoggerManager

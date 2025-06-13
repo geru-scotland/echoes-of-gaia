@@ -25,15 +25,17 @@ Tracks position history and energy reserves - supports consumption
 mechanics for water, vegetation and prey with varying benefits.
 """
 
-from typing import Any, Set, Optional
+from typing import Optional, Set
 
-from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
+from simpy import Environment as simpyEnv
+
+from biome.components.physiological.heterotrophic_nutrition import (
+    HeterotrophicNutritionComponent,
+)
 from biome.components.physiological.vital import VitalComponent
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.entity import Entity
-from simpy import Environment as simpyEnv
-
-from shared.enums.enums import FaunaSpecies, ComponentType, DietType, Direction
+from shared.enums.enums import ComponentType, DietType, Direction, FaunaSpecies
 from shared.types import HabitatList, Position
 
 

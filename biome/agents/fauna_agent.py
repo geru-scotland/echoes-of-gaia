@@ -26,20 +26,31 @@ complex fauna interactions with terrain and resource management.
 """
 
 import traceback
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 
+from biome.agents.base import Agent
 from biome.entities.fauna import Fauna
 from biome.systems.behaviours.foraging import ForagingBehaviour
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
-from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from research.training.reinforcement.reinforcement_model import ReinforcementLearningModel
-from shared.enums.enums import FaunaAction, Agents, Direction, BiomeType, SimulationMode, DietType
+from research.training.reinforcement.fauna.training_target_manager import (
+    TrainingTargetManager,
+)
+from research.training.reinforcement.reinforcement_model import (
+    ReinforcementLearningModel,
+)
+from shared.enums.enums import (
+    Agents,
+    BiomeType,
+    DietType,
+    Direction,
+    FaunaAction,
+    SimulationMode,
+)
 from shared.enums.strings import Loggers
 from shared.types import Observation, Position
-from biome.agents.base import Agent
 from utils.loggers import LoggerManager
 
 

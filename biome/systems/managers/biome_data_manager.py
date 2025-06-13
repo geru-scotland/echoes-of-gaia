@@ -28,14 +28,15 @@ supports dataset generation modes and callback-based operations.
 import os
 from logging import Logger
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from simpy import Environment as simpyEnv
+
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.snapshots.config import SnapshotConfig
 from biome.systems.snapshots.system import BiomeSnapshotSystem
 from config.settings import Config
-from shared.enums.enums import CapturePeriod, BiomeType
+from shared.enums.enums import CapturePeriod
 from shared.enums.strings import Loggers
 from shared.types import CallbackType
 from simulation.core.systems.telemetry.datapoint import Datapoint

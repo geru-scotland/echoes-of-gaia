@@ -28,7 +28,7 @@ complete point-in-time capture of simulation state for analysis and persistence.
 import time
 import traceback
 from logging import Logger
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 
@@ -37,15 +37,25 @@ from biome.services.climate_service import ClimateService
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.maps.worldmap import WorldMap
-from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
+from biome.systems.metrics.analyzers.biome_score import (
+    BiomeScoreAnalyzer,
+)
 from biome.systems.metrics.analyzers.contributors import ClimateContributor
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
 from biome.systems.neurosymbolics.data_service import NeurosymbolicDataService
 from biome.systems.snapshots.data import SnapshotData
-from shared.enums.enums import TerrainType, BiomeType, Season, EntityType, DietType
+from shared.enums.enums import BiomeType, DietType, EntityType, Season, TerrainType
 from shared.enums.strings import Loggers
-from shared.types import TerrainData, EntityData, ComponentData, ClimateData, TerrainMap, MetricsData, BiomeScoreData
+from shared.types import (
+    BiomeScoreData,
+    ClimateData,
+    ComponentData,
+    EntityData,
+    MetricsData,
+    TerrainData,
+    TerrainMap,
+)
 from simulation.core.systems.time.time import SimulationTimeInfo
 from utils.loggers import LoggerManager
 

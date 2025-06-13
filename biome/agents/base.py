@@ -24,8 +24,8 @@ supports type-safe state and action handling through generics.
 Enables consistent agent behavior patterns across the biome system.
 """
 
-from abc import abstractmethod, ABC
-from typing import TypeVar, Generic, Optional
+from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 TState = TypeVar("TState")
 TAction = TypeVar("TAction")

@@ -25,8 +25,6 @@ for launching agent training sessions - handles environment preparation
 and training process management.
 """
 
-from research.training.reinforcement.climate.naive_climate import NaiveClimateEnvironment
-from research.training.reinforcement.fauna.fauna_env import FaunaAction
 from research.training.reinforcement.training_agent import ReinforcementLearningAgent
 from shared.enums.enums import Agents
 from shared.stores.biome_store import BiomeStore

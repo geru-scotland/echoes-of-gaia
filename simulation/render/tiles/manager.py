@@ -26,17 +26,16 @@ tile positioning for render engine visualization.
 """
 
 from logging import Logger
+from typing import Any, Dict, List, Optional, TextIO, Tuple
 
-from typing import Dict, List, Tuple, Optional, Any, TextIO
-
-from pygame import Surface
 import pygame
 import yaml
+from pygame import Surface
 
 from shared.enums.enums import TerrainType
-from shared.stores.biome_store import BiomeStore
 from shared.enums.strings import Loggers
-from shared.types import TileMappings, TerrainSpritesMapping, TerrainList
+from shared.stores.biome_store import BiomeStore
+from shared.types import TerrainList, TerrainSpritesMapping, TileMappings
 from utils.loggers import LoggerManager
 
 

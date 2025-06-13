@@ -24,7 +24,7 @@ telemetry pipeline management; provides unified interface
 for database initialization and cleanup operations.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 from simulation.core.systems.telemetry.event_handler import InfluxEventHandler
 from simulation.core.systems.telemetry.influxdb import InfluxDB

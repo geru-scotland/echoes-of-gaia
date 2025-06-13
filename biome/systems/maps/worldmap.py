@@ -24,11 +24,10 @@ provides access to entity collections with filtering options.
 Maps entity coordinates and handles spatial relationships in the biome.
 """
 
-from typing import List
 
 import numpy as np
 
-from shared.types import TerrainMap, EntityRegistry, EntityIndexMap, EntityList
+from shared.types import EntityIndexMap, EntityList, EntityRegistry, TerrainMap
 
 
 class WorldMap:

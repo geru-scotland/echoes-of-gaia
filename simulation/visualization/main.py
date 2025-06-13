@@ -30,11 +30,10 @@ import os
 import sys
 from pathlib import Path
 
-from utils.loggers import LoggerManager
-from utils.paths import SIMULATION_DIR
-
 from simulation.visualization.snapshot_viewer import SnapshotViewer
 from simulation.visualization.types import ViewerConfig
+from utils.loggers import LoggerManager
+from utils.paths import SIMULATION_DIR
 
 TERRAIN_COLORS = {
     0: (15, 42, 68),  # OCEAN_DEEP

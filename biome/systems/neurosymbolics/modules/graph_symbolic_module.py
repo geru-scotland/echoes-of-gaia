@@ -16,15 +16,25 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import Dict, Any
+from typing import Any, Dict
 
 import networkx as nx
 
-from biome.systems.neurosymbolics.modules.visualizer.visualizer import EcosystemVisualizer
-from shared.enums.enums import RecommendedAction, SpeciesStatus, InterventionPriority, SpeciesAction, StabilityStatus, \
-    BiodiversityStatus, PredatorPreyBalance, EcosystemRisk
+from biome.systems.neurosymbolics.modules.visualizer.visualizer import (
+    EcosystemVisualizer,
+)
+from shared.enums.enums import (
+    BiodiversityStatus,
+    EcosystemRisk,
+    InterventionPriority,
+    PredatorPreyBalance,
+    RecommendedAction,
+    SpeciesAction,
+    SpeciesStatus,
+    StabilityStatus,
+)
 from shared.enums.strings import Loggers
-from shared.types import SymbolicFeedback, Observation
+from shared.types import Observation, SymbolicFeedback
 from utils.loggers import LoggerManager
 
 

@@ -25,7 +25,6 @@ and convolutional layers. Includes visualization tools for terrain and biome
 representations - creates compact feature vectors for RL policy networks.
 """
 
-import random
 
 import gym
 import torch
@@ -33,7 +32,7 @@ import torch as th
 import torch.nn as nn
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
-from shared.enums.enums import TerrainType, BiomeType, DietType
+from shared.enums.enums import BiomeType, DietType, TerrainType
 
 
 class CNNFeaturesExtractor(BaseFeaturesExtractor):
@@ -332,8 +331,8 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
         print(df)
 
     def print_terrain_index_distribution(self, terrain_indices: torch.Tensor):
-        import pandas as pd
         import numpy as np
+        import pandas as pd
 
         terrain_names = {
             0: "WATER_DEEP",

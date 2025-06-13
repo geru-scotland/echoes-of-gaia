@@ -26,7 +26,7 @@ metrics and stability indices - supports inference mode operations.
 """
 
 from logging import Logger
-from typing import Protocol, Dict, Any
+from typing import Any, Dict, Protocol
 
 import numpy as np
 

@@ -26,8 +26,7 @@ generation with field-of-view perception for agent learning.
 """
 
 import random
-from logging import Logger
-from typing import Tuple, Optional, Dict, Set
+from typing import Dict, Optional, Set
 
 import numpy as np
 from typing_extensions import Any, List
@@ -41,15 +40,29 @@ from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from config.settings import Settings
 from research.training.reinforcement.adapter import EnvironmentAdapter
-from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
-from research.training.reinforcement.fauna.entity_interaction import LocalInteractionSimulator
-from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import ComponentType, EntityType, SimulationMode, FaunaSpecies, Direction, FaunaAction, \
-    PositionNotValidReason, TerrainType, BiomeType, DietType
+from research.training.reinforcement.config.training_config_manager import (
+    TrainingConfigManager,
+)
+from research.training.reinforcement.fauna.entity_interaction import (
+    LocalInteractionSimulator,
+)
+from research.training.reinforcement.fauna.training_target_manager import (
+    TrainingTargetManager,
+)
+from shared.enums.enums import (
+    BiomeType,
+    DietType,
+    Direction,
+    EntityType,
+    FaunaAction,
+    FaunaSpecies,
+    SimulationMode,
+    TerrainType,
+)
 from shared.enums.events import SimulationEvent
 from shared.enums.strings import Loggers
 from shared.timers import Timers
-from shared.types import Position, DecodedAction
+from shared.types import DecodedAction, Position
 from simulation.api.simulation_api import SimulationAPI
 from simulation.core.systems.events.event_bus import SimulationEventBus
 from utils.loggers import LoggerManager

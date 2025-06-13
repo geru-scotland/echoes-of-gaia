@@ -25,9 +25,9 @@ Coordinates visual components and input events - provides
 main rendering loop with proper cleanup mechanisms.
 """
 
+import queue
 from logging import Logger
 from typing import Dict
-import queue
 
 import pygame
 

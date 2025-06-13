@@ -16,13 +16,31 @@
 ##########################################################################
 """
 from pathlib import Path
-from typing import List, Tuple, Dict, TYPE_CHECKING, Any, Optional, Callable, Union, TypeAlias
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    TypeAlias,
+    Union,
+)
 
 import numpy as np
 from numpy import ndarray
 
 from biome.components.base.component import Component
-from shared.enums.enums import TerrainType, Habitats, EntityType, ComponentType, FaunaSpecies, FaunaAction, Direction
+from shared.enums.enums import (
+    ComponentType,
+    Direction,
+    EntityType,
+    FaunaAction,
+    FaunaSpecies,
+    Habitats,
+    TerrainType,
+)
 
 if TYPE_CHECKING:
     pass

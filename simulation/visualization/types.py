@@ -28,6 +28,7 @@ across the visualization pipeline and snapshot handling.
 from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict, Union
 
 import pygame
+
 from shared.enums.enums import BiomeType, DietType, Season
 
 Point = Tuple[int, int]

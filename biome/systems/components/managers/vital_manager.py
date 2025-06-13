@@ -28,19 +28,17 @@ health state tracking throughout entity lifespans.
 from logging import Logger
 
 import numpy as np
-from typing import Dict, List, Any
 from simpy import Environment as simpyEnv
 
 from biome.components.physiological.vital import VitalComponent
 from biome.systems.components.managers.base import BaseComponentManager
-from biome.systems.events.event_bus import BiomeEventBus
-from shared.enums.events import ComponentEvent, BiomeEvent
 from shared.enums.enums import ComponentType
+from shared.enums.events import ComponentEvent
+from shared.enums.reasons import StressReason
 from shared.enums.strings import Loggers
 from shared.enums.thresholds import VitalThresholds
-from shared.enums.reasons import StressReason
-from shared.timers import Timers
 from shared.math.biological import BiologicalGrowthPatterns
+from shared.timers import Timers
 from utils.loggers import LoggerManager
 
 

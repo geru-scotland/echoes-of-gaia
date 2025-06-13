@@ -26,7 +26,7 @@ current period analytics and historical trend assessment operations.
 """
 
 from logging import Logger
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict
 
 import pandas as pd
 from pandas import DataFrame

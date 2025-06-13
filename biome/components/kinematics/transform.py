@@ -25,9 +25,10 @@ Supports event notifier disabling and state serialization for
 spatial data persistence and coordinate system operations.
 """
 
-from typing import Tuple, Dict, Any
+from typing import Any, Dict, Tuple
 
 from simpy import Environment as simpyEnv
+
 from biome.components.base.component import EntityComponent
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType

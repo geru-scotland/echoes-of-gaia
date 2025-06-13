@@ -25,24 +25,24 @@ Supports event-driven architecture and weather interactions - enables
 flexible entity behavior through modular component composition.
 """
 
-from logging import Logger
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Type, Optional
+from logging import Logger
+from typing import Any, Dict, Optional, Type
 
 from simpy import Environment as simpyEnv
 
+from biome.components.base.component import EntityComponent
 from biome.components.kinematics.movement import MovementComponent
 from biome.entities.descriptor import EntityDescriptor
 from biome.entities.state import EntityState
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.events.event_notifier import EventNotifier
 from biome.systems.state.handler import StateHandler
-from shared.enums.enums import ComponentType, EntityType, Direction
-from shared.enums.events import ComponentEvent, BiomeEvent
+from shared.enums.enums import ComponentType, Direction, EntityType
+from shared.enums.events import BiomeEvent, ComponentEvent
 from shared.enums.strings import Loggers
-from shared.types import ComponentDict, HabitatList, Position
 from shared.events.handler import EventHandler
-from biome.components.base.component import EntityComponent
+from shared.types import ComponentDict, HabitatList, Position
 from utils.loggers import LoggerManager
 
 
@@ -114,7 +114,7 @@ class Entity(EventHandler, StateHandler, ABC):
         transform_component = self._components.get(ComponentType.TRANSFORM)
         if transform_component:
             return transform_component.get_position()
-        self._logger.warning("Trying to get TRANSFORM component from an entity that doesn't have it.")
+        self._logger.debug("Trying to get TRANSFORM component from an entity that doesn't have it.")
         return None
 
     def set_position(self, x, y):

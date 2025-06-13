@@ -15,12 +15,12 @@
 #                                                                              #
 # =============================================================================
 """
-import random
-from typing import Dict, Any, List, Optional
-import yaml
 import os
+import random
+from typing import Any, Dict
 
-from shared.enums.enums import BiomeType, FloraSpecies, FaunaSpecies
+import yaml
+
 from utils.paths import CONFIG_DIR
 
 

@@ -24,14 +24,13 @@ normalizes gene values based on predefined attribute ranges.
 Supports flora and fauna genetic representations with automatic validation.
 """
 
-from typing import List
 
 from deap import creator
 
 from biome.systems.evolution.genes.fauna_genes import FaunaGenes
 from biome.systems.evolution.genes.flora_genes import FloraGenes
 from shared.enums.enums import EntityType
-from shared.evolution.ranges import FLORA_GENE_RANGES, FAUNA_GENE_RANGES
+from shared.evolution.ranges import FAUNA_GENE_RANGES, FLORA_GENE_RANGES
 
 
 class GeneticConverter:

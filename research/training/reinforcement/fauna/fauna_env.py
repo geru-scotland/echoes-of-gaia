@@ -36,7 +36,14 @@ from gymnasium.spaces import Discrete
 from biome.entities.entity import Entity
 from research.training.registry import EnvironmentRegistry
 from research.training.reinforcement.fauna.fauna_adapter import FaunaSimulationAdapter
-from shared.enums.enums import FaunaAction, Agents, LocalFovConfig, TerrainType, BiomeType, DietType
+from shared.enums.enums import (
+    Agents,
+    BiomeType,
+    DietType,
+    FaunaAction,
+    LocalFovConfig,
+    TerrainType,
+)
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 

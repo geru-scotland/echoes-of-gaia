@@ -25,12 +25,12 @@ Manages render lifecycle in response to simulation state changes.
 """
 
 from logging import Logger
-from typing import Dict, Any
+from typing import Any, Dict
 
 from shared.enums.strings import Loggers
+from shared.events.handler import EventHandler
 from shared.types import TileMap
 from simulation.core.systems.events.event_bus import SimulationEventBus
-from shared.events.handler import EventHandler
 from simulation.render.components import MapComponent
 from simulation.render.engine import RenderEngine
 from utils.loggers import LoggerManager

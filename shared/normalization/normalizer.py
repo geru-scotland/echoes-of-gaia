@@ -15,7 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Tuple, Union, Dict
+from typing import Dict, Tuple, Union
 
 from .base import Normalizer
 from .ranges import CLIMATE_RANGES

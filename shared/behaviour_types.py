@@ -15,8 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import NewType, Tuple, Dict, List, Optional, Literal, TypedDict
-import numpy as np
+from typing import Literal, NewType, Tuple, TypedDict
 
 EntityID = NewType('EntityID', int)
 PositionTuple = Tuple[int, int]  # (y, x)

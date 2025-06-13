@@ -26,7 +26,7 @@ implements sigmoid-based penalty functions for out-of-range conditions.
 """
 
 from logging import Logger
-from typing import Dict, Any
+from typing import Any, Dict
 
 import numpy as np
 
@@ -35,8 +35,8 @@ from biome.systems.climate.system import ClimateSystem
 from research.training.reinforcement.adapter import EnvironmentAdapter
 from shared.enums.enums import BiomeType, Season, WeatherEvent
 from shared.enums.strings import Loggers
-from utils.loggers import LoggerManager
 from shared.normalization.normalizer import climate_normalizer
+from utils.loggers import LoggerManager
 
 
 class ClimateTrainAdapter(EnvironmentAdapter):

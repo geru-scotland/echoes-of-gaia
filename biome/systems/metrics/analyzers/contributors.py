@@ -27,7 +27,7 @@ composite score calculation for overall biome quality assessment.
 
 from abc import ABC, abstractmethod
 from logging import Logger
-from typing import Dict, List, Tuple, Set, Any
+from typing import Any, Dict, List, Set, Tuple
 
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager

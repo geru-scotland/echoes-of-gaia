@@ -25,17 +25,17 @@ loading from disk and prediction operations - enables runtime inference
 with minimal overhead for biome entity decision-making.
 """
 
-import os
 from logging import Logger
 
-from stable_baselines3 import PPO, DQN, A2C, SAC
+from stable_baselines3 import A2C, DQN, PPO, SAC
 
 from shared.enums.enums import Agents
 from shared.enums.strings import Loggers
+from shared.types import Observation
 from utils.loggers import LoggerManager
 from utils.paths import get_model_path
+
 from .config_loader import ConfigLoader
-from shared.types import Observation
 
 
 class ReinforcementLearningModel:

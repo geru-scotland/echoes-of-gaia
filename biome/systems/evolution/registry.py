@@ -25,11 +25,11 @@ Tracks evolution trends and provides generational analysis capabilities.
 """
 
 from logging import Logger
-from typing import Any, Dict, Optional, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from biome.agents.evolution_agent import EvolutionAgentAI
 from biome.systems.evolution.trend_analyzer import EvolutionTrendAnalyzer
-from shared.enums.enums import FloraSpecies, FaunaSpecies, EntityType
+from shared.enums.enums import EntityType, FaunaSpecies, FloraSpecies
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 

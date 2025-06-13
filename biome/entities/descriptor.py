@@ -27,7 +27,7 @@ Enables consistent entity identification across the biome system.
 from dataclasses import dataclass
 
 from shared.enums.base import EnumBaseStr
-from shared.enums.enums import EntityType, FloraSpecies, FaunaSpecies
+from shared.enums.enums import EntityType, FaunaSpecies, FloraSpecies
 
 
 @dataclass

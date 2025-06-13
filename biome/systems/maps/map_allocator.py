@@ -31,7 +31,7 @@ import numpy as np
 
 from biome.systems.managers.habitat_manager import HabitatManager
 from shared.enums.strings import Loggers
-from shared.types import TileMap, Position, EntityIndexMap
+from shared.types import EntityIndexMap, Position, TileMap
 from utils.loggers import LoggerManager
 
 

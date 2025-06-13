@@ -30,7 +30,9 @@ from logging import Logger
 import numpy as np
 from simpy import Environment as simpyEnv
 
-from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
+from biome.components.physiological.photosynthetic_metabolism import (
+    PhotosyntheticMetabolismComponent,
+)
 from biome.systems.components.managers.base import BaseComponentManager
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import StressReason

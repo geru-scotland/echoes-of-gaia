@@ -26,8 +26,6 @@ Supports event notifier integration and handler lifecycle management.
 
 from abc import ABC, abstractmethod
 
-from simpy import Environment as simpyEnv
-
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager

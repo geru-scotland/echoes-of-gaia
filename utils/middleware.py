@@ -17,7 +17,7 @@
 """
 import time
 from functools import wraps
-from typing import Callable, Any
+from typing import Any, Callable
 
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager

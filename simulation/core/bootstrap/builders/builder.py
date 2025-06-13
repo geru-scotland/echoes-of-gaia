@@ -25,7 +25,6 @@ bootstrap architecture with consistent initialization patterns.
 """
 
 from abc import ABC, abstractmethod
-from logging import Logger
 from typing import Any, Optional
 
 from config.settings import Settings

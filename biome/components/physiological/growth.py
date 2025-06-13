@@ -25,7 +25,7 @@ Tracks current size, maximum size and stage advancement - supports
 stress adaptation with growth efficiency calculations.
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
 
 from simpy import Environment as simpyEnv
 

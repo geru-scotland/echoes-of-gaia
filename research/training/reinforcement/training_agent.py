@@ -27,28 +27,23 @@ embeddings - coordinates training loops and model persistence.
 
 import os
 import traceback
-from typing import Type
 from logging import Logger
+from typing import Type
 
 import gymnasium as gym
+import stable_baselines3 as sb3
+from stable_baselines3 import A2C, DQN, PPO, SAC
 from stable_baselines3.common.callbacks import BaseCallback
+from torch.utils.tensorboard import SummaryWriter
 
 from research.training.registry import EnvironmentRegistry
-
-import stable_baselines3 as sb3
-from stable_baselines3 import PPO, DQN, A2C, SAC
-
 from research.training.reinforcement.config_loader import ConfigLoader
-from research.training.reinforcement.fauna.cnn_feature_extractor import create_custom_cnn_policy
+from research.training.reinforcement.fauna.cnn_feature_extractor import (
+    create_custom_cnn_policy,
+)
 from shared.enums.enums import Agents, LocalFovConfig
-from utils.loggers import LoggerManager
 from shared.enums.strings import Loggers
-from torch.utils.tensorboard import SummaryWriter
-from stable_baselines3.common.callbacks import BaseCallback
-
-import torch
-from torch.utils.tensorboard import SummaryWriter
-from stable_baselines3.common.callbacks import BaseCallback
+from utils.loggers import LoggerManager
 
 
 class TensorboardActivationsCallback(BaseCallback):

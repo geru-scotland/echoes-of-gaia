@@ -26,9 +26,9 @@ provides foundation for hybrid intelligence result processing.
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from shared.types import PredictionFeedback, SymbolicFeedback, IntegratedResult
+from shared.types import IntegratedResult, PredictionFeedback, SymbolicFeedback
 
 
 class IntegrationStrategy(ABC):

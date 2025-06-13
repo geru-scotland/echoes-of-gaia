@@ -25,20 +25,17 @@ Tracks energy reserves and metabolic activity - supports stress
 adaptation and dormancy state transitions based on conditions.
 """
 
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
-from biome.components.base.component import EntityComponent
 from simpy import Environment as simpyEnv
 
+from biome.components.base.component import EntityComponent
 from biome.components.handlers.energy_handler import EnergyHandler
 from biome.components.handlers.stress_handler import StressHandler
 from biome.systems.components.registry import ComponentRegistry
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
-from shared.enums.reasons import DormancyReason, StressReason
-from shared.enums.thresholds import MetabolicThresholds
-from shared.timers import Timers
 
 
 class PhotosyntheticMetabolismComponent(EntityComponent):

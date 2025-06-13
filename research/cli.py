@@ -15,16 +15,16 @@
 #                                                                        #
 ##########################################################################
 """
-import os
-import sys
 import argparse
-from enum import Enum, auto
-from typing import Dict, Callable, Optional, TypedDict
+import os
 import subprocess
+import sys
+from enum import Enum, auto
+from typing import Callable, Dict, Optional, TypedDict
 
 from config.settings import Settings
 from shared.enums.strings import Loggers
-from utils.loggers import LoggerManager, LogColors
+from utils.loggers import LogColors, LoggerManager
 
 
 class MenuOptionType(Enum):

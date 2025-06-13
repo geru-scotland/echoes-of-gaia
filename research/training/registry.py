@@ -25,7 +25,7 @@ registration system for dynamic environment discovery - ensures correct
 environment selection for specific agent types during training.
 """
 
-from typing import Dict, Callable, Type
+from typing import Callable, Dict, Type
 
 from typing_extensions import TypeVar
 

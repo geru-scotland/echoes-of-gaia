@@ -25,16 +25,16 @@ Provides movement capability control and position calculation methods;
 coordinates with validation systems for terrain-aware traversal.
 """
 
-from typing import Dict, Any, Tuple
+from typing import Any, Dict
 
 from simpy import Environment as simpyEnv
 
 from biome.components.base.component import EntityComponent
 from biome.systems.components.registry import ComponentRegistry
+from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType, Direction, PositionNotValidReason
-from shared.enums.events import ComponentEvent, BiomeEvent
-from biome.systems.events.event_bus import BiomeEventBus
+from shared.enums.events import BiomeEvent, ComponentEvent
 from shared.types import Position
 
 

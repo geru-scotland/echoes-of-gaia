@@ -26,27 +26,23 @@ training and inference modes with robust configuration management.
 """
 
 import json
+import logging
 import os
+import random
 import traceback
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
-import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import yaml
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader
-from sklearn.metrics import r2_score, explained_variance_score
-import time
-from tqdm.auto import tqdm
-import numpy as np
-import yaml
-import logging
-from typing import Dict, Any, List, Optional, Tuple, Union
 
-from research.training.deep_learning.models.lstm import BiomeLSTM
-from research.training.deep_learning.models.transformer import MultiStepForecastTransformer
 from research.training.deep_learning.data.dataset import SimulationDataset
+from research.training.deep_learning.models.lstm import BiomeLSTM
 from research.training.deep_learning.preprocess.ema import EMAProcessor
 from shared.enums.enums import NeuralMode
 from shared.enums.strings import Loggers
@@ -339,8 +335,9 @@ class NeuralModelManager:
         history["baseline_mae"].append(baseline_metrics['mae'])
         history["baseline_r2"].append(baseline_metrics['r2'])
 
-        from sklearn.metrics import r2_score, explained_variance_score
         import time
+
+        from sklearn.metrics import explained_variance_score, r2_score
         from tqdm.auto import tqdm
 
         use_tqdm = self._config.get("training", {}).get("use_progress_bar", True)
@@ -736,7 +733,6 @@ class NeuralModelManager:
             import matplotlib.ticker as mtick
             import numpy as np
             from matplotlib.gridspec import GridSpec
-            import matplotlib.colors as mcolors
 
             plt.style.use('seaborn-v0_8-whitegrid')
 
@@ -1179,8 +1175,8 @@ class NeuralModelManager:
 
     def _visualize_metrics(self, history: Dict[str, List[float]], plot_base_name: str, plots_dir: str):
         import matplotlib.pyplot as plt
-        import seaborn as sns
         import numpy as np
+        import seaborn as sns
 
         sns.set_theme(style="whitegrid")
 
@@ -1330,9 +1326,9 @@ class NeuralModelManager:
         plt.close('all')
 
     def analyze_correlation(self, data: List[Dict[str, Any]]) -> None:
+        import matplotlib.pyplot as plt
         import pandas as pd
         import seaborn as sns
-        import matplotlib.pyplot as plt
 
         df = pd.DataFrame(data)
 

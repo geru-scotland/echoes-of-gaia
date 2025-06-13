@@ -16,7 +16,7 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import List, Callable
+from typing import Callable, List
 
 from shared.enums.enums import Season
 from shared.enums.strings import Loggers

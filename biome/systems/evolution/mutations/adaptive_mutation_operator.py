@@ -25,22 +25,14 @@ Supports gaussian and adaptive mutation modes with range constraints -
 provides fine-grained control over evolutionary exploration rates.
 """
 
-import math
 import random
 from logging import Logger
-
-from deap import tools
 
 from biome.systems.evolution.genetic_converter import GeneticConverter
 from shared.enums.enums import EntityType, MutationType
 from shared.enums.strings import Loggers
-from shared.evolution.ranges import FLORA_GENE_RANGES, FAUNA_GENE_RANGES
-
-import random
-
+from shared.evolution.ranges import FAUNA_GENE_RANGES, FLORA_GENE_RANGES
 from utils.loggers import LoggerManager
-
-from enum import Enum, auto
 
 
 class AdaptiveMutationOperator:
@@ -156,7 +148,7 @@ class AdaptiveMutationOperator:
             mutated_val = max(min_val, min(mutated_val, max_val))
             setattr(genes, attr_name, mutated_val)
 
-            self._logger.info(
+            self._logger.debug(
                 f"Mutation'{attr_name}': orig={original_val:.3f}, "
                 f"change={mutation:.3f} (σ={sigma:.3f}), "
                 f"new={mutated_val:.3f}, range=[{min_val}, {max_val}]"

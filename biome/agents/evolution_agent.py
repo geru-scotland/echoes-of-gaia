@@ -28,30 +28,35 @@ and adjusts cycle timing based on species lifespan dynamics.
 import itertools
 import random
 from logging import Logger
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
 
-from biome.entities.fauna import Fauna
-from biome.systems.events.event_bus import BiomeEventBus
-from biome.systems.evolution.smart_population import SmartPopulationTrendControl
-from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
-from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
-from biome.systems.evolution.visualization.setup import update_species_population
-from shared.enums.events import BiomeEvent
-from shared.enums.enums import FloraSpecies, EntityType, FaunaSpecies
-from biome.entities.flora import Flora
 from biome.agents.base import Agent, TAction
+from biome.entities.fauna import Fauna
+from biome.entities.flora import Flora
+from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.fitness import compute_fitness
 from biome.systems.evolution.genes.flora_genes import FloraGenes
-from biome.systems.evolution.genetics import GeneticAlgorithmModel, extract_genes_from_entity
+from biome.systems.evolution.genetics import (
+    GeneticAlgorithmModel,
+    extract_genes_from_entity,
+)
+from biome.systems.evolution.smart_population import SmartPopulationTrendControl
+from biome.systems.evolution.visualization.evo_crossover_tracker import (
+    GeneticCrossoverTracker,
+)
+from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
+from biome.systems.evolution.visualization.setup import update_species_population
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
+from shared.enums.enums import EntityType, FaunaSpecies, FloraSpecies
+from shared.enums.events import BiomeEvent
 from shared.enums.strings import Loggers
 from shared.events.handler import EventHandler
 from shared.timers import Timers
-from shared.types import Observation, EntityList
+from shared.types import EntityList, Observation
 from utils.loggers import LoggerManager
 
 
@@ -125,7 +130,7 @@ class EvolutionAgentAI(Agent, EventHandler):
         for species, entities_list in entities_by_species.items():
 
             k_best = self._compute_k_best(entities)
-            self._logger.info(f"K-BEST for species {self._species}: {k_best}")
+            self._logger.debug(f"K-BEST for species {self._species}: {k_best}")
             evolved_genes = self._genetic_model.evolve_population(
                 entities_list, climate_data, self._current_evolution_cycle,
                 generation_count=5, k_best=k_best,
@@ -144,8 +149,8 @@ class EvolutionAgentAI(Agent, EventHandler):
         self._current_evolution_cycle = next(self._evolution_cycle)
         self._climate_data_manager.set_evolution_cycle(self._current_evolution_cycle)
 
-        self._logger.info(f"EVOLUTION CYCLE: {self._current_evolution_cycle}")
-        self._logger.info(
+        self._logger.debug(f"EVOLUTION CYCLE: {self._current_evolution_cycle}")
+        self._logger.debug(
             f"Evolution agent is going to create: {len(action["evolved_genes"])} entities: {self._species}")
         for species, genes in action["evolved_genes"]:
             if species == self._species:
@@ -409,7 +414,7 @@ class EvolutionAgentAI(Agent, EventHandler):
 
         new_cycle_time = max(min_cycle_time, min(new_cycle_time, max_cycle_time))
 
-        self._logger.info(
+        self._logger.debug(
             f"Adjusting evolution cycle for {self._species} (factor: {adjustment_factor}) from {self._evolution_cycle_time} to {new_cycle_time}")
         self._evolution_cycle_time = new_cycle_time
 

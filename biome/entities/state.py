@@ -25,7 +25,7 @@ Provides state dumping for persistence and field access operations.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 @dataclass

@@ -25,8 +25,7 @@ Tracks photosynthesis efficiency impacts on toxicity and monitors
 stress-energy ratios - supports flora metabolic state management.
 """
 
-import random
-from typing import Dict, Any, Optional
+from typing import Any, Dict
 
 from simpy import Environment as simpyEnv
 

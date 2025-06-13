@@ -27,7 +27,7 @@ as central hub for biome simulation operations and state management.
 
 import sys
 import traceback
-from typing import Dict, Any, Type
+from typing import Any, Dict, Type
 
 import simpy
 
@@ -43,22 +43,35 @@ from biome.systems.components.registry import ComponentRegistry
 from biome.systems.data.providers import BiomeDataProvider
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.registry import EvolutionAgentRegistry
-from biome.systems.evolution.visualization.evo_crossover_tracker import GeneticCrossoverTracker
+from biome.systems.evolution.visualization.evo_crossover_tracker import (
+    GeneticCrossoverTracker,
+)
 from biome.systems.evolution.visualization.evo_tracker import EvolutionTracker
-from biome.systems.evolution.visualization.setup import setup_evolution_visualization_system
+from biome.systems.evolution.visualization.setup import (
+    setup_evolution_visualization_system,
+)
 from biome.systems.managers.climate_data_manager import ClimateDataManager
 from biome.systems.managers.entity_manager import EntityProvider
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from biome.systems.maps.worldmap import WorldMap
-from biome.systems.metrics.analyzers.biome_score import BiomeScoreAnalyzer, BiomeScoreResult
+from biome.systems.metrics.analyzers.biome_score import (
+    BiomeScoreAnalyzer,
+)
 from biome.systems.metrics.collectors.climate_collector import ClimateDataCollector
 from biome.systems.metrics.collectors.entity_collector import EntityDataCollector
-from shared.enums.enums import Agents, AgentType, Season, WeatherEvent, FloraSpecies, BiomeType, FaunaSpecies, \
-    EntityType, SimulationMode
+from shared.enums.enums import (
+    AgentType,
+    BiomeType,
+    EntityType,
+    FaunaSpecies,
+    FloraSpecies,
+    Season,
+    SimulationMode,
+)
 from shared.enums.events import BiomeEvent
 from shared.events.handler import EventHandler
 from shared.timers import Timers
-from shared.types import EntityList, Observation, EntityDefinitions
+from shared.types import EntityDefinitions, Observation
 from simulation.core.bootstrap.context.context_data import BiomeContextData
 
 

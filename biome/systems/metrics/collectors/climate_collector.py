@@ -25,9 +25,8 @@ Implements fallback mechanism for missing climate states - supports
 climate history generation and statistics calculation for ecosystem analysis.
 """
 
-import time
 from logging import Logger
-from typing import Dict, Any
+from typing import Any, Dict
 
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem

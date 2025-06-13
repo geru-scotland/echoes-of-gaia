@@ -17,13 +17,13 @@
 """
 import json
 import os
-from typing import Dict, Any
 
 import numpy as np
 
 from shared.enums.enums import TerrainType
-from shared.types import TerrainList, BiomeStoreData
+from shared.types import BiomeStoreData, TerrainList
 from utils.paths import BIOME_DATA_DIR
+
 
 class BiomeStore:
     _initialized = False

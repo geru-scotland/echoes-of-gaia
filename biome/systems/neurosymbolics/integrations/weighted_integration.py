@@ -26,22 +26,30 @@ predator-prey balance assessment and biomass state evaluation with graph metrics
 """
 
 import random
-
-from shared.enums.enums import Interventions
-
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
 from biome.services.biome_control_service import BiomeControlService
 from biome.systems.neurosymbolics.integrations.base_strategy import IntegrationStrategy
 from shared.enums.enums import (
-    SpeciesStatus, SpeciesAction, RecommendedAction,
-    PredatorPreyBalance, EntityType, FloraSpecies, FaunaSpecies,
-    StabilityStatusValue, EcosystemRiskValue, EvolutionFactor,
-    PopulationThreshold, BiomassThreshold, PopulationRatio,
-    PopulationTrend, SpawnCount, AmplificationFactor, StressThreshold
+    AmplificationFactor,
+    BiomassThreshold,
+    EcosystemRiskValue,
+    EntityType,
+    EvolutionFactor,
+    FloraSpecies,
+    Interventions,
+    PopulationRatio,
+    PopulationThreshold,
+    PopulationTrend,
+    PredatorPreyBalance,
+    SpawnCount,
+    SpeciesAction,
+    SpeciesStatus,
+    StabilityStatusValue,
+    StressThreshold,
 )
-from shared.types import PredictionFeedback, SymbolicFeedback, IntegratedResult
 from shared.enums.strings import Loggers
+from shared.types import IntegratedResult, PredictionFeedback, SymbolicFeedback
 from utils.loggers import LoggerManager
 
 
@@ -73,7 +81,7 @@ class NaiveWeightedIntegrationStrategy(IntegrationStrategy):
         if confidence_weights is None:
             confidence_weights = self._config["confidence_weights"]
 
-        self._logger.info(f"Integrating neural and symbolic results with weights: {confidence_weights}")
+        self._logger.debug(f"Integrating neural and symbolic results with weights: {confidence_weights}")
 
         context: Dict[str, Any] = symbolic_result.get("context", {})
 
@@ -285,10 +293,10 @@ class NaiveWeightedIntegrationStrategy(IntegrationStrategy):
                 (predicted_predator - current_predator) / max(1, current_predator)) if current_predator > 0 else 0
         flora_trend = ((predicted_flora - current_flora) / max(1, current_flora)) if current_flora > 0 else 0
 
-        self._logger.info(f"Prediction analysis - Current vs. Predicted:")
-        self._logger.info(f"  Prey: {current_prey} → {predicted_prey} (trend: {prey_trend:.2%})")
-        self._logger.info(f"  Predator: {current_predator} → {predicted_predator} (trend: {predator_trend:.2%})")
-        self._logger.info(f"  Flora: {current_flora} → {predicted_flora} (trend: {flora_trend:.2%})")
+        self._logger.debug(f"Prediction analysis - Current vs. Predicted:")
+        self._logger.debug(f"  Prey: {current_prey} → {predicted_prey} (trend: {prey_trend:.2%})")
+        self._logger.debug(f"  Predator: {current_predator} → {predicted_predator} (trend: {predator_trend:.2%})")
+        self._logger.debug(f"  Flora: {current_flora} → {predicted_flora} (trend: {flora_trend:.2%})")
 
         integrated_result["trends"] = {
             "prey": prey_trend,
@@ -321,14 +329,14 @@ class NaiveWeightedIntegrationStrategy(IntegrationStrategy):
                 (predicted_predator - current_predator) / max(1, current_predator)) if current_predator > 0 else 0
         flora_trend = ((predicted_flora - current_flora) / max(1, current_flora)) if current_flora > 0 else 0
 
-        self._logger.info(
+        self._logger.debug(
             f"Population trends - Prey: {prey_trend:.2%}, Predator: {predator_trend:.2%}, Flora: {flora_trend:.2%}")
 
         amplification_factor = AmplificationFactor.NONE
         if abs(prey_trend) > PopulationTrend.MODERATE_INCREASE or abs(
                 predator_trend) > PopulationTrend.MODERATE_INCREASE:
             amplification_factor = AmplificationFactor.SIGNIFICANT
-            self._logger.info(f"Neural predictions indicate significant population changes. Amplifying interventions.")
+            self._logger.debug(f"Neural predictions indicate significant population changes. Amplifying interventions.")
 
         predator_prey_balance = symbolic_result.get('predator_prey_balance')
 

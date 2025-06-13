@@ -15,26 +15,29 @@
 #                                                                        #
 ##########################################################################
 """
-import pytest
 import importlib.util
+
+import pytest
 
 if importlib.util.find_spec("stable_baselines3") is None:
     pytest.skip("Skipping test_simulation.py because stable_baselines3 is not installed", allow_module_level=True)
 
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import simpy
 
 from biome.api.biome_api import BiomeAPI
 from config.settings import Settings
-from shared.enums.strings import Strings, Loggers
+from shared.enums.strings import Loggers, Strings
 from simulation.api.simulation_api import SimulationAPI
-from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
-from simulation.core.engine import SimulationEngine
 from simulation.core.bootstrap.bootstrap import Bootstrap
-import simpy
-
+from simulation.core.bootstrap.context.context_data import (
+    BiomeContextData,
+    SimulationContextData,
+)
+from simulation.core.engine import SimulationEngine
 from utils.loggers import LoggerManager
-
 
 
 @pytest.fixture

@@ -32,12 +32,14 @@ import numpy as np
 from biome.agents.base import Agent
 from biome.systems.climate.state import ClimateState
 from biome.systems.climate.system import ClimateSystem
-from research.training.reinforcement.reinforcement_model import ReinforcementLearningModel
-from shared.enums.enums import WeatherEvent, BiomeType, Season, Agents
+from research.training.reinforcement.reinforcement_model import (
+    ReinforcementLearningModel,
+)
+from shared.enums.enums import Agents, BiomeType, Season, WeatherEvent
 from shared.enums.strings import Loggers
+from shared.normalization.normalizer import climate_normalizer
 from shared.types import Observation
 from utils.loggers import LoggerManager
-from shared.normalization.normalizer import climate_normalizer
 
 
 class ClimateAgentAI(Agent[ClimateState, WeatherEvent]):

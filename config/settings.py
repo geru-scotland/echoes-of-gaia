@@ -17,12 +17,12 @@
 """
 import json
 import os
-from typing import Dict, Any
+from typing import Any, Dict
 
 import yaml
 from dotenv import load_dotenv
 
-from utils.paths import CONFIG_DIR, ASSETS_DIR
+from utils.paths import ASSETS_DIR, CONFIG_DIR
 
 
 class Config:

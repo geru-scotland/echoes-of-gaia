@@ -25,14 +25,17 @@ Integrates specialized contributor modules to assess different aspects -
 provides comprehensive ecosystem health evaluation metrics.
 """
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from logging import Logger
-from typing import Protocol, Dict, Any, List, Tuple, Set, Optional
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
-from biome.systems.metrics.analyzers.contributors import ToxicityContributor, ClimateContributor, \
-    BiodiversityContributor, EcosystemHealthContributor, PopulationBalanceContributor
+from biome.systems.metrics.analyzers.contributors import (
+    BiodiversityContributor,
+    ClimateContributor,
+    EcosystemHealthContributor,
+    PopulationBalanceContributor,
+)
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
 

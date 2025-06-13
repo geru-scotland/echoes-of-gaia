@@ -25,7 +25,8 @@ Supports component ID tracking and generic type parameterization for
 type-safe component collections - enables modular component systems.
 """
 
-from typing import Dict, List, TypeVar, Generic, Set
+from typing import Dict, Generic, List, Set, TypeVar
+
 from simpy import Environment as simpyEnv
 
 TComponent = TypeVar('TComponent')

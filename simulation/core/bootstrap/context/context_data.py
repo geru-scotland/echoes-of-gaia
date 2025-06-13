@@ -30,7 +30,7 @@ from typing import Optional
 
 from config.settings import Config
 from shared.enums.enums import BiomeType
-from shared.types import TileMap, EntityDefinitions
+from shared.types import EntityDefinitions, TileMap
 from simulation.core.systems.telemetry.manager import InfluxDBManager
 
 

@@ -25,7 +25,7 @@ Supports stepped execution for reinforcement learning - enables
 biome data retrieval and simulation time tracking.
 """
 
-from logging import getLogger, Logger
+from logging import Logger, getLogger
 from typing import Optional, Type
 
 from config.settings import Settings

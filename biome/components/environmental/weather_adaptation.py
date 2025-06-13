@@ -26,7 +26,7 @@ integration - supports weather event processing and temperature history.
 """
 
 import math
-from typing import Dict, Any
+from typing import Any, Dict
 
 from simpy import Environment as simpyEnv
 

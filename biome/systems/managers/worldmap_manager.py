@@ -25,11 +25,9 @@ Manages local map generation for agent observation spaces - coordinates
 entity lifecycle events and provides terrain traversability validation.
 """
 
-import random
-import sys
 import traceback
 from logging import Logger
-from typing import List, Dict, Optional, Callable, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from simpy import Environment as simpyEnv
@@ -40,13 +38,28 @@ from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.maps.map_allocator import MapAllocator
 from biome.systems.maps.spawn_system import SpawnSystem
 from biome.systems.maps.worldmap import WorldMap
-from research.training.reinforcement.fauna.training_target_manager import TrainingTargetManager
-from shared.enums.enums import EntityType, FaunaSpecies, TerrainType, PositionNotValidReason, DietType, ComponentType, \
-    FloraSpecies
+from research.training.reinforcement.fauna.training_target_manager import (
+    TrainingTargetManager,
+)
+from shared.enums.enums import (
+    DietType,
+    EntityType,
+    FaunaSpecies,
+    FloraSpecies,
+    PositionNotValidReason,
+    TerrainType,
+)
 from shared.enums.events import BiomeEvent, SimulationEvent
 from shared.enums.strings import Loggers
-from shared.types import TileMap, EntityList, EntityDefinitions, EntityRegistry, \
-    TerrainMap, EntityIndexMap, Position
+from shared.types import (
+    EntityDefinitions,
+    EntityIndexMap,
+    EntityList,
+    EntityRegistry,
+    Position,
+    TerrainMap,
+    TileMap,
+)
 from simulation.core.systems.events.event_bus import SimulationEventBus
 from utils.loggers import LoggerManager
 
@@ -155,7 +168,7 @@ class WorldMapManager:
 
             if entity:
                 if control_service:
-                    self._logger.info(
+                    self._logger.debug(
                         f"Entity added correctly ID={entity.get_id()}, Position: {entity.get_position()} Species={species_name}")
                 return entity
             else:

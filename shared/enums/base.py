@@ -17,6 +17,7 @@
 """
 from enum import Enum
 
+
 class EnumBaseStr(str, Enum):
     def __str__(self):
         return self.value

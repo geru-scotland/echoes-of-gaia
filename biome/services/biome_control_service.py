@@ -27,12 +27,12 @@ centralized interface for programmatic biome manipulation operations.
 
 import random
 import traceback
-from typing import Optional, Any, List, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from biome.agents.evolution_agent import EvolutionAgentAI
 from biome.systems.events.event_bus import BiomeEventBus
 from biome.systems.evolution.registry import EvolutionAgentRegistry
-from shared.enums.enums import FloraSpecies, FaunaSpecies, EntityType
+from shared.enums.enums import EntityType, FaunaSpecies, FloraSpecies
 from shared.enums.events import BiomeEvent
 from shared.timers import Timers
 

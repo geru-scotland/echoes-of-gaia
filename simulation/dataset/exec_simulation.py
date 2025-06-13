@@ -17,11 +17,13 @@
 """
 import argparse
 import time
-from typing import Dict, Any
+from typing import Any, Dict
 
 from config.settings import Settings
-from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
-from shared.enums.enums import SimulationMode, DietType
+from research.training.reinforcement.config.training_config_manager import (
+    TrainingConfigManager,
+)
+from shared.enums.enums import DietType, SimulationMode
 from simulation.api.simulation_api import SimulationAPI
 from utils.paths import DATASET_GENERATED_CONFIGS_DIR
 

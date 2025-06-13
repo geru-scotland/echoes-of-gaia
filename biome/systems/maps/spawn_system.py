@@ -28,25 +28,31 @@ with map allocator for habitat-based positioning and entity lifecycle.
 import itertools
 import random
 from logging import Logger
-from typing import List, Dict, Optional, Tuple, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 from simpy import Environment as simpyEnv
 
 from biome.components.environmental.weather_adaptation import WeatherAdaptationComponent
+from biome.components.physiological.autotrophic_nutrition import (
+    AutotrophicNutritionComponent,
+)
 from biome.components.physiological.growth import GrowthComponent
-from biome.components.physiological.heterotrophic_nutrition import HeterotrophicNutritionComponent
-from biome.components.physiological.photosynthetic_metabolism import PhotosyntheticMetabolismComponent
-from biome.components.physiological.autotrophic_nutrition import AutotrophicNutritionComponent
+from biome.components.physiological.heterotrophic_nutrition import (
+    HeterotrophicNutritionComponent,
+)
+from biome.components.physiological.photosynthetic_metabolism import (
+    PhotosyntheticMetabolismComponent,
+)
 from biome.components.physiological.vital import VitalComponent
 from biome.components.registry import get_component_class
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
 from biome.entities.flora import Flora
 from biome.systems.maps.map_allocator import MapAllocator
-from shared.enums.enums import FloraSpecies, FaunaSpecies, DietType
+from shared.enums.enums import DietType, FaunaSpecies, FloraSpecies
 from shared.enums.strings import Loggers
 from shared.stores.biome_store import BiomeStore
-from shared.types import EntityRegistry, EntityDefinitions, HabitatList
+from shared.types import EntityDefinitions, EntityRegistry, HabitatList
 from utils.loggers import LoggerManager
 from utils.middleware import log_execution_time
 

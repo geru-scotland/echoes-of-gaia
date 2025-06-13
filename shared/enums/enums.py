@@ -15,10 +15,10 @@
 #                                                                        #
 ##########################################################################
 """
-from enum import auto, Enum
-from typing import TypedDict, NamedTuple, List, Optional, Dict, Literal, Any
+from enum import Enum, auto
+from typing import Any, Dict, List, Literal, NamedTuple, Optional, TypedDict
 
-from shared.enums.base import EnumBaseStr, EnumBaseInt, EnumBaseFloat
+from shared.enums.base import EnumBaseFloat, EnumBaseInt, EnumBaseStr
 
 
 class BiomeType(EnumBaseStr):

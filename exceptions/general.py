@@ -16,9 +16,9 @@
 # =============================================================================
 """
 import logging
-import sys
 
 from exceptions.custom import EchoesOfGaiaException
+
 
 def global_exception_handler(exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, EchoesOfGaiaException):

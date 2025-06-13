@@ -27,10 +27,9 @@ values - supports multiple stress reasons and attribute updates.
 
 import math
 from abc import ABC
-from typing import Dict, Any
+from typing import Any, Dict
 
 from biome.components.handlers.base import AttributeHandler
-
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.events import ComponentEvent
 from shared.enums.reasons import StressReason

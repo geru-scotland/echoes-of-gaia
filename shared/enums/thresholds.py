@@ -16,7 +16,7 @@
 # =============================================================================
 """
 
-from shared.enums.base import EnumBaseStr, EnumBaseFloat
+from shared.enums.base import EnumBaseFloat
 
 
 class VitalThresholds:

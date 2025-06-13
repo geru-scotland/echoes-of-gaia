@@ -25,9 +25,7 @@ Includes metabolism, hunger and thirst rate parameters - supports
 extraction from existing fauna entities for evolutionary processes.
 """
 
-from typing import List, Dict, Any
-
-from deap import creator
+from typing import Any, Dict
 
 from biome.entities.entity import Entity
 from biome.systems.evolution.genes.genes import Genes, extract_common_genes

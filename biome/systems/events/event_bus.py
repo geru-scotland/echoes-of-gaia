@@ -24,7 +24,7 @@ provides global event registration and triggering mechanisms.
 Facilitates system-wide communication through event patterns.
 """
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from shared.events.event_bus import EventBus
 

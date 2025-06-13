@@ -27,9 +27,9 @@ unified access to training hyperparameters and environment configurations.
 
 import os
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 import yaml
-from typing import Dict, Optional, Any
 
 from shared.enums.enums import ReinforcementConfig
 from utils.paths import CONFIG_DIR

@@ -24,8 +24,9 @@ includes JSON serialization support for state data export.
 Defines standard interface for state computation and persistence.
 """
 
-from abc import ABC, abstractmethod
 import json
+from abc import ABC, abstractmethod
+
 
 class StateHandler(ABC):
     def __init__(self):

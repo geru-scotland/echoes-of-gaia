@@ -24,7 +24,7 @@ exposes worldmap manager, evolution registry and entity providers.
 Serves as primary interface for external biome interactions.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 import simpy
 

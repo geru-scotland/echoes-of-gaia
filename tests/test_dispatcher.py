@@ -16,7 +16,9 @@
 ##########################################################################
 """
 import pytest
+
 from simulation.core.systems.events.event_bus import SimulationEventBus
+
 
 @pytest.fixture(autouse=True)
 def clear_dispatcher():

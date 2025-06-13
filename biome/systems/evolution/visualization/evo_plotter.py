@@ -15,10 +15,9 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
 import numpy as np
-import pandas as pd
 from matplotlib import pyplot as plt
 from scipy.stats import stats
 

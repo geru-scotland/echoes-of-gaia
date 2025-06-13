@@ -25,10 +25,10 @@ Supports both BiomeLSTM and BiomeGRU variants - provides specialized weight
 initialization for improved convergence in simulation forecasting tasks.
 """
 
+from typing import Optional, Tuple
+
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from typing import Dict, Any, Tuple, Optional, List
 
 
 class BiomeLSTM(nn.Module):

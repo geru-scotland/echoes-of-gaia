@@ -15,7 +15,8 @@
 #                                                                              #
 # =============================================================================
 """
-from typing import Dict, Optional
+from typing import Optional
+
 from simpy import Environment as simpyEnv
 
 
@@ -32,13 +33,24 @@ class ComponentRegistry:
     def initialize(cls, env: simpyEnv, cleanup_dead_entities: bool = True):
         cls._env = env
         # Importo aqui para evitar dep. circulares. TODO: Revisar.
-        from biome.systems.components.managers.growth_manager import GrowthComponentManager
-        from biome.systems.components.managers.vital_manager import VitalComponentManager
-        from biome.systems.components.managers.autotrophic_nutrition_manager import AutotrophicNutritionComponentManager
-        from biome.systems.components.managers.photo_meta_manager import PhotosyntheticMetabolismComponentManager
-        from biome.systems.components.managers.heterotrophic_nutrition_manager import \
-            HeterotrophicNutritionComponentManager
-        from biome.systems.components.managers.movement_manager import MovementComponentManager
+        from biome.systems.components.managers.autotrophic_nutrition_manager import (
+            AutotrophicNutritionComponentManager,
+        )
+        from biome.systems.components.managers.growth_manager import (
+            GrowthComponentManager,
+        )
+        from biome.systems.components.managers.heterotrophic_nutrition_manager import (
+            HeterotrophicNutritionComponentManager,
+        )
+        from biome.systems.components.managers.movement_manager import (
+            MovementComponentManager,
+        )
+        from biome.systems.components.managers.photo_meta_manager import (
+            PhotosyntheticMetabolismComponentManager,
+        )
+        from biome.systems.components.managers.vital_manager import (
+            VitalComponentManager,
+        )
 
         cls._growth_manager = GrowthComponentManager(env)
         cls._vital_manager = VitalComponentManager(env, cleanup_dead_entities)

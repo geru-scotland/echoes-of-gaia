@@ -16,13 +16,12 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import Dict, List, Tuple, Optional, Union, Set
-import numpy as np
-import pandas as pd
+from typing import Dict, List, Optional, Tuple, Union
+
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.colors import LinearSegmentedColormap
+import numpy as np
 import seaborn as sns
+from matplotlib.colors import LinearSegmentedColormap
 
 from biome.systems.evolution.genes.fauna_genes import FaunaGenes
 from biome.systems.evolution.genes.flora_genes import FloraGenes

@@ -26,16 +26,16 @@ to target entity properties - implements ecological chase dynamics.
 """
 
 from logging import Logger
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional
 
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
 from biome.systems.managers.worldmap_manager import WorldMapManager
 from shared.behaviour_types import EntityID, EntityState
-from shared.enums.enums import EntityType, Direction, DietType
+from shared.enums.enums import DietType, Direction
+from shared.enums.strings import Loggers
 from shared.types import Position
 from utils.loggers import LoggerManager
-from shared.enums.strings import Loggers
 
 
 class PursuitAndFleeBehaviour:

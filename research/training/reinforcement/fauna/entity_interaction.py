@@ -25,25 +25,20 @@ history and calculates movement vectors relative to threats - provides direction
 awareness for entities navigating complex biome environments.
 """
 
-from typing import Dict, List, Tuple, Set, Optional
-
-from biome.entities.entity import Entity
-from biome.entities.fauna import Fauna
-from biome.systems.managers.worldmap_manager import WorldMapManager
-from shared.behaviour_types import EntityID, Position, InteractionResult
-from logging import Logger
-from typing import Dict, List, Optional, Tuple, Set, cast
-
-import numpy as np
 import random
+from logging import Logger
+from typing import List, Optional, Tuple
 
 from biome.entities.entity import Entity
 from biome.entities.fauna import Fauna
-from biome.entities.flora import Flora
 from biome.systems.managers.worldmap_manager import WorldMapManager
-from shared.enums.enums import Direction, EntityType, DietType, TerrainType
+from shared.behaviour_types import (
+    EntityID,
+    InteractionResult,
+    Position,
+)
+from shared.enums.enums import DietType, Direction, EntityType
 from shared.enums.strings import Loggers
-from shared.behaviour_types import EntityID, Position, EntityState, Distance
 from utils.loggers import LoggerManager
 
 

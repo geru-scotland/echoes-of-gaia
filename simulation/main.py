@@ -20,13 +20,15 @@ from logging import Logger
 from threading import Thread
 
 from config.settings import Settings
-from research.training.reinforcement.config.training_config_manager import TrainingConfigManager
+from exceptions.general import global_exception_handler
+from research.training.reinforcement.config.training_config_manager import (
+    TrainingConfigManager,
+)
 from shared.enums.enums import SimulationMode
 from shared.enums.strings import Loggers
 from simulation.api.simulation_api import SimulationAPI
 from simulation.render.manager import RenderManager
 from utils.loggers import LoggerManager
-from exceptions.general import global_exception_handler
 
 sys.excepthook = global_exception_handler
 

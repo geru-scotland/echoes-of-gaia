@@ -25,8 +25,8 @@ Calculates normalized evolutionary slopes and prioritizes adaptations -
 generates structured reports on evolutionary direction and magnitude.
 """
 
-from typing import Dict, List, Any
 from collections import defaultdict
+from typing import Any, Dict, List
 
 import numpy as np
 

@@ -15,11 +15,13 @@
 #                                                                        #
 ##########################################################################
 """
-from enum import Enum
-import pygame
 import random
-from game.theme.colors import Colors
+from enum import Enum
+
+import pygame
+
 from game.systems.scenes.base_scene import Scene
+from game.theme.colors import Colors
 
 
 class EntitySceneState(Enum):

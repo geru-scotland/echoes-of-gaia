@@ -26,11 +26,10 @@ Provides real-time execution control with stepped progression.
 """
 
 import itertools
-import sys
 import time
 import traceback
 from logging import Logger
-from typing import Optional, cast, Tuple, Dict, Any
+from typing import Any, Dict, Optional, Tuple, cast
 
 import simpy
 
@@ -41,11 +40,14 @@ from biome.systems.managers.biome_data_manager import BiomeDataManager
 from config.settings import Settings
 from shared.enums.enums import SimulationMode
 from shared.enums.events import SimulationEvent
+from shared.enums.strings import Loggers, Strings
 from shared.timers import Timers
-from shared.enums.strings import Strings, Loggers
 from simulation.core.bootstrap.bootstrap import Bootstrap
 from simulation.core.bootstrap.context.context import Context
-from simulation.core.bootstrap.context.context_data import BiomeContextData, SimulationContextData
+from simulation.core.bootstrap.context.context_data import (
+    BiomeContextData,
+    SimulationContextData,
+)
 from simulation.core.experiment_path_manager import ExperimentPathManager
 from simulation.core.systems.events.event_bus import SimulationEventBus
 from simulation.core.systems.telemetry.datapoint import Datapoint

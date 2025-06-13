@@ -25,7 +25,7 @@ Integrates with stress system for metabolic rate adjustments - provides
 comprehensive physiological state tracking for fauna survival processes.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 from simpy import Environment as simpyEnv
 

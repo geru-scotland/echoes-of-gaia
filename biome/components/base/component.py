@@ -25,19 +25,17 @@ Provides foundation for modular entity behavior implementation - supports
 lifecycle management and state tracking across component hierarchy.
 """
 
-import math
+from abc import abstractmethod
 from logging import Logger
-from abc import abstractmethod, ABC
-from typing import Optional, Set, Dict, Any
+from typing import Any, Dict, Set
 
 from simpy import Environment as simpyEnv
 
 from biome.systems.events.event_notifier import EventNotifier
 from shared.enums.enums import ComponentType
 from shared.enums.events import ComponentEvent
-from shared.enums.reasons import DormancyReason, StressReason, EnergyGainSource
+from shared.enums.reasons import DormancyReason
 from shared.enums.strings import Loggers
-from shared.enums.thresholds import ClimateThresholds
 from shared.events.handler import EventHandler
 from utils.loggers import LoggerManager
 

@@ -24,7 +24,7 @@ enables decoupled communication between simulation components.
 Manages event listeners and triggers for biome and system events.
 """
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from shared.events.event_bus import EventBus
 

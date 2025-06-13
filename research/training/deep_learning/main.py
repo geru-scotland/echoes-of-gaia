@@ -25,18 +25,12 @@ execution script for deep learning pipeline - reports training outcomes
 and validation metrics after completion.
 """
 
-import os
-import sys
-import logging
-import json
 import argparse
-from pathlib import Path
-from typing import List, Dict, Any
+import logging
 
 from research.training.deep_learning.model_manager import NeuralModelManager
 from shared.enums.strings import Loggers
 from utils.loggers import LoggerManager
-from utils.paths import BASE_DIR
 
 
 def main():

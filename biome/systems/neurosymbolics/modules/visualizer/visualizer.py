@@ -16,15 +16,15 @@
 # =============================================================================
 """
 
+import logging
+import os
 from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Any, Dict
+
 import matplotlib.pyplot as plt
 import networkx as nx
-import os
-from datetime import datetime
 import numpy as np
-from typing import Dict, Any, Optional, List
-import logging
-from pathlib import Path
 
 from shared.enums.strings import Loggers
 

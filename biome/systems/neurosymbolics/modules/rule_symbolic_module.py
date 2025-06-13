@@ -16,17 +16,25 @@
 # =============================================================================
 """
 from logging import Logger
-from typing import Protocol, Dict, Any
+from typing import Any, Dict, Protocol
 
+from shared.enums.enums import (
+    BiodiversityStatus,
+    ClimateAction,
+    ClimateStatus,
+    EcosystemRisk,
+    InterventionPriority,
+    MoistureAction,
+    MoistureStatus,
+    PredatorPreyBalance,
+    RecommendedAction,
+    SpeciesAction,
+    SpeciesStatus,
+    StabilityStatus,
+)
 from shared.enums.strings import Loggers
 from shared.types import Observation, SymbolicFeedback
 from utils.loggers import LoggerManager
-from shared.enums.enums import (
-    SpeciesStatus, SpeciesAction, PredatorPreyBalance, EcosystemRisk,
-    RecommendedAction, BiodiversityStatus, StabilityStatus,
-    InterventionPriority, ClimateStatus, ClimateAction,
-    MoistureStatus, MoistureAction
-)
 
 
 class SymbolicModuleInterface(Protocol):

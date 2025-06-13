@@ -29,8 +29,8 @@ import logging
 from typing import Dict, Optional, Tuple
 
 import pygame
-from shared.enums.enums import DietType
 
+from shared.enums.enums import DietType
 from simulation.visualization.types import Color, EntityData, Point
 
 

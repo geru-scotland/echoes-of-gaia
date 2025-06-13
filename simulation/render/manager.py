@@ -28,6 +28,7 @@ from config.settings import RenderSettings
 from simulation.render.engine import RenderEngine
 from simulation.render.event_handler import RenderEventHandler
 
+
 class RenderManager:
     def __init__(self, settings: RenderSettings):
         self._settings = settings

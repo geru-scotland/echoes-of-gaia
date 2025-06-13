@@ -24,11 +24,10 @@ handles tile map visualization with terrain sprite management.
 Provides component-based architecture for render system extensibility.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
 
-from biome.systems.maps.procedural_maps import MapGenData
 from shared.types import TileMap
-from simulation.render.tiles.manager import TerrainTileManager, TerrainSpritesMapping
+from simulation.render.tiles.manager import TerrainSpritesMapping, TerrainTileManager
 
 
 class RenderComponent:
