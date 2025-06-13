@@ -1,0 +1,90 @@
+sl 5
+
+
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - ==================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - Epoch 250/250 - Time: 2.3s - Train Loss: 0.0102 - Val Loss: 0.0145 - Val RMSE: 0.0661 - ============ MODEL VS BASELINE COMPARISON ============
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - MSE  => Model: 0.0044 | Baseline: 0.0040 | Difference: -0.0003 | Improvement: -8.15%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - RMSE => Model: 0.0661 | Baseline: 0.0635 | Difference: -0.0025 | Improvement: -3.99%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - MAE  => Model: 0.0432 | Baseline: 0.0337 | Difference: -0.0095 | Improvement: -28.14%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - R²   => Model: 0.7066 | Baseline: 0.7106 | Difference: -0.0041
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - ======================================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,824 - deep_learning - INFO - Current LR: 0.000000
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,840 - deep_learning - INFO - Model, normalization stats and configs saved to /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/models/neural/biome.pth
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,841 - deep_learning - INFO - 
+============================== FINAL SUMMARY ==============================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,841 - deep_learning - INFO - Final model MSE: 0.004365
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,841 - deep_learning - INFO - Final baseline MSE: 0.004036
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,841 - deep_learning - INFO - Percentage improvement: -8.15%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,841 - deep_learning - INFO - ❌ MODEL DOES NOT OUTPERFORM BASELINE
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:40,841 - deep_learning - INFO - ========================================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:45,128 - deep_learning - INFO - All metrics plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-084440_h128_l2_all_metrics.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:45,545 - deep_learning - INFO - Loss plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-084440_h128_l2_loss.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:45,940 - deep_learning - INFO - MSE plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-084440_h128_l2_mse.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:46,367 - deep_learning - INFO - MAE plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-084440_h128_l2_mae.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:46,786 - deep_learning - INFO - R² plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-084440_h128_l2_r².png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:46,810 - deep_learning - INFO - Training completed
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:46,810 - deep_learning - INFO - Final training loss: 0.0102
+[DEEP_LEARNING][Main thread] 2025-05-22 08:44:46,810 - deep_learning - INFO - Final validation loss: 0.0145
+
+
+
+
+sl 20
+
+
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - ==================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - Epoch 250/250 - Time: 0.5s - Train Loss: 0.0095 - Val Loss: 0.0108 - Val RMSE: 0.0536 - ============ MODEL VS BASELINE COMPARISON ============
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - MSE  => Model: 0.0029 | Baseline: 0.0039 | Difference: 0.0010 | Improvement: 25.87%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - RMSE => Model: 0.0536 | Baseline: 0.0623 | Difference: 0.0087 | Improvement: 13.90%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - MAE  => Model: 0.0329 | Baseline: 0.0331 | Difference: 0.0002 | Improvement: 0.51%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - R²   => Model: 0.7943 | Baseline: 0.7135 | Difference: 0.0808
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - ======================================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:07,986 - deep_learning - INFO - Current LR: 0.000000
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:08,003 - deep_learning - INFO - Model, normalization stats and configs saved to /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/models/neural/biome.pth
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:08,003 - deep_learning - INFO - 
+============================== FINAL SUMMARY ==============================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:08,003 - deep_learning - INFO - Final model MSE: 0.002878
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:08,003 - deep_learning - INFO - Final baseline MSE: 0.003883
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:08,003 - deep_learning - INFO - Percentage improvement: 25.87%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:08,003 - deep_learning - INFO - ✅ MODEL OUTPERFORMS BASELINE
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:08,003 - deep_learning - INFO - ========================================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:12,219 - deep_learning - INFO - All metrics plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-083308_h128_l2_all_metrics.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:12,636 - deep_learning - INFO - Loss plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-083308_h128_l2_loss.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:13,035 - deep_learning - INFO - MSE plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-083308_h128_l2_mse.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:13,442 - deep_learning - INFO - MAE plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-083308_h128_l2_mae.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:13,857 - deep_learning - INFO - R² plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-083308_h128_l2_r².png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:13,879 - deep_learning - INFO - Training completed
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:13,879 - deep_learning - INFO - Final training loss: 0.0095
+[DEEP_LEARNING][Main thread] 2025-05-22 08:33:13,879 - deep_learning - INFO - Final validation loss: 0.0108
+
+
+
+
+
+sl 30
+
+
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,669 - deep_learning - INFO - ==================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,669 - deep_learning - INFO - Epoch 250/250 - Time: 0.3s - Train Loss: 0.0098 - Val Loss: 0.0113 - Val RMSE: 0.0544 - ============ MODEL VS BASELINE COMPARISON ============
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,669 - deep_learning - INFO - MSE  => Model: 0.0030 | Baseline: 0.0038 | Difference: 0.0008 | Improvement: 21.87%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,669 - deep_learning - INFO - RMSE => Model: 0.0544 | Baseline: 0.0616 | Difference: 0.0072 | Improvement: 11.61%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,669 - deep_learning - INFO - MAE  => Model: 0.0344 | Baseline: 0.0336 | Difference: -0.0008 | Improvement: -2.46%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,669 - deep_learning - INFO - R²   => Model: 0.7774 | Baseline: 0.7124 | Difference: 0.0650
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,670 - deep_learning - INFO - ======================================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,670 - deep_learning - INFO - Current LR: 0.000000
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,682 - deep_learning - INFO - Model, normalization stats and configs saved to /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/models/neural/biome.pth
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,682 - deep_learning - INFO - 
+============================== FINAL SUMMARY ==============================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,682 - deep_learning - INFO - Final model MSE: 0.002964
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,683 - deep_learning - INFO - Final baseline MSE: 0.003794
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,683 - deep_learning - INFO - Percentage improvement: 21.87%
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,683 - deep_learning - INFO - ✅ MODEL OUTPERFORMS BASELINE
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:22,683 - deep_learning - INFO - ========================================================================
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:26,816 - deep_learning - INFO - All metrics plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-082922_h128_l2_all_metrics.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:27,395 - deep_learning - INFO - Loss plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-082922_h128_l2_loss.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:27,800 - deep_learning - INFO - MSE plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-082922_h128_l2_mse.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:28,209 - deep_learning - INFO - MAE plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-082922_h128_l2_mae.png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:28,632 - deep_learning - INFO - R² plot saved to: /home/basajaun/workspace/university/TFG/echoes_of_gaia/research/plots/lstm/lstm_training_20250522-082922_h128_l2_r².png
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:28,653 - deep_learning - INFO - Training completed
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:28,653 - deep_learning - INFO - Final training loss: 0.0098
+[DEEP_LEARNING][Main thread] 2025-05-22 08:29:28,653 - deep_learning - INFO - Final validation loss: 0.0113
