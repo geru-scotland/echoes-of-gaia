@@ -212,7 +212,7 @@ class FaunaEnvironment(gym.Env):
         observation = self._fauna_adapter.get_observation()
         target: Entity = self._fauna_adapter.get_target()
 
-        if not target.is_alive():
+        if target and not target.is_alive():
             self._logger.error("TERMINATING EPISODE!!")
             self._fauna_adapter.finish_training_session()
             terminated = True
