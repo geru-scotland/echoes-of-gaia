@@ -15,6 +15,7 @@
 #                                                                              #
 # =============================================================================
 """
+import math
 
 """
 CNN-based feature extractor for processing environmental observation spaces.
@@ -64,21 +65,33 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
 
         h, w = local_map_space.shape
 
-        # TODO: Probar a poner una capa convolucional más. Jugar con los pasos y el padding
-        # NOTA: Ojo, si agrego más pooling, que no se me pase el modificar h_pooled y w_pooled!
+        in_channels = terrain_embedding_dim + 7
+
+        # SB3 utiliza padding 0 con NatureCNN yo 2 y 1 por temas de tamaño de FOV
         self.cnn = nn.Sequential(
-            nn.Conv2d(terrain_embedding_dim + 7, 32, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels, 32, kernel_size=8, stride=4, padding=2),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Flatten(),
         )
-        h_pooled = h // 2
-        w_pooled = w // 2
-        cnn_out_size = 64 * h_pooled * w_pooled
+
+        def conv_out(size, k, s, p=0):
+            return (size + 2 * p - k) // s + 1
+
+        # Por capa los calculo, fórmula de AARN, en puntes
+        h1 = conv_out(h, 8, 4, p=2)
+        w1 = conv_out(w, 8, 4, p=2)
+
+        h2 = conv_out(h1, 4, 2, p=1)
+        w2 = conv_out(w1, 4, 2, p=1)
+
+        h3 = conv_out(h2, 3, 1, p=1)
+        w3 = conv_out(w2, 3, 1, p=1)
+
+        cnn_out_size = 64 * h3 * w3
 
         biome_embedd_flat_size = biome_embedding_dim * num_biome_types
         diet_embedd_flat_size = diet_embedding_dim * num_diet_types  # Lo mismo, como no puedo aplicar convoluciones, al no ser espacial, concanteno
@@ -105,12 +118,30 @@ class CNNFeaturesExtractor(BaseFeaturesExtractor):
             nn.ReLU(),
         )
 
-        # self.print_terrain_embeddings()
-        # self.print_biome_embeddings()
+        self._initialize_weights()
 
-    def forward(self, observations) -> th.Tensor:
+    def _initialize_weights(self):
+        gain = nn.init.calculate_gain("relu")
 
-        # Para aclararme (Batch, width, height)
+        for module in self.modules():
+            if isinstance(module, nn.Conv2d):
+                nn.init.orthogonal_(module.weight, gain=gain)
+                if module.bias is not None:
+                    nn.init.constant_(module.bias, 0)
+
+            elif isinstance(module, nn.Linear):
+                nn.init.orthogonal_(module.weight, gain=gain)
+                if module.bias is not None:
+                    nn.init.constant_(module.bias, 0)
+
+            elif isinstance(module, nn.Embedding):
+                bound = 1.0 / math.sqrt(module.embedding_dim)
+                nn.init.uniform_(module.weight, -bound, bound)
+                if module.padding_idx is not None:
+                    with torch.no_grad():
+                        module.weight[module.padding_idx].fill_(0)
+
+    def forward(self, observations) -> torch.Tensor:
         biome_index = observations["biome_type"].long()
         terrain_indices = observations["terrain_map"].long()
         diet_index = observations["diet_type"].long()
