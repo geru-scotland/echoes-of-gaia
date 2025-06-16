@@ -157,6 +157,7 @@ class FaunaEnvironment(gym.Env):
         self._max_episode_steps: int = 4000
         self._finished: bool = False
         self._fauna_adapter: FaunaSimulationAdapter = None
+        self._failed_attempts_consecutive: int = 0
 
         atexit.register(self.cleanup)
 
@@ -168,6 +169,7 @@ class FaunaEnvironment(gym.Env):
         super().reset(seed=seed, options=options)
         self._episode_step = 0
         self._episode_number += 1
+        self._finished = False
 
         def format_boxed_title(title: str, width: int = 60, border: str = "#") -> str:
             line = border * width
@@ -183,13 +185,34 @@ class FaunaEnvironment(gym.Env):
         while not self._finished and attempt < max_attempts:
             self._fauna_adapter = FaunaSimulationAdapter(self._fov_width, self._fov_height, self._fov_center)
             correct_init: bool = self._fauna_adapter.initialize()
-            if correct_init:
+            if correct_init and self._fauna_adapter.is_valid():
                 observation = self._fauna_adapter.get_observation()
+                self._failed_attempts_consecutive = 0
                 break
+
+            if self._fauna_adapter:
+                self._fauna_adapter.finish_training_session()
+                self._fauna_adapter = None
+
             attempt += 1
             self._logger.warning("Couldn't acquire a target. Retrying...")
         else:
-            self._logger.error(f"Target acquisition failed {max_attempts} times. Aborting")
+            self._failed_attempts_consecutive += 1
+            self._logger.error(
+                f"Target acquisition failed {max_attempts} times. Episode will be terminated (consecutive failures: {self._failed_attempts_consecutive})")
+
+            if self._fauna_adapter:
+                self._fauna_adapter.finish_training_session()
+                self._fauna_adapter = None
+
+            if self._failed_attempts_consecutive >= 3:
+                import time
+                delay_seconds = min(2, self._failed_attempts_consecutive - 2)
+                self._logger.warning(f"Too many consecutive failures, adding {delay_seconds}s delay")
+                time.sleep(delay_seconds)
+
+            self._finished = True
+            observation = self._get_default_observation()
 
         return observation, {}
 
@@ -203,6 +226,11 @@ class FaunaEnvironment(gym.Env):
             self._logger.info("\n" + line + f"\n{step_msg.center(60)}\n" + line + "\n")
 
         self._logger.debug(f"Received action: {action}")
+
+        if not self._fauna_adapter or not self._fauna_adapter.is_valid() or self._finished:
+            self._logger.warning("Invalid fauna adapter or episode finished, terminating episode")
+            return self._get_default_observation(), 0.0, True, False, {"reason": "invalid_adapter_or_finished"}
+
         self._fauna_adapter.step_environment(action)
 
         info = {}

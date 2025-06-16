@@ -233,7 +233,11 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         self._simulation_api.step(time_delta)
 
     def compute_reward(self, action: FaunaAction):
-        if not self._target or not self._target.is_alive():
+        if not self._target:
+            self._logger.warning("Target is None in compute_reward, returning default penalty")
+            return 0
+
+        if not self._target.is_alive():
             time_lived_ratio: float = 1 - (
                     self._target.get_age_after_death() / (self._target.lifespan * Timers.Calendar.REAL_YEAR))
             penalization: float = -15 * time_lived_ratio
@@ -498,7 +502,8 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         thirst_level = 0.0
         energy_reserves = 0.0
         biome_type_idx = list(BiomeType).index(self._biome.get_biome_type())
-        diet_type_idx = list(DietType).index(self._target.diet_type)
+        diet_type_idx = list(DietType).index(self._target.diet_type) if self._target else list(DietType).index(
+            DietType.HERBIVORE)
 
         vitality = 0.0
         stress_level = 0.0
@@ -560,10 +565,35 @@ class FaunaSimulationAdapter(EnvironmentAdapter):
         }
 
     def finish_training_session(self):
-        if self._simulation_api:
-            self._simulation_api.finish_training()
+        self._logger.debug("Finishing training session and cleaning up resources...")
 
-        TrainingTargetManager.set_training_mode(SimulationMode.TRAINING_FINISHED)
+        try:
+            if self._simulation_api:
+                self._simulation_api.finish_training()
+                self._simulation_api = None
+        except Exception as e:
+            self._logger.warning(f"Error finishing simulation API: {e}")
+
+        try:
+            TrainingTargetManager.set_training_mode(SimulationMode.TRAINING_FINISHED)
+            TrainingTargetManager.reset()
+        except Exception as e:
+            self._logger.warning(f"Error resetting TrainingTargetManager: {e}")
+
+        self._target = None
+        self._biome = None
+        self._worldmap_manager = None
+        self._foraging_behaviour = None
+        self._entity_behaviour_system = None
+        self._local_interaction_simulator = None
+
+        self._visited_positions.clear()
+        self._previous_states.clear()
+
+        self._logger.debug("Training session cleanup completed")
 
     def get_target(self) -> Entity:
         return self._target
+
+    def is_valid(self) -> bool:
+        return self._target is not None and self._simulation_api is not None
