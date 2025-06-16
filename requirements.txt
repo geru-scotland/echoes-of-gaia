@@ -52,7 +52,7 @@ pandas==2.2.3
 perlin-noise==1.13
 pillow==11.1.0
 pluggy==1.5.0
-protobuf==5.29.3
+protobuf==5.29.5
 psutil==7.0.0
 pydantic==2.3.0
 pydantic_core==2.6.3
