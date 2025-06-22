@@ -10,7 +10,7 @@
 </div>
 
 
-[Echoes of GaIA](https://geru-scotland.github.io/echoes-of-gaia-web) es un framework híbrido que hace de simulador de
+[Echoes of GaIA](https://www.echoes-of-gaia.com) es un framework híbrido que hace de simulador de
 biomas artificiales; modela la evolución y dinámica de
 entornos naturales y lo integra con un sistema multiagente. Por defecto, existen biomas como el tropical, desierto,
 taiga, sabana y tundra, pero esto se puede extender fácilmente. Las especies de flora y fauna evolucionan sus genes
@@ -55,8 +55,7 @@ sobre dinámicas ecológicas complejas y servir como base para proyectos de simu
 
 - [**Memoria técnica**](https://geru-scotland.github.io/echoes-of-gaia-web/docs/TFG_Aingeru_memoria_Echoes_of_GaIA.pdf)
 
-- [**Fundamentos, arquitectura y sistemas
-  **](https://geru-scotland.github.io/echoes-of-gaia-web/docs/TFG_Aingeru_anexo_fundamentos_arquitectura_sistemas.pdf)
+- [**Fundamentos, arquitectura y sistemas**](https://geru-scotland.github.io/echoes-of-gaia-web/docs/TFG_Aingeru_anexo_fundamentos_arquitectura_sistemas.pdf)
 
 ## Scripts principales
 
