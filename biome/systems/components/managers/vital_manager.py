@@ -226,6 +226,21 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
 
             new_aging_rates = np.zeros_like(normalized_stresses)
 
+            # sistema que le he pasado a linealg
+            # M = np.array([
+            #     [1,    0,        0,           0,         0,    0,        0,         0],   # f1(0) = 1
+            #     [0,    1,        0,           0,         0,    0,        0,         0],   # f1'(0) = 0
+            #     [1,  0.3,   0.3**2,     0.3**3,     0,    0,        0,         0],        # f1(0.3) = 0.85
+            #     [0,    1,   2*0.3,   3*0.3**2,     0,    0,        0,         0],         # f1'(0.3) = 0
+            #     [0,    0,        0,           0,     1,  0.3,   0.3**2,   0.3**3],        # f2(0.3) = 0.85
+            #     [0,    0,        0,           0,     0,    1,   2*0.3,   3*0.3**2],       # f2'(0.3) = 0
+            #     [0,    0,        0,           0,     1,    1,        1,         1],       # f2(1) = 1.5
+            #     [0,    0,        0,           0,     0,    1,        2,         3]        # f2'(1) = 0
+            # ])
+            #
+            # y = np.array([1, 0, 0.85, 0, 0.85, 0, 1.5, 0])
+            
+            # GRÁFICA: https://echoes-of-gaia.com/images/figures/hormesis_corregida.png
             if np.any(low_stress_mask):
                 low_stress = normalized_stresses[low_stress_mask]
                 new_aging_rates[low_stress_mask] = (
