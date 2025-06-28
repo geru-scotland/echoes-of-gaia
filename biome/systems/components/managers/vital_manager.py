@@ -229,15 +229,19 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
             if np.any(low_stress_mask):
                 low_stress = normalized_stresses[low_stress_mask]
                 new_aging_rates[low_stress_mask] = (
-                        1 - 11.25 * (low_stress ** 2) + 37.5 * (low_stress ** 3)
+                        1.0
+                        + 0.0 * low_stress
+                        - 5.0 * (low_stress ** 2)
+                        + 11.111111111111109 * (low_stress ** 3)
                 )
 
             if np.any(high_stress_mask):
                 high_stress = normalized_stresses[high_stress_mask]
                 new_aging_rates[high_stress_mask] = (
-                        0.9921875 - 1.5234375 * high_stress +
-                        4.5703125 * (high_stress ** 2) -
-                        2.5390625 * (high_stress ** 3)
+                        1.3104956268221577
+                        - 3.4110787172011685 * high_stress
+                        + 7.390670553935865 * (high_stress ** 2)
+                        - 3.790087463556854 * (high_stress ** 3)
                 )
 
             for i, component in enumerate(active_components):
