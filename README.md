@@ -30,6 +30,9 @@ configuraciones de biomas, incluir nuevos componentes, especies... e incluso imp
 idea es que se pueda jugar con ello e incluir lo que se desee, para que gracias al simulador se puedan hacer estudios
 sobre dinámicas ecológicas complejas y servir como base para proyectos de simulación ambiental más especializados.
 
+## Overview con DeepWiki
+DeepWiki es una herramienta que he descubierto hace poco; muy buena para hacer análisis arquitectural y del flujo de los sistemas de proyectos. [Análisis de Echoes of Gaia](https://deepwiki.com/geru-scotland/echoes-of-gaia/).
+
 ## Índice
 
 1. [Links](#links)
