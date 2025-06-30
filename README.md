@@ -30,6 +30,14 @@ configuraciones de biomas, incluir nuevos componentes, especies... e incluso imp
 idea es que se pueda jugar con ello e incluir lo que se desee, para que gracias al simulador se puedan hacer estudios
 sobre dinámicas ecológicas complejas y servir como base para proyectos de simulación ambiental más especializados.
 
+## Erratas en memoria técnica
+He detectado un par de erratas en la memoria técnica tras la entrega en ADDI. Por un lado, en el tema de modelado computacional de biomas - componente vital - función hormética por tramos; tanto los coeficientes en la función como la gráfica no correspondía, hice muchas pruebas y al parecer mezclé resultados. Ahora está corregido:
+- [https://github.com/geru-scotland/echoes-of-gaia/commit/4045dc3aa98b7f7e0053f923f42207f34e27a429](https://github.com/geru-scotland/echoes-of-gaia/commit/4045dc3aa98b7f7e0053f923f42207f34e27a429)
+- [https://github.com/geru-scotland/echoes-of-gaia/commit/e4cc66a04cb4135199dd5f295a022e4c608d52a2](https://github.com/geru-scotland/echoes-of-gaia/commit/e4cc66a04cb4135199dd5f295a022e4c608d52a2)
+- Gráfica: [https://echoes-of-gaia.com/images/figures/hormesis_corregida.png](https://echoes-of-gaia.com/images/figures/hormesis_corregida.png)
+
+También, en el componente de nutrición autotrofa, en el cálculo de la tasa efectiva de hambre - ha de resta y no suma, ya que lo que interesa es modelar la noción de cómo un incremento de estrés, resulta en una menor eficiencia.
+
 ## Overview con DeepWiki
 DeepWiki es una herramienta que he descubierto hace poco; muy buena para hacer análisis arquitectural y del flujo de los sistemas de proyectos. [Análisis de Echoes of Gaia](https://deepwiki.com/geru-scotland/echoes-of-gaia/).
 
