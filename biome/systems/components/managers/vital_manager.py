@@ -226,18 +226,37 @@ class VitalComponentManager(BaseComponentManager[VitalComponent]):
 
             new_aging_rates = np.zeros_like(normalized_stresses)
 
+            # sistema que le he pasado a linealg
+            # M = np.array([
+            #     [1,    0,        0,           0,         0,    0,        0,         0],   # f1(0) = 1
+            #     [0,    1,        0,           0,         0,    0,        0,         0],   # f1'(0) = 0
+            #     [1,  0.3,   0.3**2,     0.3**3,     0,    0,        0,         0],        # f1(0.3) = 0.85
+            #     [0,    1,   2*0.3,   3*0.3**2,     0,    0,        0,         0],         # f1'(0.3) = 0
+            #     [0,    0,        0,           0,     1,  0.3,   0.3**2,   0.3**3],        # f2(0.3) = 0.85
+            #     [0,    0,        0,           0,     0,    1,   2*0.3,   3*0.3**2],       # f2'(0.3) = 0
+            #     [0,    0,        0,           0,     1,    1,        1,         1],       # f2(1) = 1.5
+            #     [0,    0,        0,           0,     0,    1,        2,         3]        # f2'(1) = 0
+            # ])
+            #
+            # y = np.array([1, 0, 0.85, 0, 0.85, 0, 1.5, 0])
+            
+            # GRÁFICA: https://echoes-of-gaia.com/images/figures/hormesis_corregida.png
             if np.any(low_stress_mask):
                 low_stress = normalized_stresses[low_stress_mask]
                 new_aging_rates[low_stress_mask] = (
-                        1 - 11.25 * (low_stress ** 2) + 37.5 * (low_stress ** 3)
+                        1.0
+                        + 0.0 * low_stress
+                        - 5.0 * (low_stress ** 2)
+                        + 11.111111111111109 * (low_stress ** 3)
                 )
 
             if np.any(high_stress_mask):
                 high_stress = normalized_stresses[high_stress_mask]
                 new_aging_rates[high_stress_mask] = (
-                        0.9921875 - 1.5234375 * high_stress +
-                        4.5703125 * (high_stress ** 2) -
-                        2.5390625 * (high_stress ** 3)
+                        1.3104956268221577
+                        - 3.4110787172011685 * high_stress
+                        + 7.390670553935865 * (high_stress ** 2)
+                        - 3.790087463556854 * (high_stress ** 3)
                 )
 
             for i, component in enumerate(active_components):
