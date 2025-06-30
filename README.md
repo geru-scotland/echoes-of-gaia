@@ -35,8 +35,10 @@ He detectado un par de erratas en la memoria técnica tras la entrega en ADDI. P
 - [https://github.com/geru-scotland/echoes-of-gaia/commit/4045dc3aa98b7f7e0053f923f42207f34e27a429](https://github.com/geru-scotland/echoes-of-gaia/commit/4045dc3aa98b7f7e0053f923f42207f34e27a429)
 - [https://github.com/geru-scotland/echoes-of-gaia/commit/e4cc66a04cb4135199dd5f295a022e4c608d52a2](https://github.com/geru-scotland/echoes-of-gaia/commit/e4cc66a04cb4135199dd5f295a022e4c608d52a2)
 - Gráfica: [https://echoes-of-gaia.com/images/figures/hormesis_corregida.png](https://echoes-of-gaia.com/images/figures/hormesis_corregida.png)
+- Cambios en memoria: [https://echoes-of-gaia.com/docs/TFG_Aingeru_memoria_Echoes_of_GaIA.pdf#subsubsection.2.4.1.3](https://echoes-of-gaia.com/docs/TFG_Aingeru_memoria_Echoes_of_GaIA.pdf#subsubsection.2.4.1.3)
 
-También, en el componente de nutrición autotrofa, en el cálculo de la tasa efectiva de hambre - ha de resta y no suma, ya que lo que interesa es modelar la noción de cómo un incremento de estrés, resulta en una menor eficiencia.
+También, en el componente de nutrición autotrofa, en el cálculo de la tasa efectiva de hambre - estaba por error como factor en el cálculo de la ganancia energética, cuando esa tasa efectiva es un factor de decay. Ahora está corregido y hace que se requiera de una mejor eficiencia metabólica (la cual se deteriora con el estrés acumulado). Ver cambios actualizados en memoria téncnica:
+- [https://echoes-of-gaia.com/docs/TFG_Aingeru_memoria_Echoes_of_GaIA.pdf#subsubsection.2.4.4.1](https://echoes-of-gaia.com/docs/TFG_Aingeru_memoria_Echoes_of_GaIA.pdf#subsubsection.2.4.4.1)
 
 ## Overview con DeepWiki
 DeepWiki es una herramienta que he descubierto hace poco; muy buena para hacer análisis arquitectural y del flujo de los sistemas de proyectos. [Análisis de Echoes of Gaia](https://deepwiki.com/geru-scotland/echoes-of-gaia/).
