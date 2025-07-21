@@ -1468,6 +1468,11 @@ from(bucket: "echoes_of_gaia")
 
 You’ll see metrics like:
 
+<p align="center">
+  <img src="images/grafana1.png" alt="Descripción" width="800" />
+  <img src="images/grafana2.png" alt="Descripción" width="800" />
+</p>
+
 ### Pull Requests e
 
 To contribute:
