@@ -701,8 +701,8 @@ handlers...etc
 ### Soporte para InfluxDB y Grafana
 
 Para desarrollo local, puedes levantar un[ contenedor docker de InfluxDB](https://hub.docker.com/_/influxdb) o
-[instalarlo directamente](https://docs.influxdata.com/influxdb3/core/). Crea un bucket para mediciones y las
-credenciales, las puedes configurar en un `.env`:
+[instalarlo directamente](https://docs.influxdata.com/influxdb3/core/). Crea un bucket para mediciones y lasP
+credenciales, las puedes configurar en el`.env` del root del proyecto (recuerda poner a `true` los `datapoints` en `config/simulation.yaml`):
 
 ```env
 INFLUXDB_URL=http://localhost:8086
@@ -1420,7 +1420,7 @@ base classes. Feel free to implement new features, handlers, etc.
 
 For local development, you can spin up an [InfluxDB Docker container](https://hub.docker.com/_/influxdb)
 or [install it directly](https://docs.influxdata.com/influxdb3/core/). Create a bucket for measurements and credentials,
-which you can configure in a `.env` file:
+which you can configure in the `.env` file from the project's root directory (remember to also set to `true` the `datapoints` in `config/simulation.yaml`):
 
 ```env
 INFLUXDB_URL=http://localhost:8086
